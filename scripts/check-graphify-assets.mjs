@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const target = process.env.GRAPHIFY_TARGET_DIR ?? "docs/assets/graphify";
@@ -42,6 +43,13 @@ for (const [name, schema] of [["graph", graphSchema], ["summary", summarySchema]
 }
 if (summary.nodes !== nodes.length) failures.push(`summary.nodes ${summary.nodes} != graph nodes ${nodes.length}`);
 if (summary.edges !== links.length) failures.push(`summary.edges ${summary.edges} != graph edges ${links.length}`);
+const repositoryCommit = currentRepositoryCommit();
+if (graph.built_at_commit !== summary.builtAtCommit) {
+  failures.push("graph.json and summary.json do not identify the same build commit");
+}
+if (repositoryCommit && summary.builtAtCommit !== repositoryCommit) {
+  failures.push(`published graph build commit ${summary.builtAtCommit ?? "null"} != repository HEAD ${repositoryCommit}`);
+}
 
 const graph2d = fs.readFileSync(path.join(root, target, "graph.html"), "utf8");
 if (!graph2d.includes("RAW_NODES") && !graph2d.includes("Graphify unavailable")) {
@@ -122,6 +130,16 @@ if (failures.length) {
 }
 
 console.log(`Graphify publication artifacts present: ${nodes.length} nodes, ${links.length} edges, 2D and 3D views enabled.`);
+
+function currentRepositoryCommit() {
+  const result = spawnSync("git", ["rev-parse", "HEAD"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
+  if (result.status !== 0) return null;
+  return result.stdout.trim() || null;
+}
 
 function documentSourceFiles() {
   return [...new Set(nodes.map((node) => node.source_file).filter(Boolean))];

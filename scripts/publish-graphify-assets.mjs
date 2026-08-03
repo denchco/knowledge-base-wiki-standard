@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const source = path.join(root, process.env.GRAPHIFY_SOURCE_DIR ?? "graphify-out");
@@ -10,6 +11,7 @@ const graphJsonTarget = path.join(target, "graph.json");
 const graph3dTarget = path.join(target, "graph-3d.html");
 const summaryTarget = path.join(target, "summary.json");
 const publicationSchemaVersion = "1.0";
+const repositoryCommit = currentRepositoryCommit();
 
 const title = process.env.GRAPHIFY_3D_TITLE ?? "DenchCo Knowledge Base Wiki Standard — 3D Map";
 const primary = process.env.GRAPHIFY_PRIMARY ?? "#0b7285";
@@ -120,7 +122,11 @@ function enhanceGraph(graph) {
 
   if (!baseNodes.length) {
     return {
-      graph,
+      graph: {
+        ...graph,
+        publicationSchemaVersion,
+        built_at_commit: repositoryCommit ?? graph.built_at_commit ?? null,
+      },
       htmlNodes: [],
       htmlEdges: [],
       interconnections: emptyInterconnectionSummary(),
@@ -168,6 +174,7 @@ function enhanceGraph(graph) {
     graph: {
       ...graph,
       publicationSchemaVersion,
+      built_at_commit: repositoryCommit ?? graph.built_at_commit ?? null,
       nodes: enhancedNodes,
       links: enhancedEdges.map(graphLinkFromHtmlEdge),
     },
@@ -186,6 +193,16 @@ function enhanceGraph(graph) {
       fileReferenceEdgeCount: fileReferenceEdgesList.length,
     },
   };
+}
+
+function currentRepositoryCommit() {
+  const result = spawnSync("git", ["rev-parse", "HEAD"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
+  if (result.status !== 0) return null;
+  return result.stdout.trim() || null;
 }
 
 function emptyInterconnectionSummary() {
