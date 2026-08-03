@@ -2,11 +2,12 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 const required = [
-  "README.md", "AGENTS.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml",
+  "README.md", "LICENSE", "AGENTS.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml",
   "GOVERNANCE.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "CHANGELOG.md",
   "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md",
   "docs/sources.md", "docs/evidence-matrix.md", "docs/validation-queue.md",
   "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "prompts/instantiate-wiki.md",
+  "starter/README.md", "starter/starter.yaml", "starter/templates/wiki-standard.yaml.tmpl",
   "docs/conformance/index.md", "docs/conformance/dogfood/comparison.md",
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
@@ -14,6 +15,7 @@ const required = [
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
+  "schema/documentation-sync-snapshot-v1.json",
   "profiles/portable-core.yaml",
   "profiles/standard-production.yaml", "scripts/sync-runtime-assets.mjs",
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
@@ -21,7 +23,10 @@ const required = [
   "scripts/check-visual-shape-contract.mjs", "scripts/check-runtime-browser-contract.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
-  "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/verify.mjs"
+  "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs",
+  "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/verify.mjs",
+  "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
+  "sync/documentation-sync-contract-v1.json"
 ];
 
 const failures = [];
@@ -36,8 +41,20 @@ const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
 for (const [name, text] of [["AGENTS.md", agents], ["prompt", prompt]]) {
   if (!text.includes("Question 1 of N")) failures.push(`${name} lacks sequential question protocol`);
 }
+for (const boundary of [
+  "starter/starter.yaml",
+  "immutable release tag or commit",
+  "Never recursively copy the standard root",
+  "Target Wiki URL",
+  "Target deployment",
+]) {
+  if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
+}
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+const licence = readFileSync("LICENSE", "utf8");
+if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failures.push("LICENSE must identify MIT and copyright Andrew Dench");
+if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);
 const exactNodePins = {
   "@google/design.md": "0.4.0",
   "@playwright/test": "1.62.1",
@@ -58,6 +75,7 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const lockRoot = packageLock.packages?.[""] ?? {};
 if (packageLock.version !== pkg.version || lockRoot.version !== pkg.version) failures.push("package-lock candidate version does not match package.json");
 if (lockRoot.engines?.node !== pkg.engines.node) failures.push("package-lock Node engine does not match package.json");
+if (lockRoot.license !== pkg.license) failures.push("package-lock licence does not match package.json");
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
@@ -66,11 +84,27 @@ for (const script of ["prepare:runtime", "graph:update", "graph:publish", "check
   if (!pkg.scripts?.[script]) failures.push(`missing executable script ${script}`);
 }
 if (!pkg.scripts?.["conformance:full-report"]) failures.push("missing full-profile report command");
+if (pkg.scripts?.["verify:workspace"] !== "npm run verify && npm run sync:documentation:check") failures.push("verify:workspace must finish with the real sibling documentation sync check");
+for (const script of ["sync:documentation:check", "sync:documentation:apply", "sync:documentation:test"]) {
+  if (!pkg.scripts?.[script]) failures.push(`missing documentation synchronization command ${script}`);
+}
+if (!pkg.scripts?.["conformance:test"]?.includes("sync-documentation-snapshot.test.mjs")) {
+  failures.push("conformance:test does not exercise documentation synchronization safety");
+}
+if (!pkg.scripts?.["conformance:test"]?.includes("html-script-json.test.mjs")) {
+  failures.push("conformance:test does not exercise script-safe graph JSON serialization");
+}
 if (!pkg.scripts?.check?.includes("check:visual-shape")) failures.push("check does not exercise check:visual-shape");
 if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("check does not exercise Draft 2020-12 artifact validation");
 if (!pkg.scripts?.check?.includes("check:provenance")) failures.push("check does not exercise the explicit provenance mode");
 if (!pkg.scripts?.check?.includes("audit:node") || !pkg.scripts?.check?.includes("audit:python")) failures.push("check does not exercise both locked dependency audits");
 if (pkg.scripts?.verify !== "node scripts/verify.mjs") failures.push("verify must use the mutation-safe orchestrator");
+
+const documentationSyncContract = JSON.parse(readFileSync("sync/documentation-sync-contract-v1.json", "utf8"));
+const documentationAllowlist = new Set(documentationSyncContract.allowlist ?? []);
+for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conformance", "prompts", "starter", "sync"], /./)) {
+  if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits canonical path ${file}`);
+}
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
 for (const gate of ["build", "check", "check:graphify", "check:browser"]) {
   if (!verifyOrchestrator.includes(`"${gate}"`)) failures.push(`verify orchestrator does not exercise ${gate}`);
@@ -80,6 +114,7 @@ const pyproject = readFileSync("pyproject.toml", "utf8");
 for (const pin of ["zensical==0.0.52", "graphifyy==0.9.32", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
+if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
 
 const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
 for (const pin of [
@@ -95,7 +130,7 @@ for (const pin of [
 const schema = JSON.parse(readFileSync("schema/manifest-v1.json", "utf8"));
 if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") failures.push("manifest schema dialect is not Draft 2020-12");
 
-for (const file of sourceFiles(["docs", "knowledge", "prompts"])) {
+for (const file of sourceFiles(["docs", "knowledge", "prompts", "starter"])) {
   const source = readFileSync(file, "utf8");
   if (/(?:\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/|[A-Za-z]:\\Users\\)/.test(source)) {
     failures.push(`${file} contains a machine-specific user path`);
@@ -109,7 +144,7 @@ if (failures.length) {
 
 console.log(`Standard checks passed: ${required.length} canonical roles, stable IDs, prompt protocol, schema dialect, and dependency pins.`);
 
-function sourceFiles(roots) {
+function sourceFiles(roots, filePattern = /\.(?:json|md|toml|ya?ml)$/i) {
   const found = [];
   for (const root of roots) visit(root);
   return found;
@@ -119,7 +154,7 @@ function sourceFiles(roots) {
       const child = path.join(entryPath, entry.name);
       if (entry.isDirectory()) {
         if (!["assets"].includes(entry.name)) visit(child);
-      } else if (/\.(?:json|md|toml|ya?ml)$/i.test(entry.name)) {
+      } else if (filePattern.test(entry.name)) {
         found.push(child);
       }
     }

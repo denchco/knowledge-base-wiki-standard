@@ -12,6 +12,7 @@ status: draft
 A conformance claim MUST state:
 
 - standard version and immutable revision where released;
+- canonical standard source, pinned independently of the explanatory documentation site;
 - selected profile;
 - role-to-path mappings;
 - capability states;
@@ -84,7 +85,11 @@ The full-profile report builder consumes `schema/verification-receipt-v1.json`. 
 
 There is deliberately no apply command in this candidate. Applying a reviewed plan is a later, separately authorized implementation workflow with Git/Jujutsu state capture and complete post-change verification.
 
-`init` is also planning-only and MUST reject calls without `--dry-run`. It derives a proposed manifest, role layout, requirement set, and staged implementation sequence from the canonical instantiation prompt and selected profile. It does not copy a full template. Existing paths are reported as `preserve-and-review`, absent paths as `propose-create`, and no directory or file is created. Missing topic or title context is surfaced through the canonical sequential `Question 1 of N` protocol.
+`init` is also planning-only and MUST reject calls without `--dry-run`. It derives a proposed manifest, role layout, requirement set, and staged implementation sequence from the canonical instantiation prompt and selected profile. It does not copy a full template. Existing paths are reported as `preserve-and-review`; absent paths are classified as `propose-render`, `propose-author`, or `propose-adapt`; and no directory or file is created. Missing material context is surfaced through the canonical sequential `Question 1 of N` protocol.
+
+The initialization layout is governed by `starter/starter.yaml`. It classifies subject-empty templates, target-authored content, and implementation files that require adaptation from the pinned release. A complete plan records an immutable standard revision, target Wiki URL, and target deployment choice; the planner treats all three as unresolved when absent. The standard's `docs/`, `knowledge/`, evidence, dogfood, fixtures, and documentation deployment remain reference-only.
+
+Canonical schemas are versioned in this standard repository. The documentation site mirrors public discovery endpoints under <https://denchco.github.io/knowledge-base-wiki-documentation/schema/>, but conformance validation uses schemas from the pinned local standard checkout or release artifact and does not require network access to that mirror.
 
 ## Diagnostics and reports
 

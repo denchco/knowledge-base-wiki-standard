@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/graph-publication-summary-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/graph-publication-summary-v1.json",
   "title": "DenchCo Graph Publication Summary",
   "description": "Counts, provenance, relations, and enrichment coverage for one graph publication.",
   "type": "object",

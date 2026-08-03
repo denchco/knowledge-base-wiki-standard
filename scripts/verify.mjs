@@ -8,6 +8,7 @@ import {
   readFileSync,
   readdirSync,
   readlinkSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
@@ -31,6 +32,8 @@ const provenanceMode = process.env.DKBWS_PROVENANCE_MODE ?? "maintainer";
 const receiptDirectory = path.join(root, "output", "verification");
 const receiptPath = path.join(receiptDirectory, "receipt.json");
 const reportPath = path.join(receiptDirectory, "conformance-report.json");
+
+for (const generatedReceipt of [receiptPath, reportPath]) rmSync(generatedReceipt, { force: true });
 
 const ignoreFailures = derivedOutputs.filter((entry) => !isIgnored(entry));
 if (ignoreFailures.length) {
@@ -159,7 +162,7 @@ function buildReceipt(provenance) {
     evidence("dependency-lock", "dependency-lock", "Exact npm dependency graph used by build and browser checks.", "package-lock.json"),
     evidence("security-policy", "policy", "Secrets, authorization, untrusted-input, and generated-authority boundaries.", "SECURITY.md"),
     evidence("source-policy", "policy", "Personal, confidential, copyright, retention, correction, and deletion boundaries.", "SOURCE_POLICY.md"),
-    evidence("licensing-decision", "policy", "Current no-public-licence boundary and proposed public split.", "LICENSING.md"),
+    evidence("licensing-decision", "policy", "Repository-wide MIT licence for original work, with third-party boundaries.", "LICENSING.md"),
     evidence("source-register", "evidence-register", "Stable source identities.", "docs/sources.md"),
     evidence("evidence-matrix", "evidence-matrix", "Claims mapped to support, state, and limitations.", "docs/evidence-matrix.md"),
     evidence("llm-wiki", "agent-contract", "Read order plus ingest, query, lint, authority, and generation boundaries.", "docs/llm-wiki/index.md"),
@@ -247,7 +250,7 @@ function buildReceipt(provenance) {
     },
   ];
   return {
-    $schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/verification-receipt-v1.json",
+    $schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/verification-receipt-v1.json",
     receiptVersion: "1.0",
     target: root,
     profile: manifest.profile,

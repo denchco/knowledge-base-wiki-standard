@@ -2,6 +2,7 @@
   "name": "denchco-knowledge-base-wiki-standard",
   "version": "0.1.0-candidate",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -32,9 +33,13 @@
     "conformance:upgrade-plan": "node scripts/conformance-cli.mjs upgrade --dry-run",
     "conformance:init-plan": "node scripts/conformance-cli.mjs init --dry-run",
     "conformance:full-report": "node scripts/full-profile-report.mjs",
-    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs",
+    "sync:documentation:check": "node scripts/sync-documentation-snapshot.mjs --check",
+    "sync:documentation:apply": "node scripts/sync-documentation-snapshot.mjs --apply",
+    "sync:documentation:test": "node --test scripts/sync-documentation-snapshot.test.mjs",
+    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/html-script-json.test.mjs scripts/sync-documentation-snapshot.test.mjs",
     "check": "node scripts/check-standard.mjs && npm run check:canonical-content && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
     "verify": "node scripts/verify.mjs",
+    "verify:workspace": "npm run verify && npm run sync:documentation:check",
     "service:register": "node scripts/dev-service.mjs register",
     "service:install": "node scripts/dev-service.mjs install",
     "service:start": "node scripts/dev-service.mjs start",

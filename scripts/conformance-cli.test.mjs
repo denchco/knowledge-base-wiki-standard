@@ -39,6 +39,7 @@ const GUIDANCE = path.join(ROOT, "fixtures/nonconforming/okf-guidance");
 const NEGATIVE_MANIFEST = path.join(ROOT, "fixtures/nonconforming/manifest");
 const NEGATIVE_WAIVER = path.join(ROOT, "fixtures/nonconforming/waiver");
 const OLD_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-old");
+const STARTER_PATH = path.join(ROOT, "starter/starter.yaml");
 const LIFECYCLE_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/lifecycle-plan-v1.json"), "utf8"));
 const MANIFEST_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/manifest-v1.json"), "utf8"));
 const OKF_SCHEMA_SOURCE = readFileSync(path.join(ROOT, "schema/okf-v0.2-frontmatter.json"), "utf8");
@@ -553,10 +554,51 @@ test("help and package scripts expose only lifecycle planning modes", () => {
   assert.match(help.stdout, /upgrade \[target\] --dry-run/);
   assert.match(help.stdout, /init \[target\] --dry-run/);
   assert.match(help.stdout, /no apply mode/i);
+  assert.match(help.stdout, /--standard-revision/);
+  assert.match(help.stdout, /--wiki-url/);
+  assert.match(help.stdout, /--deployment/);
   const pkg = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8"));
   assert.equal(pkg.scripts["conformance:diff"], "node scripts/conformance-cli.mjs diff");
   assert.match(pkg.scripts["conformance:upgrade-plan"], /upgrade --dry-run$/);
   assert.match(pkg.scripts["conformance:init-plan"], /init --dry-run$/);
+});
+
+test("subject-empty starter has an allowlisted, non-executable consumer boundary", () => {
+  const source = readFileSync(STARTER_PATH, "utf8");
+  const document = parseDocument(source, { prettyErrors: true, strict: true, uniqueKeys: true });
+  assert.deepEqual(document.errors, []);
+  const starter = document.toJS({ maxAliasCount: 100 });
+  assert.equal(starter.standard_source, "https://github.com/denchco/knowledge-base-wiki-standard");
+  assert.equal(starter.documentation, "https://denchco.github.io/knowledge-base-wiki-documentation/");
+  assert.equal(starter.root_copy, "forbidden");
+  assert.equal(starter.content_policy, "subject-specific-create-fresh");
+  assert.equal(starter.deployment_policy, "consumer-owned");
+  assert.equal(starter.executable_scope.apply_supported, false);
+  assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
+  assert.match(starter.executable_scope.standard_production, /complete .* dependency closure/i);
+
+  const targets = starter.entries.map((entry) => entry.target);
+  assert.equal(new Set(targets).size, targets.length, "starter target paths must be unique");
+  assert.equal(targets.some((target) => target.startsWith("docs/spec/")), false);
+  assert.equal(targets.some((target) => target.startsWith("docs/conformance/")), false);
+  assert.equal(targets.some((target) => /pages|deploy/i.test(target)), false);
+
+  const forbiddenTemplateContent = /five-project|SRC-00[1-9]|candidate status|local-unpublished/i;
+  for (const entry of starter.entries) {
+    assert.ok(["render-template", "create-subject-content", "adapt-from-release"].includes(entry.classification));
+    if (entry.classification === "render-template") {
+      assert.match(entry.template, /^starter\/templates\//);
+      const templatePath = path.join(ROOT, entry.template);
+      assert.equal(existsSync(templatePath), true, `missing starter template ${entry.template}`);
+      const template = readFileSync(templatePath, "utf8");
+      assert.match(template, /\{\{[A-Z0-9_]+\}\}/, `${entry.template} needs an explicit placeholder`);
+      assert.doesNotMatch(template, forbiddenTemplateContent, `${entry.template} leaks standard/example content`);
+    }
+    if (entry.classification === "adapt-from-release") {
+      assert.equal(entry.planning_only, true, `${entry.target} must not pretend to be an executable scaffold entry`);
+      assert.match(entry.dependency_closure, /\S/);
+    }
+  }
 });
 
 test("lifecycle diff compares the consumer version and selected profile without writing", () => {
@@ -618,6 +660,12 @@ test("init requires dry-run and plans an absent target without creating it", () 
     "Planned Wiki",
     "--topic",
     "A bounded reader task for a known audience",
+    "--standard-revision",
+    "v0.1.0-rc.1",
+    "--wiki-url",
+    "https://example.test/planned-wiki/",
+    "--deployment",
+    "none",
     "--json",
   );
   assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -629,9 +677,17 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.equal(plan.applySupported, false);
   assert.equal(plan.targetState.type, "absent");
   assert.equal(plan.proposedManifest.profile, "portable-core");
+  assert.equal(plan.proposedManifest.standard.source, "https://github.com/denchco/knowledge-base-wiki-standard");
+  assert.equal(plan.proposedManifest.standard.revision, "v0.1.0-rc.1");
   assert.equal(plan.proposedManifest.roles.okf_bundle, "knowledge");
+  assert.equal(plan.input.wikiUrl, "https://example.test/planned-wiki/");
+  assert.equal(plan.input.deployment, "none");
   assert.equal(plan.clarificationProtocol.nextQuestion, null);
-  assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md"));
+  assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md" && entry.classification === "render-template"));
+  assert.equal(plan.candidate.starter.rootCopy, "forbidden");
+  assert.equal(plan.candidate.starter.deploymentPolicy, "consumer-owned");
+  assert.equal(plan.candidate.starter.executableScope.apply_supported, false);
+  assert.match(plan.safety.standardContent, /reference-only/i);
   assert.ok(plan.stages.some((stage) => stage.id === "okf"));
   assert.equal(plan.stages.some((stage) => stage.id === "provenance"), false);
   assert.equal(plan.stages.some((stage) => stage.id === "human-llm"), false);
@@ -649,7 +705,14 @@ test("init plan preserves and reports collisions in an existing target", () => {
   assert.ok(plan.safety.collisions.includes(".wiki-standard.yaml"));
   assert.ok(plan.safety.collisions.includes("knowledge/index.md"));
   assert.ok(plan.layout.filter((entry) => entry.collision).every((entry) => entry.action === "preserve-and-review"));
-  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 2:/);
+  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 5:/);
+  assert.deepEqual(plan.unresolvedInputs, [
+    "topic, audience, governing question, and intended outcome",
+    "project title",
+    "immutable standard release tag or commit",
+    "consumer-owned canonical Wiki URL",
+    "consumer-owned deployment choice (`none` is valid)",
+  ]);
 });
 
 test("full-profile module and CLI emit a schema-valid conformant report from explicit gate evidence", () => {

@@ -1,11 +1,11 @@
-# Licensing Decision
+# Licensing
 
-No public licence has yet been granted. The repository remains private/local candidate material until the owner selects and adds licence texts.
+Copyright (c) 2026 Andrew Dench.
 
-The proposed public model is:
+Unless a file states otherwise, the repository's original code, schemas, scripts, workflows, fixtures, adapters, templates, specification, and accompanying documentation are licensed under the MIT License in `LICENSE`.
 
-- Apache License 2.0 for source code, schemas, scripts, workflows, fixtures, adapters, and templates;
-- Creative Commons Attribution 4.0 for normative prose and documentation;
-- separately identified upstream and example material under its own licence.
+The MIT License permits private, public, modified, and commercial use while requiring the copyright and permission notice to remain with copies or substantial portions. It supplies the work without warranty.
 
-Before GitHub publication, confirm the selected model, add full licence files and SPDX headers/notices where appropriate, audit imported assets, and document attribution and modification requirements. Absence of a licence is not permission to redistribute.
+Third-party dependencies, generated vendor bundles, quoted material, examples derived from upstream projects, and registered sources retain their own licences or usage terms. This repository does not relicense them. Do not redistribute source material merely because it is cited or was available to an agent.
+
+The MIT licence does not transfer ownership of the DenchCo name or presentation identity. Ordinary identification of the source is allowed; broader branding permissions are not part of this software licence.

@@ -12,6 +12,6 @@ status: draft
 - Add versioned compatibility fixtures for every supported Zensical and graph-publication adapter release.
 - Reference-qualify Jujutsu `0.42.0` only after its provenance and complete Standard Production verification results are recorded; retain `0.39.0` until then.
 - Turn the five inferred dogfood audits into project-owned formal claims only with each project's explicit adoption decision.
-- Select public code/documentation licences, GitHub organisation/owner, visibility, and security contact; then replace candidate-only placeholders.
-- Publish the first immutable GitHub prerelease and activate or replace the provisional public schema IDs for the selected owner/domain.
+- Create the selected public standard and private documentation repositories, enable GitHub private vulnerability reporting, and configure the documentation repository's public Actions-based Pages site.
+- Regenerate the documentation snapshot from the final clean standard commit, validate it against `v0.1.0-rc.1`, and publish the first immutable prerelease plus public byte-identical schema endpoints.
 - Design the optional read-first MCP resource/tool surface after the lifecycle CLI contract stabilizes and has a second independent consumer.

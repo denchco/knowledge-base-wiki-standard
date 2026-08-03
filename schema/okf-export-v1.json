@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/okf-export-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-export-v1.json",
   "title": "DenchCo lossless OKF JSON rendition",
   "description": "A deterministic tool interchange envelope. The canonical OKF distribution unit remains a Markdown directory, Git repository, tarball, or zip archive.",
   "type": "object",

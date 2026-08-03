@@ -1,0 +1,33 @@
+[project]
+site_name = "{{PROJECT_TITLE}}"
+site_description = "{{ONE_SENTENCE_PURPOSE}}"
+site_url = "{{WIKI_URL}}"
+docs_dir = "docs"
+site_dir = "site"
+extra_css = ["assets/graph.css", "assets/content.css", "assets/layout-width.css", "assets/theme.css"]
+extra_javascript = ["assets/vendor/mermaid.min.js", "assets/mermaid-adapter.js", "assets/wiki.js", "assets/layout-width.js"]
+nav = [
+  {"Home" = "index.md"},
+  {"Evidence" = [
+    {"Sources" = "sources.md"},
+    {"Evidence matrix" = "evidence-matrix.md"},
+    {"Validation queue" = "validation-queue.md"},
+    {"Research log" = "log.md"}
+  ]},
+  {"LLM Wiki" = [
+    {"Agent entry point" = "llm-wiki/index.md"},
+    {"Context map" = "llm-wiki/context-map.md"},
+    {"Maintenance" = "llm-wiki/maintenance.md"}
+  ]}
+]
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+tables = {}
+"pymdownx.details" = {}
+
+[[project.markdown_extensions."pymdownx.superfences".custom_fences]]
+name = "mermaid"
+class = "mermaid"
+format = "pymdownx.superfences.fence_code_format"

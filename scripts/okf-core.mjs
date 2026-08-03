@@ -1445,7 +1445,7 @@ export function inspectProject(options = {}) {
   const evidence = narrowEvidence(resolved, bundles, roleScan);
   const outstandingManualChecks = manualChecks(requirements);
   return {
-    $schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/conformance-report-v1.json",
+    $schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/conformance-report-v1.json",
     reportVersion: REPORT_VERSION,
     command: options.command ?? "inspect",
     readOnly: true,
@@ -1526,7 +1526,7 @@ export function losslessExport(options = {}) {
     });
   }
   const exportData = {
-    $schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/okf-export-v1.json",
+    $schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-export-v1.json",
     format: "denchco-okf-lossless-json",
     formatVersion: "1.0",
     okfVersion: SUPPORTED_OKF_VERSION,

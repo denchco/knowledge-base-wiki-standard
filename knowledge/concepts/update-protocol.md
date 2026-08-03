@@ -17,4 +17,4 @@ x-denchco:
 
 # Living update protocol
 
-Consumers pin immutable releases. Changes arrive through inspectable diffs, migration notes, patches, or pull requests that preserve local deviations. No standard tool silently replaces local work with the latest template.
+Consumers pin immutable releases of the normative standard repository. Changes arrive through inspectable diffs, migration notes, patches, or pull requests that preserve local deviations. No standard tool silently replaces local work with the latest template. The public documentation site is explanatory; its private source consumes a hash-checked standard snapshot, while consumer validation uses pinned local schemas and never depends on that site's availability.

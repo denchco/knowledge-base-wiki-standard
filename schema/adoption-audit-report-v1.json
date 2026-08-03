@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/adoption-audit-report-v1.json",
   "title": "DenchCo adoption audit report v1",
   "description": "A portable, read-only inferred adoption audit. It keeps formal conformance separate from observed mappings and capabilities.",
   "type": "object",
@@ -22,7 +22,7 @@
   ],
   "properties": {
     "$schema": {
-      "const": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json"
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/adoption-audit-report-v1.json"
     },
     "report_version": {
       "$ref": "#/$defs/version"

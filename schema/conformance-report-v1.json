@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/conformance-report-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/conformance-report-v1.json",
   "title": "DenchCo conformance report v1",
   "type": "object",
   "required": [

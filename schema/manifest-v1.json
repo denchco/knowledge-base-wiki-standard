@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/manifest-v1.json",
   "title": "DenchCo Knowledge Base Wiki Standard manifest",
   "description": "Portable, repository-relative declaration of the selected DenchCo standard, OKF bundle, roles, capabilities, and explicit deviations.",
   "type": "object",

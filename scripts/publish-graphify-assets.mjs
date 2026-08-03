@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
+import { scriptSafeJson } from "./html-script-json.mjs";
+
 const root = process.cwd();
 const source = path.join(root, process.env.GRAPHIFY_SOURCE_DIR ?? "graphify-out");
 const target = path.join(root, process.env.GRAPHIFY_TARGET_DIR ?? "docs/assets/graphify");
@@ -956,9 +958,9 @@ function syncGraphHtml(filePath, nodes, edges) {
       /<script\s+src="\.\.\/vendor\/vis-network\.min\.js"[^>]*><\/script>/i,
       '<script src="../vendor/vis-network.min.js"></script>',
     )
-    .replace(/const RAW_NODES = .*?;\nconst RAW_EDGES = /s, `const RAW_NODES = ${JSON.stringify(nodes)};\nconst RAW_EDGES = `)
-    .replace(/const RAW_EDGES = .*?;\nconst LEGEND = /s, `const RAW_EDGES = ${JSON.stringify(edges)};\nconst LEGEND = `)
-    .replace(/const LEGEND = .*?;\n\n\/\//s, `const LEGEND = ${JSON.stringify(legend)};\n\n//`)
+    .replace(/const RAW_NODES = .*?;\nconst RAW_EDGES = /s, `const RAW_NODES = ${scriptSafeJson(nodes)};\nconst RAW_EDGES = `)
+    .replace(/const RAW_EDGES = .*?;\nconst LEGEND = /s, `const RAW_EDGES = ${scriptSafeJson(edges)};\nconst LEGEND = `)
+    .replace(/const LEGEND = .*?;\n\n\/\//s, `const LEGEND = ${scriptSafeJson(legend)};\n\n//`)
     .replace(
       /\d+ nodes &middot; \d+ edges &middot; \d+ communities/,
       `${nodes.length} nodes &middot; ${edges.length} edges &middot; ${new Set(nodes.map((node) => communityKey(node))).size} communities`,
@@ -1034,8 +1036,8 @@ function relationCounts(links) {
 }
 
 function graph3dHtml(summary) {
-  const summaryJson = JSON.stringify(summary);
-  const paletteJson = JSON.stringify(palette);
+  const summaryJson = scriptSafeJson(summary);
+  const paletteJson = scriptSafeJson(palette);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>

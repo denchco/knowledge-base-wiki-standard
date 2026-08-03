@@ -1,0 +1,15 @@
+# Dependency Contract
+
+This repository implements `{{PROFILE}}` of the DenchCo Knowledge Base Wiki Standard at `{{STANDARD_REVISION}}`.
+
+| Class | Required for | Exact dependency or boundary |
+|---|---|---|
+| Universal | Reading and editing | UTF-8 Markdown, YAML frontmatter, Git-compatible files |
+| Validation | Declared conformance | {{VALIDATION_DEPENDENCIES}} |
+| Human Wiki | Rendering | {{RENDERER_AND_VERSION}} |
+| Graph | Relationship views | {{GRAPH_DEPENDENCIES}} |
+| Browser proof | Rendered verification | {{BROWSER_DEPENDENCIES}} |
+| Provenance | Maintenance workspace | {{GIT_AND_JUJUTSU_BOUNDARY}} |
+| Deployment | Consumer-owned publication | {{DEPLOYMENT_ADAPTER_OR_NONE}} |
+
+Commit exact lock files for every selected implementation dependency. Record optional and deployment dependencies separately from portable knowledge requirements.

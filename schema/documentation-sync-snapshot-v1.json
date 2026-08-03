@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/documentation-sync-snapshot-v1.json",
+  "title": "DenchCo documentation repository standard snapshot v1",
+  "description": "Deterministic manifest tying an isolated documentation-repository snapshot to one standard version, Git base revision, working-tree content digest, and explicit allowlist.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "snapshotFormat",
+    "standard",
+    "contract",
+    "snapshot",
+    "files"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/documentation-sync-snapshot-v1.json"
+    },
+    "snapshotFormat": {
+      "const": "1.0"
+    },
+    "standard": {
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "gitCommit",
+        "treeState",
+        "revision",
+        "contentDigest"
+      ],
+      "properties": {
+        "name": {
+          "const": "DenchCo Knowledge Base Wiki Standard"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gitCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "treeState": {
+          "enum": ["clean", "dirty"]
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}(?:\\+snapshot\\.[0-9a-f]{16})?$"
+        },
+        "contentDigest": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": false
+    },
+    "contract": {
+      "type": "object",
+      "required": ["path", "sha256", "allowlistCount"],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "allowlistCount": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["root", "manifest", "filesRoot"],
+      "properties": {
+        "root": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "manifest": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "filesRoot": {
+          "$ref": "#/$defs/relativePath"
+        }
+      },
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "bytes", "mode"],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mode": {
+            "type": "string",
+            "pattern": "^0[0-7]{3}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    }
+  }
+}

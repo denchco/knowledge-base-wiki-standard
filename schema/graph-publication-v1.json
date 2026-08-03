@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/graph-publication-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/graph-publication-v1.json",
   "title": "DenchCo Graph Publication",
   "description": "Shared enriched graph consumed by the reference 2D and 3D views.",
   "type": "object",

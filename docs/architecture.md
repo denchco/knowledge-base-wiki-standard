@@ -34,6 +34,16 @@ primary source
 
 Derived output assists navigation but cannot create evidence.
 
+## Distribution boundary
+
+The distribution has three deliberately separate roles:
+
+1. **Normative standard repository** — specifications, profiles, schemas, prompts, tooling, and the subject-empty starter contract at <https://github.com/denchco/knowledge-base-wiki-standard>.
+2. **Public documentation** — explanatory help and examples at <https://denchco.github.io/knowledge-base-wiki-documentation/>; schema endpoints are mirrored there for discovery, not runtime validation.
+3. **Independent consumer repository** — the subject's own sources, canonical knowledge, Human and LLM Wikis, URL, deployment, and deviations, pinned to one immutable standard revision.
+
+The standard root is never copied wholesale. `starter/starter.yaml` is the allowlist: templates are subject-empty, subject content is created fresh, and selected implementation adapters are reviewed against the pinned release. Consumer validation uses pinned local schemas and remains available if the documentation site is offline.
+
 ## Human and LLM products
 
 The Human Wiki and LLM Wiki share canonical knowledge. The Human Wiki optimizes comprehension, navigation, decisions, diagrams, and evidence inspection. The LLM Wiki optimizes context selection, maintenance discipline, machine-readable routing, and bounded workflows. Neither is maintained as an independent duplicate corpus.

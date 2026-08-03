@@ -1,5 +1,8 @@
 # DenchCo Knowledge Base Wiki Standard
 
+Human documentation: https://denchco.github.io/knowledge-base-wiki-documentation/
+Normative repository: https://github.com/denchco/knowledge-base-wiki-standard
+
 > An OKF v0.2-compatible, evidence-governed standard for coordinated Human and LLM wikis. This is a local `0.1.0-candidate`; generated pages and graphs never outrank canonical source.
 
 ## Canonical entry points
@@ -21,6 +24,7 @@ Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, and `docs/llm-wik
 - `schema/` contains Draft 2020-12 interchange and conformance schemas.
 - `profiles/` contains cumulative profile declarations.
 - `prompts/instantiate-wiki.md` is the repeatable bootstrap prompt.
+- `starter/starter.yaml` is the subject-empty allowlist for independent consumer repositories.
 - `node scripts/conformance-cli.mjs --help` describes the read-only and planning-only CLI.
 
 ## Authority warning

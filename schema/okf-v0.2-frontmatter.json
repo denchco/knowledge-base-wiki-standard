@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/okf-v0.2-frontmatter.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-v0.2-frontmatter.json",
   "title": "Open Knowledge Format v0.2 concept frontmatter",
   "description": "A permissive schema for OKF v0.2 concept metadata. Unknown producer fields are intentionally preserved and accepted.",
   "type": "object",

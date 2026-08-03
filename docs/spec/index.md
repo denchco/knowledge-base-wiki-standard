@@ -12,6 +12,8 @@ okf_version: "0.2"
 
 The DenchCo Knowledge Base Wiki Standard defines a canonical and repeatable repository pattern for evidence-governed knowledge bases maintained by humans and AI agents.
 
+This repository is the sole normative authority. Public human guidance at <https://denchco.github.io/knowledge-base-wiki-documentation/> is a separate explanatory publication and cannot change conformance requirements.
+
 It incorporates:
 
 - Karpathy's persistent LLM Wiki operating model;
@@ -34,6 +36,8 @@ It incorporates:
 - Every claimed capability MUST identify its dependency, applicability, verification, and deviation state.
 - Existing projects MUST retain stronger working patterns unless an explicit migration is authorized.
 - Updates MUST be reviewable migrations, never “download latest and overwrite.”
+- Consumers MUST live in an independent repository, pin an immutable standard revision, author their own subject content, and own their Wiki URL and deployment choice.
+- The standard's help, knowledge, evidence, dogfood, fixture, and documentation-deployment content MUST NOT be installed as a consumer's subject corpus.
 - OKF portability results MUST remain distinct from stricter DenchCo profile results.
 - Conformance inspection and validation MUST be read-only and emit stable machine diagnostics.
 

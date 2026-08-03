@@ -1,0 +1,209 @@
+schema_version: "1.0"
+id: "denchco-subject-empty"
+description: "Allowlisted recipe for creating an independent, subject-specific knowledge-base repository."
+standard_source: "https://github.com/denchco/knowledge-base-wiki-standard"
+documentation: "https://denchco.github.io/knowledge-base-wiki-documentation/"
+revision_policy: "required-immutable-release-tag-or-commit"
+repository_boundary: "independent-target"
+root_copy: "forbidden"
+content_policy: "subject-specific-create-fresh"
+deployment_policy: "consumer-owned"
+executable_scope:
+  apply_supported: false
+  portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
+  standard_production: "Planning only until an implementation agent supplies and verifies the complete renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the pinned release."
+
+classifications:
+  reference_only:
+    description: "Read from the pinned standard; never install as target content."
+    paths:
+      - "docs/spec/"
+      - "docs/conformance/"
+      - "docs/reference/"
+      - "docs/project/"
+      - "knowledge/"
+      - "profiles/"
+      - "schema/"
+      - "prompts/"
+      - "CHANGELOG.md"
+  render_template:
+    description: "Render into the independent target after replacing every placeholder."
+  create_subject_content:
+    description: "Create from the target topic and its own evidence; never derive from the standard corpus."
+  adapt_from_release:
+    description: "Planning-only selection: inspect the pinned release, bring the complete dependency closure for the chosen adapter, and verify it in the target; never copy the repository root."
+  generated:
+    description: "Rebuild in the target and keep outside canonical authoring."
+    paths:
+      - "site/"
+      - "graphify-out/"
+      - "docs/assets/vendor/"
+      - "docs/assets/graphify/"
+      - "output/"
+
+never_copy_as_consumer_content:
+  - "the standard's docs/ tree"
+  - "the standard's knowledge/ bundle"
+  - "dogfood reports or fixtures"
+  - "the standard's source register, evidence matrix, validation queue, or research log"
+  - "the standard documentation repository or its Pages workflow"
+
+consumer_owned:
+  - "title, topic, audience, governing question, and intended outcome"
+  - "canonical Wiki URL"
+  - "source and evidence corpus"
+  - "navigation and synthesis"
+  - "deployment adapter, credentials, repository settings, and domain"
+
+entries:
+  - target: ".wiki-standard.yaml"
+    role: "manifest"
+    classification: "render-template"
+    template: "starter/templates/wiki-standard.yaml.tmpl"
+    requirements: ["DKBWS-CORE-002"]
+    always: true
+  - target: "AGENTS.md"
+    role: "agent-contract"
+    classification: "render-template"
+    template: "starter/templates/AGENTS.md.tmpl"
+    requirements: ["DKBWS-PROMPT-001"]
+    always: true
+  - target: "DEPENDENCIES.md"
+    role: "dependency-contract"
+    classification: "render-template"
+    template: "starter/templates/DEPENDENCIES.md.tmpl"
+    requirements: ["DKBWS-VERIFY-001"]
+    always: true
+  - target: "SECURITY.md"
+    role: "security-policy"
+    classification: "render-template"
+    template: "starter/templates/SECURITY.md.tmpl"
+    requirements: ["DKBWS-SEC-001"]
+    always: true
+  - target: "SOURCE_POLICY.md"
+    role: "source-policy"
+    classification: "render-template"
+    template: "starter/templates/SOURCE_POLICY.md.tmpl"
+    requirements: ["DKBWS-SEC-001"]
+    always: true
+  - target: "knowledge/index.md"
+    role: "okf-index"
+    classification: "render-template"
+    template: "starter/templates/knowledge/index.md.tmpl"
+    requirements: ["DKBWS-OKF-001", "DKBWS-OKF-003"]
+    always: true
+  - target: "knowledge/log.md"
+    role: "okf-log"
+    classification: "render-template"
+    template: "starter/templates/knowledge/log.md.tmpl"
+    requirements: ["DKBWS-OKF-001"]
+    always: true
+  - target: "knowledge/concepts/"
+    role: "okf-concepts"
+    classification: "create-subject-content"
+    requirements: ["DKBWS-OKF-001"]
+    always: true
+  - target: "docs/sources.md"
+    role: "source-register"
+    classification: "render-template"
+    template: "starter/templates/docs/sources.md.tmpl"
+    requirements: ["DKBWS-EVID-001"]
+  - target: "docs/evidence-matrix.md"
+    role: "evidence-matrix"
+    classification: "render-template"
+    template: "starter/templates/docs/evidence-matrix.md.tmpl"
+    requirements: ["DKBWS-EVID-002"]
+  - target: "docs/validation-queue.md"
+    role: "validation-queue"
+    classification: "render-template"
+    template: "starter/templates/docs/validation-queue.md.tmpl"
+    requirements: ["DKBWS-EVID-002"]
+  - target: "docs/log.md"
+    role: "research-log"
+    classification: "render-template"
+    template: "starter/templates/docs/log.md.tmpl"
+    requirements: ["DKBWS-EVID-002"]
+  - target: "docs/index.md"
+    role: "human-wiki"
+    classification: "render-template"
+    template: "starter/templates/docs/index.md.tmpl"
+    requirements: ["DKBWS-HUMAN-001"]
+  - target: "docs/llm-wiki/index.md"
+    role: "llm-wiki"
+    classification: "render-template"
+    template: "starter/templates/docs/llm-wiki/index.md.tmpl"
+    requirements: ["DKBWS-LLM-001"]
+  - target: "docs/llm-wiki/context-map.md"
+    role: "llm-context-map"
+    classification: "render-template"
+    template: "starter/templates/docs/llm-wiki/context-map.md.tmpl"
+    requirements: ["DKBWS-LLM-001"]
+  - target: "docs/llm-wiki/maintenance.md"
+    role: "llm-maintenance"
+    classification: "render-template"
+    template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
+    requirements: ["DKBWS-LLM-001"]
+  - target: "DESIGN.md"
+    role: "design-contract"
+    classification: "render-template"
+    template: "starter/templates/DESIGN.md.tmpl"
+    requirements: ["DKBWS-DESIGN-001"]
+  - target: "zensical.toml"
+    role: "renderer-config"
+    classification: "render-template"
+    template: "starter/templates/zensical.toml.tmpl"
+    requirements: ["DKBWS-RENDER-001"]
+  - target: "docs/assets/"
+    role: "local-runtime-assets"
+    classification: "adapt-from-release"
+    source: "docs/assets/"
+    planning_only: true
+    dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates"
+    requirements: ["DKBWS-RENDER-001"]
+  - target: "docs/graph/index.md"
+    role: "graph-entry"
+    classification: "create-subject-content"
+    requirements: ["DKBWS-GRAPH-001"]
+  - target: "docs/graph/two-dimensional.md"
+    role: "graph-2d"
+    classification: "create-subject-content"
+    requirements: ["DKBWS-GRAPH-001"]
+  - target: "docs/graph/three-dimensional.md"
+    role: "graph-3d"
+    classification: "create-subject-content"
+    requirements: ["DKBWS-GRAPH-001"]
+  - target: "package.json"
+    role: "node-build-contract"
+    classification: "adapt-from-release"
+    source: "package.json"
+    planning_only: true
+    dependency_closure: "all scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract"
+    requirements: ["DKBWS-VERIFY-001"]
+  - target: "package-lock.json"
+    role: "node-lock"
+    classification: "adapt-from-release"
+    source: "package-lock.json"
+    planning_only: true
+    dependency_closure: "adapted package.json and its exact resolved dependency graph"
+    requirements: ["DKBWS-VERIFY-001"]
+  - target: "pyproject.toml"
+    role: "python-build-contract"
+    classification: "adapt-from-release"
+    source: "pyproject.toml"
+    planning_only: true
+    dependency_closure: "adapted renderer, graph, audit, and build configuration"
+    requirements: ["DKBWS-VERIFY-001"]
+  - target: "uv.lock"
+    role: "python-lock"
+    classification: "adapt-from-release"
+    source: "uv.lock"
+    planning_only: true
+    dependency_closure: "adapted pyproject.toml and its exact resolved dependency graph"
+    requirements: ["DKBWS-VERIFY-001"]
+  - target: ".github/workflows/verify.yml"
+    role: "ci-verification"
+    classification: "adapt-from-release"
+    source: ".github/workflows/verify.yml"
+    planning_only: true
+    dependency_closure: "every command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow"
+    requirements: ["DKBWS-VERIFY-001"]

@@ -2,7 +2,7 @@
 
 ## Reporting
 
-Until a public security channel is configured, do not publish suspected vulnerabilities or exposed personal data. Contact the repository owner privately. This section must be replaced with a public reporting route before the first public release.
+Do not publish suspected vulnerabilities or exposed personal data in an issue. After the public repository is created, use [GitHub private vulnerability reporting](https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new). Until that route is activated during publication, contact Andrew Dench privately through an existing trusted channel.
 
 ## Trust boundaries
 
@@ -18,6 +18,7 @@ Until a public security channel is configured, do not publish suspected vulnerab
 - Public and private source material must be physically or access-control separated when policy requires it.
 - Source retention records licence, confidentiality, personal-data classification, retrieval date, and permitted use.
 - HTML derived from model or source text is sanitized or rendered as non-executable text/Markdown.
+- JSON embedded in HTML script elements is serialized with HTML-significant characters and JavaScript line separators escaped; raw source labels are never interpolated into executable script text.
 - Dependencies are locked, audited, and upgraded through reviewed changes.
 - CI uses read-only permissions unless a job's narrowly defined purpose requires more.
 - Validators are read-only; generators write only declared derived paths; upgrades produce reviewable patches.

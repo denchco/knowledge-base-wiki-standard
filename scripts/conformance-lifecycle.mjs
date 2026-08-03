@@ -21,9 +21,10 @@ import {
   ProfileLoadError,
 } from "./profile-catalogue.mjs";
 
-const LIFECYCLE_SCHEMA = "https://denchco.github.io/knowledge-base-wiki-standard/schema/lifecycle-plan-v1.json";
+const LIFECYCLE_SCHEMA = "https://denchco.github.io/knowledge-base-wiki-documentation/schema/lifecycle-plan-v1.json";
 const LIFECYCLE_VERSION = "1.0";
 const STANDARD_ROOT = standardRoot();
+const STARTER_PATH = "starter/starter.yaml";
 const REQUIRED_PRODUCTION_ROLES = {
   okf_bundle: "knowledge",
   source_register: "docs/sources.md",
@@ -459,55 +460,38 @@ function targetInventory(target) {
   };
 }
 
-function plannedLayout(profile) {
+function starterContract() {
+  const contract = readYaml(path.join(STANDARD_ROOT, STARTER_PATH));
+  if (!Array.isArray(contract.data.entries)) {
+    throw new Error(`${STARTER_PATH} must define an entries list.`);
+  }
+  return contract;
+}
+
+function plannedLayout(profile, starter) {
   const selectedRequirements = new Set(profile.requirements);
-  const catalogue = [
-    [".wiki-standard.yaml", "manifest", ["DKBWS-CORE-002"]],
-    ["AGENTS.md", "agent-contract", ["DKBWS-PROMPT-001"]],
-    ["DEPENDENCIES.md", "dependency-contract", ["DKBWS-VERIFY-001"]],
-    ["SECURITY.md", "security-policy", ["DKBWS-SEC-001"]],
-    ["SOURCE_POLICY.md", "source-policy", ["DKBWS-SEC-001"]],
-    ["knowledge/index.md", "okf-index", ["DKBWS-OKF-001", "DKBWS-OKF-003"]],
-    ["knowledge/log.md", "okf-log", ["DKBWS-OKF-001"]],
-    ["knowledge/concepts/", "okf-concepts", ["DKBWS-OKF-001"]],
-    ["docs/sources.md", "source-register", ["DKBWS-EVID-001"]],
-    ["docs/evidence-matrix.md", "evidence-matrix", ["DKBWS-EVID-002"]],
-    ["docs/validation-queue.md", "validation-queue", ["DKBWS-EVID-002"]],
-    ["docs/log.md", "research-log", ["DKBWS-EVID-002"]],
-    ["docs/index.md", "human-wiki", ["DKBWS-HUMAN-001"]],
-    ["docs/llm-wiki/index.md", "llm-wiki", ["DKBWS-LLM-001"]],
-    ["docs/llm-wiki/context-map.md", "llm-context-map", ["DKBWS-LLM-001"]],
-    ["docs/llm-wiki/maintenance.md", "llm-maintenance", ["DKBWS-LLM-001"]],
-    ["DESIGN.md", "design-contract", ["DKBWS-DESIGN-001"]],
-    ["zensical.toml", "renderer-config", ["DKBWS-RENDER-001"]],
-    ["docs/assets/", "local-runtime-assets", ["DKBWS-RENDER-001"]],
-    ["docs/graph/index.md", "graph-entry", ["DKBWS-GRAPH-001"]],
-    ["docs/graph/two-dimensional.md", "graph-2d", ["DKBWS-GRAPH-001"]],
-    ["docs/graph/three-dimensional.md", "graph-3d", ["DKBWS-GRAPH-001"]],
-    ["package.json", "node-build-contract", ["DKBWS-VERIFY-001"]],
-    ["package-lock.json", "node-lock", ["DKBWS-VERIFY-001"]],
-    ["pyproject.toml", "python-build-contract", ["DKBWS-VERIFY-001"]],
-    ["uv.lock", "python-lock", ["DKBWS-VERIFY-001"]],
-    [".github/workflows/verify.yml", "ci-verification", ["DKBWS-VERIFY-001"]],
-  ];
-  const always = new Set(["manifest", "agent-contract", "dependency-contract", "security-policy", "source-policy", "okf-index", "okf-log", "okf-concepts"]);
-  return catalogue.filter(([, role, requirements]) => (
-    always.has(role) || requirements.some((requirement) => selectedRequirements.has(requirement))
+  return starter.entries.filter((entry) => (
+    entry.always === true
+    || (entry.requirements ?? []).some((requirement) => selectedRequirements.has(requirement))
   ));
 }
 
-function proposedManifest(candidate, profile) {
+function proposedManifest(candidate, profile, starter, options = {}) {
   const roles = selectedRoleBaseline(profile);
   const capabilities = Object.fromEntries(Object.entries(profile.capabilities).map(([key, value]) => [
     key,
     value === "required" ? true : value,
   ]));
+  if (options.wikiUrl) capabilities.human_wiki_url = options.wikiUrl;
+  if (options.deployment) capabilities.deployment = options.deployment === "none" ? false : options.deployment;
+  const revision = options.standardRevision ?? candidate.standard.revision;
   return {
-    schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json",
+    schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/manifest-v1.json",
     standard: {
       name: candidate.standard.name,
       version: candidate.standard.version,
-      source: candidate.standard.source,
+      source: starter.standard_source,
+      ...(revision ? { revision } : {}),
     },
     profile: profile.id,
     okf_version: candidate.okfVersion,
@@ -524,24 +508,40 @@ export function initPlan(options = {}) {
   const target = path.resolve(options.target ?? ".");
   const profileId = options.profile ?? "standard-production";
   const candidate = candidateState(profileId);
+  const starter = starterContract();
   const inventory = targetInventory(target);
   if (inventory.type === "file") throw new CliUsageError("`init --dry-run` target must be a directory path or an absent path.");
   const promptPath = path.join(STANDARD_ROOT, "prompts/instantiate-wiki.md");
   const promptSource = readFileSync(promptPath, "utf8");
-  const layout = plannedLayout(candidate.profile).map(([relativePath, role, requirements]) => {
+  const layout = plannedLayout(candidate.profile, starter.data).map((entry) => {
+    const relativePath = entry.target;
     const normalized = relativePath.replace(/\/$/, "");
     const collision = inventory.exists && existsSync(path.join(target, normalized));
     return {
       path: relativePath,
-      role,
-      requirements,
-      action: collision ? "preserve-and-review" : "propose-create",
+      role: entry.role,
+      requirements: entry.requirements ?? [],
+      classification: entry.classification,
+      ...(entry.template ? { template: entry.template } : {}),
+      ...(entry.source ? { source: entry.source } : {}),
+      ...(entry.planning_only === true ? { planningOnly: true } : {}),
+      ...(entry.dependency_closure ? { dependencyClosure: entry.dependency_closure } : {}),
+      action: collision
+        ? "preserve-and-review"
+        : entry.classification === "render-template"
+          ? "propose-render"
+          : entry.classification === "create-subject-content"
+            ? "propose-author"
+            : "propose-adapt",
       collision,
     };
   });
   const unresolvedInputs = [];
   if (!options.topic) unresolvedInputs.push("topic, audience, governing question, and intended outcome");
   if (!options.title) unresolvedInputs.push("project title");
+  if (!(options.standardRevision ?? candidate.standard.revision)) unresolvedInputs.push("immutable standard release tag or commit");
+  if (!options.wikiUrl) unresolvedInputs.push("consumer-owned canonical Wiki URL");
+  if (!options.deployment) unresolvedInputs.push("consumer-owned deployment choice (`none` is valid)");
   const selectedRequirements = new Set(candidate.profile.requirements);
   const stages = [
     { id: "inspect", purpose: "Read target instructions, repository state, canonical roles, and existing evidence before proposing edits.", always: true },
@@ -568,6 +568,9 @@ export function initPlan(options = {}) {
       title: options.title ?? null,
       topic: options.topic ?? null,
       profile: profileId,
+      standardRevision: options.standardRevision ?? candidate.standard.revision ?? null,
+      wikiUrl: options.wikiUrl ?? null,
+      deployment: options.deployment ?? null,
     },
     candidate: {
       standard: candidate.standard,
@@ -582,8 +585,19 @@ export function initPlan(options = {}) {
         sha256: candidate.requirements.sha256,
         count: candidate.requirements.rows.length,
       },
+      starter: {
+        path: STARTER_PATH,
+        sha256: starter.sha256,
+        id: starter.data.id,
+        repositoryBoundary: starter.data.repository_boundary,
+        rootCopy: starter.data.root_copy,
+        contentPolicy: starter.data.content_policy,
+        deploymentPolicy: starter.data.deployment_policy,
+        executableScope: starter.data.executable_scope,
+        documentation: starter.data.documentation,
+      },
     },
-    proposedManifest: proposedManifest(candidate, candidate.profile),
+    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, options),
     layout,
     stages,
     unresolvedInputs,
@@ -597,7 +611,11 @@ export function initPlan(options = {}) {
     },
     safety: {
       collisions: layout.filter((entry) => entry.collision).map((entry) => entry.path),
-      policy: "Preserve existing files and stronger verified patterns; no file is created, replaced, or merged by this plan.",
+      policy: "Preserve existing files and stronger verified patterns; no file is created, replaced, or merged by this plan. The standard repository root and its subject matter are never copied into a consumer.",
+      standardContent: "Reference-only: standard help, specification pages, standard knowledge, evidence, dogfood reports, and fixtures are not consumer content.",
+      consumerContent: "The target's docs, knowledge, sources, synthesis, navigation, URL, and deployment are consumer-owned and subject-specific.",
+      rootCopy: starter.data.root_copy,
+      deployment: starter.data.deployment_policy,
       externalActions: "No GitHub, deployment, service, Git, or Jujutsu mutation is authorized by init planning.",
     },
     summary: {

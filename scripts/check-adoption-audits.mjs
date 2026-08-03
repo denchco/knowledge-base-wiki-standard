@@ -8,7 +8,7 @@ const SCHEMA_PATH = "schema/adoption-audit-report-v1.json";
 const REQUIREMENTS_PATH = "docs/spec/requirements.md";
 
 export const ADOPTION_AUDIT_SCHEMA_ID =
-  "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json";
+  "https://denchco.github.io/knowledge-base-wiki-documentation/schema/adoption-audit-report-v1.json";
 export const ADOPTION_STATUSES = [
   "PASS",
   "FAIL",

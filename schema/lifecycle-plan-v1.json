@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/lifecycle-plan-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/lifecycle-plan-v1.json",
   "title": "DenchCo read-only lifecycle result",
   "type": "object",
   "required": ["$schema", "planVersion", "kind", "readOnly", "writesPerformed", "target", "candidate", "summary"],
   "properties": {
-    "$schema": { "const": "https://denchco.github.io/knowledge-base-wiki-standard/schema/lifecycle-plan-v1.json" },
+    "$schema": { "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/lifecycle-plan-v1.json" },
     "planVersion": { "const": "1.0" },
     "kind": { "enum": ["lifecycle-diff", "upgrade-plan", "init-plan"] },
     "readOnly": { "const": true },

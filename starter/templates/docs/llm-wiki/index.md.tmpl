@@ -1,0 +1,25 @@
+---
+type: "Agent Guide"
+title: "LLM Wiki entry point"
+description: "Minimum reliable context for maintaining {{PROJECT_TITLE}}."
+status: "draft"
+---
+
+# LLM Wiki entry point
+
+## Read first
+
+1. Repository `AGENTS.md`.
+2. `.wiki-standard.yaml`.
+3. `knowledge/index.md`.
+4. [Context map](context-map.md).
+5. `DESIGN.md` for rendered changes.
+6. Graphify query results when available.
+
+## Operating model
+
+- **Ingest**: register a target source, preserve its identity, update the relevant concept and evidence state, add links, and record the change.
+- **Query**: select the smallest authoritative target context, expose uncertainty, and cite registered evidence.
+- **Lint**: find contradictions, stale claims, unsupported authority, missing links, and generated-output drift.
+
+Never treat an LLM answer, rendered page, or graph edge as new evidence.

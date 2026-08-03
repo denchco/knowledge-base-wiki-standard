@@ -1,5 +1,5 @@
 {
-  "$schema": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json",
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/adoption-audit-report-v1.json",
   "report_version": "0.1.0-candidate",
   "audit": {
     "id": "dogfood-palantir-2026-08-03",

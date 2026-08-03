@@ -1,0 +1,26 @@
+# Agent Instructions for {{PROJECT_TITLE}}
+
+## Read order
+
+1. `.wiki-standard.yaml`
+2. `knowledge/index.md`
+3. `docs/llm-wiki/index.md`
+4. `DESIGN.md` for rendered changes
+5. Graphify query results when `graphify-out/graph.json` exists
+
+## Authority and boundaries
+
+- This independent repository contains only knowledge about `{{TOPIC}}` and its own operating instructions.
+- Canonical knowledge and registered evidence outrank rendered pages, generated graphs, and conversational answers.
+- The standard is pinned by source and immutable revision in `.wiki-standard.yaml`; public help is at <https://denchco.github.io/knowledge-base-wiki-documentation/>.
+- Do not import the standard's help pages, knowledge bundle, evidence records, dogfood reports, fixtures, or deployment workflow as this repository's content.
+- Preserve unknown OKF fields and declared local deviations.
+- Do not publish, change deployment, expose credentials, or alter evidence status without explicit authorization.
+
+## Clarification protocol
+
+Where material uncertainty remains, ask one individually numbered question at a time using `Question 1 of N`. Revise `N` as each answer changes the remaining uncertainty.
+
+## Verification
+
+Run the complete verification contract for every claimed capability. Generated output never substitutes for canonical source.

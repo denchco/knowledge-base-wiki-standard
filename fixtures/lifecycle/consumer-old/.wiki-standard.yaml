@@ -1,4 +1,4 @@
-schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json"
+schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/manifest-v1.json"
 standard:
   name: "DenchCo Knowledge Base Wiki Standard"
   version: "0.0.9"

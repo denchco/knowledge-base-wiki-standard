@@ -47,6 +47,10 @@ Options:
   --profile <id>     Select a candidate profile for diff/init planning.
   --title <text>     Supply the proposed project title to init planning.
   --topic <text>     Supply topic, audience, question, and outcome context.
+  --standard-revision <revision>
+                     Pin the immutable standard release tag or commit for init.
+  --wiki-url <url>   Supply the consumer-owned canonical Wiki URL for init.
+  --deployment <id> Supply the consumer's deployment adapter; none is valid.
   -h, --help         Show this help.
 
 Exit codes:
@@ -82,7 +86,7 @@ function parseArguments(argv) {
     else if (argument === "--strict") options.strict = true;
     else if (argument === "--compact") options.compact = true;
     else if (argument === "--dry-run") options.dryRun = true;
-    else if (["--bundle", "--manifest", "--date", "--profile", "--title", "--topic"].includes(argument)) {
+    else if (["--bundle", "--manifest", "--date", "--profile", "--title", "--topic", "--standard-revision", "--wiki-url", "--deployment"].includes(argument)) {
       const value = argv[index + 1];
       if (!value || value.startsWith("--")) throw new CliUsageError(`${argument} requires a value.`);
       index += 1;
@@ -91,7 +95,10 @@ function parseArguments(argv) {
       else if (argument === "--date") options.evaluationDate = value;
       else if (argument === "--profile") options.profile = value;
       else if (argument === "--title") options.title = value;
-      else options.topic = value;
+      else if (argument === "--topic") options.topic = value;
+      else if (argument === "--standard-revision") options.standardRevision = value;
+      else if (argument === "--wiki-url") options.wikiUrl = value;
+      else options.deployment = value;
     } else if (argument.startsWith("-")) {
       throw new CliUsageError(`Unknown option \`${argument}\`.`);
     } else if (!targetSeen) {

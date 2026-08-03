@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/verification-receipt-v1.json",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/verification-receipt-v1.json",
   "title": "DenchCo verification orchestrator receipt v1",
   "description": "Explicit gate evidence consumed by the full-profile report builder. Missing gates are never inferred.",
   "type": "object",
@@ -18,7 +18,7 @@
   ],
   "properties": {
     "$schema": {
-      "const": "https://denchco.github.io/knowledge-base-wiki-standard/schema/verification-receipt-v1.json"
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/verification-receipt-v1.json"
     },
     "receiptVersion": { "const": "1.0" },
     "target": { "type": "string", "minLength": 1 },
