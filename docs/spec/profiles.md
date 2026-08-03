@@ -9,11 +9,15 @@ status: draft
 
 ## Profiles
 
-- **Portable Core** — OKF-compatible Markdown, manifest, source boundaries, links, logs, and validation.
-- **Evidence Governed** — source register, evidence matrix, validation queue, quality/status language, and research discipline.
-- **Human and Agent** — coordinated Human Wiki and operational LLM Wiki.
-- **Standard Production** — Zensical, DenchCo style, local Mermaid, Graphify 2D/3D, browser verification, stable runtime, and release controls.
-- **Managed Full** — CI, migration/release governance, Git/JJ provenance, deployment adapter, and complete conformance report.
+- **Portable Core** (`portable-core`) — UTF-8 Markdown with portable links, a DenchCo manifest, one mapped OKF v0.2 bundle, declared security/source boundaries, and narrow validation. Reserved OKF index/log files conform when present; this profile does not require rendered or managed research-log surfaces.
+- **Evidence Governed** (`evidence-governed`) — source register, evidence matrix, validation queue, quality/status language, and research discipline.
+- **Human and Agent** (`human-and-agent`) — coordinated Human Wiki and operational LLM Wiki.
+- **Standard Production** (`standard-production`) — Zensical, DenchCo style, local Mermaid, Graphify 2D/3D, browser verification, stable runtime, Git interoperability, and colocated Jujutsu phase provenance.
+- **Managed Full** (`managed-full`) — a planning profile that currently adds immutable release governance and declares future CI, deployment, portfolio, and complete-report capability targets.
+
+Each named profile has an executable YAML declaration in `profiles/` and inherits the preceding obligations. The candidate repository selects Standard Production; Managed Full exists for planning and validation but is not claimed because deployment and public release are deliberately unselected.
+
+Profile YAML is normative. A `required` capability value means the manifest must declare a non-false value; a specific profile value must match exactly. Capability declaration is not implementation evidence: a full-profile receipt must still name the requirement gates that prove behaviour. Managed Full's capability labels remain planning targets until stable requirement IDs and checks cover them, so the candidate MUST NOT advertise Managed Full conformance from those labels alone.
 
 ## Optional topic profiles
 
@@ -31,3 +35,5 @@ status: draft
 - Agent access: filesystem/CLI first, repository skill, GitHub MCP, future DenchCo standard MCP.
 
 Profiles are cumulative promises. Capabilities remain independently `PASS`, `FAIL`, `WAIVED`, `NOT APPLICABLE`, or `NOT IMPLEMENTED`.
+
+`DKBWS-PROV-001` makes Jujutsu part of the DenchCo Standard Production **maintenance-workspace** contract: history remains Git-interoperable, while a colocated Jujutsu workspace at the same repository root records reviewable validated phases. It is not a distribution-format requirement. Portable Core repositories, release archives, and explicit distribution/CI checkouts may remain Git-only; they MUST NOT present that narrower check as proof of a Standard Production maintainer workspace.

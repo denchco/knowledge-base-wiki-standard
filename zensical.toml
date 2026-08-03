@@ -5,7 +5,8 @@ site_url = "http://127.0.0.1:8017/"
 docs_dir = "docs"
 site_dir = "site"
 copyright = "Candidate standard: verify claims against registered primary sources."
-extra_css = ["assets/theme.css"]
+extra_css = ["assets/graph.css", "assets/content.css", "assets/layout-width.css", "assets/theme.css"]
+extra_javascript = ["assets/vendor/mermaid.min.js", "assets/mermaid-adapter.js", "assets/wiki.js", "assets/layout-width.js"]
 nav = [
   {"Start here" = [
     {"Home" = "index.md"},
@@ -18,6 +19,7 @@ nav = [
     {"Profiles" = "spec/profiles.md"},
     {"Conformance" = "spec/conformance.md"},
     {"Dependencies" = "spec/dependencies.md"},
+    {"Security and sources" = "spec/security-and-sources.md"},
     {"Prompts" = "spec/prompts.md"}
   ]},
   {"Evidence" = [
@@ -29,7 +31,17 @@ nav = [
   {"LLM Wiki" = [
     {"Agent entry point" = "llm-wiki/index.md"},
     {"Context map" = "llm-wiki/context-map.md"},
-    {"Maintenance" = "llm-wiki/maintenance.md"}
+    {"Maintenance" = "llm-wiki/maintenance.md"},
+    {"Graphify workflow" = "llm-wiki/graphify.md"}
+  ]},
+  {"Repository graph" = [
+    {"Overview" = "graph/index.md"},
+    {"Two-dimensional view" = "graph/two-dimensional.md"},
+    {"Three-dimensional view" = "graph/three-dimensional.md"}
+  ]},
+  {"Conformance evidence" = [
+    {"Evidence hub" = "conformance/index.md"},
+    {"Five-project dogfood audit" = "conformance/dogfood/comparison.md"}
   ]},
   {"References" = [
     {"Tools and sources" = "reference/tools-and-sources.md"},

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/lifecycle-plan-v1.json",
+  "title": "DenchCo read-only lifecycle result",
+  "type": "object",
+  "required": ["$schema", "planVersion", "kind", "readOnly", "writesPerformed", "target", "candidate", "summary"],
+  "properties": {
+    "$schema": { "const": "https://denchco.github.io/knowledge-base-wiki-standard/schema/lifecycle-plan-v1.json" },
+    "planVersion": { "const": "1.0" },
+    "kind": { "enum": ["lifecycle-diff", "upgrade-plan", "init-plan"] },
+    "readOnly": { "const": true },
+    "writesPerformed": { "const": false },
+    "dryRun": { "const": true },
+    "applySupported": { "const": false },
+    "target": { "type": "string" },
+    "evaluationDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "candidate": { "type": "object" },
+    "consumer": { "type": "object" },
+    "requirements": { "type": "array" },
+    "changes": { "type": "array", "items": { "$ref": "#/$defs/change" } },
+    "inspection": { "type": "object" },
+    "patchPlan": { "type": "object" },
+    "manualActions": { "type": "array", "items": { "$ref": "#/$defs/change" } },
+    "verificationPlan": { "type": "array", "items": { "type": "string" } },
+    "sourceDiff": { "type": "object" },
+    "targetState": { "type": "object" },
+    "input": { "type": "object" },
+    "proposedManifest": { "type": "object" },
+    "layout": { "type": "array" },
+    "stages": { "type": "array" },
+    "unresolvedInputs": { "type": "array", "items": { "type": "string" } },
+    "clarificationProtocol": { "type": "object" },
+    "safety": { "type": "object" },
+    "summary": { "type": "object" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "lifecycle-diff" } } },
+      "then": { "required": ["consumer", "requirements", "changes", "inspection"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "upgrade-plan" } } },
+      "then": { "required": ["dryRun", "applySupported", "consumer", "patchPlan", "manualActions", "verificationPlan", "sourceDiff"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "init-plan" } } },
+      "then": { "required": ["dryRun", "applySupported", "targetState", "input", "proposedManifest", "layout", "stages", "unresolvedInputs", "clarificationProtocol", "safety"] }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "change": {
+      "type": "object",
+      "required": ["id", "kind", "path", "current", "proposed", "reason", "automatic", "blocking"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["create", "replace", "manual"] },
+        "path": { "type": "string" },
+        "current": {},
+        "proposed": {},
+        "reason": { "type": "string", "minLength": 1 },
+        "automatic": { "type": "boolean" },
+        "blocking": { "type": "boolean" },
+        "requirement": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

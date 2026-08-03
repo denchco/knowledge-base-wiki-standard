@@ -1,0 +1,28 @@
+# DenchCo Knowledge Base Wiki Standard
+
+> An OKF v0.2-compatible, evidence-governed standard for coordinated Human and LLM wikis. This is a local `0.1.0-candidate`; generated pages and graphs never outrank canonical source.
+
+## Canonical entry points
+
+- [Normative specification](spec/): Requirements, profiles, conformance, dependencies, security, and prompt contract.
+- [LLM Wiki](llm-wiki/): Read order, context routing, maintenance, and Graphify workflow.
+- [Architecture](architecture/): Authority and product boundaries.
+- [Conformance evidence](conformance/): Machine-readable reports and five-project dogfooding.
+- [Sources](sources/): Registered upstream authorities.
+- [Validation queue](validation-queue/): Open evidence and release work.
+
+## Repository-first agent contract
+
+Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, and `docs/llm-wiki/index.md` from the repository. Preserve unknown OKF fields and declared deviations. Use Graphify query-first with scoped-source fallback. Ask material clarification questions sequentially as `Question 1 of N`.
+
+## Machine surfaces
+
+- `knowledge/` is the canonical portable OKF bundle.
+- `schema/` contains Draft 2020-12 interchange and conformance schemas.
+- `profiles/` contains cumulative profile declarations.
+- `prompts/instantiate-wiki.md` is the repeatable bootstrap prompt.
+- `node scripts/conformance-cli.mjs --help` describes the read-only and planning-only CLI.
+
+## Authority warning
+
+The rendered site, this discovery file, generated Graphify views, JSON exports, and LLM answers are navigation aids. Normative authority remains in released `docs/spec/`, `schema/`, and profile definitions; factual authority remains with registered sources and evidence records.

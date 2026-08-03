@@ -1,0 +1,6 @@
+/* Production content accents, scoped away from Zensical's runtime chrome. */
+
+.md-typeset table thead th {
+  background-color: var(--md-accent-fg-color--transparent);
+  color: var(--md-default-fg-color);
+}

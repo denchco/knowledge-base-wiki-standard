@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/graph-publication-v1.json",
+  "title": "DenchCo Graph Publication",
+  "description": "Shared enriched graph consumed by the reference 2D and 3D views.",
+  "type": "object",
+  "required": [
+    "publicationSchemaVersion",
+    "nodes",
+    "links"
+  ],
+  "properties": {
+    "publicationSchemaVersion": {
+      "const": "1.0"
+    },
+    "directed": {
+      "type": "boolean"
+    },
+    "multigraph": {
+      "type": "boolean"
+    },
+    "graph": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": ["string", "number"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "community": {
+            "type": ["string", "number", "null"]
+          },
+          "community_name": {
+            "type": ["string", "null"]
+          },
+          "source_file": {
+            "type": ["string", "null"]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target", "relation"],
+        "properties": {
+          "source": {
+            "type": ["string", "number"]
+          },
+          "target": {
+            "type": ["string", "number"]
+          },
+          "relation": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": ["string", "null"]
+          },
+          "source_file": {
+            "type": ["string", "null"]
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

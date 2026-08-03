@@ -15,5 +15,12 @@ status: draft
 - **Decision**: Defined coordinated Human and LLM Wiki products over shared canonical knowledge.
 - **Decision**: Selected Zensical and the DenchCo governed visual profile as the first-class human reference renderer.
 - **Decision**: Included Graphify, Jujutsu, local service, conformance, prompt/question, release, and future MCP contracts.
-- **Verification**: Canonical checks and strict Zensical build passed; dependency audit passed with zero known vulnerabilities after updating Playwright to `1.55.1`.
+- **Verification**: Canonical checks and strict Zensical build passed; dependency audits passed with zero known vulnerabilities after qualifying Playwright `1.62.1`.
 - **Runtime**: Reserved and verified the restart-resilient local service at `http://127.0.0.1:8017/` with HTTP 200 health.
+- **OKF implementation**: Added v0.2 hard validation, separate strict guidance, manifest validation, lossless export, stable diagnostics, and positive/negative fixtures.
+- **Lifecycle implementation**: Added read-only inspection/diff and planning-only initialization/upgrade commands with collision preservation, content hashes, and no apply mode.
+- **Production implementation**: Added local Mermaid and graph runtimes, six-layer Graphify enrichment, schema-versioned shared 2D/3D publication, strict Zensical build, governed visual checks, and built-output Playwright verification.
+- **Dogfood**: Audited NHS Data Sharing, Regulation 28, InterSystems, X-Lab, and Palantir without modifying them; separated formal claims from inferred adoption evidence and reconciled eleven candidate defects.
+- **Governance**: Added security, source handling, licensing-decision, contribution, and governance policies; public licensing and GitHub publication remain undecided.
+- **Provenance implementation**: Added stable `DKBWS-PROV-001`, a read-only Git/Jujutsu colocation and current-change check, five-project inferred evidence, and an explicit Git-only distribution mode that cannot masquerade as maintainer provenance. Locally qualified Git `2.50.1` and Jujutsu `0.39.0`; recorded upstream `0.42.0` as available but not yet qualified.
+- **Verification requalification**: Qualified the exact Node stack (`@google/design.md` `0.4.0`, Playwright `1.62.1`, 3d-force-graph `1.80.0`, Ajv `8.20.0`, Mermaid `11.16.0`, vis-network `10.1.0`, and YAML `2.9.0`) on the Node 24 LTS CI contract; compiled every Draft 2020-12 schema, schema-validated generated receipts and graph artifacts, added npm/Python vulnerability gates, and made full verification fail any canonical-file mutation.

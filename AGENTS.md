@@ -13,8 +13,9 @@
 - Canonical knowledge lives in maintained Markdown and registered evidence, never in generated HTML, LLM artifacts, Graphify output, or conversational answers.
 - Preserve unknown OKF frontmatter fields and documented local deviations.
 - Do not silently change the declared profile, waive a requirement, publish to GitHub, deploy, or alter evidence status.
-- `npm run check` and `npm run verify` are read-only with respect to canonical source. Regeneration commands must be explicit.
-- Use Git for interoperable history and GitHub releases. Use colocated Jujutsu for local phase provenance.
+- `npm run check` and `npm run verify` never rewrite canonical source. Verification may rebuild only the declared derived paths (`site/`, `graphify-out/`, `.cache/`, `output/verification/`, `GRAPH_REPORT.md`, and generated runtime/graph assets); unexpected tracked or unignored canonical changes fail the contract.
+- Conformance `inspect`, `validate`, `export-okf`, and `diff` are read-only. Candidate `upgrade` and `init` require `--dry-run`, emit review plans only, and have no apply mode.
+- Use Git for interoperable history and GitHub releases. Standard Production maintenance workspaces use colocated Jujutsu for local phase provenance under `DKBWS-PROV-001`; explicit distribution/CI mode is Git-only and does not prove that maintainer obligation.
 
 ## Clarification protocol
 
@@ -31,5 +32,6 @@ Update `N` as uncertainty narrows or expands. Do not ask a routine question when
 
 - Normative changes require a stable requirement ID, applicability, verification method, migration impact, changelog entry, and fixture change where automatable.
 - Changes derived from a project remain proposals until classified as project-specific, reusable, preferred, or core.
-- Run `npm run verify`, inspect `git status` and `jj status`, then record a JJ phase for substantive validated work.
+- Run `npm run verify`, run the read-only provenance check in maintainer mode, inspect `git status` and `jj status`, then record a JJ phase for substantive validated work.
 - After modifying canonical content or code, run `npm run graph:update` when Graphify is available.
+- If a Graphify query has insufficient recall, continue through its wiki/report and then the smallest relevant canonical source set; never treat graph absence as evidence absence.

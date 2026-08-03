@@ -1,0 +1,11 @@
+schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json"
+standard:
+  name: "DenchCo Knowledge Base Wiki Standard"
+  version: "0.1.0-candidate"
+  source: "local-fixture"
+profile: "portable-core"
+okf_version: "0.2"
+roles:
+  okf_bundle: "knowledge"
+capabilities: {}
+deviations: []

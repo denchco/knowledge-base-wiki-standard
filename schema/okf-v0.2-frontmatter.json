@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/okf-v0.2-frontmatter.json",
+  "title": "Open Knowledge Format v0.2 concept frontmatter",
+  "description": "A permissive schema for OKF v0.2 concept metadata. Unknown producer fields are intentionally preserved and accepted.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "resource": { "type": "string", "minLength": 1 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "usage_window": { "$ref": "#/$defs/dateRange" },
+    "generated": { "$ref": "#/$defs/generated" },
+    "verified": {
+      "oneOf": [
+        { "$ref": "#/$defs/verification" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/verification" }
+        }
+      ]
+    },
+    "status": { "enum": ["draft", "stable", "deprecated"] },
+    "stale_after": { "$ref": "#/$defs/date" },
+    "runtime": { "type": "string", "minLength": 1 },
+    "parameters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/parameter" }
+    },
+    "computation": { "type": "string", "minLength": 1 },
+    "executor": { "$ref": "#/$defs/executor" },
+    "attester": { "$ref": "#/$defs/endpoint" }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "string",
+      "anyOf": [
+        { "pattern": "^human:[^\\s:][^\\s]*$" },
+        { "pattern": "^process:[^\\s:][^\\s]*$" },
+        { "pattern": "^[^\\s/]+/[^\\s/]+$" }
+      ]
+    },
+    "dateRange": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "$ref": "#/$defs/date" },
+        "to": { "$ref": "#/$defs/date" }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": ["resource"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "resource": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "author": { "type": "string", "minLength": 1 },
+        "usage_count": { "type": "integer", "minimum": 0 },
+        "last_modified": { "$ref": "#/$defs/date" },
+        "usage_window": { "$ref": "#/$defs/dateRange" }
+      },
+      "additionalProperties": true
+    },
+    "generated": {
+      "type": "object",
+      "required": ["by"],
+      "properties": {
+        "by": { "$ref": "#/$defs/actor" },
+        "at": { "$ref": "#/$defs/dateTime" }
+      },
+      "additionalProperties": true
+    },
+    "verification": {
+      "type": "object",
+      "required": ["by", "at"],
+      "properties": {
+        "by": { "$ref": "#/$defs/actor" },
+        "at": { "$ref": "#/$defs/dateTime" }
+      },
+      "additionalProperties": true
+    },
+    "parameter": {
+      "type": "object",
+      "required": ["name", "type", "required"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "endpoint": {
+      "type": "object",
+      "required": ["resource"],
+      "properties": {
+        "resource": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "executor": {
+      "allOf": [
+        { "$ref": "#/$defs/endpoint" },
+        {
+          "type": "object",
+          "properties": {
+            "receipt": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

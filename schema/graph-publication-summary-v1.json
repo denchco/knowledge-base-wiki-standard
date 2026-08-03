@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/graph-publication-summary-v1.json",
+  "title": "DenchCo Graph Publication Summary",
+  "description": "Counts, provenance, relations, and enrichment coverage for one graph publication.",
+  "type": "object",
+  "required": [
+    "publicationSchemaVersion",
+    "status",
+    "nodes",
+    "edges",
+    "communities",
+    "sourceFiles",
+    "relations",
+    "interconnections"
+  ],
+  "properties": {
+    "publicationSchemaVersion": {
+      "const": "1.0"
+    },
+    "status": {
+      "type": "string"
+    },
+    "nodes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "edges": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "communities": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sourceFiles": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "builtAtCommit": {
+      "type": ["string", "null"]
+    },
+    "relations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "interconnections": {
+      "type": "object",
+      "required": [
+        "graphifyEdgeCount",
+        "markdownDocumentNodeCount",
+        "markdownLinkEdgeCount",
+        "sourceReferenceNodeCount",
+        "sourceReferenceEdgeCount",
+        "navNodeCount",
+        "navEdgeCount",
+        "fileHierarchyNodeCount",
+        "fileHierarchyEdgeCount",
+        "fileReferenceEdgeCount"
+      ],
+      "properties": {
+        "graphifyEdgeCount": { "type": "integer", "minimum": 0 },
+        "markdownDocumentNodeCount": { "type": "integer", "minimum": 0 },
+        "markdownLinkEdgeCount": { "type": "integer", "minimum": 0 },
+        "sourceReferenceNodeCount": { "type": "integer", "minimum": 0 },
+        "sourceReferenceEdgeCount": { "type": "integer", "minimum": 0 },
+        "navNodeCount": { "type": "integer", "minimum": 0 },
+        "navEdgeCount": { "type": "integer", "minimum": 0 },
+        "fileHierarchyNodeCount": { "type": "integer", "minimum": 0 },
+        "fileHierarchyEdgeCount": { "type": "integer", "minimum": 0 },
+        "fileReferenceEdgeCount": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,14 +1,40 @@
 {
   "name": "denchco-knowledge-base-wiki-standard",
-  "version": "0.1.0",
+  "version": "0.1.0-candidate",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "dev": "uv run zensical serve -f zensical.toml --dev-addr ${HOST:-127.0.0.1}:${PORT:-8017}",
-    "build": "uv run zensical build -f zensical.toml --strict",
-    "check": "node scripts/check-standard.mjs",
-    "verify": "npm run check && npm run build",
-    "graph:update": "uv run graphify update . --force",
+    "prepare:runtime": "node scripts/sync-runtime-assets.mjs",
+    "browser:install": "playwright install chromium",
+    "browser:install:ci": "playwright install --with-deps chromium",
+    "dev": "npm run prepare:runtime && uv run zensical serve -f zensical.toml --dev-addr ${HOST:-127.0.0.1}:${PORT:-8017}",
+    "build": "npm run graph:update && npm run build:site",
+    "build:site": "npm run prepare:runtime && uv run zensical build -f zensical.toml --strict",
+    "design:lint": "design.md lint DESIGN.md",
+    "graph:publish": "node scripts/publish-graphify-assets.mjs",
+    "graph:update": "npm run prepare:runtime && uv run graphify update . --force && npm run graph:publish",
+    "check:visual-shape": "node scripts/check-visual-shape-contract.mjs",
+    "check:graphify": "node scripts/check-graphify-assets.mjs",
+    "check:browser": "node scripts/check-runtime-browser-contract.mjs",
+    "check:adoption-audits": "node scripts/check-adoption-audits.mjs",
+    "check:canonical-content": "node scripts/check-canonical-content.mjs",
+    "check:schema-artifacts": "node scripts/check-schema-artifacts.mjs",
+    "check:provenance": "node scripts/check-provenance-mode.mjs",
+    "audit:node": "npm audit --audit-level=high",
+    "audit:python": "uv run pip-audit --local",
+    "conformance:inspect": "node scripts/conformance-cli.mjs inspect",
+    "conformance:validate": "node scripts/conformance-cli.mjs validate",
+    "conformance:export-okf": "node scripts/conformance-cli.mjs export-okf",
+    "conformance:diff": "node scripts/conformance-cli.mjs diff",
+    "conformance:upgrade-plan": "node scripts/conformance-cli.mjs upgrade --dry-run",
+    "conformance:init-plan": "node scripts/conformance-cli.mjs init --dry-run",
+    "conformance:full-report": "node scripts/full-profile-report.mjs",
+    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs",
+    "check": "node scripts/check-standard.mjs && npm run check:canonical-content && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
+    "verify": "node scripts/verify.mjs",
     "service:register": "node scripts/dev-service.mjs register",
     "service:install": "node scripts/dev-service.mjs install",
     "service:start": "node scripts/dev-service.mjs start",
@@ -27,11 +53,12 @@
     "command": "npm run dev"
   },
   "devDependencies": {
-    "@google/design.md": "0.2.0",
-    "@playwright/test": "1.55.1",
-    "3d-force-graph": "1.77.0",
+    "@google/design.md": "0.4.0",
+    "@playwright/test": "1.62.1",
+    "3d-force-graph": "1.80.0",
+    "ajv": "8.20.0",
     "mermaid": "11.16.0",
     "vis-network": "10.1.0",
-    "wrangler": "4.114.0"
+    "yaml": "2.9.0"
   }
 }

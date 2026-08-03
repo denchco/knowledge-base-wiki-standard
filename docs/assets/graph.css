@@ -1,0 +1,39 @@
+/* Functional graph sizing only. Production chrome remains Zensical-owned. */
+.graph-shell {
+  min-height: 520px;
+  height: clamp(520px, 68vh, 840px);
+  overflow: hidden;
+  position: relative;
+  border: var(--technical-frame-border-width) solid var(--accent-light);
+  border-radius: var(--component-radius);
+  background: var(--surface);
+}
+
+.graph-frame {
+  border: 0;
+  border-radius: calc(var(--component-radius) - 2px);
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.graph-error {
+  padding: 1rem;
+}
+
+.graph-text-alternative {
+  margin-block: 1rem;
+}
+
+.graph-text-alternative[open] {
+  max-height: 32rem;
+  overflow: auto;
+}
+
+@media (max-width: 760px) {
+  .graph-shell,
+  .graph-frame {
+    min-height: 380px;
+    height: 380px;
+  }
+}

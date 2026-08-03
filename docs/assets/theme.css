@@ -1,49 +1,375 @@
-:root {
-  --denchco-accent: #0b7285;
-  --denchco-accent-dark: #075866;
-  --denchco-accent-light: #d9f0f3;
-  --denchco-surface: #ffffff;
-  --denchco-background: #f6f8f9;
-  --denchco-text: #1f2933;
-  --denchco-muted: #52606d;
-  --denchco-border: #aab7c0;
-  --denchco-component-radius: .35rem;
-  --denchco-diagram-radius: 5px;
-  --denchco-border-width: 1px;
-  --denchco-technical-border-width: 1.75px;
-  --md-primary-fg-color: var(--denchco-accent);
-  --md-primary-fg-color--dark: var(--denchco-accent-dark);
-  --md-accent-fg-color: var(--denchco-accent);
-  --md-typeset-a-color: var(--denchco-accent);
-}
+/* Deterministic content tokens. Zensical continues to own renderer chrome. */
 
-.md-header {
-  background: var(--denchco-surface);
-  color: var(--denchco-text);
-}
+:root,
+body[data-md-color-primary],
+body[data-md-color-accent] {
+  --primary: #174a5b;
+  --accent: #0b7285;
+  --accent-dark: #075866;
+  --accent-darker: #06444f;
+  --accent-visited: #096777;
+  --accent-light: #42a5b3;
+  --accent-lightest: #d9f0f3;
+  --accent-transparent: rgb(11 114 133 / 10%);
+  --accent-transparent-strong: rgb(11 114 133 / 16%);
+  --accent-contrast: #ffffff;
+  --background: #f6f8f9;
+  --surface: #ffffff;
+  --text: #1f2933;
+  --muted: #52606d;
+  --border: #aab7c0;
+  --focus: #075866;
+  --focus-contrast: #ffffff;
+  --conditional: #a15c00;
+  --conditional-transparent: rgb(161 92 0 / 10%);
+  --success: #007f3b;
+  --success-transparent: rgb(0 127 59 / 10%);
+  --warning: #d5281b;
+  --component-radius: .35rem;
+  --component-radius-small: .2rem;
+  --component-radius-large: .5rem;
+  --diagram-node-radius: 5px;
+  --component-border-width: 1px;
+  --accent-rail-width: .3rem;
+  --source-row-rail-width: .25rem;
+  --technical-frame-border-width: 1.75px;
+  --list-marker-indent: 1.2rem;
+  --list-marker-size: 1em;
+  --compact-data-font-size: .64rem;
+  --diagram-text-size: var(--compact-data-font-size);
+  --sequential-menu-rail-width: 1.5px;
 
-.md-search__button {
-  background: var(--denchco-background);
-  color: var(--denchco-text);
+  /* Material-compatible aliases consumed by the stock Zensical renderer. */
+  --md-primary-fg-color: var(--primary);
+  --md-primary-fg-color--light: var(--accent-light);
+  --md-primary-fg-color--dark: var(--accent-dark);
+  --md-primary-bg-color: var(--accent-contrast);
+  --md-primary-bg-color--light: rgb(255 255 255 / 70%);
+  --md-accent-fg-color: var(--accent);
+  --md-accent-fg-color--transparent: var(--accent-transparent);
+  --md-accent-bg-color: var(--accent-contrast);
+  --md-accent-bg-color--light: rgb(255 255 255 / 70%);
+  --md-typeset-a-color: var(--accent);
+  --md-code-hl-color: var(--accent);
+  --md-code-hl-color--light: var(--accent-transparent);
 }
 
 .md-typeset a {
-  color: var(--denchco-accent);
-  text-underline-offset: .14em;
+  color: var(--accent);
+  text-underline-offset: .13em;
 }
 
-.md-typeset a:hover,
-.md-typeset a:focus-visible {
-  color: var(--denchco-accent-dark);
+.md-typeset a:visited {
+  color: var(--accent-visited);
 }
 
-.md-typeset table:not([class]) {
-  border: var(--denchco-border-width) solid var(--denchco-border);
-  border-radius: var(--denchco-component-radius);
+.md-typeset a:hover {
+  color: var(--accent-dark);
 }
 
-.md-typeset :is(a, button, input, select):focus-visible,
-.md-nav__link:focus-visible {
-  outline: 3px solid var(--denchco-accent-dark);
+.md-typeset a:active {
+  color: var(--accent-darker);
+}
+
+.md-nav--primary .md-nav__link:is([href], [for]):hover:not(.md-nav__link--active),
+.md-nav--secondary .md-nav__link:is([href], [for]):hover:not(.md-nav__link--active) {
+  background-color: var(--accent-transparent);
+  color: var(--accent-dark);
+}
+
+.md-nav--primary .md-nav__item--active > .md-nav__link,
+.md-nav--primary .md-nav__item .md-nav__link--active,
+.md-nav--secondary .md-nav__link--active {
+  background-color: var(--accent-transparent);
+  color: var(--accent-dark);
+}
+
+.md-header__button {
+  color: var(--accent-dark);
+}
+
+.md-header {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.md-search__button {
+  background-color: var(--md-default-fg-color--lightest);
+  color: var(--text);
+}
+
+.md-header__button:hover {
+  background-color: var(--accent-transparent);
+  color: var(--accent-dark);
+  opacity: 1;
+}
+
+.md-header__button:active {
+  background-color: var(--accent-transparent-strong);
+  color: var(--accent-darker);
+  opacity: 1;
+}
+
+.md-tabs__item--active {
+  border-color: var(--accent);
+}
+
+.md-tabs__item--active .md-tabs__link,
+.md-tabs__link:hover {
+  color: var(--accent-dark);
+}
+
+.md-typeset .tabbed-labels {
+  --md-default-fg-color: var(--accent-dark);
+}
+
+.js .md-typeset .tabbed-labels::before {
+  background-color: var(--accent);
+}
+
+.md-typeset .tabbed-labels > label:hover,
+.md-typeset a.md-tag[href]:hover {
+  background-color: var(--accent-transparent);
+  color: var(--accent-dark);
+}
+
+.md-typeset .md-button--primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.md-typeset .md-button--primary:hover,
+.md-typeset .md-button--primary:active {
+  background-color: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: var(--accent-contrast);
+  opacity: 1;
+}
+
+.md-typeset .md-button:not(.md-button--primary):hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.md-typeset :is(input[type="checkbox"], input[type="radio"], select) {
+  accent-color: var(--accent);
+}
+
+.md-typeset blockquote.governing-question {
+  border-inline-start-color: var(--accent);
+}
+
+.md-typeset blockquote.governing-question > p {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  background-color: var(--accent-transparent);
+}
+
+.md-typeset .admonition.note > .admonition-title::before,
+.md-typeset details.note > summary::before {
+  background-color: var(--accent);
+}
+
+.md-typeset .md-input:hover,
+.md-typeset .md-input:focus {
+  border-color: var(--accent);
+}
+
+.md-typeset a:is(:focus-visible, .focus-visible),
+.md-typeset button:is(:focus-visible, .focus-visible),
+.md-typeset input:is(:focus-visible, .focus-visible),
+.md-typeset select:is(:focus-visible, .focus-visible),
+.md-nav__link:is(:focus-visible, .focus-visible),
+.md-header__button:is(:focus-visible, .focus-visible),
+.md-search__button:is(:focus-visible, .focus-visible),
+.md-tabs__link:is(:focus-visible, .focus-visible),
+.md-select__link:is(:focus-visible, .focus-visible),
+input.md-option:is(:focus-visible, .focus-visible) + label,
+.layout-width-toggle:is(:focus-visible, .focus-visible) {
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--focus-contrast);
+}
+
+.md-typeset .requirement-tier {
+  border: var(--component-border-width) solid var(--border);
+  border-left: var(--accent-rail-width) solid var(--accent);
+  border-radius: var(--component-radius);
+  background: var(--accent-transparent);
+  margin: 1rem 0;
+  padding: .85rem 1rem;
+}
+
+.md-typeset .requirement-tier h3 {
+  color: var(--primary);
+  margin: 0 0 .35rem;
+}
+
+.md-typeset .tier-envelope {
+  background: var(--conditional-transparent);
+  border-left-color: var(--conditional);
+}
+
+.md-typeset .tier-envelope h3 {
+  color: var(--conditional);
+}
+
+.md-typeset .tier-ceiling {
+  background: var(--success-transparent);
+  border-left-color: var(--success);
+}
+
+.md-typeset .tier-ceiling h3 {
+  color: var(--success);
+}
+
+.md-typeset .status-pill {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: .12rem .45rem;
+}
+
+.md-typeset table {
+  border: var(--component-border-width) solid var(--border);
+  border-radius: var(--component-radius);
+  font-size: var(--compact-data-font-size);
+}
+
+.md-typeset ul:not(.task-list) {
+  list-style-type: square;
+  margin-inline-start: 0;
+  padding-inline-start: var(--list-marker-indent);
+}
+
+.md-typeset ul:not(.task-list) > li {
+  margin-inline-start: 0;
+}
+
+.md-typeset ul:not(.task-list) > li::marker {
+  color: var(--text);
+  font-size: var(--list-marker-size);
+}
+
+.md-nav--secondary .md-nav__list {
+  border-inline-start: var(--sequential-menu-rail-width) solid var(--border);
+}
+
+.md-nav--secondary .md-nav__link {
+  color: var(--muted);
+}
+
+.md-nav--secondary .md-nav__link--active {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.md-typeset table tr:target {
+  background: var(--accent-lightest);
+  box-shadow: inset var(--source-row-rail-width) 0 0 var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.md-typeset table tr:has(span:target) {
+  background: var(--accent-lightest);
+  box-shadow: inset var(--source-row-rail-width) 0 0 var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.md-typeset table tr:target a,
+.md-typeset table tr:has(span:target) a {
+  color: var(--accent-dark);
+}
+
+.md-typeset table tr:target a:hover,
+.md-typeset table tr:has(span:target) a:hover {
+  color: var(--accent-darker);
+}
+
+.md-typeset__table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.md-typeset .mermaid {
+  border: 0;
+  background: transparent;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 0;
+}
+
+.md-typeset .mermaid .node rect,
+.md-typeset .mermaid .node polygon {
+  rx: var(--diagram-node-radius);
+  ry: var(--diagram-node-radius);
+  fill: var(--accent-lightest) !important;
+  stroke: var(--accent) !important;
+}
+
+.md-typeset .mermaid .edgePath path,
+.md-typeset .mermaid .flowchart-link,
+.md-typeset .mermaid .messageLine0,
+.md-typeset .mermaid .messageLine1 {
+  stroke: var(--accent) !important;
+}
+
+.md-typeset .mermaid marker path,
+.md-typeset .mermaid .arrowheadPath {
+  fill: var(--accent) !important;
+  stroke: var(--accent) !important;
+}
+
+.md-typeset .mermaid .cluster rect {
+  fill: var(--surface) !important;
+  stroke: var(--accent-light) !important;
+  rx: var(--component-radius-large);
+  ry: var(--component-radius-large);
+}
+
+.md-typeset .mermaid .nodeLabel,
+.md-typeset .mermaid .edgeLabel,
+.md-typeset .mermaid .label,
+.md-typeset .mermaid text {
+  color: var(--text) !important;
+  fill: var(--text) !important;
+  font-size: var(--diagram-text-size) !important;
+}
+
+.md-typeset .mermaid foreignObject,
+.md-typeset .mermaid foreignObject div,
+.md-typeset .mermaid foreignObject span,
+.md-typeset .mermaid foreignObject p {
+  font-size: var(--diagram-text-size) !important;
+  line-height: 1.2 !important;
+}
+
+.md-typeset .mermaid .note {
+  fill: #fff4e5 !important;
+  stroke: #8a4b00 !important;
+}
+
+.md-typeset .mermaid .activation0,
+.md-typeset .mermaid .activation1,
+.md-typeset .mermaid .activation2 {
+  fill: var(--accent-lightest) !important;
+  stroke: var(--accent) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset *,
+  .layout-width-toggle {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
 }

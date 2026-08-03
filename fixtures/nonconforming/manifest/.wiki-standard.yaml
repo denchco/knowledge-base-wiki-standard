@@ -1,0 +1,14 @@
+schema: ""
+standard:
+  name: "A different standard"
+  version: ""
+profile: ""
+okf_version: "0.1"
+roles:
+  outside: "../outside.md"
+capabilities: []
+deviations:
+  - requirement: "NOT-STABLE"
+    status: "ignored"
+    reason: ""
+unexpected: true

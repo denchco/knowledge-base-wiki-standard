@@ -1,0 +1,129 @@
+{
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json",
+  "report_version": "0.1.0-candidate",
+  "audit": {
+    "id": "dogfood-nhs-data-sharing-2026-08-03",
+    "performed_at": "2026-08-03T11:22:41Z",
+    "mode": "read-only-inferred",
+    "standard_name": "DenchCo Knowledge Base Wiki Standard",
+    "standard_version": "0.1.0-candidate",
+    "standard_snapshot": "c3469da5bd2be4587d6d9e256c99c9557a61faec+working-tree",
+    "status_vocabulary": ["PASS", "FAIL", "WAIVED", "NOT_APPLICABLE", "NOT_IMPLEMENTED"],
+    "confidence_vocabulary": ["HIGH", "MEDIUM", "LOW"],
+    "confidence": "MEDIUM",
+    "waivers_recognized": 0,
+    "method": [
+      "Read the nearest AGENTS.md before inspection.",
+      "Queried the existing Graphify graph before scoped source inspection.",
+      "Mapped canonical roles to actual project paths rather than assuming filenames.",
+      "Did not run npm run verify because it intentionally regenerates derived files.",
+      "Probed only the declared local canonical URL; no audited-project files were changed."
+    ]
+  },
+  "project": {
+    "name": "NHS Data Sharing",
+    "root": "[local-projects]/NHS Data Sharing",
+    "git_head": "6e046241a7671cb1ef35792dfb46b79504817977",
+    "working_tree_entries_at_audit": 25,
+    "graphify_graph_present": true,
+    "graph_query": "Which files implement the human wiki, LLM wiki, evidence governance, source register, evidence matrix, validation queue, design contract, Graphify publication, verification, dependency management, local service, and deployment?",
+    "local_runtime_probe": {
+      "url": "http://127.0.0.1:8015/",
+      "http_status": 200,
+      "status": "PASS"
+    }
+  },
+  "formal_conformance": {
+    "status": "FAIL",
+    "reason": "The project predates the candidate and has no .wiki-standard.yaml declaring a DenchCo version, role mappings, capabilities, deviations, or waivers. Capability results below are inferred adoption evidence, not a formal conformance claim."
+  },
+  "profile_assessment": {
+    "declared_legacy_profile": "Full / Level 7 (operational) under the Evidence-Linked Knowledge Standard",
+    "closest_candidate_profile": "standard-production",
+    "confidence": "MEDIUM",
+    "topic_profiles": ["question-led-decision-wiki"],
+    "managed_full_readiness": "partial",
+    "summary": "The closest and most complete standard-production exemplar in this sample, but it lacks the candidate manifest and security/source-policy set, its OKF output is a custom catalogue rather than proven OKF v0.2, and its published graph runtimes are CDN-hosted."
+  },
+  "role_mappings": {
+    "manifest": {"status": "FAIL", "confidence": "HIGH", "paths": []},
+    "human_wiki": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/index.md", "zensical.toml"]},
+    "llm_wiki": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "docs/llm-wiki/routing.md", "AGENTS.md"]},
+    "source_register": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/evidence/sources.md"]},
+    "evidence_matrix": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/evidence/matrix.md"]},
+    "validation_queue": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/evidence/validation-queue.md"]},
+    "research_log": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/evidence/research-log.md"]},
+    "design_contract": {"status": "PASS", "confidence": "HIGH", "paths": ["DESIGN.md", "scripts/check-visual-shape.mjs"]},
+    "canonical_concept_registry": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/canonical-concept-links.json", "scripts/check-canonical-concept-links.mjs"]},
+    "graph_publication": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/graph/index.md", "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md", "docs/assets/generated/graph.json", "docs/assets/generated/graph.html", "docs/assets/generated/graph-3d.html", "docs/assets/generated/summary.json"]},
+    "dependency_contract": {"status": "PASS", "confidence": "HIGH", "paths": ["pyproject.toml", "uv.lock", "package.json", "package-lock.json"]},
+    "runtime_and_deployment": {"status": "PASS", "confidence": "HIGH", "paths": ["package.json", "scripts/dev_service.mjs", "DEPLOYMENT.md", ".github/workflows/verify.yml", ".github/workflows/deploy-cloudflare-pages.yml"]},
+    "okf_export": {"status": "FAIL", "confidence": "HIGH", "paths": ["scripts/export-okf.mjs", "okf-out/bundle.json"]}
+  },
+  "capabilities": [
+    {"id": "human-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["zensical.toml", "docs/project/conformance.md"], "finding": "Strict Zensical site, reader-led navigation, public and local canonical URLs."},
+    {"id": "llm-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "AGENTS.md"], "finding": "Read order, response, maintenance, authority and generated boundaries are explicit across mapped files."},
+    {"id": "evidence-governance", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence/sources.md", "docs/evidence/matrix.md", "docs/evidence/validation-queue.md", "docs/evidence/research-log.md"], "finding": "Stable SRC/CLM/VAL identities, provenance, status and limitations are maintained."},
+    {"id": "okf-v0.2", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["scripts/export-okf.mjs", "okf-out/bundle.json"], "finding": "The sidecar is a custom document catalogue with okfCompatible=true; it has no okf_version, OKF concept metadata, source mapping or unknown-field round-trip proof."},
+    {"id": "contextual-links", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/canonical-concept-links.json", "scripts/check-canonical-concept-links.mjs"], "finding": "Substantive concepts require checked non-navigation inbound routes including LLM routing."},
+    {"id": "graphify-raw", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["graphify-out/graph.json", "scripts/graph-update.mjs"], "finding": "Queryable repository graph exists and is refreshed by the knowledge update path."},
+    {"id": "graphify-published-2d-3d", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/generated/graph.json", "docs/assets/generated/graph.html", "docs/assets/generated/graph-3d.html", "docs/assets/generated/summary.json", "scripts/check-graphify-assets.mjs"], "finding": "865-node/2,377-edge enriched dataset, checked 2D and force-directed 3D publications."},
+    {"id": "design-governance", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "scripts/check-visual-shape.mjs"], "finding": "Named colour, semantic, shape, rail, border and layout tokens have an executable custom check."},
+    {"id": "zensical", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["pyproject.toml", "uv.lock", "zensical.toml"], "finding": "Zensical 0.0.51 is exactly pinned and is the only active renderer."},
+    {"id": "local-browser-runtimes", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/assets/generated/graph.html", "docs/assets/generated/graph-3d.html"], "finding": "Published graph pages load vis-network 9.1.6 and 3d-force-graph 1.77.0 from unpkg rather than repository-local assets."},
+    {"id": "browser-verification", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/project/conformance.md"], "finding": "Desktop/mobile, graph, focus, deep-link and geometry checks are recorded.", "limitations": ["No repository-pinned Playwright fixture was found and this audit did not replay the historical browser pass."]},
+    {"id": "one-command-verification", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", ".github/workflows/verify.yml"], "finding": "npm run verify covers content, evidence, links, concepts, graph and strict build.", "limitations": ["The command regenerates declared derived artifacts before checking; the standard must define whether this is compatible with read-only verification."]},
+    {"id": "stable-local-runtime", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "scripts/dev_service.mjs", "docs/project/conformance.md"], "finding": "Port 8015 returned HTTP 200 during this audit."},
+    {"id": "deployment", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DEPLOYMENT.md", ".github/workflows/deploy-cloudflare-pages.yml"], "finding": "Cloudflare Direct Upload, clean/exact-commit gate, health, secret boundary and rollback are documented."},
+    {"id": "jujutsu", "status": "PASS", "confidence": "HIGH", "evidence_paths": [".jj", "scripts/jj-phase-helper.mjs", "AGENTS.md"], "finding": "Colocated Jujutsu phase provenance is implemented alongside Git."},
+    {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version diff, deviation-preserving patch or migration workflow exists yet."},
+    {"id": "bounded-ask-wiki", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": [], "finding": "This topic profile does not claim Ask Wiki."}
+  ],
+  "requirement_summary": {"PASS": 12, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 3},
+  "requirements": [
+    {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-links.mjs"], "finding": "Canonical knowledge is UTF-8 Markdown with checked relative links."},
+    {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No .wiki-standard.yaml declares standard version, roles, capabilities and deviations."},
+    {"id": "DKBWS-OKF-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["scripts/export-okf.mjs", "okf-out/bundle.json"], "finding": "Custom catalogue is labelled compatible but does not demonstrate OKF v0.2 concept consumption or an explicit mapped extension."},
+    {"id": "DKBWS-OKF-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["scripts/export-okf.mjs"], "finding": "Exporter enumerates paths only; no unknown-field preservation or round-trip fixture exists."},
+    {"id": "DKBWS-OKF-003", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["scripts/export-okf.mjs", "okf-out/bundle.json"], "finding": "No DenchCo manifest maps one canonical OKF bundle directory."},
+    {"id": "DKBWS-EVID-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence/sources.md"], "finding": "Stable source IDs and provenance are explicit."},
+    {"id": "DKBWS-EVID-002", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence/matrix.md", "docs/evidence/validation-queue.md"], "finding": "Material claims route to evidence, limitations and open validation items."},
+    {"id": "DKBWS-HUMAN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["zensical.toml", "package.json", "docs/project/conformance.md"], "finding": "Strict build and stable public/local URLs are declared; local URL returned 200."},
+    {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "AGENTS.md"], "finding": "All required operational semantics are present across mapped agent files."},
+    {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/canonical-concept-links.json", "scripts/check-canonical-concept-links.mjs"], "finding": "Contextual inbound links beyond navigation are executable obligations."},
+    {"id": "DKBWS-GRAPH-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/generated/graph.json", "docs/assets/generated/graph.html", "docs/assets/generated/graph-3d.html", "scripts/check-graphify-assets.mjs"], "finding": "One enriched dataset drives real 2D and 3D publications."},
+    {"id": "DKBWS-DESIGN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "scripts/check-visual-shape.mjs"], "finding": "Named tokens and a project linter/check are present."},
+    {"id": "DKBWS-RENDER-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["pyproject.toml", "docs/assets/generated/graph.html", "docs/assets/generated/graph-3d.html"], "finding": "Zensical is pinned, but claimed production graph runtimes are remote unpkg dependencies rather than local browser assets."},
+    {"id": "DKBWS-PROV-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": [".git", ".jj", "scripts/jj-phase-helper.mjs", "AGENTS.md"], "finding": "The inspected maintenance workspace has Git-interoperable history, colocated Jujutsu, and an explicit validated-phase helper. This is inferred adoption evidence, not a formal DenchCo claim."},
+    {"id": "DKBWS-VERIFY-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", ".github/workflows/verify.yml"], "finding": "One verification command covers claimed capabilities without editing canonical knowledge.", "limitations": ["It refreshes tracked derived files; candidate wording about read-only behaviour is ambiguous."]},
+    {"id": "DKBWS-VERIFY-002", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No schema-valid DenchCo conformance report with stable diagnostic codes is emitted."},
+    {"id": "DKBWS-RUNTIME-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "docs/project/conformance.md"], "finding": "Canonical local URL returned HTTP 200 at audit time."},
+    {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Blocking clarification is explicitly one-at-a-time and numbered Question X of N."},
+    {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No candidate-standard upgrade mechanism exists."},
+    {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "The inferred standard-production profile is not a public DenchCo standard distribution claim; project deployment controls were assessed separately."},
+    {"id": "DKBWS-SEC-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/about/governance-privacy-corrections.md", "DEPLOYMENT.md", "docs/llm-wiki/maintenance.md"], "finding": "Personal-data, secret and disappearing-source handling exist, but a complete copyright/licensing and source-retention policy is not declared."}
+  ],
+  "candidate_false_positive_risks": [
+    {"id": "FP-OKF-LABEL", "finding": "Accepting okfCompatible=true would wrongly pass a catalogue without OKF v0.2 semantics or round-trip preservation."},
+    {"id": "FP-GRAPH-FILES", "finding": "Presence of 2D/3D HTML and versioned CDN URLs would wrongly pass the local-runtime requirement."},
+    {"id": "FP-HISTORICAL-VERIFICATION", "finding": "A prose conformance record should not be treated as a current executable browser result."}
+  ],
+  "candidate_false_negative_risks": [
+    {"id": "FN-ROLE-PATHS", "finding": "Evidence roles live under docs/evidence/ rather than the candidate's root docs filenames; filename-only checks would miss a stronger equivalent."},
+    {"id": "FN-CUSTOM-DESIGN-LINT", "finding": "The project uses an executable custom visual-shape check rather than @google/design.md; dependency-name checks would miss the behaviour."},
+    {"id": "FN-DISTRIBUTED-LLM-CONTRACT", "finding": "Read order, ingest/query/lint equivalents and authority are distributed across AGENTS.md and two LLM pages rather than one file."}
+  ],
+  "recommendations": [
+    "Add a DenchCo manifest that maps the existing stronger role paths and records inferred capabilities without moving files.",
+    "Replace the custom OKF catalogue with a validator-backed OKF v0.2 sidecar and unknown-field round-trip fixtures.",
+    "Vendor and lock graph browser runtimes, then add an offline/no-CDN browser fixture.",
+    "Adopt the standard security, source-retention, copyright and licensing policies by reference or mapped local equivalents.",
+    "Add a reviewable candidate-standard diff/upgrade path; do not overwrite local question-led improvements."
+  ],
+  "audit_limitations": [
+    "The audit included 25 pre-existing dirty working-tree entries; it describes the inspected working tree, not only git_head.",
+    "Graphify query recall was shallow, so graph results were used for routing and corroborated from source files.",
+    "Historical browser and CI claims were inspected but not replayed because doing so would regenerate project artifacts.",
+    "No external production URL health claim was rechecked in this sub-audit."
+  ]
+}

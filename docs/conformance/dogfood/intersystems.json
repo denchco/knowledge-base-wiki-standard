@@ -1,0 +1,133 @@
+{
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json",
+  "report_version": "0.1.0-candidate",
+  "audit": {
+    "id": "dogfood-intersystems-2026-08-03",
+    "performed_at": "2026-08-03T11:22:41Z",
+    "mode": "read-only-inferred",
+    "standard_name": "DenchCo Knowledge Base Wiki Standard",
+    "standard_version": "0.1.0-candidate",
+    "standard_snapshot": "c3469da5bd2be4587d6d9e256c99c9557a61faec+working-tree",
+    "status_vocabulary": ["PASS", "FAIL", "WAIVED", "NOT_APPLICABLE", "NOT_IMPLEMENTED"],
+    "confidence_vocabulary": ["HIGH", "MEDIUM", "LOW"],
+    "confidence": "MEDIUM",
+    "waivers_recognized": 0,
+    "method": [
+      "Read the nearest AGENTS.md before inspection.",
+      "Queried the existing Graphify graph before scoped source inspection.",
+      "Mapped root-level legacy role paths and Material adapter evidence.",
+      "Did not run npm run verify because this was a read-only cross-project audit.",
+      "Probed the documented local canonical URL; no audited-project files were changed."
+    ]
+  },
+  "project": {
+    "name": "InterSystems",
+    "root": "[local-projects]/InterSystems",
+    "git_head": "fc852bb63e7a4a3dcce01a99a1472e468c808088",
+    "working_tree_entries_at_audit": 0,
+    "graphify_graph_present": true,
+    "graph_query": "Which files implement the human wiki, LLM wiki, evidence governance, source register, evidence matrix, validation queue, design contract, Graphify publication, verification, dependency management, local service, and deployment?",
+    "local_runtime_probe": {
+      "url": "http://127.0.0.1:8002/",
+      "http_status": 404,
+      "listener_present": true,
+      "listener_process": "mkdocs serve",
+      "status": "FAIL",
+      "finding": "A listening process is not sufficient health evidence; the declared canonical root returned 404."
+    }
+  },
+  "formal_conformance": {
+    "status": "FAIL",
+    "reason": "The repository has no .wiki-standard.yaml and uses an intentionally preserved Material implementation. Results below infer its compatibility-profile capabilities without treating renderer difference as a defect."
+  },
+  "profile_assessment": {
+    "declared_legacy_profile": "No single current level claim found; repository instructions describe evidence, LLM, graph, design, JJ and deployment contracts.",
+    "closest_candidate_profile": "evidence-governed + human-and-agent + material-mkdocs compatibility + graph-linked + design-governed",
+    "confidence": "MEDIUM",
+    "topic_profiles": ["revision-and-learning-wiki", "bounded-ask-wiki"],
+    "standard_production_readiness": "not targeted",
+    "summary": "A mature Material compatibility exemplar with the richest long-lived LLM operating guide and strong graph freshness checks. It intentionally treats OKF as a future sidecar and currently fails its declared local HTTP health contract."
+  },
+  "role_mappings": {
+    "manifest": {"status": "FAIL", "confidence": "HIGH", "paths": []},
+    "human_wiki": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/index.md", "mkdocs.yml"]},
+    "llm_wiki": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "docs/llm-wiki/context-map.md", "docs/llm-wiki/architecture.md", "AGENTS.md"]},
+    "source_register": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/sources.md"]},
+    "evidence_matrix": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/evidence-matrix.md"]},
+    "validation_queue": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/evidence-validation-queue.md"]},
+    "research_log": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/log.md"]},
+    "design_contract": {"status": "PASS", "confidence": "HIGH", "paths": ["DESIGN.md", "package.json", "tests/"]},
+    "graph_publication": {"status": "PASS", "confidence": "HIGH", "paths": ["docs/llm-wiki/graphify.md", "docs/llm-wiki/graphify-2d.md", "docs/llm-wiki/graphify-3d.md", "docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "docs/assets/graphify/summary.json"]},
+    "dependency_contract": {"status": "PASS", "confidence": "HIGH", "paths": ["requirements.txt", "requirements-tools.txt", "package-lock.json"], "limitations": ["Browser graph runtimes are CDN dependencies and the design linter is fetched by npx rather than locked in package-lock.json."]},
+    "runtime_and_deployment": {"status": "FAIL", "confidence": "HIGH", "paths": ["docs/project-ops/deployment.md", "DEPLOYMENT.md", ".github/workflows/pages.yml"], "limitations": ["Deployment is documented, but the declared local root returned 404 at audit time."]},
+    "okf_export": {"status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "paths": ["docs/llm-wiki/maintenance.md"]}
+  },
+  "capabilities": [
+    {"id": "human-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["mkdocs.yml", "scripts/check-mkdocs.mjs", "docs/project-ops/deployment.md"], "finding": "Strict Material build, extensive task-oriented navigation and documented public URL."},
+    {"id": "llm-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "docs/llm-wiki/context-map.md", "AGENTS.md"], "finding": "Detailed read map, ingest/query/update/lint equivalents, evidence authority, generated boundaries and response contract."},
+    {"id": "evidence-governance", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/sources.md", "docs/evidence-matrix.md", "docs/evidence-validation-queue.md", "docs/log.md"], "finding": "Stable source IDs, claim-level boundaries and a clear To Do/Done/current synthesis model."},
+    {"id": "okf-v0.2", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm-wiki/maintenance.md"], "finding": "The maintenance contract explicitly treats OKF as a future optional sidecar and describes conversion hazards."},
+    {"id": "contextual-links", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/context-map.md", "hooks/presentation_rules.py"], "finding": "Operational maps and synthesis contain extensive contextual routes beyond navigation; build hooks add canonical-title links.", "limitations": ["No explicit inbound-link obligation registry defines all canonical concepts."]},
+    {"id": "graphify-raw", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["graphify-out/graph.json", "AGENTS.md"], "finding": "Graph exists and query-first rules are explicit."},
+    {"id": "graphify-published-2d-3d", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "docs/assets/graphify/summary.json", "scripts/check-graphify-freshness.mjs"], "finding": "1,958-node/6,629-edge enriched shared dataset, 2D/3D views and temp-copy freshness verification."},
+    {"id": "design-governance", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "package.json", "tests/"], "finding": "Google-format structured tokens, @google/design.md lint and presentation tests are present."},
+    {"id": "zensical", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["mkdocs.yml"], "finding": "Material for MkDocs is intentionally retained as a compatibility adapter."},
+    {"id": "material-mkdocs", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["requirements.txt", "mkdocs.yml", "scripts/check-mkdocs.mjs"], "finding": "MkDocs 1.6.1 and Material 9.7.6 are exactly pinned and strict-built."},
+    {"id": "local-browser-runtimes", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["mkdocs.yml", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html"], "finding": "Not a standard-production claim; Mermaid and graph runtimes currently use jsDelivr/unpkg, so this capability is not implemented."},
+    {"id": "browser-verification", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["scripts/smoke-graphify-rendered.mjs", "tests/", "DEPLOYMENT.md"], "finding": "Presentation tests and graph smoke checks exist.", "limitations": ["No pinned Playwright dependency or complete DenchCo browser contract was found."]},
+    {"id": "one-command-verification", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "scripts/check-graphify-freshness.mjs"], "finding": "npm run verify lints design, runs presentation tests, strict-builds MkDocs and verifies Graphify in a temporary copy."},
+    {"id": "stable-local-runtime", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/project-ops/deployment.md", "docs/llm-wiki/maintenance.md"], "finding": "The declared root returned 404 during the audit despite a listening MkDocs process."},
+    {"id": "deployment", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DEPLOYMENT.md", ".github/workflows/pages.yml", "wrangler.jsonc"], "finding": "GitHub Pages and Cloudflare/Ask paths are documented and verified historically."},
+    {"id": "jujutsu", "status": "PASS", "confidence": "HIGH", "evidence_paths": [".jj", "AGENTS.md", "docs/llm-wiki/maintenance.md"], "finding": "JJ is explicitly required for development-pass visibility alongside Git."},
+    {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware upgrade and deviation merge exists."},
+    {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/ask.md", "functions/api/ask.js", "DEPLOYMENT.md"], "finding": "Cloudflare Ask is bounded by retrieval, source links, secrets and documented authority limits."}
+  ],
+  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 2, "NOT_IMPLEMENTED": 5},
+  "requirements": [
+    {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-mkdocs.mjs"], "finding": "Canonical knowledge is Markdown and strict-built with portable local links."},
+    {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, roles, capabilities or deviations."},
+    {"id": "DKBWS-OKF-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm-wiki/maintenance.md"], "finding": "OKF is analysed but no sidecar or mapped extension is generated."},
+    {"id": "DKBWS-OKF-002", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No OKF unknown-field round-trip tooling exists."},
+    {"id": "DKBWS-OKF-003", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm-wiki/maintenance.md"], "finding": "No DenchCo manifest maps a canonical OKF bundle directory."},
+    {"id": "DKBWS-EVID-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/sources.md"], "finding": "Stable SRC identities and provenance are maintained."},
+    {"id": "DKBWS-EVID-002", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence-matrix.md", "docs/evidence-validation-queue.md"], "finding": "Claims route to confidence, limitations and open gaps."},
+    {"id": "DKBWS-HUMAN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["mkdocs.yml", "scripts/check-mkdocs.mjs", "DEPLOYMENT.md"], "finding": "Strict build and a documented stable production URL exist.", "limitations": ["The separate local-runtime requirement failed its live root probe."]},
+    {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "AGENTS.md"], "finding": "Required operational concepts are explicit across the mapped LLM surface."},
+    {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/context-map.md", "hooks/presentation_rules.py"], "finding": "Contextual and generated canonical-title links go beyond navigation.", "limitations": ["A finite canonical concept obligation set is not machine-declared."]},
+    {"id": "DKBWS-GRAPH-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "scripts/check-graphify-freshness.mjs"], "finding": "Shared enriched graph data, real 2D/3D views and freshness checks exist."},
+    {"id": "DKBWS-DESIGN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "package.json"], "finding": "Lintable structured DESIGN.md and named tokens are implemented."},
+    {"id": "DKBWS-RENDER-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["mkdocs.yml"], "finding": "The project is a Material compatibility implementation, not a standard-production Zensical claim."},
+    {"id": "DKBWS-PROV-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": [".git", ".jj", "AGENTS.md", "docs/llm-wiki/maintenance.md"], "finding": "The inspected maintenance workspace has Git-interoperable history and a colocated Jujutsu workspace; project instructions make JJ phase visibility explicit. This is inferred adoption evidence, not a formal DenchCo claim."},
+    {"id": "DKBWS-VERIFY-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "scripts/check-graphify-freshness.mjs"], "finding": "One check command covers declared capabilities and regenerates Graphify only in a temporary copy."},
+    {"id": "DKBWS-VERIFY-002", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No schema-valid DenchCo conformance report with stable diagnostic codes is emitted."},
+    {"id": "DKBWS-RUNTIME-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/project-ops/deployment.md"], "finding": "The canonical local URL returned HTTP 404, demonstrating that process/listener state is not health."},
+    {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Sequential Question 1 of N clarification is explicit."},
+    {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo standard upgrade workflow exists."},
+    {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "This audit does not treat project hosting as a DenchCo public standard release."},
+    {"id": "DKBWS-SEC-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["DEPLOYMENT.md", "docs/llm-wiki/maintenance.md", "docs/sources.md"], "finding": "Ask secrets and evidence boundaries exist, but complete repository personal-data, copyright/licensing and source-retention policies are not declared as one mapped contract."}
+  ],
+  "candidate_false_positive_risks": [
+    {"id": "FP-LISTENER-HEALTH", "finding": "A loaded service or listening port would have passed incorrectly; the required HTTP probe found 404."},
+    {"id": "FP-GRAPH-LOCALITY", "finding": "Graph publication files would hide that browser runtimes are remote CDNs."},
+    {"id": "FP-OKF-DISCUSSION", "finding": "Documentation discussing OKF must not be mistaken for an implemented export."}
+  ],
+  "candidate_false_negative_risks": [
+    {"id": "FN-MATERIAL-ADAPTER", "finding": "A Zensical-only validator would reject a deliberately mature Material compatibility implementation."},
+    {"id": "FN-LEGACY-ROLE-PATHS", "finding": "sources.md, evidence-matrix.md and evidence-validation-queue.md use root-level legacy paths that a fixed path check would miss."},
+    {"id": "FN-GRAPH-SUMMARY-SCHEMA", "finding": "InterSystems summary.json uses nodeCount/edgeCount while newer projects use nodes/edges; a single hard-coded schema would reject equivalent output."},
+    {"id": "FN-DESIGN-NPX", "finding": "The design contract is genuinely linted even though package-lock has no local @google/design.md package."}
+  ],
+  "recommendations": [
+    "Add a DenchCo manifest selecting the Material compatibility adapter and mapping the existing root-level roles.",
+    "Diagnose the local 8002 root health failure before asserting runtime conformance; preserve the current process-vs-health distinction.",
+    "Generate a non-destructive OKF v0.2 sidecar using the page-role mapping already designed in maintenance.md.",
+    "If local-runtime capability is selected, vendor Mermaid and graph libraries and add offline browser checks.",
+    "Map complete security, copyright/licensing and source-retention policies, then add a reviewable standard-upgrade workflow."
+  ],
+  "audit_limitations": [
+    "The Git working tree was clean at audit time.",
+    "The documented public Cloudflare/GitHub URLs were not externally health-probed in this sub-audit.",
+    "The local 404 was observed but not diagnosed or fixed because audited projects were read-only.",
+    "Graphify query results were supplemented by direct source inspection due limited semantic recall."
+  ]
+}

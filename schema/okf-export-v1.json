@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/okf-export-v1.json",
+  "title": "DenchCo lossless OKF JSON rendition",
+  "description": "A deterministic tool interchange envelope. The canonical OKF distribution unit remains a Markdown directory, Git repository, tarball, or zip archive.",
+  "type": "object",
+  "required": ["$schema", "format", "formatVersion", "okfVersion", "readOnlySource", "bundles"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "denchco-okf-lossless-json" },
+    "formatVersion": { "const": "1.0" },
+    "okfVersion": { "const": "0.2" },
+    "readOnlySource": { "const": true },
+    "bundles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["root", "files"],
+        "properties": {
+          "root": { "type": "string" },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "kind", "conceptId", "sha256", "frontmatter", "body", "raw"],
+              "properties": {
+                "path": { "type": "string" },
+                "kind": { "enum": ["concept", "index", "log"] },
+                "conceptId": { "type": ["string", "null"] },
+                "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "frontmatter": { "type": ["object", "null"] },
+                "body": { "type": "string" },
+                "raw": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

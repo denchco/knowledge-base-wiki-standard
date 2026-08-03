@@ -18,9 +18,9 @@ status: draft
 | Diagrams | Mermaid, served locally |
 | Browser proof | Playwright with pinned Chromium |
 | Versioning | Git and GitHub Releases |
-| Local phases | Jujutsu |
+| Local phases | [Jujutsu](https://github.com/jj-vcs/jj): `0.39.0` reference-qualified; `0.42.0` available but awaiting deliberate requalification |
 | Local service | Repo wrapper plus OS adapter and HTTP-200 health |
-| Deployment | Cloudflare Pages reference adapter and Wrangler |
+| Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |
 | Future domain integration | DenchCo Wiki Standard MCP |
 

@@ -5,8 +5,24 @@ description: Audit, instantiate, validate, or upgrade an OKF-compatible DenchCo 
 
 # DenchCo Knowledge Base Wiki Standard
 
-Read the repository `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, selected profile, `DEPENDENCIES.md`, and `docs/llm-wiki/index.md` before acting.
+Read the repository `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, selected profile, `DEPENDENCIES.md`, and `docs/llm-wiki/index.md` completely before acting. Treat `knowledge/` as the explicit OKF bundle; renderer pages and generated files are not implicit OKF concepts.
 
-For instantiation, read `prompts/instantiate-wiki.md`. For audits, map required roles to actual project paths rather than relying on filenames. For upgrades, compare the pinned release and requirement IDs, preserve deviations, and produce a reviewable patch; never overwrite local changes from the latest template.
+For instantiation, read `prompts/instantiate-wiki.md`. For audits, distinguish a project-owned formal claim from a read-only inferred adoption assessment, and map required roles to actual paths rather than relying on filenames. For upgrades, compare the pinned release and requirement IDs, preserve deviations and unknown OKF fields, and produce a reviewable patch; never overwrite local changes from the latest template.
 
-Use Graphify first when the target has a graph. Run the target's declared verification and report manual/unrun checks separately.
+Use Graphify first when the target has a graph. If query recall is insufficient, continue through its graph wiki/report and then scoped canonical sources. Run the target's declared verification and report manual, failed, and unrun checks separately.
+
+Prefer the repository CLI:
+
+```sh
+npm run conformance:inspect -- <target> --json
+npm run conformance:validate -- <target> --strict --json
+npm run conformance:diff -- <target> --json
+npm run conformance:upgrade-plan -- <target> --json
+npm run conformance:init-plan -- <target> --profile <profile> --json
+```
+
+`init` and `upgrade` are planning-only in this candidate and never apply changes. Do not publish, deploy, create a repository, or make a formal claim without explicit authority. A waiver requires a named authority and an expiry or review state.
+
+For `standard-production`, treat `DKBWS-PROV-001` as a maintenance-workspace obligation: use Git-interoperable history and colocated Jujutsu at the same repository root, then run the read-only provenance checker before recording a validated phase. Use distribution/CI mode only for an explicitly Git-only checkout; it reports Jujutsu maintainer provenance as not checked and must not be described as a maintainer-workspace pass. Portable Core remains Git-only compatible.
+
+When material information is genuinely missing, ask one sequential question using `Question 1 of N`; revise `N` after each answer. Do not ask for choices already resolved by the manifest, target evidence, or a reversible standard default.

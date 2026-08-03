@@ -1,0 +1,485 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json",
+  "title": "DenchCo adoption audit report v1",
+  "description": "A portable, read-only inferred adoption audit. It keeps formal conformance separate from observed mappings and capabilities.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "report_version",
+    "audit",
+    "project",
+    "formal_conformance",
+    "profile_assessment",
+    "role_mappings",
+    "capabilities",
+    "requirement_summary",
+    "requirements",
+    "candidate_false_positive_risks",
+    "candidate_false_negative_risks",
+    "recommendations",
+    "audit_limitations"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://denchco.github.io/knowledge-base-wiki-standard/schema/adoption-audit-report-v1.json"
+    },
+    "report_version": {
+      "$ref": "#/$defs/version"
+    },
+    "audit": {
+      "type": "object",
+      "required": [
+        "id",
+        "performed_at",
+        "mode",
+        "standard_name",
+        "standard_version",
+        "standard_snapshot",
+        "status_vocabulary",
+        "confidence_vocabulary",
+        "confidence",
+        "waivers_recognized",
+        "method"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^dogfood-[a-z0-9]+(?:-[a-z0-9]+)*-[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "performed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mode": {
+          "const": "read-only-inferred"
+        },
+        "standard_name": {
+          "const": "DenchCo Knowledge Base Wiki Standard"
+        },
+        "standard_version": {
+          "$ref": "#/$defs/version"
+        },
+        "standard_snapshot": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status_vocabulary": {
+          "const": [
+            "PASS",
+            "FAIL",
+            "WAIVED",
+            "NOT_APPLICABLE",
+            "NOT_IMPLEMENTED"
+          ]
+        },
+        "confidence_vocabulary": {
+          "const": [
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ]
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "waivers_recognized": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "method": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        }
+      },
+      "additionalProperties": false
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "name",
+        "root",
+        "git_head",
+        "working_tree_entries_at_audit",
+        "graphify_graph_present",
+        "graph_query",
+        "local_runtime_probe"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "root": {
+          "$ref": "#/$defs/portablePath"
+        },
+        "git_head": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "working_tree_entries_at_audit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "graphify_graph_present": {
+          "type": "boolean"
+        },
+        "graph_query": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "local_runtime_probe": {
+          "$ref": "#/$defs/runtimeProbe"
+        }
+      },
+      "additionalProperties": false
+    },
+    "formal_conformance": {
+      "type": "object",
+      "description": "The target project's formal claim result; never inferred from observed capabilities.",
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "profile_assessment": {
+      "type": "object",
+      "description": "Inferred adoption evidence, explicitly separate from formal_conformance.",
+      "required": [
+        "declared_legacy_profile",
+        "closest_candidate_profile",
+        "topic_profiles",
+        "confidence",
+        "summary"
+      ],
+      "properties": {
+        "declared_legacy_profile": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "closest_candidate_profile": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "topic_profiles": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "managed_full_readiness": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "standard_production_readiness": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "summary": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "managed_full_readiness"
+          ],
+          "not": {
+            "required": [
+              "standard_production_readiness"
+            ]
+          }
+        },
+        {
+          "required": [
+            "standard_production_readiness"
+          ],
+          "not": {
+            "required": [
+              "managed_full_readiness"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "role_mappings": {
+      "type": "object",
+      "description": "Proposed semantic role mappings. These are observations, not project-owned declarations.",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/roleMapping"
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/capabilityResult"
+      }
+    },
+    "requirement_summary": {
+      "$ref": "#/$defs/statusSummary"
+    },
+    "requirements": {
+      "description": "Exactly one result for every stable requirement in the canonical catalogue, including DKBWS-PROV-001, in catalogue order. The repository checker enforces dynamic catalogue coverage and summary counts.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/requirementResult"
+      }
+    },
+    "candidate_false_positive_risks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/risk"
+      }
+    },
+    "candidate_false_negative_risks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/risk"
+      }
+    },
+    "recommendations": {
+      "$ref": "#/$defs/nonEmptyStringList"
+    },
+    "audit_limitations": {
+      "$ref": "#/$defs/nonEmptyStringList"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "WAIVED",
+        "NOT_APPLICABLE",
+        "NOT_IMPLEMENTED"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "portablePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!~(?:[\\\\/]|$))(?!\\.\\.(?:[\\\\/]|$))(?!.*[\\\\/]\\.\\.(?:[\\\\/]|$))[^\\\\]+$"
+    },
+    "nonEmptyStringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "portablePathList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/portablePath"
+      }
+    },
+    "runtimeProbe": {
+      "type": "object",
+      "required": [
+        "url",
+        "http_status",
+        "status"
+      ],
+      "properties": {
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "http_status": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 100,
+          "maximum": 599
+        },
+        "listener_present": {
+          "type": "boolean"
+        },
+        "listener_process": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "finding": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "roleMapping": {
+      "type": "object",
+      "required": [
+        "status",
+        "confidence",
+        "paths"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "paths": {
+          "$ref": "#/$defs/portablePathList"
+        },
+        "finding": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "limitations": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilityResult": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "confidence",
+        "evidence_paths",
+        "finding"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:[-.][a-z0-9]+)*$"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "evidence_paths": {
+          "$ref": "#/$defs/portablePathList"
+        },
+        "finding": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "limitations": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        }
+      },
+      "additionalProperties": false
+    },
+    "statusSummary": {
+      "type": "object",
+      "required": [
+        "PASS",
+        "FAIL",
+        "WAIVED",
+        "NOT_APPLICABLE",
+        "NOT_IMPLEMENTED"
+      ],
+      "properties": {
+        "PASS": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "FAIL": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "WAIVED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_APPLICABLE": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_IMPLEMENTED": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "requirementResult": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "confidence",
+        "evidence_paths",
+        "finding"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^DKBWS-[A-Z]+-[0-9]{3}$"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "evidence_paths": {
+          "$ref": "#/$defs/portablePathList"
+        },
+        "finding": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "limitations": {
+          "$ref": "#/$defs/nonEmptyStringList"
+        }
+      },
+      "additionalProperties": false
+    },
+    "risk": {
+      "type": "object",
+      "required": [
+        "id",
+        "finding"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(?:FP|FN)-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+        },
+        "finding": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

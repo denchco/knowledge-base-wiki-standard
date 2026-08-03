@@ -1,0 +1,9 @@
+id: evidence-governed
+version: "0.1.0-candidate"
+extends:
+  - portable-core
+requires:
+  - DKBWS-EVID-001
+  - DKBWS-EVID-002
+capabilities:
+  evidence_governance: required

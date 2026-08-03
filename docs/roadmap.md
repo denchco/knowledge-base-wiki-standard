@@ -7,11 +7,18 @@ status: draft
 
 # Roadmap
 
-1. Validate the canonical candidate and initialize Git/Jujutsu.
-2. Implement OKF extension schemas, validators, and round-trip fixtures.
-3. Import/adapt mature Mermaid, Graphify, visual, browser, service, and deployment contracts.
-4. Dogfood five diverse local repositories and publish conformance reports.
-5. Select licences, GitHub owner, visibility, and Cloudflare deployment mode.
-6. Publish `v0.1.0` prerelease with checksums and migration notes.
-7. Add safe `inspect`, `validate`, `diff`, `upgrade`, and `export-okf` CLI commands.
-8. Add a thin MCP adapter only after the CLI becomes the stable implementation core.
+## Completed in the local candidate
+
+1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
+2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
+3. Implemented the governed Zensical runtime, local Mermaid, versioned Graphify 2D/3D publication, visual checks, and built-output Playwright contract.
+4. Dogfooded five diverse local repositories through non-mutating adoption audits and fed the defects back into the normative contract.
+5. Added safe `inspect`, `validate`, `export-okf`, `diff`, planning-only `upgrade --dry-run`, and planning-only `init --dry-run` commands.
+
+## Before public distribution
+
+1. Select the code/documentation licences, GitHub owner, repository visibility, and public security contact.
+2. Decide whether the first release includes a deployment adapter or keeps deployment as a separately versioned capability.
+3. Publish `v0.1.0` as an immutable prerelease with checksums, migration notes, and stable schema URLs.
+4. Exercise upgrade planning from a second independently maintained consumer.
+5. Add a thin, read-first MCP adapter only if it materially improves discovery and update inspection over GitHub MCP plus the stable CLI.

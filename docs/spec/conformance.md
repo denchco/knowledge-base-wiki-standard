@@ -7,6 +7,8 @@ status: draft
 
 # Conformance
 
+## Claim contents
+
 A conformance claim MUST state:
 
 - standard version and immutable revision where released;
@@ -17,8 +19,121 @@ A conformance claim MUST state:
 - last verification result and environment;
 - manual checks that remain outstanding.
 
-Each requirement records applicability, deterministic or manual verification, diagnostic text, remediation, and introduction/deprecation versions.
+The candidate catalogue records each requirement's stable ID, normative statement, applicability, and verification method. Machine diagnostics add code, severity, message, location, and remediation when a check can provide them. Introduction/deprecation metadata is not yet a catalogue field and MUST NOT be claimed until a versioned catalogue schema adds it.
 
 The conformance kit contains positive and negative fixtures. A source/configuration assertion cannot prove browser-visible behaviour; rendered claims require built-output browser checks.
 
-`validate` and `verify` MUST NOT silently rewrite canonical files. Generation and upgrade are separate explicit operations.
+`inspect` and `validate` are wholly read-only. `verify` MUST leave canonical inputs unchanged, but MAY rebuild declared derived outputs in deterministic paths so freshness can be proved. A project MUST list those derived paths; unexpected worktree changes fail verification. Upgrade remains a separate explicit, reviewable operation.
+
+## Formal claims and adoption audits
+
+Formal conformance and inferred adoption evidence are different report modes:
+
+- **formal claim mode** validates the project's own manifest, selected profile, declared deviations, waivers, and evidence;
+- **adoption audit mode** proposes role mappings and reports observed capabilities, evidence paths, and confidence without inventing a claim or changing the target.
+
+A missing manifest therefore fails a formal DenchCo claim, but it does not erase useful adoption evidence. Inferred mappings MUST require human review before they become canonical. A legacy label, prose exclusion, or absent capability MUST NOT be silently converted into a waiver.
+
+## OKF v0.2 boundary
+
+OKF portability and DenchCo profile conformance are related but distinct claims. The OKF v0.2 hard-conformance boundary is deliberately small:
+
+1. every non-reserved `.md` concept has parseable YAML frontmatter;
+2. every concept has a non-empty `type`;
+3. reserved `index.md` and `log.md` files follow their defined structures.
+
+Missing optional metadata, unknown concept types, unknown producer fields, broken concept links, and missing index files MUST NOT make an OKF bundle nonconformant. When provenance, trust, lifecycle, or attestation metadata is supplied, the validator reports deviations from the v0.2 conventions as warnings. DenchCo `--strict` validation promotes those warnings to a failing command without misrepresenting the underlying OKF portability result.
+
+Every DenchCo manifest MUST map `roles.okf_bundle` to one repository-relative directory. A bare OKF directory MAY be inspected without a DenchCo manifest, but the result is not a DenchCo profile claim.
+
+## Read-only CLI
+
+The canonical commands are:
+
+```sh
+npm run --silent conformance:inspect -- [target] --json
+npm run --silent conformance:validate -- [target] --json
+npm run --silent conformance:export-okf -- [target]
+npm run --silent conformance:diff -- [target] --json
+npm run --silent conformance:upgrade-plan -- [target] --json
+npm run --silent conformance:init-plan -- [target] --profile standard-production --json
+node scripts/full-profile-report.mjs --target [target] --receipt output/verification/receipt.json
+npm run conformance:test
+```
+
+`inspect` returns observations even when errors exist. `validate` exits `1` for hard errors, or for warnings when `--strict` is selected. Both accept `--date YYYY-MM-DD` so freshness results can be reproduced. Exit code `2` is reserved for invalid CLI usage or tool failure.
+
+`export-okf` emits a deterministic, lossless JSON rendition to standard output. It includes parsed frontmatter, the Markdown body, the exact source text, and a SHA-256 digest for each file. This proves that unknown OKF extension fields and lexical source survive the tool boundary. The JSON rendition is a tooling/MCP interchange envelope, not a replacement OKF distribution unit: canonical OKF remains a Markdown directory distributed directly, through Git, or in a tar/zip archive.
+
+No command above modifies the target. A caller MAY redirect export output to a new artifact; the CLI never selects or overwrites an output file itself.
+
+The full-profile report builder consumes `schema/verification-receipt-v1.json`. A receipt names the selected profile, evaluation date, environment, canonical-input mutation result, and explicit gate results with evidence references. An absent gate remains `not-checked`; a successful command does not implicitly pass requirements that its receipt does not name. `DKBWS-PROV-001` accepts only the read-only maintainer-mode provenance receipt with both Git and Jujutsu passing, and `DKBWS-SEC-001` requires all four subcontrols. The generated report distinguishes complete evaluation from a conformant outcome and validates itself against `schema/conformance-report-v1.json` before emission.
+
+## Lifecycle diff and plans
+
+`diff` compares a consumer manifest with this candidate's manifest, selected profile, inherited requirement set, and normative requirement catalogue. The result records hashes of the candidate inputs so a later review can establish exactly which standard material informed the comparison. It MUST distinguish a candidate upgrade from an attempted downgrade or an unparseable version relation. It MUST retain unknown or superseded deviation IDs for manual migration rather than deleting them.
+
+`upgrade` is planning-only in the candidate and MUST reject calls without `--dry-run`. Its JSON-patch-style review plan contains:
+
+- a SHA-256 precondition for the exact consumer manifest inspected;
+- `test` operations before any proposed replacement;
+- only changes that are deterministic and do not alter the selected profile;
+- separate manual actions for role, capability, OKF-version, deviation, and profile decisions;
+- an explicit preservation list covering roles, capabilities, deviations, unknown OKF fields, and canonical Markdown;
+- `applySupported: false` and `writesPerformed: false`.
+
+There is deliberately no apply command in this candidate. Applying a reviewed plan is a later, separately authorized implementation workflow with Git/Jujutsu state capture and complete post-change verification.
+
+`init` is also planning-only and MUST reject calls without `--dry-run`. It derives a proposed manifest, role layout, requirement set, and staged implementation sequence from the canonical instantiation prompt and selected profile. It does not copy a full template. Existing paths are reported as `preserve-and-review`, absent paths as `propose-create`, and no directory or file is created. Missing topic or title context is surfaced through the canonical sequential `Question 1 of N` protocol.
+
+## Diagnostics and reports
+
+Machine reports conform to `schema/conformance-report-v1.json`. Every diagnostic has a stable code, severity, message, and—where applicable—a requirement ID, repository-relative file, line, field, and remediation. Reports distinguish:
+
+- `okf.conformant`: the OKF v0.2 portability result;
+- `manifest.valid`: the DenchCo manifest result;
+- `requirementResults`: checks that are passed, failed, waived, not applicable, or not checked by this CLI;
+- `summary.profileComplete`: whether every requirement in the selected profile has evidence from the complete verification pipeline.
+
+An OKF/manifest-only run MUST report unimplemented browser, renderer, graph, runtime, security, and release checks as `not-checked`; it MUST NOT infer full profile conformance from the absence of errors in its narrower scope.
+
+`DKBWS-PROV-001` is checked in a Standard Production maintenance workspace with a read-only Git/Jujutsu probe. The probe MUST establish a supported Git version and repository root, a reference-qualified `jj` version, a Jujutsu workspace and Git store colocated with that same root, and a readable current change while disabling working-copy snapshotting. A Git-only release archive or CI checkout may select the explicit distribution mode; that result is `not-checked` for Jujutsu maintainer provenance and MUST NOT be promoted to a full maintainer-workspace pass.
+
+Formal requirement results use this algorithm:
+
+- `pass`: the requirement applies and sufficient evidence satisfies it;
+- `fail`: the requirement is mandatory or claimed and evidence contradicts or incompletely satisfies it;
+- `waived`: the manifest names the applicable requirement, authority, rationale, and review or expiry state;
+- `not-applicable`: the selected profile and project facts make the requirement irrelevant;
+- `not-checked`: this validator did not execute the required check.
+
+A manifest deviation with `status: waived` MUST name a non-empty `authority` and MUST carry at least one explicit ISO date: `expires` or `reviewed_at`. `pending`, `deviates`, and `not-applicable` records MAY use those lifecycle fields but do not inherit the waiver-only requirement.
+
+Adoption-audit capability observations may additionally use `not-implemented` when a relevant optional capability is absent and no claim is made for it. `not-implemented` is never a substitute for `fail` after a formal profile makes the capability mandatory.
+
+Every adoption audit MUST declare bounded `HIGH`, `MEDIUM`, or `LOW` confidence for the inferred audit, profile assessment, role mappings, capabilities, and requirement observations. Confidence qualifies inference strength; it never changes a status or converts inferred evidence into a formal claim.
+
+`HIGH` means direct inspected or probed evidence with little interpretive ambiguity; `MEDIUM` means a bounded inference or absence finding from scoped inspection; `LOW` means provisional evidence that needs further inspection before adoption.
+
+`DKBWS-SEC-001` remains one portable-core obligation but produces separately reportable subcontrols: `secrets-and-authorization`, `personal-and-confidential-data`, `copyright-licensing-and-retention`, and `untrusted-and-generated-content`. An aggregate pass requires all applicable subcontrols to pass.
+
+Renderer adapters publish a tested compatibility range; each implementation still records one exact pin. Graph-publication adapters similarly declare a schema version and migration path. Validators MUST inspect built network references when local runtimes are claimed and MUST NOT accept a graph artifact merely because it is syntactically valid JSON.
+
+Graph-assisted inspection is query-first, not graph-only. If a scoped query has insufficient recall, inspection continues through the graph wiki/report and then scoped canonical sources; the graph is orientation evidence, not proof of completeness.
+
+`DKBWS-RELEASE-001` governs releases of this standard and public releases of an implementation that advertise DenchCo conformance. A local deployment, readiness record, or healthy commit does not by itself constitute an immutable release.
+
+## Schemas and fixtures
+
+- `schema/manifest-v1.json` defines the DenchCo declaration and requires `roles.okf_bundle`.
+- `schema/okf-v0.2-frontmatter.json` describes the optional OKF field families while retaining `additionalProperties: true`.
+- `schema/conformance-report-v1.json` defines machine-readable diagnostics and requirement results.
+- `schema/verification-receipt-v1.json` defines the explicit gate-evidence input to full-profile reporting.
+- `schema/adoption-audit-report-v1.json` defines portable, confidence-qualified inferred audit records separately from formal claims.
+- `schema/okf-export-v1.json` defines the lossless JSON rendition.
+- `schema/lifecycle-plan-v1.json` defines diff, upgrade-plan, and init-plan artifacts.
+- `fixtures/conforming/okf-v0.2` includes provenance, both trust forms, lifecycle, attested computation, and a nested unknown extension.
+- `fixtures/nonconforming/okf-v0.2` proves every hard structural failure class.
+- `fixtures/nonconforming/okf-guidance` proves the portable-versus-strict distinction.
+- `fixtures/nonconforming/manifest` proves manifest diagnostics independently of bundle parsing.
+- `fixtures/lifecycle/consumer-old` proves a conservative version diff, guarded upgrade plan, deviation preservation, and byte-for-byte non-mutation.

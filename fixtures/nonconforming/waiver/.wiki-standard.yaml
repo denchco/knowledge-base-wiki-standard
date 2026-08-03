@@ -1,0 +1,24 @@
+schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json"
+standard:
+  name: "DenchCo Knowledge Base Wiki Standard"
+  version: "0.1.0-candidate"
+  source: "local-fixture"
+profile: "portable-core"
+okf_version: "0.2"
+roles:
+  okf_bundle: "knowledge"
+capabilities: {}
+deviations:
+  - requirement: "DKBWS-SEC-001"
+    status: "waived"
+    reason: "Missing authority proves the authorization diagnostic."
+    reviewed_at: "2026-08-01"
+  - requirement: "DKBWS-EVID-001"
+    status: "waived"
+    reason: "Missing lifecycle proves the expiry/review diagnostic."
+    authority: "human:fixture-maintainer"
+  - requirement: "DKBWS-LINK-001"
+    status: "waived"
+    reason: "Invalid values prove field-level validation."
+    authority: "   "
+    expires: "2026-99-99"

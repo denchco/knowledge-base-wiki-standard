@@ -5,5 +5,6 @@ requires:
   - DKBWS-CORE-002
   - DKBWS-OKF-001
   - DKBWS-OKF-002
+  - DKBWS-OKF-003
   - DKBWS-SEC-001
-capabilities: []
+capabilities: {}

@@ -11,13 +11,15 @@ status: draft
 
 1. **Raw sources** — immutable or content-addressed source material.
 2. **Staging** — optional deterministic extraction, OCR, transcription, or normalization.
-3. **Canonical knowledge** — OKF-compatible Markdown concepts and structured records.
+3. **Canonical knowledge** — the first-class `knowledge/` OKF v0.2 bundle plus normative specification and structured records. The explicit bundle boundary avoids falsely treating renderer navigation files as OKF concepts.
 4. **Evidence governance** — source register, evidence matrix, validation queue, and research log.
 5. **Human Wiki** — first-class Zensical site using the DenchCo visual profile.
 6. **LLM Wiki** — compact routing, context, maintenance, ingest, query, and lint instructions.
-7. **Discovery outputs** — `llms.txt`, indexes, search, Graphify 2D/3D, and optional OKF bundles.
+7. **Discovery outputs** — `llms.txt`, indexes, search, Graphify 2D/3D, and optional lossless JSON interchange exports of the canonical OKF bundle.
 8. **Conformance** — schemas, deterministic checks, browser evidence, fixtures, and reports.
 9. **Operations** — Git, Jujutsu phases, stable local runtime, CI, release, deployment, and migration.
+
+Inspect these relationships through the shared [2D and 3D repository graph](graph/index.md). The graph is a generated discovery layer and never outranks the authority chain below.
 
 ## Authority
 

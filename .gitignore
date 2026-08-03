@@ -6,6 +6,9 @@ graphify-out/
 .cache/
 .playwright-cli/
 output/
+GRAPH_REPORT.md
+docs/assets/graphify/
+docs/assets/vendor/
 *.log
 *.pid
 .env

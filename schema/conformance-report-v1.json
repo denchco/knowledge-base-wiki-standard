@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/conformance-report-v1.json",
+  "title": "DenchCo conformance report v1",
+  "type": "object",
+  "required": [
+    "$schema",
+    "reportVersion",
+    "command",
+    "readOnly",
+    "evaluationDate",
+    "target",
+    "manifest",
+    "okf",
+    "requirementResults",
+    "summary",
+    "diagnostics"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "reportVersion": { "const": "1.0" },
+    "command": { "enum": ["inspect", "validate", "export-okf", "verify"] },
+    "readOnly": { "const": true },
+    "evaluationDate": { "$ref": "#/$defs/date" },
+    "target": { "type": "string" },
+    "manifest": { "type": "object" },
+    "okf": { "type": "object" },
+    "capabilityStates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "expected", "declared", "value", "declarationStatus", "verificationStatus"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "expected": true,
+          "declared": { "type": "boolean" },
+          "value": true,
+          "declarationStatus": { "enum": ["declared", "missing"] },
+          "verificationStatus": { "$ref": "#/$defs/resultStatus" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "requirementResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "status"],
+        "properties": {
+          "requirement": { "type": "string", "pattern": "^DKBWS-" },
+          "status": { "$ref": "#/$defs/resultStatus" },
+          "reason": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "subcontrols": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "status"],
+              "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "status": { "$ref": "#/$defs/resultStatus" },
+                "reason": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": { "type": "string", "minLength": 1 }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["scope", "environment", "result", "canonicalMutation"],
+      "properties": {
+        "scope": { "type": "string", "minLength": 1 },
+        "environment": {
+          "type": "object",
+          "required": ["runtime", "runtimeVersion", "platform", "architecture"],
+          "properties": {
+            "runtime": { "type": "string", "minLength": 1 },
+            "runtimeVersion": { "type": "string", "minLength": 1 },
+            "platform": { "type": "string", "minLength": 1 },
+            "architecture": { "type": "string", "minLength": 1 },
+            "ci": { "type": "boolean" },
+            "tools": { "type": "object" }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["pass", "fail", "partial"] },
+            "strict": { "type": "boolean" },
+            "startedAt": { "type": "string" },
+            "completedAt": { "type": "string" },
+            "receipt": { "type": "string" },
+            "evaluation": { "enum": ["complete", "incomplete"] },
+            "conformance": { "enum": ["conformant", "nonconformant", "partial"] }
+          },
+          "additionalProperties": false
+        },
+        "canonicalMutation": { "$ref": "#/$defs/canonicalMutation" }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "outstandingManualChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "requirement", "reason"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "requirement": { "type": "string", "pattern": "^DKBWS-" },
+          "subcontrol": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["status", "errors", "warnings", "info", "strictFailure", "profileComplete", "markdown", "concepts"],
+      "properties": {
+        "status": { "enum": ["conformant", "partial", "nonconformant"] },
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "info": { "type": "integer", "minimum": 0 },
+        "strictFailure": { "type": "boolean" },
+        "profileComplete": { "type": "boolean" },
+        "evaluationComplete": { "type": "boolean" },
+        "failedRequirements": { "type": "integer", "minimum": 0 },
+        "failedCapabilities": { "type": "integer", "minimum": 0 },
+        "notCheckedCapabilities": { "type": "integer", "minimum": 0 },
+        "notCheckedRequirements": { "type": "integer", "minimum": 0 },
+        "markdown": { "type": "integer", "minimum": 0 },
+        "concepts": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "severity", "message"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "severity": { "enum": ["error", "warning", "info"] },
+          "message": { "type": "string", "minLength": 1 },
+          "requirement": { "type": "string" },
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "field": { "type": "string" },
+          "remediation": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "resultStatus": {
+      "enum": ["pass", "fail", "not-checked", "waived", "not-applicable"]
+    },
+    "canonicalMutation": {
+      "type": "object",
+      "required": ["status", "changedPaths"],
+      "properties": {
+        "status": { "enum": ["pass", "fail", "not-checked"] },
+        "changedPaths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        },
+        "reason": { "type": "string" },
+        "method": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "kind", "description", "supports"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 },
+        "location": { "type": "string" },
+        "description": { "type": "string", "minLength": 1 },
+        "supports": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^DKBWS-" }
+        },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "details": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

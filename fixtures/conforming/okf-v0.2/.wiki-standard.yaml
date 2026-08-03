@@ -1,0 +1,19 @@
+schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json"
+standard:
+  name: "DenchCo Knowledge Base Wiki Standard"
+  version: "0.1.0-candidate"
+  source: "https://github.com/denchco/knowledge-base-wiki-standard"
+profile: "portable-core"
+okf_version: "0.2"
+roles:
+  okf_bundle: "knowledge"
+  human_wiki: "knowledge/index.md"
+  research_log: "knowledge/log.md"
+capabilities:
+  okf_export: true
+deviations:
+  - requirement: "DKBWS-SEC-001"
+    status: "waived"
+    reason: "Fixture waiver used only to prove the lifecycle contract."
+    authority: "human:fixture-maintainer"
+    reviewed_at: "2026-08-02"

@@ -1,0 +1,79 @@
+/* Optional production width override. Stock Zensical remains the default. */
+
+:root {
+  --header-title-content-rail-offset: 10.5rem;
+  --layout-width-control-content-rail-offset: 2rem;
+  --layout-width-control-inline-start: 0.25rem;
+  --layout-width-control-radius: var(--component-radius-small);
+  --layout-width-control-rest-color: var(--md-default-fg-color--light);
+  --layout-width-control-hover-background: var(--md-default-fg-color--lightest);
+  --layout-width-control-hover-color: var(--md-default-fg-color);
+  --layout-width-control-selected-background: var(--accent-transparent);
+  --layout-width-control-selected-color: var(--accent-dark);
+}
+
+.layout-width-toggle {
+  align-items: center;
+  border-radius: var(--layout-width-control-radius);
+  color: var(--layout-width-control-rest-color);
+  cursor: pointer;
+  display: none;
+  flex: 0 0 auto;
+  font-size: 0.64rem;
+  gap: 0.25rem;
+  line-height: 1;
+  margin-inline: var(--layout-width-control-inline-start) var(--layout-width-control-content-rail-offset);
+  outline-color: var(--md-accent-fg-color);
+  outline-offset: 0.1rem;
+  padding: 0.35rem 0.45rem;
+  white-space: nowrap;
+}
+
+.layout-width-toggle:hover {
+  background-color: var(--layout-width-control-hover-background);
+  color: var(--layout-width-control-hover-color);
+}
+
+.layout-width-toggle[aria-pressed="true"] {
+  background-color: var(--layout-width-control-selected-background);
+  color: var(--layout-width-control-selected-color);
+}
+
+.layout-width-toggle svg {
+  fill: none;
+  height: 0.9rem;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 0.9rem;
+}
+
+@media screen and (min-width: 60em) {
+  .layout-width-toggle {
+    display: inline-flex;
+  }
+
+  .md-header__title {
+    margin-inline-start: var(--header-title-content-rail-offset);
+  }
+
+  .md-header__title .md-header__topic {
+    transform: none !important;
+  }
+
+  .md-header__source {
+    flex: 0 0 0.6rem;
+    width: 0.6rem;
+  }
+
+  html[data-layout-width="wide"] .md-grid {
+    max-width: calc(100% - 0.5rem);
+  }
+}
+
+@media print {
+  .layout-width-toggle {
+    display: none !important;
+  }
+}

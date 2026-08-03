@@ -14,13 +14,19 @@ roles:
   human_wiki: "docs/index.md"
   llm_wiki: "docs/llm-wiki/index.md"
   design_contract: "DESIGN.md"
+  okf_bundle: "knowledge"
 capabilities:
+  evidence_governance: true
+  human_wiki: true
+  llm_wiki: true
   human_renderer: "zensical"
   llm_artifacts: true
   graphify: true
   okf_export: true
+  local_browser_runtimes: true
+  browser_verification: true
   local_service: "macos-launchd"
-  deployment: "cloudflare-pages-reference"
+  deployment: false
   jujutsu: true
 deviations:
   - requirement: "DKBWS-RELEASE-001"

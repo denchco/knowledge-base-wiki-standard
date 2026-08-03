@@ -34,5 +34,7 @@ It incorporates:
 - Every claimed capability MUST identify its dependency, applicability, verification, and deviation state.
 - Existing projects MUST retain stronger working patterns unless an explicit migration is authorized.
 - Updates MUST be reviewable migrations, never “download latest and overwrite.”
+- OKF portability results MUST remain distinct from stricter DenchCo profile results.
+- Conformance inspection and validation MUST be read-only and emit stable machine diagnostics.
 
 See [Requirements](requirements.md), [Profiles](profiles.md), and [Conformance](conformance.md).

@@ -35,4 +35,12 @@ flowchart LR
 - [Agent entry point](llm-wiki/index.md) gives Codex and other agents the minimum reliable context.
 - [Tools and sources](reference/tools-and-sources.md) records upstream authority.
 
+## Governed implementation
+
+- [Dependencies](spec/dependencies.md) and [security/source boundaries](spec/security-and-sources.md) define the executable and trust perimeter.
+- [Prompt rules](spec/prompts.md), [LLM maintenance](llm-wiki/maintenance.md), and the [context map](llm-wiki/context-map.md) govern repeatable agent work.
+- [Sources](sources.md), the [evidence matrix](evidence-matrix.md), [validation queue](validation-queue.md), and [research log](log.md) keep authority and uncertainty inspectable.
+- [Roadmap](roadmap.md), [project status](project/status.md), and [local precedents](reference/local-precedents.md) separate completed candidate work from remaining release decisions.
+- [Conformance evidence](conformance/index.md) keeps formal declarations distinct from inferred dogfood audits.
+
 This repository is at candidate status. Do not claim public release conformance until the GitHub release and migration workflow are completed.

@@ -21,3 +21,4 @@ status: draft
 | SRC-010 | [Cloudflare Pages](https://developers.cloudflare.com/pages/) | Reference deployment adapter | 2026-08-03 |
 | SRC-011 | Parent Evidence-Linked Knowledge Standard | Mature local evidence and operational precedent | 2026-08-03 |
 | SRC-012 | NHS Data Sharing, Regulation 28, Risk Appetite, SharePoint, InterSystems and openIPS | Mature local implementation evidence | 2026-08-03 |
+| SRC-013 | [Jujutsu repository](https://github.com/jj-vcs/jj), [v0.42.0 release](https://github.com/jj-vcs/jj/releases/tag/v0.42.0), and [v0.38.0 release](https://github.com/jj-vcs/jj/releases/tag/v0.38.0) | Git interoperability, colocated-workspace model, current upstream release, and the Git 2.41 minimum introduced by Jujutsu 0.38 | 2026-08-03 |

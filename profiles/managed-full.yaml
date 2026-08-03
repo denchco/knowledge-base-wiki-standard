@@ -1,0 +1,11 @@
+id: managed-full
+version: "0.1.0-candidate"
+extends:
+  - standard-production
+requires:
+  - DKBWS-RELEASE-001
+capabilities:
+  ci: required
+  complete_conformance_report: required
+  deployment_adapter: required
+  portfolio_updates: required

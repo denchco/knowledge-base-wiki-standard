@@ -16,6 +16,8 @@ status: draft
 5. `DESIGN.md` for rendered changes.
 6. Graphify query results when available.
 
+Use the [Graphify workflow](graphify.md) for query-first discovery, the six required enrichment layers, and repeatable 2D/3D publication.
+
 ## Operating model
 
 - **Ingest**: register the source, preserve raw identity, update relevant concepts and evidence, add links, and record the change.

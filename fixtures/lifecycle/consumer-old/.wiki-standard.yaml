@@ -1,0 +1,15 @@
+schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json"
+standard:
+  name: "DenchCo Knowledge Base Wiki Standard"
+  version: "0.0.9"
+  source: "https://example.invalid/denchco-standard"
+profile: "portable-core"
+okf_version: "0.2"
+roles:
+  okf_bundle: "knowledge"
+capabilities:
+  local_extension: true
+deviations:
+  - requirement: "DKBWS-SEC-001"
+    status: "pending"
+    reason: "Security policy review is scheduled."
