@@ -15,3 +15,4 @@ status: draft
 | Change visual behaviour | `DESIGN.md`, Zensical adapter | Browser fixtures and local precedent |
 | Upgrade the standard | Current manifest, target release, migration notes | Changelog and changed fixtures |
 | Research a concept | Source register, evidence matrix, relevant canonical page | Validation queue and Graphify |
+| Select follow-up work | User's requested outcome and project status | Failed or unrun checks and currently unparked validation items |

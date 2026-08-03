@@ -13,8 +13,9 @@ status: draft
 2. `.wiki-standard.yaml`.
 3. [Normative specification](../spec/index.md).
 4. [Context map](context-map.md).
-5. `DESIGN.md` for rendered changes.
-6. Graphify query results when available.
+5. [Project status](../project/status.md).
+6. `DESIGN.md` for rendered changes.
+7. Graphify query results when available.
 
 Use the [Graphify workflow](graphify.md) for query-first discovery, the six required enrichment layers, and repeatable 2D/3D publication.
 
@@ -26,3 +27,5 @@ Use the [Graphify workflow](graphify.md) for query-first discovery, the six requ
 - **Promote**: a local innovation becomes standard only with applicability, fallback, verification, fixture, and migration impact.
 
 Never treat an LLM answer, rendered page, graph edge, or generated export as new evidence.
+
+Codex reads the shared root `AGENTS.md`; Claude Code reaches the same contract through the root `CLAUDE.md` import. Use project status for zero to three current priorities and the validation queue for parked work. A completed response does not acquire a Next Steps section merely as boilerplate: apply the completion and cycle guard in `AGENTS.md` first.

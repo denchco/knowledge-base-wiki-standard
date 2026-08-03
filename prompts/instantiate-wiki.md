@@ -36,4 +36,6 @@ Target deployment: [consumer-selected adapter or none].
 
 Where a material uncertainty remains, ask one question at a time using `Question 1 of N`. Each answer informs the next question and `N` is updated as uncertainty changes. Do not ask when evidence or a safe reversible default resolves the choice.
 
-Complete the implementation unless blocked. The handoff must state what was built, profile and versions, validation and limitations, canonical file links, available Wiki URLs, and exactly three discrete high-impact next steps.
+Use a completion-first handoff: complete the requested implementation before proposing further work. The handoff must state what was built, profile and versions, validation and limitations, canonical file links, and available Wiki URLs.
+
+Next Steps are recommendations, not authority to expand the implementation. Include them only when requested, required work remains incomplete or blocked, or this named instantiation workflow needs a handoff. Include no more than three. Every item must map to an unfinished requested deliverable, a failed or unrun required check, or a decision requiring user authority; name its target and completion condition. Do not add adjacent research, generic improvements, passive waits, invitations to continue, or filler to reach a count. If no item qualifies, omit the section.

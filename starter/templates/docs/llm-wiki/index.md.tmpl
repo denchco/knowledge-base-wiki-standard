@@ -13,8 +13,9 @@ status: "draft"
 2. `.wiki-standard.yaml`.
 3. `knowledge/index.md`.
 4. [Context map](context-map.md).
-5. `DESIGN.md` for rendered changes.
-6. Graphify query results when available.
+5. `docs/project/status.md`.
+6. `DESIGN.md` for rendered changes.
+7. Graphify query results when available.
 
 ## Operating model
 
@@ -23,3 +24,5 @@ status: "draft"
 - **Lint**: find contradictions, stale claims, unsupported authority, missing links, and generated-output drift.
 
 Never treat an LLM answer, rendered page, or graph edge as new evidence.
+
+Use project status for zero to three current priorities and the validation queue for parked work. Apply the `AGENTS.md` completion and cycle guard before recommending any follow-up; a completed answer does not need a Next Steps section.

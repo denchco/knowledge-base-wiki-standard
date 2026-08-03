@@ -19,3 +19,5 @@ status: draft
 10. Record a validated JJ phase and prepare a reviewable Git change.
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
+
+Follow-up selection follows the same file's completion and cycle guard. A candidate is eligible only when it advances unfinished requested scope, addresses a failed or unrun required check, or asks for authority needed to continue. It must fit one follow-up pass and state a completion condition. Park blocked work in project status or the validation queue with `blocked_by`, `reopen_when`, and `last_checked`; it remains ineligible until that trigger occurs. Do not recommend optional adjacent research or generic maintenance merely to fill a list.

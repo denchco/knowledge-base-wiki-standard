@@ -15,3 +15,5 @@ status: "draft"
 6. Review Git and Jujutsu state before recording a validated phase.
 
 Standard upgrades use an immutable release and a reviewable diff. They never replace local topic content silently.
+
+Before recommending follow-up work, apply the goal and cycle gates in `AGENTS.md`. A candidate is eligible only when it advances unfinished requested scope, addresses a failed or unrun required check, or asks for authority needed to continue. It must fit one follow-up pass and have a completion condition. Park blocked work in project status or the validation queue with `blocked_by`, `reopen_when`, and `last_checked`; it is ineligible until reopened. Never recommend optional adjacent research or generic maintenance merely to fill a list.

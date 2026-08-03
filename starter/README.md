@@ -11,6 +11,8 @@ Use `starter.yaml` as the machine-readable boundary. A Codex instance should:
 5. choose the target's own canonical Wiki URL and deployment adapter; and
 6. validate the completed target against the pinned standard revision.
 
+The rendered starter installs one shared agent contract in `AGENTS.md`, a root `CLAUDE.md` import for Claude Code, and a project-status record that keeps active priorities separate from parked work. Next Steps are completion-first and capped at three; the contract forbids inventing adjacent work merely to fill the list.
+
 The public human documentation is at <https://denchco.github.io/knowledge-base-wiki-documentation/>. The standard repository at <https://github.com/denchco/knowledge-base-wiki-standard> remains the sole normative authority.
 
 Do not recursively copy the repository root. Do not publish the standard's reference pages as the target Wiki.

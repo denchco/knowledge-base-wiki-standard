@@ -22,7 +22,7 @@ Canonical schemas live in this repository's `schema/` directory. Public endpoint
 
 ## Status
 
-Version `0.1.0-candidate`. The executable candidate and its first five-project dogfood cycle are complete. The public source is `denchco/knowledge-base-wiki-standard`; `v0.1.0-rc.1` is the first prerelease identifier and may be published only from an exact CI-green commit under GitHub immutable-release protection.
+Version `0.1.0-candidate`. The executable candidate and its first five-project dogfood cycle are complete. The public source is `denchco/knowledge-base-wiki-standard`; immutable prerelease `v0.1.0-rc.1` is published from its exact CI-green commit. Later candidate changes remain on `main` until a separately authorized immutable prerelease is created.
 
 The npm implementation package uses the same `0.1.0-candidate` identifier. Python project metadata encodes that prerelease as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 
@@ -55,8 +55,10 @@ The local wiki is reserved at <http://127.0.0.1:8017/>.
 - `DEPENDENCIES.md` — dependency classes, pins, and installation requirements.
 - `prompts/instantiate-wiki.md` — canonical repeatable bootstrap prompt.
 - `starter/starter.yaml` — allowlisted subject-empty consumer recipe.
-- `AGENTS.md` — agent operating and clarification contract.
+- `AGENTS.md` — shared Codex/Claude operating, clarification, completion, and cycle-guard contract.
+- `CLAUDE.md` — Claude Code import of the canonical `AGENTS.md` instructions.
 - `docs/llm-wiki/index.md` — compact agent-facing wiki.
+- `docs/project/status.md` — current bounded priorities, separate from parked work.
 - `docs/conformance/index.md` — dogfood reports and conformance evidence.
 
 The lifecycle CLI is read-only in this candidate:

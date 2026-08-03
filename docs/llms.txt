@@ -16,7 +16,7 @@ Normative repository: https://github.com/denchco/knowledge-base-wiki-standard
 
 ## Repository-first agent contract
 
-Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, and `docs/llm-wiki/index.md` from the repository. Preserve unknown OKF fields and declared deviations. Use Graphify query-first with scoped-source fallback. Ask material clarification questions sequentially as `Question 1 of N`.
+Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, `docs/llm-wiki/index.md`, and `docs/project/status.md` from the repository. Claude Code imports the shared agent contract through `CLAUDE.md`. Preserve unknown OKF fields and declared deviations. Use Graphify query-first with scoped-source fallback. Ask material clarification questions sequentially as `Question 1 of N`. Finish requested scope before suggesting more work; include no more than three goal-linked, executable Next Steps and never pad the list or reopen parked work without its trigger.
 
 ## Machine surfaces
 

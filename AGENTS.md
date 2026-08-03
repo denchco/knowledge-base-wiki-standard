@@ -5,8 +5,9 @@
 1. `.wiki-standard.yaml`
 2. `docs/spec/index.md`
 3. `docs/llm-wiki/index.md`
-4. `DESIGN.md` for visual changes
-5. Graphify query results when `graphify-out/graph.json` exists
+4. `docs/project/status.md`
+5. `DESIGN.md` for visual changes
+6. Graphify query results when `graphify-out/graph.json` exists
 
 ## Authority and safety
 
@@ -27,6 +28,17 @@ Question 2 of N
 ```
 
 Update `N` as uncertainty narrows or expands. Do not ask a routine question when the standard, manifest, target evidence, or a reversible default resolves it safely.
+
+<!-- DKBWS-PROMPT-001-HANDOFF:START -->
+## Completion and handoff
+
+- Complete the requested scope before proposing further work.
+- `Next Steps` are recommendations, not continuation authority. Include them only when the user asks for them, required work remains incomplete or blocked, or a named workflow requires a handoff.
+- Include no more than three. Every item must map to an unfinished requested deliverable, a failed or unrun required check, or a decision requiring the user's authority. It must name the target artifact or outcome, be executable in one follow-up pass, and state its completion condition.
+- Apply a cycle guard before selecting items. Do not reopen a bounded, parked, or evidence-blocked trail without new evidence, a due scheduled recheck, or explicit user instruction. Record parked work with `blocked_by`, `reopen_when`, and `last_checked` fields.
+- Do not add optional adjacent research, generic improvements, passive waiting, invitations to continue, or filler merely to reach a count. If no item qualifies, omit the section and stop.
+- Keep zero to three current project priorities in `docs/project/status.md`. Surface that list for status or roadmap work, not as automatic response boilerplate.
+<!-- DKBWS-PROMPT-001-HANDOFF:END -->
 
 ## Change protocol
 

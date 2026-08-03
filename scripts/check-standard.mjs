@@ -2,12 +2,16 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 const required = [
-  "README.md", "LICENSE", "AGENTS.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml",
+  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml",
+  ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
+  ".claude/skills/denchco-kb-wiki-standard/SKILL.md",
   "GOVERNANCE.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "CHANGELOG.md",
   "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md",
   "docs/sources.md", "docs/evidence-matrix.md", "docs/validation-queue.md",
   "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "prompts/instantiate-wiki.md",
   "starter/README.md", "starter/starter.yaml", "starter/templates/wiki-standard.yaml.tmpl",
+  "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl",
+  "starter/templates/docs/project/status.md.tmpl",
   "docs/conformance/index.md", "docs/conformance/dogfood/comparison.md",
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
@@ -37,9 +41,43 @@ for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-PROMPT-001", "DKBWS-
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
+const starterAgents = readFileSync("starter/templates/AGENTS.md.tmpl", "utf8");
+const claude = readFileSync("CLAUDE.md", "utf8");
+const starterClaude = readFileSync("starter/templates/CLAUDE.md.tmpl", "utf8");
+const codexSkill = readFileSync(".agents/skills/denchco-kb-wiki-standard/SKILL.md", "utf8");
+const claudeSkill = readFileSync(".claude/skills/denchco-kb-wiki-standard/SKILL.md", "utf8");
 const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
 for (const [name, text] of [["AGENTS.md", agents], ["prompt", prompt]]) {
   if (!text.includes("Question 1 of N")) failures.push(`${name} lacks sequential question protocol`);
+}
+if (claude.trim() !== "@AGENTS.md") failures.push("CLAUDE.md must contain only the canonical @AGENTS.md import");
+if (!starterClaude.split(/\r?\n/).some((line) => line.trim() === "@AGENTS.md")) {
+  failures.push("starter CLAUDE.md template must import AGENTS.md");
+}
+if (codexSkill !== claudeSkill) failures.push("Codex and Claude Standard skills must be byte-identical");
+
+const agentsHandoff = managedSection(agents, "DKBWS-PROMPT-001-HANDOFF");
+const starterHandoff = managedSection(starterAgents, "DKBWS-PROMPT-001-HANDOFF");
+if (!agentsHandoff) failures.push("AGENTS.md lacks the managed completion and handoff policy");
+if (!starterHandoff) failures.push("starter AGENTS.md template lacks the managed completion and handoff policy");
+if (agentsHandoff && starterHandoff && agentsHandoff !== starterHandoff) {
+  failures.push("root and starter completion/handoff policies have drifted");
+}
+for (const phrase of [
+  "Complete the requested scope before proposing further work",
+  "recommendations, not continuation authority",
+  "Include no more than three",
+  "failed or unrun required check",
+  "blocked_by",
+  "reopen_when",
+  "last_checked",
+  "If no item qualifies, omit the section and stop",
+]) {
+  if (!agentsHandoff?.includes(phrase)) failures.push(`completion/handoff policy lacks: ${phrase}`);
+}
+if (/exactly three/i.test(prompt)) failures.push("prompt retains an unconditional exactly-three handoff quota");
+for (const phrase of ["completion-first", "no more than three", "If no item qualifies, omit the section"]) {
+  if (!prompt.includes(phrase)) failures.push(`prompt lacks anti-rabbit-hole handoff contract: ${phrase}`);
 }
 for (const boundary of [
   "starter/starter.yaml",
@@ -142,7 +180,16 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Standard checks passed: ${required.length} canonical roles, stable IDs, prompt protocol, schema dialect, and dependency pins.`);
+console.log(`Standard checks passed: ${required.length} canonical roles, stable IDs, Codex/Claude instruction parity, prompt protocol, schema dialect, and dependency pins.`);
+
+function managedSection(source, id) {
+  const start = `<!-- ${id}:START -->`;
+  const end = `<!-- ${id}:END -->`;
+  const startIndex = source.indexOf(start);
+  const endIndex = source.indexOf(end);
+  if (startIndex < 0 || endIndex < 0 || endIndex <= startIndex) return null;
+  return source.slice(startIndex + start.length, endIndex).trim();
+}
 
 function sourceFiles(roots, filePattern = /\.(?:json|md|toml|ya?ml)$/i) {
   const found = [];

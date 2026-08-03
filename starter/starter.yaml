@@ -68,6 +68,12 @@ entries:
     template: "starter/templates/AGENTS.md.tmpl"
     requirements: ["DKBWS-PROMPT-001"]
     always: true
+  - target: "CLAUDE.md"
+    role: "claude-agent-contract"
+    classification: "render-template"
+    template: "starter/templates/CLAUDE.md.tmpl"
+    requirements: ["DKBWS-PROMPT-001"]
+    always: true
   - target: "DEPENDENCIES.md"
     role: "dependency-contract"
     classification: "render-template"
@@ -143,6 +149,12 @@ entries:
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
     requirements: ["DKBWS-LLM-001"]
+  - target: "docs/project/status.md"
+    role: "project-status"
+    classification: "render-template"
+    template: "starter/templates/docs/project/status.md.tmpl"
+    requirements: ["DKBWS-PROMPT-001"]
+    always: true
   - target: "DESIGN.md"
     role: "design-contract"
     classification: "render-template"

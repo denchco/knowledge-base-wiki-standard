@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-## Completed in the local candidate
+## Completed through `v0.1.0-rc.1`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
 2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
@@ -15,11 +15,17 @@ status: draft
 4. Dogfooded five diverse local repositories through non-mutating adoption audits and fed the defects back into the normative contract.
 5. Added safe `inspect`, `validate`, `export-okf`, `diff`, planning-only `upgrade --dry-run`, and planning-only `init --dry-run` commands.
 6. Added the two-repository public boundary and a subject-empty consumer starter recipe with immutable revision, target URL, deployment, and copy-classification gates.
+7. Created the public `denchco/knowledge-base-wiki-standard` repository and private-source/public-Pages documentation repository, enabled the selected security and Actions controls, and published immutable prerelease `v0.1.0-rc.1`.
+8. Proved deterministic documentation synchronization from the exact clean Standard commit and deployed the public help/example Wiki with byte-identical schemas and pinned specification.
 
-## Before public distribution
+## Current candidate after `v0.1.0-rc.1`
 
-1. Create the selected public `denchco/knowledge-base-wiki-standard` repository and private `denchco/knowledge-base-wiki-documentation` source; enable private vulnerability reporting and GitHub Actions Pages.
-2. Commit the clean standard, regenerate the documentation snapshot from that exact commit, and prove the public Pages artifact uses its byte-identical schemas and pinned specification.
-3. Publish `v0.1.0-rc.1` as an immutable prerelease with checksums and migration notes; then mark the documentation pin verified and deploy Pages.
-4. Exercise upgrade planning from a second independently maintained consumer.
-5. Add a thin, read-first MCP adapter only if it materially improves discovery and update inspection over GitHub MCP plus the stable CLI.
+1. Added one shared completion-first Codex/Claude instruction contract, Claude's `@AGENTS.md` compatibility entry point, byte-identical project skills, a consumer starter relay, and static parity checks.
+2. Replaced the unconditional three-item handoff quota with a maximum of three eligible recommendations, plus explicit cycle, parking, reopen, and completion gates.
+3. Reconciled project status and validation records so completed publication work is no longer recommended.
+
+## Next evidence gates
+
+1. Exercise lifecycle planning and the instruction contract against a second independently maintained consumer.
+2. Add compatibility fixtures only for exact versions or environments evidenced by that consumer or an upstream change.
+3. Make a dedicated read-first MCP go/no-go decision only after the second-consumer evidence identifies whether GitHub MCP plus the stable CLI leave a named gap.

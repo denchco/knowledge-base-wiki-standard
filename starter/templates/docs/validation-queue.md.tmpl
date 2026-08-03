@@ -7,4 +7,8 @@ status: "draft"
 
 # Validation queue
 
-No validation items have been recorded yet.
+| ID | Gap | State | Next bounded action | `blocked_by` | `reopen_when` | `last_checked` |
+|---|---|---|---|---|---|---|
+| VAL-001 | {{VALIDATION_GAP_OR_NONE}} | {{OPEN_PARKED_OR_DONE}} | {{NEXT_ACTION_OR_NONE}} | {{BLOCKER_OR_NONE}} | {{REOPEN_TRIGGER_OR_NONE}} | {{LAST_CHECKED_DATE}} |
+
+Parked rows are not recurring handoff recommendations. Reopen one only when its recorded trigger occurs or the user explicitly changes scope.

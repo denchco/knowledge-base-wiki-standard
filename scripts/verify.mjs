@@ -166,7 +166,8 @@ function buildReceipt(provenance) {
     evidence("source-register", "evidence-register", "Stable source identities.", "docs/sources.md"),
     evidence("evidence-matrix", "evidence-matrix", "Claims mapped to support, state, and limitations.", "docs/evidence-matrix.md"),
     evidence("llm-wiki", "agent-contract", "Read order plus ingest, query, lint, authority, and generation boundaries.", "docs/llm-wiki/index.md"),
-    evidence("prompt-contract", "prompt-contract", "Sequential evidence-dependent clarification protocol.", "prompts/instantiate-wiki.md"),
+    evidence("prompt-contract", "prompt-contract", "Sequential clarification plus completion-first, bounded, anti-rabbit-hole handoff protocol.", "prompts/instantiate-wiki.md"),
+    evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, and parked-work boundary.", "AGENTS.md"),
   ];
   const gatesWithEvidence = [
     {
@@ -194,7 +195,7 @@ function buildReceipt(provenance) {
         result("DKBWS-LLM-001", ["canonical-content", "llm-wiki"]),
         result("DKBWS-LINK-001", ["canonical-content"]),
         result("DKBWS-DESIGN-001", ["design-contract"]),
-        result("DKBWS-PROMPT-001", ["standard-check", "prompt-contract"]),
+        result("DKBWS-PROMPT-001", ["standard-check", "prompt-contract", "agent-instruction-parity"]),
         result("DKBWS-UPDATE-001", ["conformance-fixtures"]),
         result("DKBWS-VERIFY-002", ["conformance-fixtures", "schema-artifacts"]),
         {

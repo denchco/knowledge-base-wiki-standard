@@ -583,6 +583,13 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(targets.some((target) => target.startsWith("docs/spec/")), false);
   assert.equal(targets.some((target) => target.startsWith("docs/conformance/")), false);
   assert.equal(targets.some((target) => /pages|deploy/i.test(target)), false);
+  const claudeEntry = starter.entries.find((entry) => entry.target === "CLAUDE.md");
+  assert.equal(claudeEntry?.classification, "render-template");
+  assert.equal(claudeEntry?.always, true);
+  assert.equal(claudeEntry?.template, "starter/templates/CLAUDE.md.tmpl");
+  const projectStatusEntry = starter.entries.find((entry) => entry.target === "docs/project/status.md");
+  assert.equal(projectStatusEntry?.classification, "render-template");
+  assert.equal(projectStatusEntry?.always, true);
 
   const forbiddenTemplateContent = /five-project|SRC-00[1-9]|candidate status|local-unpublished/i;
   for (const entry of starter.entries) {
@@ -685,6 +692,8 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.equal(plan.input.deployment, "none");
   assert.equal(plan.clarificationProtocol.nextQuestion, null);
   assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md" && entry.classification === "render-template"));
+  assert.ok(plan.layout.some((entry) => entry.path === "CLAUDE.md" && entry.classification === "render-template"));
+  assert.ok(plan.layout.some((entry) => entry.path === "docs/project/status.md" && entry.classification === "render-template"));
   assert.equal(plan.candidate.starter.rootCopy, "forbidden");
   assert.equal(plan.candidate.starter.deploymentPolicy, "consumer-owned");
   assert.equal(plan.candidate.starter.executableScope.apply_supported, false);
