@@ -1,0 +1,13 @@
+.DS_Store
+.venv/
+node_modules/
+site/
+graphify-out/
+.cache/
+.playwright-cli/
+output/
+*.log
+*.pid
+.env
+.env.*
+!.env.example

@@ -1,0 +1,9 @@
+id: portable-core
+version: "0.1.0-candidate"
+requires:
+  - DKBWS-CORE-001
+  - DKBWS-CORE-002
+  - DKBWS-OKF-001
+  - DKBWS-OKF-002
+  - DKBWS-SEC-001
+capabilities: []

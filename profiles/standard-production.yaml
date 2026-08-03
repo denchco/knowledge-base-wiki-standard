@@ -1,0 +1,23 @@
+id: standard-production
+version: "0.1.0-candidate"
+extends:
+  - portable-core
+requires:
+  - DKBWS-EVID-001
+  - DKBWS-EVID-002
+  - DKBWS-HUMAN-001
+  - DKBWS-LLM-001
+  - DKBWS-LINK-001
+  - DKBWS-GRAPH-001
+  - DKBWS-DESIGN-001
+  - DKBWS-RENDER-001
+  - DKBWS-VERIFY-001
+  - DKBWS-RUNTIME-001
+  - DKBWS-PROMPT-001
+  - DKBWS-UPDATE-001
+capabilities:
+  human_renderer: zensical
+  graphify: required
+  local_browser_runtimes: required
+  browser_verification: required
+  jujutsu: required

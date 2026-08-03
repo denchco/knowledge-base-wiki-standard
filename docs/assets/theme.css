@@ -1,0 +1,49 @@
+:root {
+  --denchco-accent: #0b7285;
+  --denchco-accent-dark: #075866;
+  --denchco-accent-light: #d9f0f3;
+  --denchco-surface: #ffffff;
+  --denchco-background: #f6f8f9;
+  --denchco-text: #1f2933;
+  --denchco-muted: #52606d;
+  --denchco-border: #aab7c0;
+  --denchco-component-radius: .35rem;
+  --denchco-diagram-radius: 5px;
+  --denchco-border-width: 1px;
+  --denchco-technical-border-width: 1.75px;
+  --md-primary-fg-color: var(--denchco-accent);
+  --md-primary-fg-color--dark: var(--denchco-accent-dark);
+  --md-accent-fg-color: var(--denchco-accent);
+  --md-typeset-a-color: var(--denchco-accent);
+}
+
+.md-header {
+  background: var(--denchco-surface);
+  color: var(--denchco-text);
+}
+
+.md-search__button {
+  background: var(--denchco-background);
+  color: var(--denchco-text);
+}
+
+.md-typeset a {
+  color: var(--denchco-accent);
+  text-underline-offset: .14em;
+}
+
+.md-typeset a:hover,
+.md-typeset a:focus-visible {
+  color: var(--denchco-accent-dark);
+}
+
+.md-typeset table:not([class]) {
+  border: var(--denchco-border-width) solid var(--denchco-border);
+  border-radius: var(--denchco-component-radius);
+}
+
+.md-typeset :is(a, button, input, select):focus-visible,
+.md-nav__link:focus-visible {
+  outline: 3px solid var(--denchco-accent-dark);
+  outline-offset: 3px;
+}

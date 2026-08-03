@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json",
+  "title": "DenchCo Knowledge Base Wiki Standard manifest",
+  "type": "object",
+  "required": ["schema", "standard", "profile", "okf_version", "roles", "capabilities", "deviations"],
+  "properties": {
+    "schema": { "type": "string" },
+    "standard": {
+      "type": "object",
+      "required": ["name", "version", "source"],
+      "properties": {
+        "name": { "const": "DenchCo Knowledge Base Wiki Standard" },
+        "version": { "type": "string" },
+        "source": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "profile": { "type": "string" },
+    "okf_version": { "const": "0.2" },
+    "roles": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "string" } },
+    "capabilities": { "type": "object" },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "status", "reason"],
+        "properties": {
+          "requirement": { "type": "string", "pattern": "^DKBWS-" },
+          "status": { "enum": ["pending", "waived", "deviates", "not-applicable"] },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,37 @@
+{
+  "name": "denchco-knowledge-base-wiki-standard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "uv run zensical serve -f zensical.toml --dev-addr ${HOST:-127.0.0.1}:${PORT:-8017}",
+    "build": "uv run zensical build -f zensical.toml --strict",
+    "check": "node scripts/check-standard.mjs",
+    "verify": "npm run check && npm run build",
+    "graph:update": "uv run graphify update . --force",
+    "service:register": "node scripts/dev-service.mjs register",
+    "service:install": "node scripts/dev-service.mjs install",
+    "service:start": "node scripts/dev-service.mjs start",
+    "service:stop": "node scripts/dev-service.mjs stop",
+    "service:status": "node scripts/dev-service.mjs status",
+    "service:restart": "node scripts/dev-service.mjs restart",
+    "service:list": "node scripts/dev-service.mjs list",
+    "service:uninstall": "node scripts/dev-service.mjs uninstall",
+    "jj:status": "jj status",
+    "jj:phase": "node scripts/jj-phase.mjs"
+  },
+  "codexDevServer": {
+    "serviceId": "denchco-kb-wiki-standard",
+    "host": "127.0.0.1",
+    "port": 8017,
+    "command": "npm run dev"
+  },
+  "devDependencies": {
+    "@google/design.md": "0.2.0",
+    "@playwright/test": "1.55.1",
+    "3d-force-graph": "1.77.0",
+    "mermaid": "11.16.0",
+    "vis-network": "10.1.0",
+    "wrangler": "4.114.0"
+  }
+}

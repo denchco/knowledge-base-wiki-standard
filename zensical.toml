@@ -1,0 +1,50 @@
+[project]
+site_name = "DenchCo Knowledge Base Wiki Standard"
+site_description = "An OKF-compatible standard for evidence-governed, human- and AI-maintained wikis."
+site_url = "http://127.0.0.1:8017/"
+docs_dir = "docs"
+site_dir = "site"
+copyright = "Candidate standard: verify claims against registered primary sources."
+extra_css = ["assets/theme.css"]
+nav = [
+  {"Start here" = [
+    {"Home" = "index.md"},
+    {"Architecture" = "architecture.md"},
+    {"Roadmap" = "roadmap.md"}
+  ]},
+  {"Normative standard" = [
+    {"Specification" = "spec/index.md"},
+    {"Requirements" = "spec/requirements.md"},
+    {"Profiles" = "spec/profiles.md"},
+    {"Conformance" = "spec/conformance.md"},
+    {"Dependencies" = "spec/dependencies.md"},
+    {"Prompts" = "spec/prompts.md"}
+  ]},
+  {"Evidence" = [
+    {"Sources" = "sources.md"},
+    {"Evidence matrix" = "evidence-matrix.md"},
+    {"Validation queue" = "validation-queue.md"},
+    {"Research log" = "log.md"}
+  ]},
+  {"LLM Wiki" = [
+    {"Agent entry point" = "llm-wiki/index.md"},
+    {"Context map" = "llm-wiki/context-map.md"},
+    {"Maintenance" = "llm-wiki/maintenance.md"}
+  ]},
+  {"References" = [
+    {"Tools and sources" = "reference/tools-and-sources.md"},
+    {"Local precedents" = "reference/local-precedents.md"},
+    {"Project status" = "project/status.md"}
+  ]}
+]
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+tables = {}
+"pymdownx.details" = {}
+
+[[project.markdown_extensions."pymdownx.superfences".custom_fences]]
+name = "mermaid"
+class = "mermaid"
+format = "pymdownx.superfences.fence_code_format"

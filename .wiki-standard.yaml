@@ -1,0 +1,28 @@
+schema: "https://denchco.github.io/knowledge-base-wiki-standard/schema/manifest-v1.json"
+standard:
+  name: "DenchCo Knowledge Base Wiki Standard"
+  version: "0.1.0-candidate"
+  source: "local-unpublished"
+profile: "standard-production"
+okf_version: "0.2"
+roles:
+  specification: "docs/spec/index.md"
+  source_register: "docs/sources.md"
+  evidence_matrix: "docs/evidence-matrix.md"
+  validation_queue: "docs/validation-queue.md"
+  research_log: "docs/log.md"
+  human_wiki: "docs/index.md"
+  llm_wiki: "docs/llm-wiki/index.md"
+  design_contract: "DESIGN.md"
+capabilities:
+  human_renderer: "zensical"
+  llm_artifacts: true
+  graphify: true
+  okf_export: true
+  local_service: "macos-launchd"
+  deployment: "cloudflare-pages-reference"
+  jujutsu: true
+deviations:
+  - requirement: "DKBWS-RELEASE-001"
+    status: "pending"
+    reason: "The candidate has not yet been published to GitHub."
