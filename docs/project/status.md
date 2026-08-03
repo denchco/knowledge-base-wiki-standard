@@ -23,10 +23,10 @@ status: draft
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans implemented |
 | Subject-empty starter | Allowlisted planning/templates implemented; root copying and standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
 | Public documentation boundary | Human guidance routes to the separate Pages site; this repository remains normative and local pinned schemas remain the validation input |
-| Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; final snapshot regeneration pending |
+| Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
-| Public GitHub release | Owner `denchco`, public visibility, MIT licence, private vulnerability reporting, and `v0.1.0-rc.1` selected; remote creation not yet authorized/published |
+| Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and CI-gated `v0.1.0-rc.1` process established |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
 The local Zensical service is registered at `http://127.0.0.1:8017/`; health requires HTTP 200.

@@ -16,7 +16,7 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 - Completed five read-only cross-project dogfood audits and reconciled formal-vs-inferred reporting, status, security, verification, renderer, graph-schema, Jujutsu, and release semantics.
 - Selected one repository-wide MIT License for original code and accompanying documentation, copyright Andrew Dench, while preserving third-party terms.
 - Separated the normative standard repository from the public documentation site and independent consumer repositories; added a subject-empty, allowlisted starter contract with pinned revisions and consumer-owned URL/deployment inputs.
-- Selected the public standard and private-documentation/public-Pages repository boundary, public schema endpoint, GitHub private vulnerability reporting route, and planned `v0.1.0-rc.1` prerelease; remote creation remains a separately authorized action.
+- Established the public-standard and private-documentation/public-Pages repository boundary, public schema endpoint, GitHub private vulnerability reporting route, and CI-gated immutable `v0.1.0-rc.1` prerelease process.
 - Added deterministic standard-to-documentation synchronization with an explicit allowlist, per-file hashes and modes, isolated writes, drift checks, and conflict refusal.
 - Made Graphify's inline 2D/3D JSON serialization script-safe against hostile Markdown labels and added a dedicated security fixture.
 - Aligned distribution-mode verification with selected profile capabilities so declared optional capabilities remain visible without becoming false CI gaps; maintainer-only Jujutsu provenance remains explicitly not checked.

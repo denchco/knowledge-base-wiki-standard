@@ -22,7 +22,7 @@ Canonical schemas live in this repository's `schema/` directory. Public endpoint
 
 ## Status
 
-Version `0.1.0-candidate`. The executable local candidate and its first five-project dogfood cycle are complete. The selected public destination is `denchco/knowledge-base-wiki-standard`; remote creation and the planned `v0.1.0-rc.1` prerelease remain deferred until final authorization.
+Version `0.1.0-candidate`. The executable candidate and its first five-project dogfood cycle are complete. The public source is `denchco/knowledge-base-wiki-standard`; `v0.1.0-rc.1` is the first prerelease identifier and may be published only from an exact CI-green commit under GitHub immutable-release protection.
 
 The npm implementation package uses the same `0.1.0-candidate` identifier. Python project metadata encodes that prerelease as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 

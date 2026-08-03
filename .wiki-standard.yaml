@@ -31,7 +31,4 @@ capabilities:
   public_repository: "https://github.com/denchco/knowledge-base-wiki-standard"
   public_documentation: "https://denchco.github.io/knowledge-base-wiki-documentation/"
   documentation_sync: "snapshot-v1"
-deviations:
-  - requirement: "DKBWS-RELEASE-001"
-    status: "pending"
-    reason: "The public repository and planned v0.1.0-rc.1 prerelease are configured locally but have not yet been authorized for remote creation."
+deviations: []
