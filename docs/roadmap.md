@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-## Completed through `v0.1.0-rc.1`
+## Completed through `v0.1.0-rc.2`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
 2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
@@ -17,12 +17,9 @@ status: draft
 6. Added the two-repository public boundary and a subject-empty consumer starter recipe with immutable revision, target URL, deployment, and copy-classification gates.
 7. Created the public `denchco/knowledge-base-wiki-standard` repository and private-source/public-Pages documentation repository, enabled the selected security and Actions controls, and published immutable prerelease `v0.1.0-rc.1`.
 8. Proved deterministic documentation synchronization from the exact clean Standard commit and deployed the public help/example Wiki with byte-identical schemas and pinned specification.
-
-## Current candidate after `v0.1.0-rc.1`
-
-1. Added one shared completion-first Codex/Claude instruction contract, Claude's `@AGENTS.md` compatibility entry point, byte-identical project skills, a consumer starter relay, and static parity checks.
-2. Replaced the unconditional three-item handoff quota with a maximum of three eligible recommendations, plus explicit cycle, parking, reopen, and completion gates.
-3. Reconciled project status and validation records so completed publication work is no longer recommended.
+9. Added one shared completion-first Codex/Claude instruction contract, Claude's `@AGENTS.md` compatibility entry point, byte-identical project skills, a consumer starter relay, and static parity checks.
+10. Replaced the unconditional three-item handoff quota with a maximum of three eligible recommendations, plus explicit cycle, parking, reopen, and completion gates.
+11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
 
 ## Next evidence gates
 

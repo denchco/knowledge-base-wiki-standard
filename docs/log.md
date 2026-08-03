@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-08-04
+
+- **Instruction prerelease**: Published the shared completion-first Codex/Claude operating contract, subject-empty consumer relay, zero-to-three handoff eligibility rule, one-pass completion conditions, and structured parked-work reopen fields as immutable `v0.1.0-rc.2`.
+- **Migration boundary**: Consumers moving from `v0.1.0-rc.1` update agent instructions and project-status separation only; the manifest and OKF content model do not change.
+- **Release verification**: Required complete local verification, exact-commit GitHub Actions success, deterministic Documentation snapshot synchronization, and the private-source/public-Pages deployment gate for the same pinned Standard commit.
+
 ## 2026-08-03
 
 - **Creation**: Established the DenchCo Knowledge Base Wiki Standard candidate repository.

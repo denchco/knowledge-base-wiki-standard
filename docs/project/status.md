@@ -26,7 +26,7 @@ status: draft
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
-| Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and CI-gated `v0.1.0-rc.1` process established |
+| Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and exact-commit CI gates established; `v0.1.0-rc.2` is the current immutable prerelease |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
 The local Zensical service is registered at `http://127.0.0.1:8017/`; health requires HTTP 200.

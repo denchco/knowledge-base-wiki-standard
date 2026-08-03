@@ -2,12 +2,13 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning for its declared conformance contract.
 
-## Unreleased
+## 0.1.0-rc.2 — 2026-08-04
 
 - Added a shared Codex/Claude instruction surface: canonical `AGENTS.md`, Claude's `@AGENTS.md` import, and byte-identical Standard-maintainer skills in both discovery locations.
 - Tightened `DKBWS-PROMPT-001` from an unconditional exactly-three handoff quota to a completion-first maximum of three eligible recommendations, with goal linkage, one-pass completion conditions, cycle guards, and structured parked-work reopen fields.
 - Added subject-empty `CLAUDE.md` and project-status templates, plus starter and static-validation coverage for portable instruction loading.
 - Reconciled stale publication roadmap and validation items after immutable `v0.1.0-rc.1` and recorded the remaining second-consumer, evidence-led compatibility, and conditional MCP gates.
+- Published the instruction and handoff changes as a separately verified immutable prerelease; the declared implementation version remains `0.1.0-candidate`.
 
 ## 0.1.0-candidate — 2026-08-03
 
