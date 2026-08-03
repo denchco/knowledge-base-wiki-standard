@@ -43,6 +43,12 @@ pass for an absent gate and never writes to the target.`;
 
 export class ReceiptError extends Error {}
 
+export function selectedNotCheckedCapabilityIds(report) {
+  return (report?.capabilityStates ?? [])
+    .filter((capability) => capability.expected !== null && capability.verificationStatus === "not-checked")
+    .map((capability) => capability.id);
+}
+
 function loadJson(filePath, label) {
   let source;
   try {

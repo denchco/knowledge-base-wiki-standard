@@ -15,6 +15,8 @@ import path from "node:path";
 
 import { parse } from "yaml";
 
+import { selectedNotCheckedCapabilityIds } from "./full-profile-report.mjs";
+
 const root = process.cwd();
 const derivedOutputs = [
   "site/",
@@ -112,9 +114,7 @@ if (provenanceMode === "maintainer") {
   const notChecked = (parsedReport.requirementResults ?? [])
     .filter((result) => result.status === "not-checked")
     .map((result) => result.requirement);
-  const notCheckedCapabilities = (parsedReport.capabilityStates ?? [])
-    .filter((capability) => capability.verificationStatus === "not-checked")
-    .map((capability) => capability.id);
+  const notCheckedCapabilities = selectedNotCheckedCapabilityIds(parsedReport);
   const failed = (parsedReport.requirementResults ?? []).filter((result) => result.status === "fail");
   const expectedDistributionGap = notChecked.length === 1 && notChecked[0] === "DKBWS-PROV-001";
   const expectedCapabilityGap = notCheckedCapabilities.length === 1 && notCheckedCapabilities[0] === "jujutsu";

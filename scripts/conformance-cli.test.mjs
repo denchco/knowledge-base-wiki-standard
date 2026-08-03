@@ -22,6 +22,7 @@ import { parseDocument } from "yaml";
 import {
   buildFullProfileReport,
   ReceiptError,
+  selectedNotCheckedCapabilityIds,
 } from "./full-profile-report.mjs";
 import {
   listProfileIds,
@@ -813,6 +814,8 @@ test("distribution provenance cannot satisfy Standard Production maintainer prov
   });
   const report = buildFullProfileReport({ target: ROOT, receipt });
   assert.equal(report.requirementResults.find((item) => item.requirement === "DKBWS-PROV-001").status, "not-checked");
+  assert.ok(report.capabilityStates.some((item) => item.expected === null && item.verificationStatus === "not-checked"));
+  assert.deepEqual(selectedNotCheckedCapabilityIds(report), ["jujutsu"]);
   assert.equal(report.summary.profileComplete, false);
   assert.equal(report.summary.evaluationComplete, false);
 });
