@@ -19,16 +19,35 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ## The system
 
 ```mermaid
-flowchart LR
-  A[Raw sources] --> B[Canonical OKF knowledge]
-  B --> C[Evidence governance]
-  C --> D[Human Zensical Wiki]
-  C --> E[Operational LLM Wiki]
-  C --> F[Graphify 2D and 3D]
-  D --> G[Verification]
-  E --> G
-  F --> G
+%%{init: {"flowchart": {"nodeSpacing": 6, "rankSpacing": 18, "padding": 4}}}%%
+flowchart TB
+  accTitle: Governed knowledge base system
+  accDescr: Raw sources pass through evidence governance into one canonical OKF corpus. Human, LLM, and Graphify products derive from that corpus and converge on executable verification.
+
+  subgraph K["Governed knowledge"]
+    A["Raw sources"] --> E["Evidence governance"] --> C[["Canonical OKF<br/>knowledge"]]
+  end
+  subgraph P["Derived products"]
+    H["Human Wiki"]
+    L["LLM Wiki"]
+    G["Graphify 2D + 3D"]
+  end
+  V(["Executable verification"])
+  C --> H
+  C --> L
+  C --> G
+  H --> V
+  L --> V
+  G --> V
+  class A kb-source
+  class E kb-evidence
+  class C kb-canonical
+  class H,L kb-product
+  class G kb-derived
+  class V kb-verification
 ```
+
+Solid accent marks the canonical authority; the product group is coordinated but derived, and every surface converges on the same executable verification boundary.
 
 ## Start here
 

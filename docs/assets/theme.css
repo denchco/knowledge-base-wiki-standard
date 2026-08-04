@@ -33,6 +33,8 @@ body[data-md-color-accent] {
   --accent-rail-width: .3rem;
   --source-row-rail-width: .25rem;
   --technical-frame-border-width: 1.75px;
+  --diagram-emphasis-line-width: 3px;
+  --diagram-label-mask-width: 4px;
   --list-marker-indent: 1.2rem;
   --list-marker-size: 1em;
   --compact-data-font-size: .64rem;
@@ -324,6 +326,14 @@ input.md-option:is(:focus-visible, .focus-visible) + label,
   stroke: var(--accent) !important;
 }
 
+.md-typeset .mermaid .edge-thickness-thick {
+  stroke-width: var(--diagram-emphasis-line-width) !important;
+}
+
+.md-typeset .mermaid .edge-pattern-dotted {
+  stroke: var(--accent-light) !important;
+}
+
 .md-typeset .mermaid marker path,
 .md-typeset .mermaid .arrowheadPath {
   fill: var(--accent) !important;
@@ -331,10 +341,61 @@ input.md-option:is(:focus-visible, .focus-visible) + label,
 }
 
 .md-typeset .mermaid .cluster rect {
-  fill: var(--surface) !important;
+  fill: var(--accent-transparent) !important;
   stroke: var(--accent-light) !important;
   rx: var(--component-radius-large);
   ry: var(--component-radius-large);
+}
+
+.md-typeset .mermaid .cluster-label text {
+  fill: var(--accent-dark) !important;
+  font-weight: 700 !important;
+  paint-order: stroke !important;
+  stroke: var(--background) !important;
+  stroke-linejoin: round !important;
+  stroke-width: var(--diagram-label-mask-width) !important;
+}
+
+.md-typeset .mermaid .node.kb-source :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--surface) !important;
+  stroke: var(--accent-light) !important;
+}
+
+.md-typeset .mermaid .node:is(.kb-evidence, .kb-product) :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--accent-lightest) !important;
+  stroke: var(--accent) !important;
+}
+
+.md-typeset .mermaid .node.kb-snapshot :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--accent-transparent-strong) !important;
+  stroke: var(--accent) !important;
+}
+
+.md-typeset .mermaid .node:is(.kb-normative, .kb-canonical) :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--accent) !important;
+  stroke: var(--accent-darker) !important;
+}
+
+.md-typeset .mermaid .node.kb-derived :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--surface) !important;
+  stroke: var(--accent-light) !important;
+  stroke-dasharray: 4 3 !important;
+}
+
+.md-typeset .mermaid .node.kb-consumer :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--surface) !important;
+  stroke: var(--accent-dark) !important;
+}
+
+.md-typeset .mermaid .node.kb-verification :is(rect, polygon, circle, ellipse, path) {
+  fill: var(--accent-dark) !important;
+  stroke: var(--accent-darker) !important;
+}
+
+.md-typeset .mermaid .node:is(.kb-normative, .kb-canonical, .kb-verification) :is(.nodeLabel, .label, text) {
+  color: var(--accent-contrast) !important;
+  fill: var(--accent-contrast) !important;
+  font-weight: 700 !important;
 }
 
 .md-typeset .mermaid .nodeLabel,

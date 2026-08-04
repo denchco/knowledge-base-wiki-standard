@@ -249,12 +249,17 @@ export default async page => {
     try {
       const rendered = await window.mermaid.render(
         `runtime-contract-${Date.now()}`,
-        "flowchart LR\n  A[Alpha] --> B[Beta]",
+        "flowchart LR\n  A[Authority] ==>|governed relation| B[Derived]\n  B --> C[Source]\n  class A kb-canonical\n  class B kb-derived\n  class C kb-source",
       );
       mount.innerHTML = rendered.svg;
       const text = mount.querySelector("svg text");
       const node = mount.querySelector(".node rect");
-      const edge = mount.querySelector(".edgePath path, .flowchart-link");
+      const edge = mount.querySelector(".edge-thickness-normal:not(.edge-thickness-thick)");
+      const emphasisEdge = mount.querySelector(".edge-thickness-thick");
+      const edgeLabelBackground = mount.querySelector(".edgeLabel rect.background");
+      const canonicalNode = mount.querySelector(".node.kb-canonical rect");
+      const canonicalText = mount.querySelector(".node.kb-canonical text");
+      const derivedNode = mount.querySelector(".node.kb-derived rect");
       const svg = mount.querySelector("svg");
       return {
         fontSize: text ? getComputedStyle(text).fontSize : "",
@@ -262,6 +267,13 @@ export default async page => {
         nodeRadiusY: node ? getComputedStyle(node).ry : "",
         nodeStrokeWidth: node ? getComputedStyle(node).strokeWidth : "",
         edgeStrokeWidth: edge ? getComputedStyle(edge).strokeWidth : "",
+        emphasisStrokeWidth: emphasisEdge ? getComputedStyle(emphasisEdge).strokeWidth : "",
+        edgeLabelFill: edgeLabelBackground ? getComputedStyle(edgeLabelBackground).fill : "",
+        edgeLabelFillOpacity: edgeLabelBackground ? getComputedStyle(edgeLabelBackground).fillOpacity : "",
+        canonicalFill: canonicalNode ? getComputedStyle(canonicalNode).fill : "",
+        canonicalTextFill: canonicalText ? getComputedStyle(canonicalText).fill : "",
+        derivedFill: derivedNode ? getComputedStyle(derivedNode).fill : "",
+        derivedDash: derivedNode ? getComputedStyle(derivedNode).strokeDasharray : "",
         width: svg?.getBoundingClientRect().width || 0,
         height: svg?.getBoundingClientRect().height || 0,
       };
@@ -273,6 +285,15 @@ export default async page => {
   check(mermaidProbe.nodeRadiusX === "5px" && mermaidProbe.nodeRadiusY === "5px", "Mermaid nodes must render with the governed 5px radius");
   check(mermaidProbe.nodeStrokeWidth === "1.75px", "Mermaid node borders must render at 1.75px");
   check(mermaidProbe.edgeStrokeWidth === "1.75px", "Mermaid edges must render at 1.75px");
+  check(mermaidProbe.emphasisStrokeWidth === "3px", "Emphasized Mermaid relationships must render at 3px");
+  check(
+    mermaidProbe.edgeLabelFill === "rgb(246, 248, 249)" && mermaidProbe.edgeLabelFillOpacity === "1",
+    "Mermaid edge labels must fully mask connecting lines with the governed diagram background",
+  );
+  check(mermaidProbe.canonicalFill === "rgb(11, 114, 133)", "Canonical Mermaid nodes must use the active solid accent");
+  check(mermaidProbe.canonicalTextFill === "rgb(255, 255, 255)", "Canonical Mermaid labels must use accent-contrast text");
+  check(mermaidProbe.derivedFill === "rgb(255, 255, 255)", "Derived Mermaid nodes must use the surface fill");
+  check(mermaidProbe.derivedDash.includes("4px") && mermaidProbe.derivedDash.includes("3px"), "Derived Mermaid nodes must use a dashed boundary");
 
   await goto(tableRoute);
   await page.waitForSelector(".md-typeset table tbody td");

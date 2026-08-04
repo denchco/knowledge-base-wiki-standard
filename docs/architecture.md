@@ -11,8 +11,8 @@ status: draft
 
 1. **Raw sources** — immutable or content-addressed source material.
 2. **Staging** — optional deterministic extraction, OCR, transcription, or normalization.
-3. **Canonical knowledge** — the first-class `knowledge/` OKF v0.2 bundle plus normative specification and structured records. The explicit bundle boundary avoids falsely treating renderer navigation files as OKF concepts.
-4. **Evidence governance** — source register, evidence matrix, validation queue, and research log.
+3. **Evidence governance** — source register, evidence matrix, validation queue, and research log.
+4. **Canonical knowledge** — the first-class `knowledge/` OKF v0.2 bundle plus normative specification and structured records. The explicit bundle boundary avoids falsely treating renderer navigation files as OKF concepts.
 5. **Human Wiki** — first-class Zensical site using the DenchCo visual profile.
 6. **LLM Wiki** — compact routing, context, maintenance, ingest, query, and lint instructions.
 7. **Discovery outputs** — `llms.txt`, indexes, search, Graphify 2D/3D, and optional lossless JSON interchange exports of the canonical OKF bundle.
@@ -23,16 +23,32 @@ Inspect these relationships through the shared [2D and 3D repository graph](grap
 
 ## Authority
 
-```text
-primary source
-  → source register
-    → evidence record
-      → canonical synthesis
-        → operational LLM context
-          → generated discovery/rendering outputs
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 6, "rankSpacing": 18, "padding": 4}}}%%
+flowchart TB
+  accTitle: Knowledge authority and derived surfaces
+  accDescr: Primary sources pass through registered identity and evidence records into canonical OKF knowledge. Human, LLM, and discovery surfaces derive from that canonical layer and cannot create evidence.
+
+  subgraph A["Evidence authority"]
+    S["1 · Primary sources"] --> R["2 · Source register"]
+    R --> E["3 · Evidence records<br/>claims + limits + gaps"]
+    E --> C[["4 · Canonical OKF<br/>knowledge"]]
+  end
+  subgraph D["Derived — not evidence"]
+    H["Human Wiki"]
+    L["LLM Wiki"]
+    G["Graph + exports"]
+  end
+  C --> H
+  C --> L
+  C --> G
+  class S kb-source
+  class R,E kb-evidence
+  class C kb-canonical
+  class H,L,G kb-derived
 ```
 
-Derived output assists navigation but cannot create evidence.
+Solid accent marks canonical authority. Dashed node boundaries mark derived surfaces: they assist comprehension, routing, and discovery but cannot create evidence.
 
 ## Distribution boundary
 

@@ -11,6 +11,7 @@ const zensical = read("zensical.toml");
 const requirements = read("docs/spec/requirements.md");
 const humanProfile = read("profiles/human-and-agent.yaml");
 const home = read("docs/index.md");
+const architecture = read("docs/architecture.md");
 const starterHome = read("starter/templates/docs/index.md.tmpl");
 const starterDesign = read("starter/templates/DESIGN.md.tmpl");
 
@@ -18,7 +19,7 @@ for (const token of [
   "accentDark", "accentDarker", "accentVisited", "accentLight", "accentLightest",
   "accentTransparent", "accentTransparentStrong", "accentContrast", "conditional",
   "success", "warning", "componentRadius", "componentRadiusSmall", "componentRadiusLarge",
-  "diagramNodeRadius", "componentBorderWidth", "technicalFrameBorderWidth",
+  "diagramNodeRadius", "diagramEmphasisLineWidth", "diagramLabelMaskWidth", "componentBorderWidth", "technicalFrameBorderWidth",
   "sourceRowRailWidth", "accentRailWidth", "layoutWidthControlContentRailOffset",
   "headerTitleContentRailOffset", "listMarkerIndent", "listMarkerSize",
   "compactDataFontSize", "diagramTextSize", "sequentialMenuRailWidth",
@@ -35,8 +36,11 @@ for (const [token, value] of [
 }
 requireIn(design, 'compactDataFontSize: ".64rem"', "DESIGN.md must pin reduced table text");
 requireIn(design, 'diagramTextSize: ".64rem"', "DESIGN.md must match Mermaid and reduced table text");
+requireIn(design, 'diagramEmphasisLineWidth: "3px"', "DESIGN.md must pin the Mermaid emphasis line");
+requireIn(design, 'diagramLabelMaskWidth: "4px"', "DESIGN.md must pin the Mermaid label mask");
 requireIn(design, "governing-question:", "DESIGN.md must define the governing-question component");
 requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry the governing-question component");
+requireIn(starterDesign, "kb-canonical", "starter DESIGN.md must carry the semantic Mermaid role grammar");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
 for (const [name, source] of [["Standard homepage", home], ["starter homepage", starterHome]]) {
@@ -57,7 +61,7 @@ for (const token of [
   "--accent-transparent:", "--accent-transparent-strong:", "--accent-contrast:",
   "--conditional:", "--success:", "--warning:", "--component-radius:",
   "--component-radius-small:", "--component-radius-large:", "--diagram-node-radius:",
-  "--component-border-width:", "--technical-frame-border-width: 1.75px",
+  "--diagram-emphasis-line-width: 3px", "--diagram-label-mask-width: 4px", "--component-border-width:", "--technical-frame-border-width: 1.75px",
   "--source-row-rail-width:", "--accent-rail-width:", "--list-marker-indent:",
   "--list-marker-size: 1em", "--compact-data-font-size: .64rem",
   "--diagram-text-size:", "--sequential-menu-rail-width:",
@@ -73,10 +77,44 @@ requireIn(theme, "font-size: var(--diagram-text-size) !important", "diagram text
 requireIn(mermaidAdapter, "rx: var(--diagram-node-radius)", "closed-shadow Mermaid nodes must use the radius token");
 requireIn(mermaidAdapter, "font-size: var(--diagram-text-size)", "closed-shadow Mermaid text must use the diagram token");
 requireIn(mermaidAdapter, "stroke-width: var(--technical-frame-border-width)", "closed-shadow Mermaid lines must use the 1.75px technical width");
+requireIn(mermaidAdapter, "stroke-width: var(--diagram-emphasis-line-width)", "closed-shadow Mermaid emphasis lines must use the 3px token");
 requireIn(mermaidAdapter, "useMaxWidth: false", "Mermaid must retain governed label scale");
 requireIn(mermaidAdapter, "htmlLabels: false", "Mermaid labels must remain measurable SVG text");
+requireIn(mermaidAdapter, "subGraphTitleMargin: { top: 4, bottom: 10 }", "Mermaid clusters must reserve readable title space");
+requireIn(mermaidAdapter, "paint-order: stroke", "closed-shadow Mermaid cluster titles must mask crossing lines");
 requireIn(mermaidAdapter, "diagram.scrollLeft", "wide Mermaid diagrams must open centrally");
 requireIn(selectorBlock(theme, ".md-typeset .mermaid"), "overflow-x: auto", "Mermaid must scroll within its pane");
+for (const role of [
+  "kb-source", "kb-evidence", "kb-snapshot", "kb-normative", "kb-canonical",
+  "kb-product", "kb-derived", "kb-consumer", "kb-verification",
+]) {
+  requireIn(theme, role, `fallback Mermaid CSS must style ${role}`);
+  requireIn(mermaidAdapter, role, `closed-shadow Mermaid CSS must style ${role}`);
+}
+for (const phrase of [
+  "accTitle: Governed knowledge base system",
+  "accDescr: Raw sources pass through evidence governance",
+  'subgraph K["Governed knowledge"]',
+  'subgraph P["Derived products"]',
+  "class C kb-canonical",
+  "class G kb-derived",
+  "class V kb-verification",
+]) {
+  requireIn(home, phrase, `Standard homepage Mermaid must retain ${phrase}`);
+}
+for (const phrase of [
+  "accTitle: Knowledge authority and derived surfaces",
+  'subgraph A["Evidence authority"]',
+  'subgraph D["Derived — not evidence"]',
+  "E --> C",
+  "C --> H",
+  "C --> L",
+  "C --> G",
+  "class C kb-canonical",
+  "class H,L,G kb-derived",
+]) {
+  requireIn(architecture, phrase, `Standard authority Mermaid must retain ${phrase}`);
+}
 requireIn(theme, "border-inline-start: var(--sequential-menu-rail-width) solid var(--border)", "page outline must use its quiet rail");
 requireIn(layout, "--layout-width-control-content-rail-offset: 2rem", "Wide control must use the body-rail offset");
 requireIn(layout, "--header-title-content-rail-offset: 10.5rem", "header title must use the body-rail offset");

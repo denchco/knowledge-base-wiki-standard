@@ -20,6 +20,63 @@
     .messageLine1 {
       stroke-width: var(--technical-frame-border-width) !important;
     }
+    .edge-thickness-thick {
+      stroke-width: var(--diagram-emphasis-line-width) !important;
+    }
+    .edge-pattern-dotted {
+      stroke: var(--accent-light) !important;
+    }
+    .edgeLabel rect.background {
+      fill: var(--background) !important;
+      fill-opacity: 1 !important;
+      opacity: 1 !important;
+    }
+    .cluster rect {
+      fill: var(--accent-transparent) !important;
+      stroke: var(--accent-light) !important;
+    }
+    .cluster-label text {
+      fill: var(--accent-dark) !important;
+      font-weight: 700 !important;
+      paint-order: stroke !important;
+      stroke: var(--background) !important;
+      stroke-linejoin: round !important;
+      stroke-width: var(--diagram-label-mask-width) !important;
+    }
+    .node.kb-source :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--surface) !important;
+      stroke: var(--accent-light) !important;
+    }
+    .node:is(.kb-evidence, .kb-product) :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--accent-lightest) !important;
+      stroke: var(--accent) !important;
+    }
+    .node.kb-snapshot :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--accent-transparent-strong) !important;
+      stroke: var(--accent) !important;
+    }
+    .node:is(.kb-normative, .kb-canonical) :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--accent) !important;
+      stroke: var(--accent-darker) !important;
+    }
+    .node.kb-derived :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--surface) !important;
+      stroke: var(--accent-light) !important;
+      stroke-dasharray: 4 3 !important;
+    }
+    .node.kb-consumer :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--surface) !important;
+      stroke: var(--accent-dark) !important;
+    }
+    .node.kb-verification :is(rect, polygon, circle, ellipse, path) {
+      fill: var(--accent-dark) !important;
+      stroke: var(--accent-darker) !important;
+    }
+    .node:is(.kb-normative, .kb-canonical, .kb-verification) :is(.nodeLabel, .label, text) {
+      color: var(--accent-contrast) !important;
+      fill: var(--accent-contrast) !important;
+      font-weight: 700 !important;
+    }
     .nodeLabel,
     .edgeLabel,
     .label,
@@ -41,6 +98,7 @@
     flowchart: {
       ...options?.flowchart,
       htmlLabels: false,
+      subGraphTitleMargin: { top: 4, bottom: 10 },
       useMaxWidth: false,
     },
     sequence: {
