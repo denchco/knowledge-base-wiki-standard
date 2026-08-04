@@ -41,6 +41,7 @@ requireIn(design, 'diagramLabelMaskWidth: "4px"', "DESIGN.md must pin the Mermai
 requireIn(design, "governing-question:", "DESIGN.md must define the governing-question component");
 requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry the governing-question component");
 requireIn(starterDesign, "kb-canonical", "starter DESIGN.md must carry the semantic Mermaid role grammar");
+requireIn(starterDesign, "no edge labels", "starter DESIGN.md must carry the simplified Mermaid topology rule");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
 for (const issue of governingQuestionMarkupIssues(home)) errors.push(`Standard homepage ${issue}`);
@@ -96,7 +97,7 @@ requireIn(mermaidAdapter, "stroke-width: var(--diagram-emphasis-line-width)", "c
 requireIn(mermaidAdapter, "useMaxWidth: false", "Mermaid must retain governed label scale");
 requireIn(mermaidAdapter, "htmlLabels: false", "Mermaid labels must remain measurable SVG text");
 requireIn(mermaidAdapter, "subGraphTitleMargin: { top: 4, bottom: 10 }", "Mermaid clusters must reserve readable title space");
-requireIn(mermaidAdapter, "paint-order: stroke", "closed-shadow Mermaid cluster titles must mask crossing lines");
+requireIn(mermaidAdapter, "paint-order: stroke", "closed-shadow Mermaid downstream cluster fallback must retain a label mask");
 requireIn(mermaidAdapter, "diagram.scrollLeft", "wide Mermaid diagrams must open centrally");
 requireIn(selectorBlock(theme, ".md-typeset .mermaid"), "overflow-x: auto", "Mermaid must scroll within its pane");
 for (const role of [
@@ -106,29 +107,30 @@ for (const role of [
   requireIn(theme, role, `fallback Mermaid CSS must style ${role}`);
   requireIn(mermaidAdapter, role, `closed-shadow Mermaid CSS must style ${role}`);
 }
+const homeDiagram = overviewDiagram(home, "Standard homepage Mermaid");
 for (const phrase of [
   "accTitle: Governed knowledge base system",
-  "accDescr: Raw sources pass through evidence governance",
-  'subgraph K["Governed knowledge"]',
-  'subgraph P["Derived products"]',
+  "accDescr: Source material becomes inspectable evidence",
+  "S --> E --> C --> W --> V",
+  "class S kb-source",
+  "class E kb-evidence",
   "class C kb-canonical",
-  "class G kb-derived",
+  "class W kb-derived",
   "class V kb-verification",
 ]) {
-  requireIn(home, phrase, `Standard homepage Mermaid must retain ${phrase}`);
+  requireIn(homeDiagram, phrase, `Standard homepage Mermaid must retain ${phrase}`);
 }
+const authorityDiagram = overviewDiagram(architecture, "Standard authority Mermaid");
 for (const phrase of [
   "accTitle: Knowledge authority and derived surfaces",
-  'subgraph A["Evidence authority"]',
-  'subgraph D["Derived — not evidence"]',
-  "E --> C",
-  "C --> H",
-  "C --> L",
-  "C --> G",
+  "accDescr: Sources are registered, assessed as evidence",
+  "S --> R --> E --> C --> W",
+  "class S kb-source",
+  "class R,E kb-evidence",
   "class C kb-canonical",
-  "class H,L,G kb-derived",
+  "class W kb-derived",
 ]) {
-  requireIn(architecture, phrase, `Standard authority Mermaid must retain ${phrase}`);
+  requireIn(authorityDiagram, phrase, `Standard authority Mermaid must retain ${phrase}`);
 }
 requireIn(theme, "border-inline-start: var(--sequential-menu-rail-width) solid var(--border)", "page outline must use its quiet rail");
 requireIn(layout, "--layout-width-control-content-rail-offset: 2rem", "Wide control must use the body-rail offset");
@@ -199,6 +201,51 @@ function requireIn(source, phrase, message) {
 function selectorBlock(source, selector) {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return source.match(new RegExp(`${escaped}\\s*\\{([\\s\\S]*?)\\}`, "m"))?.[1] ?? "";
+}
+function mermaidFences(source) {
+  return [...source.matchAll(/```mermaid\s*\n([\s\S]*?)```/g)].map(match => match[1]);
+}
+function overviewDiagram(source, label) {
+  const diagrams = mermaidFences(source);
+  if (diagrams.length !== 1) {
+    errors.push(`${label} must contain exactly one diagram; found ${diagrams.length}`);
+    return diagrams[0] || "";
+  }
+  const diagram = diagrams[0];
+  if (!/^flowchart TB$/m.test(diagram)) errors.push(`${label} must use one top-to-bottom reading direction`);
+  if (!diagram.includes('"curve": "linear"')) errors.push(`${label} must use straight connectors`);
+  if (/^\s*subgraph\b/m.test(diagram)) errors.push(`${label} must remain cluster-free on the narrow content rail`);
+  if (/\|[^|\n]+\||(?:--|==)\s+[^>\n]+\s+(?:-->|==>)/.test(diagram)) {
+    errors.push(`${label} must not place text on connectors`);
+  }
+  if (/<br\s*\/?\s*>/i.test(diagram)) errors.push(`${label} must keep node labels short without manual line breaks`);
+
+  const nodeIds = new Set(
+    [...diagram.matchAll(/\b([A-Za-z][A-Za-z0-9_]*)\s*(?=\[\[|\[\(|\[|\(\[|\(\(|\(|\{)/g)]
+      .map(match => match[1]),
+  );
+  const edgeCount = [...diagram.matchAll(/-->|==>|-\.->/g)].length;
+  if (nodeIds.size > 5) errors.push(`${label} must use no more than five nodes; found ${nodeIds.size}`);
+  if (edgeCount > 5) errors.push(`${label} must use no more than five visible relationships; found ${edgeCount}`);
+
+  const incoming = new Map();
+  const outgoing = new Map();
+  for (const line of diagram.split("\n")) {
+    if (!/(?:-->|==>|-\.->)/.test(line)) continue;
+    const ids = line.split(/\s*(?:-->|==>|-\.->)\s*/)
+      .map(segment => segment.match(/\b([A-Za-z][A-Za-z0-9_]*)\b/)?.[1])
+      .filter(Boolean);
+    for (let index = 0; index < ids.length - 1; index += 1) {
+      outgoing.set(ids[index], (outgoing.get(ids[index]) || 0) + 1);
+      incoming.set(ids[index + 1], (incoming.get(ids[index + 1]) || 0) + 1);
+    }
+  }
+  const branchNodes = new Set([
+    ...[...outgoing].filter(([, count]) => count > 1).map(([id]) => id),
+    ...[...incoming].filter(([, count]) => count > 1).map(([id]) => id),
+  ]);
+  if (branchNodes.size > 2) errors.push(`${label} must use at most one parallel branch; found ${branchNodes.size} split/merge points`);
+  return diagram;
 }
 function governingQuestionMarkupIssues(source) {
   const issues = [];

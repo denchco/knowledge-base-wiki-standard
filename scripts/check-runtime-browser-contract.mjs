@@ -27,6 +27,7 @@ const routeFor = (candidate, fallback = "/") => (
     : fallback
 );
 const mermaidRoute = routeFor("");
+const architectureRoute = routeFor("architecture", mermaidRoute);
 const tableRoute = routeFor("spec/requirements", mermaidRoute);
 const listRoute = mermaidRoute;
 const graphEnabled = ["graph/two-dimensional", "graph/three-dimensional"]
@@ -44,6 +45,7 @@ try {
   const serverUrl = await waitForServer(server);
   const initialUrl = new URL(serverUrl);
   initialUrl.searchParams.set("mermaid", mermaidRoute);
+  initialUrl.searchParams.set("architecture", architectureRoute);
   initialUrl.searchParams.set("table", tableRoute);
   initialUrl.searchParams.set("list", listRoute);
   initialUrl.searchParams.set("graph", graphEnabled ? "1" : "0");
@@ -62,7 +64,12 @@ try {
   if (!bootstrap.control) {
     throw new Error(`Runtime width control did not initialize: ${JSON.stringify(bootstrap)}`);
   }
-  const result = await runContract(page);
+  const result = await runContract(page, {
+    mermaidSources: {
+      homepage: mermaidFences(fs.readFileSync(path.join(root, "docs", "index.md"), "utf8")),
+      architecture: mermaidFences(fs.readFileSync(path.join(root, "docs", "architecture.md"), "utf8")),
+    },
+  });
   if (result.ok !== true) throw new Error("Runtime browser contract did not report success.");
 
   const graphSummary = graphEnabled ? ", Graphify 2D/3D desktop/mobile pixels and controls" : "";
@@ -121,4 +128,8 @@ function waitForServer(child) {
       reject(error);
     });
   });
+}
+
+function mermaidFences(source) {
+  return [...source.matchAll(/```mermaid\s*\n([\s\S]*?)```/g)].map(match => match[1]);
 }

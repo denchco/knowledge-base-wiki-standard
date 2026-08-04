@@ -24,31 +24,24 @@ Inspect these relationships through the shared [2D and 3D repository graph](grap
 ## Authority
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 6, "rankSpacing": 18, "padding": 4}}}%%
+%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
 flowchart TB
   accTitle: Knowledge authority and derived surfaces
-  accDescr: Primary sources pass through registered identity and evidence records into canonical OKF knowledge. Human, LLM, and discovery surfaces derive from that canonical layer and cannot create evidence.
+  accDescr: Sources are registered, assessed as evidence, maintained as canonical knowledge, and then presented through derived human, agent, and graph views.
 
-  subgraph A["Evidence authority"]
-    S["1 · Primary sources"] --> R["2 · Source register"]
-    R --> E["3 · Evidence records<br/>claims + limits + gaps"]
-    E --> C[["4 · Canonical OKF<br/>knowledge"]]
-  end
-  subgraph D["Derived — not evidence"]
-    H["Human Wiki"]
-    L["LLM Wiki"]
-    G["Graph + exports"]
-  end
-  C --> H
-  C --> L
-  C --> G
+  S["1 · Sources"]
+  R["2 · Source register"]
+  E["3 · Evidence records"]
+  C[["4 · Canonical knowledge"]]
+  W["Human · agent · graph views"]
+  S --> R --> E --> C --> W
   class S kb-source
   class R,E kb-evidence
   class C kb-canonical
-  class H,L,G kb-derived
+  class W kb-derived
 ```
 
-Solid accent marks canonical authority. Dashed node boundaries mark derived surfaces: they assist comprehension, routing, and discovery but cannot create evidence.
+The numbered authority chain ends at canonical knowledge. The final dashed node groups the derived views that help people and agents use it; those views cannot create evidence.
 
 ## Distribution boundary
 

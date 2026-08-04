@@ -125,7 +125,7 @@ The shell may look identical across topics. The topic's reader model, navigation
 - `accentDark`, `accentDarker`, `accentVisited`, `accentLight`, `accentLightest`, `accentTransparent`, `accentTransparentStrong`, and `accentContrast` form one complete, replaceable accent family.
 - `conditional`, `success`, and `warning` are semantic states, not alternate brand colours.
 - `componentRadiusSmall`, `componentRadius`, and `componentRadiusLarge` bound rectangular corners at `.2rem`, `.35rem`, and `.5rem`.
-- `diagramNodeRadius` governs Mermaid boxes; `diagramEmphasisLineWidth` distinguishes an explicitly stronger authoritative relationship from ordinary technical lines; `diagramLabelMaskWidth` keeps cluster titles legible when routed lines pass behind them.
+- `diagramNodeRadius` governs Mermaid boxes; `diagramEmphasisLineWidth` distinguishes an explicitly stronger authoritative relationship from ordinary technical lines; `diagramLabelMaskWidth` is a downstream legibility fallback and never makes a line routed through text acceptable.
 - `componentBorderWidth`, `technicalFrameBorderWidth`, `sourceRowRailWidth`, and `accentRailWidth` govern every visible line. The Graphify pane rail is `1.75px`; the iframe inside it is borderless.
 - `layoutWidthControlContentRailOffset` right-aligns the Standard/Wide control with the central body/content rail.
 - `headerTitleContentRailOffset` aligns the visible desktop title with that body/content rail without embedding a raw geometry value in the selector.
@@ -146,8 +146,10 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.
 - Avoid marketing heroes, nested cards, decorative panels, and prose that overstates evidence.
 - Tables, Mermaid diagrams, and Graphify frames use named border and radius tokens only.
-- Canonical Mermaid diagrams use semantic classes rather than raw colours: `kb-source`, `kb-evidence`, `kb-snapshot`, `kb-normative`, `kb-canonical`, `kb-product`, `kb-derived`, `kb-consumer`, and `kb-verification`. Normative/canonical nodes take the solid accent and contrast text; derived nodes take a quiet dashed boundary; short cluster titles expose phase or authority boundaries.
-- Canonical diagrams preserve accessible titles/descriptions, the complete material topology, and readable path order while fitting the content rail at desktop, tablet, and mobile widths. Contained scrolling is a downstream fallback, not a simplification target.
+- Canonical Mermaid diagrams use semantic classes rather than raw colours: `kb-source`, `kb-evidence`, `kb-snapshot`, `kb-normative`, `kb-canonical`, `kb-product`, `kb-derived`, `kb-consumer`, and `kb-verification`. Normative/canonical nodes take the solid accent and contrast text; derived nodes take a quiet dashed boundary. When nesting is material, a short cluster title may expose the boundary without accepting a crossing connector.
+- Canonical entry and architecture diagrams use one top-to-bottom reading direction, straight connectors, no edge labels, no more than five nodes and five visible relationships, and at most one parallel branch. Put finer distinctions in nearby prose or a separate diagram.
+- No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
+- Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. Contained scrolling is a downstream fallback, not a simplification target.
 - The production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent.
 - Mermaid `11.16.0`, vis-network `10.1.0`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles

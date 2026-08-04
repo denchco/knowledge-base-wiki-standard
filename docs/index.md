@@ -19,35 +19,25 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ## The system
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 6, "rankSpacing": 18, "padding": 4}}}%%
+%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
 flowchart TB
   accTitle: Governed knowledge base system
-  accDescr: Raw sources pass through evidence governance into one canonical OKF corpus. Human, LLM, and Graphify products derive from that corpus and converge on executable verification.
+  accDescr: Source material becomes inspectable evidence, maintained knowledge, coordinated human, agent, and graph views, and finally a verified local system.
 
-  subgraph K["Governed knowledge"]
-    A["Raw sources"] --> E["Evidence governance"] --> C[["Canonical OKF<br/>knowledge"]]
-  end
-  subgraph P["Derived products"]
-    H["Human Wiki"]
-    L["LLM Wiki"]
-    G["Graphify 2D + 3D"]
-  end
-  V(["Executable verification"])
-  C --> H
-  C --> L
-  C --> G
-  H --> V
-  L --> V
-  G --> V
-  class A kb-source
+  S["Source material"]
+  E["Evidence records"]
+  C[["Maintained knowledge"]]
+  W["Human · agent · graph views"]
+  V(["Verification"])
+  S --> E --> C --> W --> V
+  class S kb-source
   class E kb-evidence
   class C kb-canonical
-  class H,L kb-product
-  class G kb-derived
+  class W kb-derived
   class V kb-verification
 ```
 
-Solid accent marks the canonical authority; the product group is coordinated but derived, and every surface converges on the same executable verification boundary.
+Read from top to bottom: source material becomes inspectable evidence, then maintained knowledge, then coordinated views for people and agents. Verification checks the resulting system. Solid accent marks the maintained authority; the dashed view remains derived from it.
 
 ## Start here
 

@@ -1,9 +1,10 @@
-export default async page => {
+export default async (page, options = {}) => {
   const configuration = await page.evaluate(() => {
     const current = new URL(location.href);
     return {
       origin: current.origin,
       mermaidRoute: current.searchParams.get("mermaid") || "/",
+      architectureRoute: current.searchParams.get("architecture"),
       tableRoute: current.searchParams.get("table"),
       listRoute: current.searchParams.get("list"),
       graphEnabled: current.searchParams.get("graph") === "1",
@@ -11,6 +12,7 @@ export default async page => {
   });
   const baseUrl = configuration.origin;
   const mermaidRoute = configuration.mermaidRoute;
+  const architectureRoute = configuration.architectureRoute || mermaidRoute;
   const tableRoute = configuration.tableRoute || mermaidRoute;
   const listRoute = configuration.listRoute || mermaidRoute;
   const graphEnabled = configuration.graphEnabled;
@@ -136,6 +138,117 @@ export default async page => {
       };
     }, dataUrl);
   };
+  const inspectMermaidPage = async ({ route, pageName, expectedCount, viewportName }) => {
+    await goto(route);
+    await page.waitForSelector(".mermaid");
+    await page.waitForFunction(() => (
+      [...document.querySelectorAll(".mermaid")]
+        .every(diagram => diagram.getBoundingClientRect().height > 40)
+    ));
+    const geometry = await page.locator(".mermaid").evaluateAll(diagrams => diagrams.map(diagram => ({
+      width: diagram.clientWidth,
+      height: diagram.clientHeight,
+      scrollWidth: diagram.scrollWidth,
+      scrollHeight: diagram.scrollHeight,
+      scrollLeft: diagram.scrollLeft,
+    })));
+    check(
+      geometry.length === expectedCount,
+      `${pageName} must render exactly ${expectedCount} Mermaid diagram${expectedCount === 1 ? "" : "s"} at ${viewportName} width`,
+    );
+    for (const [index, diagram] of geometry.entries()) {
+      check(diagram.width > 200 && diagram.height > 40, `${pageName} Mermaid ${index + 1} must have non-empty geometry at ${viewportName} width`);
+      check(
+        diagram.scrollWidth <= diagram.width + 1 && diagram.scrollHeight <= diagram.height + 1,
+        `${pageName} Mermaid ${index + 1} must fit its pane at ${viewportName} width`,
+      );
+      check(Math.abs(diagram.scrollLeft) <= 1, `${pageName} Mermaid ${index + 1} must open without displaced scrolling at ${viewportName} width`);
+    }
+    const pageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    check(pageOverflow <= 1, `${pageName} page must not overflow horizontally at ${viewportName} width`);
+    return geometry;
+  };
+  const inspectMermaidSourceLayouts = async (sources, pageName) => {
+    if (!Array.isArray(sources) || sources.length === 0) {
+      check(false, `${pageName} must supply canonical Mermaid source for collision checks`);
+      return [];
+    }
+    const layouts = await page.evaluate(async sourceList => {
+      if (!window.mermaid?.render) throw new Error("Pinned local Mermaid runtime is unavailable");
+      const mount = document.createElement("div");
+      mount.style.cssText = "position:absolute;left:-10000px;top:0;width:1200px;opacity:0;pointer-events:none";
+      document.body.append(mount);
+      try {
+        if (document.fonts?.ready) await document.fonts.ready;
+        const results = [];
+        for (const [diagramIndex, source] of sourceList.entries()) {
+          const rendered = await window.mermaid.render(
+            `canonical-layout-${Date.now()}-${diagramIndex}`,
+            source,
+          );
+          mount.innerHTML = rendered.svg;
+          await new Promise(resolve => requestAnimationFrame(resolve));
+          const svg = mount.querySelector("svg");
+          if (!svg) {
+            results.push({ diagramIndex, missingSvg: true, edgeLabels: [], nodeOverlaps: [], textPathCollisions: [] });
+            continue;
+          }
+          const edgeLabels = [...svg.querySelectorAll(".edgeLabel text")]
+            .map(text => text.textContent?.trim() || "")
+            .filter(Boolean);
+          const nodes = [...svg.querySelectorAll("g.node")].map((node, index) => ({
+            index,
+            label: node.textContent?.trim() || `node ${index + 1}`,
+            rect: node.getBoundingClientRect(),
+          }));
+          const nodeOverlaps = [];
+          for (let left = 0; left < nodes.length; left += 1) {
+            for (let right = left + 1; right < nodes.length; right += 1) {
+              const overlapX = Math.min(nodes[left].rect.right, nodes[right].rect.right) - Math.max(nodes[left].rect.left, nodes[right].rect.left);
+              const overlapY = Math.min(nodes[left].rect.bottom, nodes[right].rect.bottom) - Math.max(nodes[left].rect.top, nodes[right].rect.top);
+              if (overlapX > 1 && overlapY > 1) nodeOverlaps.push([nodes[left].label, nodes[right].label]);
+            }
+          }
+          const texts = [...svg.querySelectorAll("text")].map((text, index) => ({
+            index,
+            label: text.textContent?.trim() || `text ${index + 1}`,
+            rect: text.getBoundingClientRect(),
+          })).filter(text => text.rect.width > 0 && text.rect.height > 0);
+          const textPathCollisions = [];
+          for (const [pathIndex, path] of [...svg.querySelectorAll(".flowchart-link")].entries()) {
+            const length = path.getTotalLength();
+            const matrix = path.getScreenCTM();
+            if (!matrix) continue;
+            let collision = null;
+            for (let distance = 2; distance < length - 2 && !collision; distance += 1.5) {
+              const localPoint = path.getPointAtLength(distance);
+              const point = new DOMPoint(localPoint.x, localPoint.y).matrixTransform(matrix);
+              collision = texts.find(text => (
+                point.x > text.rect.left + 1 && point.x < text.rect.right - 1 &&
+                point.y > text.rect.top + 1 && point.y < text.rect.bottom - 1
+              )) || null;
+            }
+            if (collision) textPathCollisions.push({ pathIndex, text: collision.label });
+          }
+          results.push({ diagramIndex, missingSvg: false, edgeLabels, nodeOverlaps, textPathCollisions });
+        }
+        return results;
+      } finally {
+        mount.remove();
+      }
+    }, sources);
+    for (const layout of layouts) {
+      const prefix = `${pageName} Mermaid ${layout.diagramIndex + 1}`;
+      check(!layout.missingSvg, `${prefix} must render inspectable SVG geometry`);
+      check(layout.edgeLabels.length === 0, `${prefix} must not put text on connectors: ${layout.edgeLabels.join(", ")}`);
+      check(layout.nodeOverlaps.length === 0, `${prefix} nodes must not overlap: ${JSON.stringify(layout.nodeOverlaps)}`);
+      check(
+        layout.textPathCollisions.length === 0,
+        `${prefix} connectors must not intersect text: ${JSON.stringify(layout.textPathCollisions)}`,
+      );
+    }
+    return layouts;
+  };
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
@@ -239,6 +352,16 @@ export default async page => {
   const mermaidPixels = await screenshotPixels(await mermaidHost.screenshot());
   check(mermaidHostGeometry.width > 200 && mermaidHostGeometry.height > 40, "Rendered Mermaid geometry must be non-empty");
   check(mermaidPixels.distinctColours > 24 && mermaidPixels.opaqueRatio > 0.95, "Rendered Mermaid pixels must be nonblank");
+  const mermaidLayouts = {
+    homepage: await inspectMermaidSourceLayouts(options.mermaidSources?.homepage, "Homepage"),
+    architecture: await inspectMermaidSourceLayouts(options.mermaidSources?.architecture, "Architecture"),
+  };
+  const architectureDesktop = await inspectMermaidPage({
+    route: architectureRoute,
+    pageName: "Architecture",
+    expectedCount: 1,
+    viewportName: "1256px desktop",
+  });
 
   const mermaidProbe = await page.evaluate(async () => {
     if (!window.mermaid?.render) throw new Error("Pinned local Mermaid runtime is unavailable");
@@ -358,6 +481,12 @@ export default async page => {
   check(mobileMermaidGeometry.pageOverflow <= 1, "Mobile Mermaid page must not overflow horizontally");
   check(mobileMermaidGeometry.widthControlDisplay === "none", "Desktop width control must not crowd the mobile header");
   check(mobileMermaidPixels.distinctColours > 24, "Mobile Mermaid pixels must be nonblank");
+  const architectureMobile = await inspectMermaidPage({
+    route: architectureRoute,
+    pageName: "Architecture",
+    expectedCount: 1,
+    viewportName: "390px mobile",
+  });
 
   const graphMetrics = {};
   if (graphEnabled) {
@@ -460,6 +589,11 @@ export default async page => {
     mermaid: {
       desktop: mermaidPixels,
       mobile: mobileMermaidPixels,
+      layouts: mermaidLayouts,
+      architecture: {
+        desktop: architectureDesktop,
+        mobile: architectureMobile,
+      },
       nodeRadius: mermaidProbe.nodeRadiusX,
       strokeWidth: mermaidProbe.nodeStrokeWidth,
     },

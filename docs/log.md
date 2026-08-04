@@ -9,6 +9,7 @@ status: draft
 
 ## 2026-08-04
 
+- **Mermaid legibility**: Replaced compressed cluster-and-fan diagrams with short top-to-bottom flows, shorter labels, straight connectors, and prose-held detail. Added bounded topology and rendered collision checks so connectors cannot pass through labels or overlapping nodes while entry and architecture diagrams remain within the content rail.
 - **Beginner entry point**: Recast the README around the single repository-address invocation, made the adaptive questions and automatic defaults scannable, moved maintainer mechanics behind progressive disclosure, and added the governed DENCH | CO wordmark plus four trust-oriented badges.
 - **URL-only adaptive bootstrap**: Replaced pre-filled topic/profile/URL/deployment fields with a repository-URL-only agent entry point. The first question now selects a research topic seed or subject-empty local initialization; subsequent questions depend on inspected evidence, with exact accent confirmation and automatic local defaults.
 - **Subject-empty semantics**: Blank initialization now preserves an explicit awaiting-seed state and omits the governing-question callout rather than inventing subject claims. External research extent and sensitive-source handling are conditional questions; deployment remains none unless separately authorised.
