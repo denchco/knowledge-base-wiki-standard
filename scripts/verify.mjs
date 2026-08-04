@@ -231,6 +231,7 @@ function buildReceipt(provenance) {
       ],
       results: [
         result("DKBWS-HUMAN-001", ["browser-contract"], "The Human Wiki returned HTTP 200 and remained usable at tested viewports."),
+        result("DKBWS-HUMAN-002", ["browser-contract"], "The governing-question marker rendered its rail and text in the resolved active accent at desktop and mobile widths while an ordinary quotation remained neutral."),
         result("DKBWS-GRAPH-001", ["browser-contract"], "The shared 2D/3D graph views rendered with usable controls."),
         result("DKBWS-RENDER-001", ["browser-contract", "browser-dependency-lock"]),
         result("DKBWS-RUNTIME-001", ["browser-contract"], "The verification runtime served the canonical built Wiki with HTTP 200."),

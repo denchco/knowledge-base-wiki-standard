@@ -8,6 +8,11 @@ const graph = read("docs/assets/graph.css");
 const publisher = read("scripts/publish-graphify-assets.mjs");
 const mermaidAdapter = read("docs/assets/mermaid-adapter.js");
 const zensical = read("zensical.toml");
+const requirements = read("docs/spec/requirements.md");
+const humanProfile = read("profiles/human-and-agent.yaml");
+const home = read("docs/index.md");
+const starterHome = read("starter/templates/docs/index.md.tmpl");
+const starterDesign = read("starter/templates/DESIGN.md.tmpl");
 
 for (const token of [
   "accentDark", "accentDarker", "accentVisited", "accentLight", "accentLightest",
@@ -30,6 +35,21 @@ for (const [token, value] of [
 }
 requireIn(design, 'compactDataFontSize: ".64rem"', "DESIGN.md must pin reduced table text");
 requireIn(design, 'diagramTextSize: ".64rem"', "DESIGN.md must match Mermaid and reduced table text");
+requireIn(design, "governing-question:", "DESIGN.md must define the governing-question component");
+requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry the governing-question component");
+requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
+requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
+for (const [name, source] of [["Standard homepage", home], ["starter homepage", starterHome]]) {
+  for (const issue of governingQuestionMarkupIssues(source)) errors.push(`${name} ${issue}`);
+}
+const mismatchedGoverningQuestionFixture = [
+  "<blockquote>",
+  '<p class="governing-question">Mismatched marker</p>',
+  "</blockquote>",
+].join("\n");
+if (governingQuestionMarkupIssues(mismatchedGoverningQuestionFixture).length === 0) {
+  errors.push("governing-question source validation must reject a marker placed on the paragraph instead of its callout");
+}
 
 for (const token of [
   "--primary: #174a5b", "--accent: #0b7285", "--accent-dark: #075866",
@@ -66,6 +86,17 @@ requireIn(layout, ".md-header__title .md-header__topic", "the visible header top
 requireIn(layout, "transform: none !important", "the visible header topic must stay on the body rail");
 requireIn(selectorBlock(theme, ".md-header"), "background-color: var(--surface)", "header must use the surface token");
 requireIn(selectorBlock(theme, ".md-search__button"), "background-color: var(--md-default-fg-color--lightest)", "Search must use the neutral renderer token");
+requireIn(
+  selectorBlock(theme, ".md-typeset blockquote.governing-question"),
+  "border-inline-start-color: var(--accent)",
+  "governing-question rail must use the active accent token",
+);
+const governingQuestionText = selectorBlock(theme, ".md-typeset blockquote.governing-question > p");
+requireIn(governingQuestionText, "color: var(--accent)", "governing-question text must use the active accent token");
+requireIn(governingQuestionText, "font-weight: 700", "governing-question text must remain visually prominent");
+if (selectorBlock(theme, ".md-typeset blockquote").includes("var(--accent)")) {
+  errors.push("ordinary blockquotes must remain neutral instead of inheriting the active accent");
+}
 requireIn(graph, "border: var(--technical-frame-border-width) solid var(--accent-light)", "Graph pane must use one 1.75px rail");
 requireIn(selectorBlock(graph, ".graph-frame"), "border: 0", "Graph iframe must not add a second border");
 requireIn(publisher, 'const primary = process.env.GRAPHIFY_PRIMARY ?? "#0b7285"', "Graph publication must default to DenchCo teal");
@@ -115,4 +146,14 @@ function requireIn(source, phrase, message) {
 function selectorBlock(source, selector) {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return source.match(new RegExp(`${escaped}\\s*\\{([\\s\\S]*?)\\}`, "m"))?.[1] ?? "";
+}
+function governingQuestionMarkupIssues(source) {
+  const issues = [];
+  const markers = [...source.matchAll(/class=["'][^"']*\bgoverning-question\b[^"']*["']/g)];
+  const valid = [...source.matchAll(
+    /<blockquote\s+class=["']governing-question["']>\s*<p>[^<]+<\/p>\s*<\/blockquote>/g,
+  )];
+  if (markers.length !== 1) issues.push(`must contain exactly one governing-question marker; found ${markers.length}`);
+  if (valid.length !== 1) issues.push("must place its governing-question marker on a blockquote containing one direct paragraph");
+  return issues;
 }

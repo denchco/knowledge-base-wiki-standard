@@ -17,6 +17,7 @@ status: draft
 | DKBWS-EVID-001 | Sources MUST have stable identities and provenance. | Evidence profile | Source-register check |
 | DKBWS-EVID-002 | Material claims MUST route to evidence state, limitations, or a validation gap. | Evidence profile | Evidence check/manual review |
 | DKBWS-HUMAN-001 | A Human Wiki MUST provide a stable navigable URL and strict build. | Human profile | Build/HTTP check |
+| DKBWS-HUMAN-002 | Every callout designated as a Human Wiki's governing question MUST be machine-identifiable as `governing-question` and MUST render both its inline-start rail and all question text using the implementation's active accent colour. Ordinary quotations MUST remain neutral. | Human profile when a governing-question callout is present | Built-output browser comparison with the resolved active accent token |
 | DKBWS-LLM-001 | An LLM Wiki MUST define read order, ingest, query, lint, authority, and generated boundaries. | Agent profile | Required-role check |
 | DKBWS-LINK-001 | Canonical pages MUST have contextual inbound links beyond navigation. | Maintained wiki | Concept-link check |
 | DKBWS-GRAPH-001 | Graph-Linked projects MUST publish shared data under a declared, versioned graph-publication schema and provide real 2D/3D views. | Graph profile | Graph/schema/browser check |
@@ -32,3 +33,11 @@ status: draft
 | DKBWS-SEC-001 | Security and source-handling boundaries MUST be declared and separately report secrets/authorization, personal/confidential data, copyright/licensing/retention, and untrusted/generated content. | All | Policy and subcontrol check |
 
 Candidate identifiers remain stable through `0.x`; incompatible renaming requires a migration map.
+
+## Governing-question rendering
+
+`DKBWS-HUMAN-002` is conditional on presenting a governing-question callout; it does not require every Human Wiki to invent one. A conforming renderer MAY choose its native semantic element, but the built output MUST expose a stable `governing-question` marker so agents and verification tools can distinguish the callout from quoted evidence.
+
+The Zensical reference adapter uses `<blockquote class="governing-question">`. Its rail and question text resolve from the same active accent token at every supported viewport, while unmarked blockquotes retain the renderer's neutral quotation treatment. Source markup or CSS inspection alone cannot prove this rendered requirement.
+
+Migration from a release without this rule requires three reviewable changes where a governing-question callout already exists: add the semantic marker, bind both rendered colours to the active accent family, and add browser evidence that compares computed colours with the resolved token. A project with no governing-question callout records the requirement as not applicable rather than creating decorative content.

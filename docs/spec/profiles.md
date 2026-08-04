@@ -11,7 +11,7 @@ status: draft
 
 - **Portable Core** (`portable-core`) — UTF-8 Markdown with portable links, a DenchCo manifest, one mapped OKF v0.2 bundle, declared security/source boundaries, and narrow validation. Reserved OKF index/log files conform when present; this profile does not require rendered or managed research-log surfaces.
 - **Evidence Governed** (`evidence-governed`) — source register, evidence matrix, validation queue, quality/status language, and research discipline.
-- **Human and Agent** (`human-and-agent`) — coordinated Human Wiki and operational LLM Wiki.
+- **Human and Agent** (`human-and-agent`) — coordinated Human Wiki and operational LLM Wiki; any displayed governing-question callout is semantically marked and uses the active accent for both its rail and text while ordinary quotations remain neutral.
 - **Standard Production** (`standard-production`) — Zensical, DenchCo style, local Mermaid, Graphify 2D/3D, browser verification, stable runtime, Git interoperability, and colocated Jujutsu phase provenance.
 - **Managed Full** (`managed-full`) — a planning profile that currently adds immutable release governance and declares future CI, deployment, portfolio, and complete-report capability targets.
 

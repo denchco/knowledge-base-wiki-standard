@@ -2,6 +2,12 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning for its declared conformance contract.
 
+## Unreleased
+
+- Added `DKBWS-HUMAN-002`: every displayed governing-question callout is machine-identifiable and renders both its inline-start rail and question text in the active accent colour, while ordinary quotations remain neutral.
+- Activated the reference implementation on the Standard homepage and subject-empty starter, and added static plus desktop/mobile rendered checks with positive and negative controls.
+- Migration: existing Human Wikis with a governing-question callout add the semantic marker, bind both colours to the active accent family, and record browser evidence. Human Wikis without the callout mark the conditional rule not applicable.
+
 ## 0.1.0-rc.2 — 2026-08-04
 
 - Added a shared Codex/Claude instruction surface: canonical `AGENTS.md`, Claude's `@AGENTS.md` import, and byte-identical Standard-maintainer skills in both discovery locations.

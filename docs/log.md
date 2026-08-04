@@ -9,6 +9,9 @@ status: draft
 
 ## 2026-08-04
 
+- **Governing-question promotion**: Promoted the mature NHS Data Sharing semantic callout pattern from reusable local precedent to candidate-core Human Wiki requirement `DKBWS-HUMAN-002`; the Standard, Documentation dogfood site, and subject-empty starter now distinguish governed questions from neutral quotations.
+- **Rendered verification**: Required the inline-start rail and all question text to equal the runtime-resolved active accent at desktop and mobile widths, with a negative mismatched-colour fixture and a neutral ordinary-quotation control.
+- **Migration impact**: Existing Human Wikis only migrate when they already present a governing-question callout: add the semantic marker, bind both colours to the active accent family, and capture built-output browser evidence. Wikis without such a callout record the rule as not applicable.
 - **Instruction prerelease**: Published the shared completion-first Codex/Claude operating contract, subject-empty consumer relay, zero-to-three handoff eligibility rule, one-pass completion conditions, and structured parked-work reopen fields as immutable `v0.1.0-rc.2`.
 - **Migration boundary**: Consumers moving from `v0.1.0-rc.1` update agent instructions and project-status separation only; the manifest and OKF content model do not change.
 - **Release verification**: Required complete local verification, exact-commit GitHub Actions success, deterministic Documentation snapshot synchronization, and the private-source/public-Pages deployment gate for the same pinned Standard commit.

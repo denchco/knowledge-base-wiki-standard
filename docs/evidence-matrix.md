@@ -12,6 +12,7 @@ status: draft
 | Persistent synthesis should compound rather than be rediscovered for every query. | SRC-001 | Supported | Requires lint and evidence safeguards against propagated errors. |
 | OKF v0.2 is the portable knowledge foundation. | SRC-002 | Implemented candidate | Public schema endpoints are published through the documentation Pages site; validation still uses the pinned local schema copy. Hard validation, strict guidance, and unknown-field round-trip fixtures pass locally. |
 | Human and LLM products should share canonical knowledge. | SRC-001, SRC-002, SRC-011 | Implemented candidate | More cross-renderer and independently maintained consumer fixtures are still needed. |
+| A displayed governing question should be semantically distinct and use the active accent for both its rail and text. | SRC-009, SRC-012 | Implemented candidate (`DKBWS-HUMAN-002`) | The reference Zensical implementation has desktop/mobile browser evidence; broader cross-renderer evidence remains to be gathered. |
 | Zensical plus the DenchCo style should lead the reference distribution. | SRC-005, SRC-011, SRC-012 | Candidate preferred | Cross-renderer accessibility evidence remains incomplete. |
 | Graphify adds useful explicit relationships but not evidence authority. | SRC-006, SRC-011, SRC-012 | Supported | Semantic extraction coverage varies by corpus. |
 | A dedicated MCP is useful later but should not be required to read the standard. | SRC-002, SRC-007, SRC-008 | Adopted | MCP tool surface is not yet implemented. |

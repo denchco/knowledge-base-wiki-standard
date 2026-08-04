@@ -37,7 +37,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-VERIFY-001"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-VERIFY-001"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -85,6 +85,8 @@ for (const boundary of [
   "Never recursively copy the standard root",
   "Target Wiki URL",
   "Target deployment",
+  "governing-question",
+  "ordinary quotations neutral",
 ]) {
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }

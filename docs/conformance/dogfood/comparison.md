@@ -33,15 +33,15 @@ No `WAIVED` result was recognised. A narrative decision not to adopt OKF, Graph 
 
 | Project | Closest candidate position | PASS | FAIL | WAIVED | NOT APPLICABLE | NOT IMPLEMENTED |
 |---|---|---:|---:|---:|---:|---:|
-| [NHS Data Sharing](nhs-data-sharing.json) | Standard Production + Question-Led | 12 | 5 | 0 | 1 | 3 |
-| [Regulation 28](regulation-28.json) | Evidence/Human/Graph/Design + Generated Analytical + Ask | 12 | 3 | 0 | 1 | 5 |
-| [InterSystems](intersystems.json) | Evidence/Human/Graph/Design + Material compatibility | 11 | 3 | 0 | 2 | 5 |
-| [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 2 | 8 |
-| [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 3 | 0 | 1 | 5 |
+| [NHS Data Sharing](nhs-data-sharing.json) | Standard Production + Question-Led | 13 | 5 | 0 | 1 | 3 |
+| [Regulation 28](regulation-28.json) | Evidence/Human/Graph/Design + Generated Analytical + Ask | 12 | 3 | 0 | 2 | 5 |
+| [InterSystems](intersystems.json) | Evidence/Human/Graph/Design + Material compatibility | 11 | 3 | 0 | 3 | 5 |
+| [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 3 | 8 |
+| [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 4 | 0 | 1 | 5 |
 
 These counts are diagnostic rather than rankings. X-Lab deliberately omits capabilities that its purpose does not currently justify. Regulation 28's legacy Level 4 label similarly prevents the audit from silently treating advanced Ask/deployment work as a higher formal claim.
 
-The 21-row catalogue includes the separately added bundle-mapping, provenance, and machine-report obligations (`DKBWS-OKF-003`, `DKBWS-PROV-001`, and `DKBWS-VERIFY-002`). Because these projects predate the candidate and make no DenchCo claim, absent capabilities are reported as `NOT_IMPLEMENTED`, not silently promoted to formal failures. The four existing colocated Git/Jujutsu workspaces are inferred `PASS` evidence for provenance; X-Lab remains `NOT_IMPLEMENTED` because its inspected project record deliberately retained Git without JJ.
+The 22-row catalogue includes the separately added bundle-mapping, governing-question, provenance, and machine-report obligations (`DKBWS-OKF-003`, `DKBWS-HUMAN-002`, `DKBWS-PROV-001`, and `DKBWS-VERIFY-002`). Because these projects predate the candidate and make no DenchCo claim, absent capabilities are reported as `NOT_IMPLEMENTED`, not silently promoted to formal failures. The four existing colocated Git/Jujutsu workspaces are inferred `PASS` evidence for provenance; X-Lab remains `NOT_IMPLEMENTED` because its inspected project record deliberately retained Git without JJ.
 
 ## Component comparison
 
@@ -50,6 +50,7 @@ The 21-row catalogue includes the separately added bundle-mapping, provenance, a
 | Candidate manifest | FAIL | FAIL | FAIL | FAIL | FAIL |
 | Human renderer | Zensical 0.0.51 | Zensical 0.0.50 | Material 9.7.6 | Material 9.7.6 | Zensical 0.0.52 |
 | Human Wiki | PASS | PASS | PASS | FAIL: no stable URL | PASS |
+| Governing-question accent rail and text | PASS | NOT APPLICABLE: no callout | NOT APPLICABLE: no callout | NOT APPLICABLE: no callout | FAIL: accent rail, default text |
 | Operational LLM Wiki | PASS | PASS | PASS | PASS | PASS |
 | Stable source identities | PASS | PASS | PASS | FAIL | PASS |
 | Claim limitations/gaps | PASS | PASS | PASS | PASS | PASS |
@@ -165,6 +166,10 @@ Clarify whether `DKBWS-RELEASE-001` governs releases of the DenchCo standard, pu
 
 Narrative exclusions must not silently become waivers. A missing mandatory core requirement is `FAIL`, not `NOT_IMPLEMENTED`, once a formal profile is selected.
 
+### 12. Governing questions need a rendered accent invariant
+
+NHS Data Sharing demonstrates the complete reusable pattern: a semantically identified governing-question blockquote whose rail and text both use the active accent, backed by an executable visual check. Palantir shows why rail-only styling is insufficient: its callout has the semantic class and accent rail, while the question text remains at the default colour. Regulation 28, InterSystems, and X-Lab contain no governing-question callout, so this conditional requirement is not applicable to them. `DKBWS-HUMAN-002` therefore requires rendered rail-and-text equality with the active accent rather than accepting class or source-CSS presence alone.
+
 ## Candidate disposition after the audit
 
 The audit was used as a design test, not left as a static scorecard:
@@ -182,6 +187,7 @@ The audit was used as a design test, not left as a static scorecard:
 | Git/Jujutsu provenance ambiguity | `DKBWS-PROV-001` now makes colocated Jujutsu mandatory for Standard Production maintenance workspaces, retains Git-only Portable Core/distribution compatibility, and has an executable read-only checker. |
 | Release ambiguity | The release rule now covers the standard and public implementation releases that advertise conformance. |
 | Status ambiguity | Formal and adoption-audit status algorithms are now normative; waivers require authority plus expiry or review state. |
+| Governing-question visual drift | `DKBWS-HUMAN-002` requires a semantically identified callout to render both its rail and text with the implementation's active accent, proved from built output; projects without such a callout are not applicable. |
 
 The audited projects retain their recorded gaps. Candidate improvements do not retroactively make those projects conformant or authorize their migration.
 

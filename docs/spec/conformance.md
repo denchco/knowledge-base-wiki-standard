@@ -22,7 +22,7 @@ A conformance claim MUST state:
 
 The candidate catalogue records each requirement's stable ID, normative statement, applicability, and verification method. Machine diagnostics add code, severity, message, location, and remediation when a check can provide them. Introduction/deprecation metadata is not yet a catalogue field and MUST NOT be claimed until a versioned catalogue schema adds it.
 
-The conformance kit contains positive and negative fixtures. A source/configuration assertion cannot prove browser-visible behaviour; rendered claims require built-output browser checks.
+The conformance kit contains positive and negative fixtures. A source/configuration assertion cannot prove browser-visible behaviour; rendered claims require built-output browser checks. In particular, `DKBWS-HUMAN-002` passes only when computed governing-question rail and text colours both equal the runtime-resolved active accent at each supported verification viewport and an ordinary quotation remains neutral.
 
 `inspect` and `validate` are wholly read-only. `verify` MUST leave canonical inputs unchanged, but MAY rebuild declared derived outputs in deterministic paths so freshness can be proved. A project MUST list those derived paths; unexpected worktree changes fail verification. Upgrade remains a separate explicit, reviewable operation.
 

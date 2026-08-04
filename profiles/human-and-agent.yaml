@@ -4,6 +4,7 @@ extends:
   - evidence-governed
 requires:
   - DKBWS-HUMAN-001
+  - DKBWS-HUMAN-002
   - DKBWS-LLM-001
   - DKBWS-LINK-001
   - DKBWS-PROMPT-001

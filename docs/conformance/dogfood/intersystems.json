@@ -82,7 +82,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware upgrade and deviation merge exists."},
     {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/ask.md", "functions/api/ask.js", "DEPLOYMENT.md"], "finding": "Cloudflare Ask is bounded by retrieval, source links, secrets and documented authority limits."}
   ],
-  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 2, "NOT_IMPLEMENTED": 5},
+  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 5},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-mkdocs.mjs"], "finding": "Canonical knowledge is Markdown and strict-built with portable local links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, roles, capabilities or deviations."},
@@ -92,6 +92,7 @@
     {"id": "DKBWS-EVID-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/sources.md"], "finding": "Stable SRC identities and provenance are maintained."},
     {"id": "DKBWS-EVID-002", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence-matrix.md", "docs/evidence-validation-queue.md"], "finding": "Claims route to confidence, limitations and open gaps."},
     {"id": "DKBWS-HUMAN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["mkdocs.yml", "scripts/check-mkdocs.mjs", "DEPLOYMENT.md"], "finding": "Strict build and a documented stable production URL exist.", "limitations": ["The separate local-runtime requirement failed its live root probe."]},
+    {"id": "DKBWS-HUMAN-002", "status": "NOT_APPLICABLE", "confidence": "HIGH", "evidence_paths": [], "finding": "Scoped inspection found no governing-question callout, so the accent rail-and-text obligation does not apply."},
     {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "AGENTS.md"], "finding": "Required operational concepts are explicit across the mapped LLM surface."},
     {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/context-map.md", "hooks/presentation_rules.py"], "finding": "Contextual and generated canonical-title links go beyond navigation.", "limitations": ["A finite canonical concept obligation set is not machine-declared."]},
     {"id": "DKBWS-GRAPH-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "scripts/check-graphify-freshness.mjs"], "finding": "Shared enriched graph data, real 2D/3D views and freshness checks exist."},

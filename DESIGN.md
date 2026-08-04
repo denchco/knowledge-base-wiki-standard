@@ -98,6 +98,8 @@ components:
     backgroundColor: "{colors.accentDark}"
   muted-text:
     textColor: "{colors.muted}"
+  governing-question:
+    textColor: "{colors.accent}"
   bordered-panel:
     backgroundColor: "{colors.border}"
   diagram-boundary:
@@ -136,6 +138,7 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 ## Content And Navigation
 
 - Use one governing question and answer-first routes when the topic is a decision, comparison, compliance, purchase, build, migration, or operational interpretation.
+- Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. Keep ordinary quotations neutral.
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.

@@ -14,8 +14,13 @@ typography:
     lineHeight: "1.6"
 rounded:
   component: ".35rem"
+components:
+  governing-question:
+    textColor: "{colors.accent}"
 ---
 
 # Design Contract
 
 Use the pinned DenchCo visual adapter as the baseline, then record only deliberate target-specific token and interaction decisions here. Navigation and synthesis must follow the target's audience and governing question.
+
+Every displayed governing-question callout must expose the `governing-question` marker and use the active accent colour for both its inline-start rail and question text at every supported viewport. Ordinary quotations remain neutral.

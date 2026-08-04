@@ -204,6 +204,7 @@ test("canonical profiles resolve inheritance and align with the requirement cata
   );
   assert.ok(portable.requirements.includes("DKBWS-OKF-003"));
   assert.ok(production.requirements.includes("DKBWS-OKF-003"));
+  assert.ok(production.requirements.includes("DKBWS-HUMAN-002"));
   assert.ok(production.requirements.includes("DKBWS-VERIFY-002"));
   assert.deepEqual(
     production.sources.map((source) => source.path),
@@ -326,6 +327,7 @@ test("standard-production requirement results come from the resolved profile cha
   const report = JSON.parse(result.stdout);
   const requirements = new Map(report.requirementResults.map((item) => [item.requirement, item]));
   assert.equal(requirements.get("DKBWS-OKF-003")?.status, "pass");
+  assert.equal(requirements.get("DKBWS-HUMAN-002")?.status, "not-checked");
   assert.equal(requirements.get("DKBWS-VERIFY-002")?.status, "not-checked");
   assert.match(requirements.get("DKBWS-VERIFY-002")?.reason ?? "", /complete profile verification pipeline/);
 });

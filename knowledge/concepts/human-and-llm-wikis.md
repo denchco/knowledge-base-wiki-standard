@@ -18,3 +18,5 @@ x-denchco:
 # Coordinated Human and LLM Wikis
 
 The Human Wiki optimizes reading, navigation, search, diagrams, decisions, and evidence inspection. The LLM Wiki optimizes context selection, maintenance, ingest, query, and lint. They do not become independent duplicate corpora.
+
+When the Human Wiki presents a governing-question callout, `DKBWS-HUMAN-002` makes it machine-identifiable and binds both its rail and question text to the active accent colour. This semantic distinction is reserved for the governing question; ordinary quotations remain neutral evidence content.

@@ -133,7 +133,7 @@ entries:
     role: "human-wiki"
     classification: "render-template"
     template: "starter/templates/docs/index.md.tmpl"
-    requirements: ["DKBWS-HUMAN-001"]
+    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002"]
   - target: "docs/llm-wiki/index.md"
     role: "llm-wiki"
     classification: "render-template"
@@ -159,7 +159,7 @@ entries:
     role: "design-contract"
     classification: "render-template"
     template: "starter/templates/DESIGN.md.tmpl"
-    requirements: ["DKBWS-DESIGN-001"]
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002"]
   - target: "zensical.toml"
     role: "renderer-config"
     classification: "render-template"
@@ -171,7 +171,7 @@ entries:
     source: "docs/assets/"
     planning_only: true
     dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates"
-    requirements: ["DKBWS-RENDER-001"]
+    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002"]
   - target: "docs/graph/index.md"
     role: "graph-entry"
     classification: "create-subject-content"

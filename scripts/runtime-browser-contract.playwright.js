@@ -46,6 +46,66 @@ export default async page => {
     const response = await page.goto(routeUrl(route), { waitUntil: "networkidle" });
     check(Boolean(response?.ok()), `${route} did not return HTTP 200`);
   };
+  const inspectGoverningQuestion = async viewportName => {
+    const metrics = await page.evaluate(() => {
+      const article = document.querySelector(".md-typeset");
+      const questions = [...document.querySelectorAll(".md-typeset blockquote.governing-question")];
+      const question = questions[0] || null;
+      const questionText = question?.querySelector(":scope > p") || null;
+      const probe = document.createElement("span");
+      probe.style.color = "var(--accent)";
+      probe.style.position = "absolute";
+      probe.style.left = "-10000px";
+      const ordinary = document.createElement("blockquote");
+      ordinary.innerHTML = "<p>Neutral quotation fixture.</p>";
+      ordinary.style.position = "absolute";
+      ordinary.style.left = "-10000px";
+      const negative = document.createElement("blockquote");
+      negative.className = "governing-question";
+      negative.innerHTML = "<p>Negative governing-question fixture.</p>";
+      negative.style.position = "absolute";
+      negative.style.left = "-10000px";
+      negative.style.setProperty("border-inline-start-color", "rgb(1, 2, 3)", "important");
+      negative.querySelector("p").style.setProperty("color", "rgb(4, 5, 6)", "important");
+      article?.append(probe, ordinary, negative);
+      try {
+        const accent = getComputedStyle(probe).color;
+        const ordinaryText = ordinary.querySelector("p");
+        const negativeText = negative.querySelector("p");
+        return {
+          count: questions.length,
+          accent,
+          rail: question ? getComputedStyle(question).borderInlineStartColor : "",
+          text: questionText ? getComputedStyle(questionText).color : "",
+          weight: questionText ? getComputedStyle(questionText).fontWeight : "",
+          ordinaryRail: getComputedStyle(ordinary).borderInlineStartColor,
+          ordinaryText: ordinaryText ? getComputedStyle(ordinaryText).color : "",
+          negativeRail: getComputedStyle(negative).borderInlineStartColor,
+          negativeText: negativeText ? getComputedStyle(negativeText).color : "",
+          pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        };
+      } finally {
+        probe.remove();
+        ordinary.remove();
+        negative.remove();
+      }
+    });
+    check(metrics.count === 1, `The homepage must expose exactly one governing-question marker at ${viewportName} width`);
+    check(Boolean(metrics.accent), `The active accent token must resolve at ${viewportName} width`);
+    check(metrics.rail === metrics.accent, `The governing-question rail must equal the active accent at ${viewportName} width`);
+    check(metrics.text === metrics.accent, `The governing-question text must equal the active accent at ${viewportName} width`);
+    check(Number.parseInt(metrics.weight, 10) >= 700, `The governing-question text must remain bold at ${viewportName} width`);
+    check(
+      metrics.ordinaryRail !== metrics.accent && metrics.ordinaryText !== metrics.accent,
+      `An ordinary quotation must remain neutral at ${viewportName} width`,
+    );
+    check(
+      metrics.negativeRail !== metrics.accent && metrics.negativeText !== metrics.accent,
+      `The negative mismatched-colour fixture must be rejected at ${viewportName} width`,
+    );
+    check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow at ${viewportName} width`);
+    return metrics;
+  };
   const screenshotPixels = async buffer => {
     const dataUrl = `data:image/png;base64,${buffer.toString("base64")}`;
     return page.evaluate(async imageUrl => {
@@ -80,6 +140,7 @@ export default async page => {
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
   await goto(mermaidRoute);
+  const desktopGoverningQuestion = await inspectGoverningQuestion("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
     header: Boolean(document.querySelector(".md-header__inner")),
@@ -255,6 +316,7 @@ export default async page => {
 
   await page.setViewportSize({ width: 390, height: 844 });
   await goto(mermaidRoute);
+  const mobileGoverningQuestion = await inspectGoverningQuestion("mobile");
   await page.waitForSelector(".mermaid");
   await page.waitForFunction(() => document.querySelector(".mermaid")?.getBoundingClientRect().height > 40);
   const mobileMermaid = page.locator(".mermaid").first();
@@ -369,6 +431,10 @@ export default async page => {
       body: tableTypography.body,
       table: tableTypography.table,
       mermaid: mermaidProbe.fontSize,
+    },
+    governingQuestion: {
+      desktop: desktopGoverningQuestion,
+      mobile: mobileGoverningQuestion,
     },
     mermaid: {
       desktop: mermaidPixels,
