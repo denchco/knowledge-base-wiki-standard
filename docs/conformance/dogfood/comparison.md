@@ -191,6 +191,7 @@ The audit was used as a design test, not left as a static scorecard:
 
 The audited projects retain their recorded gaps. Candidate improvements do not retroactively make those projects conformant or authorize their migration.
 
+<!-- DKBWS-PUBLICATION-OMIT:START -->
 ## Project-specific next adoption steps
 
 ### NHS Data Sharing
@@ -222,6 +223,7 @@ The audited projects retain their recorded gaps. Candidate improvements do not r
 1. Add the manifest while preserving the explicit no-OKF/no-Ask/no-deployment boundaries.
 2. Add OKF v0.2 and local graph runtimes before a Standard Production claim.
 3. Treat deployment as `NOT_IMPLEMENTED` until a production URL and exact commit pass real health/browser checks.
+<!-- DKBWS-PUBLICATION-OMIT:END -->
 
 ## Audit limitations
 
