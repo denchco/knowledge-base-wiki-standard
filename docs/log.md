@@ -15,6 +15,8 @@ status: draft
 - **Instruction prerelease**: Published the shared completion-first Codex/Claude operating contract, subject-empty consumer relay, zero-to-three handoff eligibility rule, one-pass completion conditions, and structured parked-work reopen fields as immutable `v0.1.0-rc.2`.
 - **Migration boundary**: Consumers moving from `v0.1.0-rc.1` update agent instructions and project-status separation only; the manifest and OKF content model do not change.
 - **Release verification**: Required complete local verification, exact-commit GitHub Actions success, deterministic Documentation snapshot synchronization, and the private-source/public-Pages deployment gate for the same pinned Standard commit.
+- **Semantic-and-publication prerelease**: Published governed question styling, semantic responsive Mermaid role grammar, corrected authority topology, and deterministic local-versus-public publication scoping as immutable `v0.1.0-rc.3`.
+- **Public projection boundary**: Project-specific adoption recommendations and their raw JSON records remain inspectable in the repository and local Wiki, while generated public Pages, search, and Graphify outputs omit them with executable negative checks.
 
 ## 2026-08-03
 

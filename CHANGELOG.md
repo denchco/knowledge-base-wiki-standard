@@ -4,12 +4,16 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+## 0.1.0-rc.3 — 2026-08-04
+
 - Added `DKBWS-HUMAN-002`: every displayed governing-question callout is machine-identifiable and renders both its inline-start rail and question text in the active accent colour, while ordinary quotations remain neutral.
 - Activated the reference implementation on the Standard homepage and subject-empty starter, and added static plus desktop/mobile rendered checks with positive and negative controls.
 - Migration: existing Human Wikis with a governing-question callout add the semantic marker, bind both colours to the active accent family, and record browser evidence. Human Wikis without the callout mark the conditional rule not applicable.
 - Added a reusable, accent-family Mermaid grammar for source, evidence, snapshot, normative, canonical, product, derived, consumer, and verification roles, including closed-shadow rendering and executable style checks.
 - Corrected the reference system flow so evidence governance precedes canonical synthesis; derived Human, LLM, and Graphify surfaces now visibly fan out from one canonical corpus instead of appearing to create authority.
 - Migration: adapted Mermaid diagrams retain their complete topology and accessible description, assign semantic role classes, distinguish derived surfaces from authority, and prove fit at desktop, tablet, and mobile widths.
+- Added deterministic publication-scope markers so project-specific adoption recommendations remain available in the repository and local Wiki while public Pages, search, and Graphify derivatives omit them.
+- Added malformed-marker, local-retention, public-omission, and raw-report exclusion checks for the publication boundary.
 
 ## 0.1.0-rc.2 — 2026-08-04
 
@@ -34,7 +38,7 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 - Selected one repository-wide MIT License for original code and accompanying documentation, copyright Andrew Dench, while preserving third-party terms.
 - Separated the normative standard repository from the public documentation site and independent consumer repositories; added a subject-empty, allowlisted starter contract with pinned revisions and consumer-owned URL/deployment inputs.
 - Established the public-standard and private-documentation/public-Pages repository boundary, public schema endpoint, GitHub private vulnerability reporting route, and CI-gated immutable `v0.1.0-rc.1` prerelease process.
-- Classified project-specific dogfood adoption recommendations as canonical repository/local audit material and marked them for deterministic omission from public documentation projections without changing their evidence or authority.
+- Classified project-specific dogfood adoption recommendations as canonical repository/local audit material and reserved deterministic public-documentation omission as a release-gated follow-on without changing their evidence or authority.
 - Added deterministic standard-to-documentation synchronization with an explicit allowlist, per-file hashes and modes, isolated writes, drift checks, and conflict refusal.
 - Made Graphify's inline 2D/3D JSON serialization script-safe against hostile Markdown labels and added a dedicated security fixture.
 - Aligned distribution-mode verification with selected profile capabilities so declared optional capabilities remain visible without becoming false CI gaps; maintainer-only Jujutsu provenance remains explicitly not checked.

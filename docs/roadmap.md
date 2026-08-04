@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-## Completed through `v0.1.0-rc.2`
+## Completed through `v0.1.0-rc.3`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
 2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
@@ -20,6 +20,7 @@ status: draft
 9. Added one shared completion-first Codex/Claude instruction contract, Claude's `@AGENTS.md` compatibility entry point, byte-identical project skills, a consumer starter relay, and static parity checks.
 10. Replaced the unconditional three-item handoff quota with a maximum of three eligible recommendations, plus explicit cycle, parking, reopen, and completion gates.
 11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
+12. Added the governed accent-colour question invariant, restored semantic responsive Mermaid architecture, and proved deterministic repository/local retention versus public-Pages omission of project-specific adoption guidance, then published the changes as immutable prerelease `v0.1.0-rc.3`.
 
 ## Next evidence gates
 
