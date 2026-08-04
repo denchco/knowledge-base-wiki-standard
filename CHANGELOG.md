@@ -4,6 +4,9 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Simplified the canonical bootstrap prompt so users point only at the standard GitHub repository; the implementation agent now resolves the current default-branch HEAD automatically and pins its exact commit SHA before acting.
+- Migration: remove the user-supplied standard revision from bootstrap prompts. Existing consumer manifests retain their current immutable pins.
+
 ## 0.1.0-rc.3 — 2026-08-04
 
 - Added `DKBWS-HUMAN-002`: every displayed governing-question callout is machine-identifiable and renders both its inline-start rail and question text in the active accent colour, while ordinary quotations remain neutral.

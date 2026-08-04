@@ -717,11 +717,12 @@ test("init plan preserves and reports collisions in an existing target", () => {
   assert.ok(plan.safety.collisions.includes(".wiki-standard.yaml"));
   assert.ok(plan.safety.collisions.includes("knowledge/index.md"));
   assert.ok(plan.layout.filter((entry) => entry.collision).every((entry) => entry.action === "preserve-and-review"));
-  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 5:/);
+  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 4:/);
+  assert.match(plan.input.standardRevision, /^[0-9a-f]{40}$/);
+  assert.equal(plan.proposedManifest.standard.revision, plan.input.standardRevision);
   assert.deepEqual(plan.unresolvedInputs, [
     "topic, audience, governing question, and intended outcome",
     "project title",
-    "immutable standard release tag or commit",
     "consumer-owned canonical Wiki URL",
     "consumer-owned deployment choice (`none` is valid)",
   ]);

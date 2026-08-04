@@ -81,7 +81,8 @@ for (const phrase of ["completion-first", "no more than three", "If no item qual
 }
 for (const boundary of [
   "starter/starter.yaml",
-  "immutable release tag or commit",
+  "current default-branch HEAD",
+  "Do not ask the user to choose or supply a release tag or commit",
   "Never recursively copy the standard root",
   "Target Wiki URL",
   "Target deployment",
@@ -90,6 +91,7 @@ for (const boundary of [
 ]) {
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
+if (/\[immutable release tag or commit\]/i.test(prompt)) failures.push("prompt still requires a user-supplied standard revision");
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const licence = readFileSync("LICENSE", "utf8");

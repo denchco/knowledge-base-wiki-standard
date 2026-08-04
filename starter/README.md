@@ -4,7 +4,7 @@ This directory is the reusable starting surface for an independent knowledge-bas
 
 Use `starter.yaml` as the machine-readable boundary. A Codex instance should:
 
-1. inspect the standard at an immutable release tag or commit;
+1. resolve the standard repository's current default-branch HEAD automatically and inspect that exact commit;
 2. render only the listed templates into a separate target repository;
 3. author the target's `docs/` and `knowledge/` content from its own topic and sources;
 4. adapt only the explicitly classified implementation files needed by the selected profile;

@@ -9,6 +9,7 @@ status: draft
 
 ## 2026-08-04
 
+- **Automatic bootstrap revision**: Removed the release tag or commit from the user-facing instantiation prompt. Implementations now resolve the standard repository's current default-branch HEAD once, use its exact commit SHA for the run, and record that immutable SHA in the consumer manifest.
 - **Governing-question promotion**: Promoted the mature NHS Data Sharing semantic callout pattern from reusable local precedent to candidate-core Human Wiki requirement `DKBWS-HUMAN-002`; the Standard, Documentation dogfood site, and subject-empty starter now distinguish governed questions from neutral quotations.
 - **Rendered verification**: Required the inline-start rail and all question text to equal the runtime-resolved active accent at desktop and mobile widths, with a negative mismatched-colour fixture and a neutral ordinary-quotation control.
 - **Migration impact**: Existing Human Wikis only migrate when they already present a governing-question callout: add the semantic marker, bind both colours to the active accent family, and capture built-output browser evidence. Wikis without such a callout record the rule as not applicable.

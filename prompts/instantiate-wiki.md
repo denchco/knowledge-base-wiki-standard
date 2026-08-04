@@ -1,11 +1,11 @@
 # Instantiate a DenchCo Knowledge Base Wiki
 
-Use this prompt from an immutable released copy of the standard. Human guidance is published at <https://denchco.github.io/knowledge-base-wiki-documentation/>; normative files remain in <https://github.com/denchco/knowledge-base-wiki-standard>.
+Use this prompt by pointing the implementation agent at the standard repository. The agent resolves and records the immutable revision automatically. Human guidance is published at <https://denchco.github.io/knowledge-base-wiki-documentation/>; normative files remain in <https://github.com/denchco/knowledge-base-wiki-standard>.
 
 ```text
 Apply the DenchCo Knowledge Base Wiki Standard from
-https://github.com/denchco/knowledge-base-wiki-standard at
-[immutable release tag or commit] to [absolute independent target path].
+https://github.com/denchco/knowledge-base-wiki-standard to
+[absolute independent target path].
 
 Topic and intended scope: [topic, audience, governing question or reader task,
 and the outcome the wiki must support].
@@ -19,7 +19,7 @@ Target deployment: [consumer-selected adapter or none].
 
 ## Instruction to the implementation agent
 
-1. Resolve the exact release tag or commit before acting. Do not use a moving branch, `latest`, or the public documentation site as normative input.
+1. Resolve the standard repository's current default-branch HEAD to its exact commit SHA before acting, then use that immutable commit for the complete run. Do not ask the user to choose or supply a release tag or commit. Do not retain a moving branch, `latest`, or the public documentation site as normative input.
 2. Read the pinned standard repository `AGENTS.md`, manifest, normative specification, selected profile, dependency contract, LLM Wiki entry point, `starter/starter.yaml`, and this prompt completely.
 3. Treat the standard and target as different repositories. Never recursively copy the standard root, and never install its help pages, `knowledge/` bundle, source/evidence records, dogfood reports, fixtures, project status, or documentation deployment as target content.
 4. Read the target's nearest instructions and inspect its repository, renderer, design, evidence, generated artifacts, services, and version-control state.

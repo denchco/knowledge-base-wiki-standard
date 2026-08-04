@@ -6,6 +6,7 @@ import {
   readdirSync,
 } from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 import { parseDocument } from "yaml";
 
@@ -35,6 +36,18 @@ const REQUIRED_PRODUCTION_ROLES = {
   llm_wiki: "docs/llm-wiki/index.md",
   design_contract: "DESIGN.md",
 };
+
+function automaticStandardRevision() {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], {
+      cwd: STANDARD_ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    throw new CliUsageError("Cannot resolve the standard checkout to an immutable commit SHA; use --standard-revision only as an explicit override.");
+  }
+}
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -508,6 +521,7 @@ export function initPlan(options = {}) {
   const target = path.resolve(options.target ?? ".");
   const profileId = options.profile ?? "standard-production";
   const candidate = candidateState(profileId);
+  const standardRevision = options.standardRevision ?? candidate.standard.revision ?? automaticStandardRevision();
   const starter = starterContract();
   const inventory = targetInventory(target);
   if (inventory.type === "file") throw new CliUsageError("`init --dry-run` target must be a directory path or an absent path.");
@@ -539,7 +553,6 @@ export function initPlan(options = {}) {
   const unresolvedInputs = [];
   if (!options.topic) unresolvedInputs.push("topic, audience, governing question, and intended outcome");
   if (!options.title) unresolvedInputs.push("project title");
-  if (!(options.standardRevision ?? candidate.standard.revision)) unresolvedInputs.push("immutable standard release tag or commit");
   if (!options.wikiUrl) unresolvedInputs.push("consumer-owned canonical Wiki URL");
   if (!options.deployment) unresolvedInputs.push("consumer-owned deployment choice (`none` is valid)");
   const selectedRequirements = new Set(candidate.profile.requirements);
@@ -568,7 +581,7 @@ export function initPlan(options = {}) {
       title: options.title ?? null,
       topic: options.topic ?? null,
       profile: profileId,
-      standardRevision: options.standardRevision ?? candidate.standard.revision ?? null,
+      standardRevision,
       wikiUrl: options.wikiUrl ?? null,
       deployment: options.deployment ?? null,
     },
@@ -597,7 +610,7 @@ export function initPlan(options = {}) {
         documentation: starter.data.documentation,
       },
     },
-    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, options),
+    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision }),
     layout,
     stages,
     unresolvedInputs,

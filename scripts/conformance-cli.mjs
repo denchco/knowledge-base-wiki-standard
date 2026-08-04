@@ -48,7 +48,7 @@ Options:
   --title <text>     Supply the proposed project title to init planning.
   --topic <text>     Supply topic, audience, question, and outcome context.
   --standard-revision <revision>
-                     Pin the immutable standard release tag or commit for init.
+                     Override the automatically resolved standard commit for init.
   --wiki-url <url>   Supply the consumer-owned canonical Wiki URL for init.
   --deployment <id> Supply the consumer's deployment adapter; none is valid.
   -h, --help         Show this help.
