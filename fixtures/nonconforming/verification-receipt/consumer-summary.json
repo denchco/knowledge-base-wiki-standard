@@ -1,0 +1,22 @@
+{
+  "profile": "standard-production",
+  "standardRevision": "v0.1.0-rc.3",
+  "verifiedAt": "2026-08-04T17:50:21Z",
+  "canonicalMutation": {
+    "status": "pass",
+    "changedPaths": []
+  },
+  "browserCoverage": {
+    "graphViews": ["2d", "3d"],
+    "viewports": ["desktop", "mobile"]
+  },
+  "gates": [
+    {
+      "command": "npm run build",
+      "status": "pass"
+    }
+  ],
+  "limitations": [
+    "This project-only summary is deliberately invalid at the reserved receipt path."
+  ]
+}

@@ -43,7 +43,9 @@ requireIn(design, 'diagramEmphasisLineWidth: "3px"', "DESIGN.md must pin the Mer
 requireIn(design, 'diagramLabelMaskWidth: "4px"', "DESIGN.md must pin the Mermaid label mask");
 requireIn(design, "governing-question:", "DESIGN.md must define the governing-question component");
 requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry the governing-question component");
-requireIn(starterDesign, "kb-canonical", "starter DESIGN.md must carry the semantic Mermaid role grammar");
+requireIn(design, "Mermaid's ordinary node treatment", "DESIGN.md must make ordinary Mermaid nodes the reference default");
+requireIn(starterDesign, "ordinary node treatment", "starter DESIGN.md must make ordinary Mermaid nodes the reference default");
+requireIn(starterDesign, "they are not the default", "starter DESIGN.md must keep semantic Mermaid roles optional");
 requireIn(design, "Mermaid's native `basis` connectors", "DESIGN.md must preserve Mermaid's native connector curve");
 requireIn(starterDesign, "Mermaid's native `basis` connectors", "starter DESIGN.md must preserve Mermaid's native connector curve");
 requireIn(starterDesign, "consistent rectangular node geometry", "starter DESIGN.md must carry the default-first node geometry rule");
@@ -123,11 +125,6 @@ for (const phrase of [
   "accTitle: Governed knowledge base system",
   "accDescr: Source material becomes inspectable evidence",
   "S --> E --> C --> W --> V",
-  "class S kb-source",
-  "class E kb-evidence",
-  "class C kb-canonical",
-  "class W kb-derived",
-  "class V kb-verification",
 ]) {
   requireIn(homeDiagram, phrase, `Standard homepage Mermaid must retain ${phrase}`);
 }
@@ -136,12 +133,18 @@ for (const phrase of [
   "accTitle: Knowledge authority and derived surfaces",
   "accDescr: Sources are registered, assessed as evidence",
   "S --> R --> E --> C --> W",
-  "class S kb-source",
-  "class R,E kb-evidence",
-  "class C kb-canonical",
-  "class W kb-derived",
 ]) {
   requireIn(authorityDiagram, phrase, `Standard authority Mermaid must retain ${phrase}`);
+}
+for (const [fixture, label] of [
+  ['  %%{init: {"flowchart": {"padding": 10}}}%%\nflowchart TB\n  A["A"]', "indented init"],
+  ['flowchart TB\n  A["A"]\n  class A kb-canonical', "semantic class"],
+  ['flowchart TB\n  A["A"]:::kb-canonical', "inline semantic class"],
+]) {
+  if (!hasDiagramStylingOptIn(fixture)) errors.push(`Mermaid native-default guard must reject ${label}`);
+}
+if (hasDiagramStylingOptIn('flowchart TB\n  A["A"] --> B["B"]')) {
+  errors.push("Mermaid native-default guard must accept plain Mermaid source");
 }
 requireIn(theme, "border-inline-start: var(--sequential-menu-rail-width) solid var(--border)", "page outline must use its quiet rail");
 const draftMarker = selectorBlock(theme, ".md-status--draft::after");
@@ -241,8 +244,11 @@ function overviewDiagram(source, label) {
   }
   const diagram = diagrams[0];
   if (!/^flowchart TB$/m.test(diagram)) errors.push(`${label} must use one top-to-bottom reading direction`);
+  if (/^[ \t]*%%\{init:/m.test(diagram)) errors.push(`${label} must inherit pinned Mermaid defaults without a diagram-level init override`);
+  if (hasDiagramStylingOptIn(diagram)) {
+    errors.push(`${label} must use ordinary Mermaid node treatment without diagram-level styling opt-ins`);
+  }
   if (/"curve"\s*:/.test(diagram)) errors.push(`${label} must inherit Mermaid's native basis connectors`);
-  if (!diagram.includes('"padding": 10')) errors.push(`${label} must use the governed 10px node padding`);
   const hasNonRectangleNode = diagram.split("\n").some(line => {
     const declaration = line.match(/^\s*[A-Za-z][A-Za-z0-9_]*\s*([\[\(\{>@]\S?)/);
     return declaration && declaration[1] !== '["';
@@ -283,6 +289,11 @@ function overviewDiagram(source, label) {
   ]);
   if (branchNodes.size > 2) errors.push(`${label} must use at most one parallel branch; found ${branchNodes.size} split/merge points`);
   return diagram;
+}
+function hasDiagramStylingOptIn(diagram) {
+  return /^[ \t]*%%\{init:/m.test(diagram)
+    || /^[ \t]*(?:class|classDef|style|linkStyle)\b/m.test(diagram)
+    || /:::[A-Za-z]/.test(diagram);
 }
 function governingQuestionMarkupIssues(source) {
   const issues = [];

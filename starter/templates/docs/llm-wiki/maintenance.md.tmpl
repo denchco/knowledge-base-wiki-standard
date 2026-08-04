@@ -13,7 +13,10 @@ status: "draft"
 4. Update sources, concepts, evidence, links, and logs together.
 5. Rebuild generated outputs and run every applicable check.
 6. Review Git and Jujutsu state before recording a validated phase.
+7. For a potentially reusable user-authored improvement, keep the verified implementation project-owned and prepare ignored `output/standard-change-proposal.md` only after the local phase is complete.
+8. Search existing Standard issues read-only and draft the problem, outcome, origin and immutable revision, reuse class, affected contract, dependencies and fallback, evidence, accessibility/browser implications, regression fixture, and migration impact.
+9. Scrub private paths, credentials, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Show the exact repository, title, body, and labels and obtain explicit authorization before any remote submission; if the issue form is unavailable, stop with the local draft.
 
-Standard upgrades use an immutable release and a reviewable diff. They never replace local topic content silently.
+Standard upgrades use an immutable source revision and a reviewable diff. Equal version labels do not prove equal revisions. Upgrades never replace local topic content silently, and filing a proposal does not change the pinned revision or authorize migration.
 
 Before recommending follow-up work, apply the goal and cycle gates in `AGENTS.md`. A candidate is eligible only when it advances unfinished requested scope, addresses a failed or unrun required check, or asks for authority needed to continue. It must fit one follow-up pass and have a completion condition. Park blocked work in project status or the validation queue with `blocked_by`, `reopen_when`, and `last_checked`; it is ineligible until reopened. Never recommend optional adjacent research or generic maintenance merely to fill a list.

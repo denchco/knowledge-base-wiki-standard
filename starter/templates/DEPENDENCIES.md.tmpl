@@ -11,5 +11,10 @@ This repository implements `{{PROFILE}}` of the DenchCo Knowledge Base Wiki Stan
 | Browser proof | Rendered verification | {{BROWSER_DEPENDENCIES}} |
 | Provenance | Maintenance workspace | {{GIT_AND_JUJUTSU_BOUNDARY}} |
 | Deployment | Consumer-owned publication | {{DEPLOYMENT_ADAPTER_OR_NONE}} |
+| Verification artifacts | Complete profile evaluation | `output/verification/receipt.json` conforming to verification-receipt v1 and paired `output/verification/conformance-report.json` |
 
 Commit exact lock files for every selected implementation dependency. Record optional and deployment dependencies separately from portable knowledge requirements.
+
+The complete verification command must emit the schema-valid receipt and build its paired schema-valid conformance report. A project-only verification summary may be useful, but it must use another path and must not occupy either reserved artifact path.
+
+Standard-maintainer documentation synchronization (`sync:documentation:*` and `verify:workspace`) is not part of a normal consumer dependency closure. Do not copy those commands or their sibling-repository contract unless this consumer separately declares, implements, and verifies its own documentation-synchronization capability.

@@ -2,7 +2,7 @@ schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/mani
 standard:
   name: "DenchCo Knowledge Base Wiki Standard"
   version: "0.0.9"
-  source: "https://example.invalid/denchco-standard"
+  source: "https://github.com/denchco/knowledge-base-wiki-standard"
 profile: "portable-core"
 okf_version: "0.2"
 roles:

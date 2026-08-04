@@ -21,9 +21,8 @@ status: draft
 10. Replaced the unconditional three-item handoff quota with a maximum of three eligible recommendations, plus explicit cycle, parking, reopen, and completion gates.
 11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
 12. Added the governed accent-colour question invariant, restored semantic responsive Mermaid architecture, and proved deterministic repository/local retention versus public-Pages omission of project-specific adoption guidance, then published the changes as immutable prerelease `v0.1.0-rc.3`.
+13. Exercised lifecycle, starter, browser, graph, security, verification, proposal, and dual-agent boundaries against the independently maintained Health IT Governance Beyond the NHS consumer; promoted reusable defects and preferred patterns while excluding its subject-specific research.
 
 ## Next evidence gates
 
-1. Exercise lifecycle planning and the instruction contract against a second independently maintained consumer.
-2. Add compatibility fixtures only for exact versions or environments evidenced by that consumer or an upstream change.
-3. Make a dedicated read-first MCP go/no-go decision only after the second-consumer evidence identifies whether GitHub MCP plus the stable CLI leave a named gap.
+No gate is currently active. Add compatibility fixtures only when a consumer or evidenced upstream change selects an exact new version/environment. A dedicated read-first Standard MCP remains a no-go until a future consumer identifies a named discovery or update-inspection task not served by the stable CLI, Git, and governed GitHub route.

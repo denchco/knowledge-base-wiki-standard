@@ -415,7 +415,8 @@ function sourceEntry(standardRoot, relativePath) {
 function assertGitRepositoryRoot(candidate, label) {
   let canonical;
   try {
-    canonical = realpathSync(path.resolve(candidate));
+    const requested = path.isAbsolute(candidate) ? candidate : path.resolve(candidate);
+    canonical = realpathSync(requested);
   } catch (error) {
     throw new SyncSafetyError(`${label} does not exist: ${candidate} (${error.message})`);
   }
@@ -431,12 +432,17 @@ function assertGitRepositoryRoot(candidate, label) {
 
 function git(cwd, args) {
   try {
-    return execFileSync("git", args, {
+    const output = execFileSync("git", args, {
       cwd,
       encoding: "utf8",
       maxBuffer: 16 * 1024 * 1024,
       stdio: ["ignore", "pipe", "pipe"],
-    }).trim();
+    });
+    return output.endsWith("\r\n")
+      ? output.slice(0, -2)
+      : output.endsWith("\n")
+        ? output.slice(0, -1)
+        : output;
   } catch (error) {
     const detail = String(error.stderr ?? error.message).trim();
     throw new SyncSafetyError(`git ${args.join(" ")} failed${detail ? `: ${detail}` : ""}`);

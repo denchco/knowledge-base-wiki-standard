@@ -18,9 +18,13 @@
 - Preserve unknown OKF fields and declared local deviations.
 - Do not publish, change deployment, expose credentials, or alter evidence status without explicit authorization.
 
-## Upstream proposals
+## Consumer-to-Standard proposals
 
-When the user identifies a reusable improvement they authored in this consumer, preserve the originating revision and route a proposed Standard change through <https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml>. Complete and verify the local request first. An agent may prepare the issue content, but must not submit it remotely without explicit authority; filing does not promote the local pattern.
+- A user-authored improvement remains project-owned until it is accepted into the Standard and included in an immutable release. Do not change this repository's Standard pin, conformance claims, or deviations merely because a proposal exists.
+- Finish, verify, and record the local implementation before preparing an upstream proposal. Use the ignored scratch path `output/standard-change-proposal.md`; do not import Standard documentation or create a retrospective topic-evidence record for the proposal process.
+- Search existing Standard issues read-only, then remove private paths, secrets, personal or confidential data, restricted evidence, and vulnerability detail from the draft. Suspected vulnerabilities use the Standard's private security-advisory route, and third-party material must include sufficient public licence evidence for the proposed reuse.
+- Before any remote write, show the user the exact repository, title, body, and labels and obtain explicit authorization. Prefer the [Standard change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml), which leaves final submission with the user. If the form is unavailable on the default branch, stop with the local draft; a connector or `gh issue create` must not be used as a fallback without that same explicit authorization.
+- Filing an issue does not authorize a pull request, release, publication, consumer migration, Standard pin change, or conformance change. Those remain separate reviewed actions.
 
 ## Clarification protocol
 

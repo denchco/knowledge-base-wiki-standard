@@ -13,6 +13,10 @@ const required = [
   "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "prompts/instantiate-wiki.md",
   "starter/README.md", "starter/starter.yaml", "starter/templates/wiki-standard.yaml.tmpl",
   "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl",
+  "starter/templates/LICENSING.md.tmpl",
+  "starter/templates/docs/graph/index.md.tmpl",
+  "starter/templates/docs/graph/two-dimensional.md.tmpl",
+  "starter/templates/docs/graph/three-dimensional.md.tmpl",
   "starter/templates/docs/project/status.md.tmpl",
   "docs/conformance/index.md", "docs/conformance/dogfood/comparison.md",
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
@@ -29,6 +33,7 @@ const required = [
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
   "scripts/publish-graphify-assets.mjs", "scripts/check-graphify-assets.mjs",
   "scripts/check-visual-shape-contract.mjs", "scripts/check-runtime-browser-contract.mjs",
+  "scripts/runtime-browser-contract-config.mjs", "scripts/runtime-browser-contract-config.test.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs",
@@ -41,7 +46,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-VERIFY-001"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -53,6 +58,57 @@ const claudeSkill = readFileSync(".claude/skills/denchco-kb-wiki-standard/SKILL.
 const readme = readFileSync("README.md", "utf8");
 const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
 const contributing = readFileSync("CONTRIBUTING.md", "utf8");
+const starterManifest = YAML.parse(readFileSync("starter/starter.yaml", "utf8"));
+const starterEntries = starterManifest?.entries ?? [];
+const starterTargets = starterEntries.map((entry) => entry?.target);
+if (new Set(starterTargets).size !== starterTargets.length) failures.push("starter target paths must be unique");
+for (const entry of starterEntries.filter((candidate) => candidate?.classification === "render-template")) {
+  if (!entry.template || !existsSync(entry.template)) failures.push(`starter render-template ${entry.target} has no existing template`);
+}
+for (const target of ["SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md"]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (entry?.classification !== "render-template" || entry?.always !== true || !(entry?.requirements ?? []).includes("DKBWS-SEC-001")) {
+    failures.push(`starter ${target} must be an always-present DKBWS-SEC-001 render template`);
+  }
+}
+const starterSecurity = readFileSync("starter/templates/SECURITY.md.tmpl", "utf8");
+const starterSourcePolicy = readFileSync("starter/templates/SOURCE_POLICY.md.tmpl", "utf8");
+const starterLicensing = readFileSync("starter/templates/LICENSING.md.tmpl", "utf8");
+for (const [label, source, patterns] of [
+  ["secrets-and-authorization", starterSecurity, [/Secrets stay outside/, /explicit authorization/, /least-privilege/]],
+  ["personal-and-confidential-data", `${starterSecurity}\n${starterSourcePolicy}`, [/Personal or confidential data/, /redacted/, /access-controlled/, /Deletion and correction/]],
+  ["copyright-licensing-and-retention", `${starterSourcePolicy}\n${starterLicensing}`, [/licen[cs]e/i, /Do not redistribute/, /retention/i, /removal consequences|Deletion and correction/]],
+  ["untrusted-and-generated-content", starterSecurity, [/untrusted inputs/, /must not execute/, /no independent evidence authority/, /sanitized/]],
+]) {
+  for (const pattern of patterns) if (!pattern.test(source)) failures.push(`starter DKBWS-SEC-001 ${label} lacks ${pattern}`);
+}
+if (!starterLicensing.includes("{{REPOSITORY_LICENCE_DECISION}}")) failures.push("starter licensing must require an explicit repository licence decision");
+if (/\bMIT\b/.test(starterLicensing)) failures.push("starter licensing must not hardcode the Standard's MIT licence into consumers");
+const graphTemplates = [
+  ["docs/graph/index.md", "starter/templates/docs/graph/index.md.tmpl", null],
+  ["docs/graph/two-dimensional.md", "starter/templates/docs/graph/two-dimensional.md.tmpl", "2d"],
+  ["docs/graph/three-dimensional.md", "starter/templates/docs/graph/three-dimensional.md.tmpl", "3d"],
+];
+for (const [target, template, view] of graphTemplates) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (entry?.classification !== "render-template" || entry?.template !== template || !(entry?.requirements ?? []).includes("DKBWS-GRAPH-001")) {
+    failures.push(`starter ${target} must use its governed DKBWS-GRAPH-001 render template`);
+    continue;
+  }
+  const source = readFileSync(template, "utf8");
+  if (/kb-graph|data-graph-source/.test(source)) failures.push(`${template} retains a stale graph mount hook`);
+  if (view && (!source.includes('class="graph-shell"') || !source.includes(`data-graph-view="${view}"`))) {
+    failures.push(`${template} lacks the ${view} graph-shell mount contract`);
+  }
+}
+const starterGraphIndex = readFileSync("starter/templates/docs/graph/index.md.tmpl", "utf8");
+for (const phrase of ["generated discovery aids", "not evidence", "canonical Markdown", "source register", "(two-dimensional.md)", "(three-dimensional.md)"]) {
+  if (!starterGraphIndex.includes(phrase)) failures.push(`starter graph index lacks ${phrase}`);
+}
+const starterDependencies = readFileSync("starter/templates/DEPENDENCIES.md.tmpl", "utf8");
+for (const phrase of ["output/verification/receipt.json", "verification-receipt v1", "output/verification/conformance-report.json", "project-only verification summary", "sync:documentation:*", "verify:workspace", "not part of a normal consumer dependency closure"]) {
+  if (!starterDependencies.includes(phrase)) failures.push(`starter dependency contract lacks verification closure: ${phrase}`);
+}
 for (const [name, text] of [["AGENTS.md", agents], ["prompt", prompt]]) {
   if (!text.includes("Question 1 of N")) failures.push(`${name} lacks sequential question protocol`);
 }
@@ -63,6 +119,15 @@ if (!starterClaude.split(/\r?\n/).some((line) => line.trim() === "@AGENTS.md")) 
 if (codexSkill !== claudeSkill) failures.push("Codex and Claude Standard skills must be byte-identical");
 for (const [name, source] of [["AGENTS.md", agents], ["starter AGENTS.md", starterAgents], ["Standard skill", codexSkill], ["CONTRIBUTING.md", contributing]]) {
   if (!source.includes("standard-change.yml")) failures.push(`${name} lacks the consumer-to-Standard proposal route`);
+}
+for (const phrase of [
+  "output/standard-change-proposal.md",
+  "Search existing Standard issues read-only",
+  "exact repository, title, body, and labels",
+  "If the form is unavailable",
+  "does not authorize a pull request",
+]) {
+  if (!starterAgents.includes(phrase)) failures.push(`starter AGENTS.md lacks proposal safeguard: ${phrase}`);
 }
 if (!contributing.includes("must not submit it remotely without explicit authority")) {
   failures.push("CONTRIBUTING.md must keep remote proposal submission behind explicit authority");
@@ -119,6 +184,9 @@ for (const boundary of [
   "no external deployment",
   "governing-question",
   "ordinary quotations neutral",
+  "verification-receipt-v1",
+  "project-only summary must use a different path",
+  "Do not copy Standard-maintainer `sync:documentation:*` commands",
 ]) {
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
@@ -173,6 +241,9 @@ if (!pkg.scripts?.["conformance:test"]?.includes("sync-documentation-snapshot.te
 if (!pkg.scripts?.["conformance:test"]?.includes("html-script-json.test.mjs")) {
   failures.push("conformance:test does not exercise script-safe graph JSON serialization");
 }
+if (!pkg.scripts?.["conformance:test"]?.includes("runtime-browser-contract-config.test.mjs")) {
+  failures.push("conformance:test does not exercise fail-closed representative browser route selection");
+}
 if (!pkg.scripts?.check?.includes("check:visual-shape")) failures.push("check does not exercise check:visual-shape");
 if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("check does not exercise Draft 2020-12 artifact validation");
 if (!pkg.scripts?.check?.includes("check:provenance")) failures.push("check does not exercise the explicit provenance mode");
@@ -208,6 +279,7 @@ for (const pin of [
   "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0",
   "astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0",
   "node-version: 24",
+  "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",
 ]) {
   if (!workflow.includes(pin)) failures.push(`CI verification is missing exact contract: ${pin}`);

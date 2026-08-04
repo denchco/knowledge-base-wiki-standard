@@ -14,16 +14,16 @@ status: draft
 | Human Zensical wiki | Governed reference runtime with strict build, local assets, and dedicated readable draft-navigation markers |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, and completion/cycle guards |
 | Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
-| Dependency contract | Exact locks, installation classes, offline boundary, and adapter requalification rule implemented |
+| Dependency contract | Exact locks, installation classes, offline boundary, adapter requalification, consumer/maintainer separation, and reserved verification-artifact rules implemented |
 | Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, and completion-first anti-rabbit-hole handoff implemented |
 | Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: Git and colocated Jujutsu are active, with a read-only root/version/current-change checker; `jj 0.39.0` is reference-qualified and explicit Git-only distribution mode does not claim maintainer provenance |
-| Graphify publication | Versioned shared data plus enriched 2D/3D views and local runtimes implemented |
-| Built-output browser contract | Desktop/mobile geometry, local network, Mermaid, graph, controls, console, and asset checks implemented |
-| Cross-project dogfooding | Five read-only inferred audits and comparative report implemented |
-| Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans implemented |
-| Subject-empty starter | Allowlisted planning/templates implemented; root copying and standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
+| Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
+| Built-output browser contract | Independent representative routes; desktop/mobile geometry, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
+| Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |
+| Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
+| Subject-empty starter | Allowlisted policy/graph/planning templates implemented with consumer-owned licensing and maintainer-sync exclusion; root copying and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
 | Public documentation boundary | Human guidance routes to the separate Pages site; this repository remains normative and local pinned schemas remain the validation input |
-| Standard-change intake | Proposal-first `standard-change.yml` issue form implemented for consumer-derived patterns; remote submission remains explicitly authorised and promotion remains maintainer-governed |
+| Standard-change intake | Proposal-first `standard-change.yml` route implemented with verified-local-first, scrubbed ignored draft, read-only duplicate search, exact remote-payload authority, no write fallback, and separate promotion/release/migration authority |
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
@@ -34,8 +34,4 @@ The local Zensical service is registered at `http://127.0.0.1:8017/`; health req
 
 ## Current bounded priorities
 
-These are the three current project priorities in order. They are status, not automatic response boilerplate, and each must be removed or replaced when completed.
-
-1. **Second-consumer proof** — run the pinned lifecycle and instruction contract against a second independently maintained consumer, record its schema-valid report and owner decision, and finish when reusable defects are reconciled or explicitly parked.
-2. **Evidence-led compatibility** — add version/browser fixtures only for exact adapters or environments exposed by that consumer or an evidenced upstream change; finish when those observed combinations pass or are declared unsupported. Do not create a speculative compatibility matrix.
-3. **MCP go/no-go** — after the second-consumer pass, compare its real discovery/update-inspection tasks with the stable CLI and GitHub MCP; finish with a recorded decision, and implement a dedicated read-first MCP only if a named unmet gap remains.
+No active priority remains from the second-consumer pass. Compatibility work is parked until a consumer selects a new exact adapter/environment, and a dedicated Standard MCP remains a no-go because the observed discovery and update-inspection tasks were served by the local CLI, Git, and governed GitHub issue route.

@@ -40,46 +40,59 @@ const REQUIRED_PRODUCTION_ROLES = {
 
 function automaticStandardRevision() {
   try {
-    return execFileSync("git", ["rev-parse", "HEAD"], {
+    return stripFinalLineEnding(execFileSync("git", ["rev-parse", "HEAD"], {
       cwd: STANDARD_ROOT,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
+    }));
   } catch {
     throw new CliUsageError("Cannot resolve the standard checkout to an immutable commit SHA; use --standard-revision only as an explicit override.");
   }
+}
+
+function stripFinalLineEnding(value) {
+  return value.endsWith("\r\n")
+    ? value.slice(0, -2)
+    : value.endsWith("\n")
+      ? value.slice(0, -1)
+      : value;
 }
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function readYaml(filePath) {
-  const source = readFileSync(filePath, "utf8");
+function parseYaml(source, label) {
   const document = parseDocument(source, {
     prettyErrors: true,
     strict: true,
     uniqueKeys: true,
   });
   if (document.errors.length) {
-    throw new Error(`Cannot parse canonical YAML ${filePath}: ${document.errors.map((error) => error.message).join("; ")}`);
+    throw new Error(`Cannot parse canonical YAML ${label}: ${document.errors.map((error) => error.message).join("; ")}`);
   }
   const data = document.toJS({ maxAliasCount: 100 });
   if (!data || typeof data !== "object" || Array.isArray(data)) {
-    throw new Error(`Canonical YAML ${filePath} must contain a mapping.`);
+    throw new Error(`Canonical YAML ${label} must contain a mapping.`);
   }
   return { source, data, sha256: sha256(source) };
 }
 
-function candidateState(profileId) {
-  const manifestPath = path.join(STANDARD_ROOT, ".wiki-standard.yaml");
-  const manifest = readYaml(manifestPath);
+function candidateState(profileId, requestedRevision = null) {
+  const revision = requestedRevision ?? automaticStandardRevision();
+  const commit = resolveStandardRevision(revision);
+  if (!commit) {
+    throw new CliUsageError(`Cannot resolve Standard revision ${JSON.stringify(revision)} to an immutable commit.`);
+  }
+  const readSource = (relativePath) => gitSource(commit, relativePath);
+  const manifest = parseYaml(readSource(".wiki-standard.yaml"), `${commit}:.wiki-standard.yaml`);
   let requirements;
   let profile;
   try {
-    requirements = loadRequirementCatalogue({ standardRoot: STANDARD_ROOT });
+    requirements = loadRequirementCatalogue({ standardRoot: STANDARD_ROOT, readSource });
     profile = loadProfile(profileId ?? manifest.data.profile, {
       standardRoot: STANDARD_ROOT,
+      readSource,
       requirementIds: requirements.ids,
     });
   } catch (error) {
@@ -89,7 +102,10 @@ function candidateState(profileId) {
     throw error;
   }
   return {
-    standard: manifest.data.standard,
+    standard: {
+      ...manifest.data.standard,
+      revision: commit,
+    },
     okfVersion: manifest.data.okf_version,
     manifest: {
       path: ".wiki-standard.yaml",
@@ -98,6 +114,78 @@ function candidateState(profileId) {
     requirements,
     profile,
   };
+}
+
+function gitText(args) {
+  return stripFinalLineEnding(execFileSync("git", args, {
+    cwd: STANDARD_ROOT,
+    encoding: "utf8",
+    maxBuffer: 16 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
+  }));
+}
+
+function gitSource(commit, relativePath) {
+  return execFileSync("git", ["show", `${commit}:${relativePath}`], {
+    cwd: STANDARD_ROOT,
+    encoding: "utf8",
+    maxBuffer: 16 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+}
+
+function resolveStandardRevision(revision) {
+  if (typeof revision !== "string" || revision.length === 0) return null;
+  try {
+    const commit = gitText(["rev-parse", "--verify", "--end-of-options", `${revision}^{commit}`]);
+    return /^[0-9a-f]{40,64}$/.test(commit) ? commit : null;
+  } catch {
+    return null;
+  }
+}
+
+function revisionIsAncestor(ancestor, descendant) {
+  try {
+    execFileSync("git", ["merge-base", "--is-ancestor", ancestor, descendant], {
+      cwd: STANDARD_ROOT,
+      stdio: ["ignore", "ignore", "ignore"],
+    });
+    return true;
+  } catch (error) {
+    if (error?.status === 1) return false;
+    throw error;
+  }
+}
+
+function revisionState(consumerCommit, candidateCommit) {
+  if (consumerCommit === candidateCommit) return "same";
+  if (revisionIsAncestor(consumerCommit, candidateCommit)) return "candidate-newer";
+  if (revisionIsAncestor(candidateCommit, consumerCommit)) return "consumer-newer";
+  return "diverged";
+}
+
+function standardStateAtRevision(profileId, revision) {
+  const commit = resolveStandardRevision(revision);
+  if (!commit) return null;
+  const readSource = (relativePath) => gitSource(commit, relativePath);
+  try {
+    const manifest = parseYaml(readSource(".wiki-standard.yaml"), `${commit}:.wiki-standard.yaml`);
+    const requirements = loadRequirementCatalogue({ standardRoot: STANDARD_ROOT, readSource });
+    const profile = loadProfile(profileId, {
+      standardRoot: STANDARD_ROOT,
+      readSource,
+      requirementIds: requirements.ids,
+    });
+    return {
+      commit,
+      standard: manifest.data.standard,
+      okfVersion: manifest.data.okf_version,
+      requirements,
+      profile,
+    };
+  } catch {
+    return null;
+  }
 }
 
 function parseVersion(value) {
@@ -178,6 +266,11 @@ export function lifecycleDiff(options = {}) {
   const selectedProfile = options.profile ?? consumer?.profile ?? "standard-production";
   const candidate = candidateState(selectedProfile);
   const changes = [];
+  const versionState = consumer
+    ? versionRelation(consumer.standard?.version, candidate.standard.version)
+    : "manifest-missing";
+  let comparedRevisionState = consumer ? "not-compared" : "manifest-missing";
+  let pinnedState = null;
 
   if (!inspection.manifest.present || !consumer) {
     changes.push(diffChange(
@@ -201,8 +294,20 @@ export function lifecycleDiff(options = {}) {
         { blocking: true, requirement: "DKBWS-CORE-002" },
       ));
     }
-    const relation = versionRelation(consumer.standard?.version, candidate.standard.version);
-    if (relation === "candidate-newer" && consumer.standard?.name === candidate.standard.name) {
+    if (consumer.standard?.source !== candidate.standard.source) {
+      changes.push(diffChange(
+        "standard-source-review",
+        "manual",
+        "/standard/source",
+        consumer.standard?.source,
+        candidate.standard.source,
+        "The consumer declares a different Standard source; version and revision ordering cannot establish a safe upgrade across identities.",
+        { blocking: true, requirement: "DKBWS-UPDATE-001" },
+      ));
+    }
+    const sameStandardIdentity = consumer.standard?.name === candidate.standard.name
+      && consumer.standard?.source === candidate.standard.source;
+    if (versionState === "candidate-newer" && sameStandardIdentity) {
       changes.push(diffChange(
         "standard-version-update",
         "replace",
@@ -212,7 +317,7 @@ export function lifecycleDiff(options = {}) {
         "The selected candidate is newer than the consumer declaration.",
         { automatic: true, requirement: "DKBWS-UPDATE-001" },
       ));
-    } else if (relation === "consumer-newer") {
+    } else if (versionState === "consumer-newer") {
       changes.push(diffChange(
         "standard-version-newer-consumer",
         "manual",
@@ -222,7 +327,7 @@ export function lifecycleDiff(options = {}) {
         "The consumer is newer than this candidate; the planner will not propose a downgrade.",
         { blocking: true, requirement: "DKBWS-UPDATE-001" },
       ));
-    } else if (relation === "unknown") {
+    } else if (versionState === "unknown") {
       changes.push(diffChange(
         "standard-version-unparseable",
         "manual",
@@ -232,6 +337,90 @@ export function lifecycleDiff(options = {}) {
         "The version relationship cannot be established safely.",
         { blocking: true, requirement: "DKBWS-UPDATE-001" },
       ));
+    }
+
+    if (sameStandardIdentity) {
+      const declaredRevision = consumer.standard?.revision;
+      if (typeof declaredRevision !== "string" || declaredRevision.length === 0) {
+        comparedRevisionState = "missing";
+        changes.push(diffChange(
+          "standard-revision-missing",
+          "manual",
+          "/standard/revision",
+          null,
+          candidate.standard.revision,
+          "Version labels alone are insufficient for lifecycle comparison; the consumer must preserve an immutable Standard revision before requirement changes can be assessed.",
+          { blocking: true, requirement: "DKBWS-UPDATE-001" },
+        ));
+      } else {
+        pinnedState = standardStateAtRevision(selectedProfile, declaredRevision);
+        if (!pinnedState) {
+          comparedRevisionState = "unresolved";
+          changes.push(diffChange(
+            "standard-revision-unresolved",
+            "manual",
+            "/standard/revision",
+            declaredRevision,
+            candidate.standard.revision,
+            "The consumer's immutable Standard revision or its selected profile cannot be resolved from this checkout; no current or upgrade conclusion is safe.",
+            { blocking: true, requirement: "DKBWS-UPDATE-001" },
+          ));
+        } else {
+          comparedRevisionState = revisionState(pinnedState.commit, candidate.standard.revision);
+          if (consumer.standard?.version !== pinnedState.standard.version) {
+            changes.push(diffChange(
+              "standard-version-revision-mismatch",
+              "manual",
+              "/standard/version",
+              consumer.standard?.version,
+              pinnedState.standard.version,
+              "The declared version does not match the Standard manifest at the pinned immutable revision; correct the identity record before planning an upgrade.",
+              { blocking: true, requirement: "DKBWS-UPDATE-001" },
+            ));
+          }
+          if (comparedRevisionState !== "same") {
+            const reason = comparedRevisionState === "candidate-newer"
+              ? "The candidate commit is newer than the consumer's immutable revision; review requirement and implementation changes independently of the version labels before repinning."
+              : comparedRevisionState === "consumer-newer"
+                ? "The consumer revision is newer than this candidate; the planner will not propose a downgrade."
+                : "The consumer and candidate revisions have diverged; ancestry and migration require maintainer review.";
+            changes.push(diffChange(
+              "standard-revision-review",
+              "manual",
+              "/standard/revision",
+              declaredRevision,
+              candidate.standard.revision,
+              reason,
+              { blocking: true, requirement: "DKBWS-UPDATE-001" },
+            ));
+          }
+
+          const pinnedRequirements = new Set(pinnedState.profile.requirements);
+          const candidateRequirements = new Set(candidate.profile.requirements);
+          for (const requirement of candidate.profile.requirements.filter((id) => !pinnedRequirements.has(id))) {
+            changes.push(diffChange(
+              `requirement-introduced-${requirement}`,
+              "manual",
+              "/profile",
+              null,
+              requirement,
+              `The selected profile introduces ${requirement} after the consumer's pinned revision; implementation evidence and migration impact require review before repinning.`,
+              { blocking: true, requirement },
+            ));
+          }
+          for (const requirement of pinnedState.profile.requirements.filter((id) => !candidateRequirements.has(id))) {
+            changes.push(diffChange(
+              `requirement-removed-${requirement}`,
+              "manual",
+              "/profile",
+              requirement,
+              null,
+              `The consumer's pinned profile includes ${requirement}, which is absent from the candidate profile; preserve deviations and require an explicit migration map.`,
+              { blocking: true, requirement: "DKBWS-UPDATE-001" },
+            ));
+          }
+        }
+      }
     }
 
     if (consumer.okf_version !== candidate.okfVersion) {
@@ -314,12 +503,14 @@ export function lifecycleDiff(options = {}) {
 
   const deviations = deviationIndex(consumer);
   const inspectionResults = new Map(inspection.requirementResults.map((item) => [item.requirement, item]));
+  const pinnedRequirementIds = pinnedState ? new Set(pinnedState.profile.requirements) : null;
   const requirements = candidate.profile.requirements.map((id) => {
     const result = inspectionResults.get(id);
     const deviation = deviations.get(id);
     return {
       id,
       known: candidate.requirements.ids.has(id),
+      introducedSinceConsumerRevision: pinnedRequirementIds ? !pinnedRequirementIds.has(id) : null,
       validationStatus: result?.status ?? "not-checked",
       deviation: deviation ? {
         status: deviation.status,
@@ -344,9 +535,6 @@ export function lifecycleDiff(options = {}) {
     }
   }
 
-  const versionState = consumer
-    ? versionRelation(consumer.standard?.version, candidate.standard.version)
-    : "manifest-missing";
   const blocking = changes.filter((change) => change.blocking).length
     + inspection.summary.errors;
   const automatic = changes.filter((change) => change.automatic).length;
@@ -376,12 +564,15 @@ export function lifecycleDiff(options = {}) {
       standard: consumer?.standard ?? null,
       okfVersion: consumer?.okf_version ?? null,
       profile: consumer?.profile ?? null,
+      resolvedRevision: pinnedState?.commit ?? null,
+      pinnedProfileRequirements: pinnedState?.profile.requirements ?? null,
     },
     requirements,
     changes,
     inspection: publicReport(inspection),
     summary: {
       versionState,
+      revisionState: comparedRevisionState,
       changes: changes.length,
       automatic,
       manual: changes.length - automatic,
@@ -474,8 +665,8 @@ function targetInventory(target) {
   };
 }
 
-function starterContract() {
-  const contract = readYaml(path.join(STANDARD_ROOT, STARTER_PATH));
+function starterContract(revision) {
+  const contract = parseYaml(gitSource(revision, STARTER_PATH), `${revision}:${STARTER_PATH}`);
   if (!Array.isArray(contract.data.entries)) {
     throw new Error(`${STARTER_PATH} must define an entries list.`);
   }
@@ -530,13 +721,12 @@ export function initPlan(options = {}) {
     throw new CliUsageError("`init --dry-run` target must be an independent repository path, not the standard repository root.");
   }
   const profileId = options.profile ?? "standard-production";
-  const candidate = candidateState(profileId);
-  const standardRevision = options.standardRevision ?? candidate.standard.revision ?? automaticStandardRevision();
-  const starter = starterContract();
+  const candidate = candidateState(profileId, options.standardRevision);
+  const standardRevision = candidate.standard.revision;
+  const starter = starterContract(candidate.standard.revision);
   const inventory = targetInventory(target);
   if (inventory.type === "file") throw new CliUsageError("`init --dry-run` target must be a directory path or an absent path.");
-  const promptPath = path.join(STANDARD_ROOT, "prompts/instantiate-wiki.md");
-  const promptSource = readFileSync(promptPath, "utf8");
+  const promptSource = gitSource(candidate.standard.revision, "prompts/instantiate-wiki.md");
   const layout = plannedLayout(candidate.profile, starter.data).map((entry) => {
     const relativePath = entry.target;
     const normalized = relativePath.replace(/\/$/, "");

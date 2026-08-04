@@ -24,6 +24,6 @@ status: draft
 | Local service | Repo wrapper plus OS adapter and HTTP-200 health |
 | Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |
-| Future domain integration | Conditional DenchCo Wiki Standard MCP, only after a second consumer proves a named gap left by GitHub MCP and the stable CLI |
+| Future domain integration | DenchCo Wiki Standard MCP is currently no-go; reconsider only if a future consumer proves a named gap left by Git, GitHub, and the stable CLI |
 
 See the root dependency contract and source register for versions and authority.

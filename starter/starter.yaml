@@ -27,7 +27,7 @@ bootstrap:
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
-  standard_production: "Planning only until an implementation agent supplies and verifies the complete renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the pinned release."
+  standard_production: "Planning only until an implementation agent supplies and verifies the complete consumer renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the pinned release. Standard-maintainer documentation-sync commands and verify:workspace are excluded unless the consumer independently declares and implements that capability."
 
 classifications:
   reference_only:
@@ -69,6 +69,7 @@ consumer_owned:
   - "accent colour and derived accessible colour family"
   - "canonical Wiki URL"
   - "source and evidence corpus"
+  - "repository licence decision, rights holder, and any resulting LICENSE text"
   - "navigation and synthesis"
   - "deployment adapter, credentials, repository settings, and domain"
 
@@ -107,6 +108,12 @@ entries:
     role: "source-policy"
     classification: "render-template"
     template: "starter/templates/SOURCE_POLICY.md.tmpl"
+    requirements: ["DKBWS-SEC-001"]
+    always: true
+  - target: "LICENSING.md"
+    role: "licensing-record"
+    classification: "render-template"
+    template: "starter/templates/LICENSING.md.tmpl"
     requirements: ["DKBWS-SEC-001"]
     always: true
   - target: "knowledge/index.md"
@@ -191,22 +198,25 @@ entries:
     requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003"]
   - target: "docs/graph/index.md"
     role: "graph-entry"
-    classification: "create-subject-content"
+    classification: "render-template"
+    template: "starter/templates/docs/graph/index.md.tmpl"
     requirements: ["DKBWS-GRAPH-001"]
   - target: "docs/graph/two-dimensional.md"
     role: "graph-2d"
-    classification: "create-subject-content"
+    classification: "render-template"
+    template: "starter/templates/docs/graph/two-dimensional.md.tmpl"
     requirements: ["DKBWS-GRAPH-001"]
   - target: "docs/graph/three-dimensional.md"
     role: "graph-3d"
-    classification: "create-subject-content"
+    classification: "render-template"
+    template: "starter/templates/docs/graph/three-dimensional.md.tmpl"
     requirements: ["DKBWS-GRAPH-001"]
   - target: "package.json"
     role: "node-build-contract"
     classification: "adapt-from-release"
     source: "package.json"
     planning_only: true
-    dependency_closure: "all scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract"
+    dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
     requirements: ["DKBWS-VERIFY-001"]
   - target: "package-lock.json"
     role: "node-lock"
@@ -234,5 +244,5 @@ entries:
     classification: "adapt-from-release"
     source: ".github/workflows/verify.yml"
     planning_only: true
-    dependency_closure: "every command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow"
+    dependency_closure: "every consumer command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow; exclude Standard-maintainer documentation synchronization unless independently declared"
     requirements: ["DKBWS-VERIFY-001"]

@@ -20,7 +20,9 @@ status: draft
 
 ## Consumer-derived proposals
 
-When a user-authored consumer change appears reusable, preserve its originating project and immutable revision and use the [standard-change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml). The form records classification, affected contract, evidence, accessibility/browser results, dependencies, fallback, fixtures, and migration impact. An agent may prepare the issue content locally after completing and verifying the consumer request, but submitting it to GitHub requires explicit authority and does not itself promote the pattern.
+When a user-authored consumer change appears reusable, preserve its originating project and immutable revision and use the [standard-change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml). Complete and verify the project-owned request first, search existing issues read-only, and prepare ignored `output/standard-change-proposal.md` with classification, affected contract, evidence, accessibility/browser results, dependencies, fallback, fixtures, and migration impact. Scrub private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material.
+
+Before any remote write, show the exact repository, title, body, and labels and obtain explicit authority. If the form is unavailable, stop with the local draft rather than substituting a connector or CLI write. Filing does not promote the pattern or authorize a PR, release, publication, migration, pin, or conformance change.
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
 

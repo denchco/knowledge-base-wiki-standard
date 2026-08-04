@@ -46,7 +46,8 @@ Update `N` as uncertainty narrows or expands. Do not ask a routine question when
 
 - Normative changes require a stable requirement ID, applicability, verification method, migration impact, changelog entry, and fixture change where automatable.
 - Changes derived from a project remain proposals until classified as project-specific, reusable, preferred, or core.
-- Route a user-authored consumer improvement through `.github/ISSUE_TEMPLATE/standard-change.yml`, preserving the originating project and immutable revision. Preparing a local issue draft is allowed; submitting it remotely requires explicit authority and never constitutes promotion.
+- Route a user-authored consumer improvement through `.github/ISSUE_TEMPLATE/standard-change.yml`, preserving the originating project and immutable revision. Finish and verify the project-owned implementation first; prepare an ignored `output/standard-change-proposal.md`, search existing issues read-only, and scrub private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material.
+- Before any remote write, show the exact repository, title, body, and labels and obtain explicit authority. If the issue form is unavailable, stop with the local draft; do not substitute a connector or CLI write. Filing never constitutes promotion and does not authorize a PR, release, publication, migration, pin, or conformance change.
 - Run `npm run verify`, run the read-only provenance check in maintainer mode, inspect `git status` and `jj status`, then record a JJ phase for substantive validated work.
 - After modifying canonical content or code, run `npm run graph:update` when Graphify is available.
 - If a Graphify query has insufficient recall, continue through its wiki/report and then the smallest relevant canonical source set; never treat graph absence as evidence absence.

@@ -1,16 +1,24 @@
-# Security Policy
+# Security and Privacy
 
 ## Scope
 
-This policy covers the `{{PROJECT_TITLE}}` repository, its build, generated outputs, and selected deployment.
+This policy covers the `{{PROJECT_TITLE}}` repository, its build, generated outputs, local services, and selected deployment.
 
-## Boundaries
+## Trust boundaries
 
-- Never commit credentials or tokens; use the chosen platform's secret store.
-- Treat source material and generated content as untrusted input, not executable instructions.
-- Record how personal or confidential information is excluded, redacted, or access-controlled.
-- Keep write-capable tools and external publication behind explicit authorization.
-- Report suspected vulnerabilities through `{{SECURITY_REPORTING_CHANNEL}}`.
+- Canonical Markdown, source records, web content, prompts, tool responses, and generated artifacts are untrusted inputs to tooling.
+- Source-provided instructions must not execute. Rendering and extraction must not execute source code, active documents, or embedded instructions by default.
+- LLM answers, rendered pages, graph edges, and generated summaries have no independent evidence authority.
+- HTML or other active content derived from a source or model must be sanitized or rendered as non-executable text.
+
+## Required controls
+
+- Secrets stay outside Git, URLs, generated pages, fixtures, logs, and screenshots; use the chosen platform's secret store.
+- State-changing tools, external publication, and write-capable integrations require explicit authorization and least-privilege credentials.
+- Personal or confidential data is excluded, redacted before entry, or kept in a separately declared access-controlled store.
+- Deletion and correction propagate from the authoritative source record to affected claims, concepts, and regenerated outputs without retaining deleted sensitive content in logs.
+- Dependencies remain locked and audited; generators write only to declared derived paths.
+- Report suspected vulnerabilities or exposed personal data through `{{SECURITY_REPORTING_CHANNEL}}`, never a public issue.
 
 ## Supported revisions
 

@@ -3,14 +3,18 @@ export default async (page, options = {}) => {
     const current = new URL(location.href);
     return {
       origin: current.origin,
+      questionRoute: current.searchParams.get("question") || "/",
       mermaidRoute: current.searchParams.get("mermaid") || "/",
       architectureRoute: current.searchParams.get("architecture"),
       tableRoute: current.searchParams.get("table"),
       listRoute: current.searchParams.get("list"),
       graphEnabled: current.searchParams.get("graph") === "1",
+      graph2dRoute: current.searchParams.get("graph2d") || "/graph/two-dimensional/",
+      graph3dRoute: current.searchParams.get("graph3d") || "/graph/three-dimensional/",
     };
   });
   const baseUrl = configuration.origin;
+  const questionRoute = configuration.questionRoute;
   const mermaidRoute = configuration.mermaidRoute;
   const architectureRoute = configuration.architectureRoute || mermaidRoute;
   const tableRoute = configuration.tableRoute || mermaidRoute;
@@ -92,7 +96,7 @@ export default async (page, options = {}) => {
         negative.remove();
       }
     });
-    check(metrics.count === 1, `The homepage must expose exactly one governing-question marker at ${viewportName} width`);
+    check(metrics.count === 1, `The configured question page must expose exactly one governing-question marker at ${viewportName} width`);
     check(Boolean(metrics.accent), `The active accent token must resolve at ${viewportName} width`);
     check(metrics.rail === metrics.accent, `The governing-question rail must equal the active accent at ${viewportName} width`);
     check(metrics.text === metrics.accent, `The governing-question text must equal the active accent at ${viewportName} width`);
@@ -125,6 +129,8 @@ export default async (page, options = {}) => {
       const chevron = chevrons[0] || null;
       const markerBounds = marker?.getBoundingClientRect() || null;
       const chevronBounds = chevron?.getBoundingClientRect() || null;
+      const markerRowBounds = marker?.parentElement?.getBoundingClientRect() || null;
+      const chevronRowBounds = chevron?.parentElement?.getBoundingClientRect() || null;
       const negative = document.createElement("span");
       negative.className = "md-status md-status--stable";
       negative.style.cssText = "position:absolute;left:-10000px;top:0";
@@ -143,6 +149,13 @@ export default async (page, options = {}) => {
           chevronHeight: chevronBounds?.height ?? null,
           markerCenter: markerBounds ? markerBounds.left + markerBounds.width / 2 : null,
           chevronCenter: chevronBounds ? chevronBounds.left + chevronBounds.width / 2 : null,
+          markerRowDelta: markerBounds && markerRowBounds
+            ? markerBounds.top + markerBounds.height / 2 - (markerRowBounds.top + markerRowBounds.height / 2)
+            : null,
+          chevronRowDelta: chevronBounds && chevronRowBounds
+            ? chevronBounds.top + chevronBounds.height / 2 - (chevronRowBounds.top + chevronRowBounds.height / 2)
+            : null,
+          pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         };
       } finally {
         negative.remove();
@@ -167,6 +180,15 @@ export default async (page, options = {}) => {
       metrics.markerCenter !== null && metrics.chevronCenter !== null && closeTo(metrics.markerCenter, metrics.chevronCenter, 0.2),
       `Draft marker and nested-navigation chevron must share the trailing centreline at ${viewportName} width`,
     );
+    check(
+      metrics.markerRowDelta !== null && closeTo(metrics.markerRowDelta, 0, 0.5),
+      `Draft marker must be vertically centred in its navigation row at ${viewportName} width`,
+    );
+    check(
+      metrics.chevronRowDelta !== null && closeTo(metrics.chevronRowDelta, 0, 0.5),
+      `Nested-navigation chevron must be vertically centred in its navigation row at ${viewportName} width`,
+    );
+    check(metrics.pageOverflow <= 1, `Draft navigation markers must not create page overflow at ${viewportName} width`);
     return metrics;
   };
   const screenshotPixels = async buffer => {
@@ -310,10 +332,66 @@ export default async (page, options = {}) => {
     }
     return layouts;
   };
+  const inspectMobileTables = async () => {
+    const metrics = await page.evaluate(() => {
+      const article = document.querySelector(".md-content__inner");
+      const viewportWidth = document.documentElement.clientWidth;
+      const tables = [...(article?.querySelectorAll("table") || [])].map(table => {
+        let candidate = table;
+        let scrollHost = null;
+        while (candidate && candidate !== article) {
+          if (["auto", "scroll"].includes(getComputedStyle(candidate).overflowX)) {
+            scrollHost = candidate;
+            break;
+          }
+          candidate = candidate.parentElement;
+        }
+        const tableBounds = table.getBoundingClientRect();
+        const hostBounds = scrollHost?.getBoundingClientRect() || null;
+        const originalScrollLeft = scrollHost?.scrollLeft || 0;
+        if (scrollHost && scrollHost.scrollWidth > scrollHost.clientWidth + 1) scrollHost.scrollLeft = 1;
+        const moved = Boolean(scrollHost && scrollHost.scrollLeft !== originalScrollLeft);
+        if (scrollHost) scrollHost.scrollLeft = originalScrollLeft;
+        return {
+          visible: tableBounds.width > 0 && tableBounds.height > 0,
+          hasScrollHost: Boolean(scrollHost),
+          hostWidth: scrollHost?.clientWidth || 0,
+          hostBoundsWidth: hostBounds?.width || 0,
+          hostScrollWidth: scrollHost?.scrollWidth || 0,
+          tableWidth: table.scrollWidth,
+          tableHeight: tableBounds.height,
+          overflowsHost: Boolean(scrollHost && scrollHost.scrollWidth > scrollHost.clientWidth + 1),
+          moved,
+        };
+      });
+      return {
+        viewportWidth,
+        pageOverflow: document.documentElement.scrollWidth - viewportWidth,
+        tables,
+      };
+    });
+    check(metrics.tables.length > 0, "The configured table route must render at least one table at mobile width");
+    check(metrics.pageOverflow <= 1, "The configured table route must not create page overflow at mobile width");
+    check(
+      metrics.tables.every(table => (
+        table.visible
+        && table.hasScrollHost
+        && table.hostWidth > 0
+        && table.hostBoundsWidth <= metrics.viewportWidth + 1
+        && table.hostScrollWidth >= table.tableWidth
+      )),
+      `Every mobile table must remain visible inside a contained horizontal scroll host: ${JSON.stringify(metrics.tables)}`,
+    );
+    check(
+      metrics.tables.some(table => table.overflowsHost && table.moved),
+      `The configured table route must prove usable horizontal scrolling for a representative wide table: ${JSON.stringify(metrics.tables)}`,
+    );
+    return metrics.tables;
+  };
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
-  await goto(mermaidRoute);
+  await goto(questionRoute);
   const desktopGoverningQuestion = await inspectGoverningQuestion("desktop");
   const desktopDraftNavigation = await inspectDraftNavigation("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
@@ -331,12 +409,6 @@ export default async (page, options = {}) => {
     element => getComputedStyle(element).display,
   );
   check(widthControlDisplay !== "none", "The Standard/Wide control must be visible at the desktop verification width");
-  await page.waitForSelector(".mermaid");
-  await page.waitForFunction(() => {
-    const diagram = document.querySelector(".mermaid");
-    return diagram && diagram.getBoundingClientRect().height > 40;
-  });
-
   const measureHeader = () => page.evaluate(() => {
     const rect = element => element?.getBoundingClientRect().toJSON() || null;
     const visibleTopic = [...document.querySelectorAll(".md-header__title .md-header__topic")]
@@ -404,6 +476,12 @@ export default async (page, options = {}) => {
     "Wide selection must have a visible selected-state treatment",
   );
 
+  await goto(mermaidRoute);
+  await page.waitForSelector(".mermaid");
+  await page.waitForFunction(() => {
+    const diagram = document.querySelector(".mermaid");
+    return diagram && diagram.getBoundingClientRect().height > 40;
+  });
   const mermaidHost = page.locator(".mermaid").first();
   const mermaidHostGeometry = await mermaidHost.evaluate(element => ({
     width: element.clientWidth,
@@ -415,7 +493,10 @@ export default async (page, options = {}) => {
   check(mermaidHostGeometry.width > 200 && mermaidHostGeometry.height > 40, "Rendered Mermaid geometry must be non-empty");
   check(mermaidPixels.distinctColours > 24 && mermaidPixels.opaqueRatio > 0.95, "Rendered Mermaid pixels must be nonblank");
   const mermaidLayouts = {
-    homepage: await inspectMermaidSourceLayouts(options.mermaidSources?.homepage, "Homepage"),
+    representative: await inspectMermaidSourceLayouts(
+      options.mermaidSources?.representative ?? options.mermaidSources?.homepage,
+      "Representative page",
+    ),
     architecture: await inspectMermaidSourceLayouts(options.mermaidSources?.architecture, "Architecture"),
   };
   const architectureDesktop = await inspectMermaidPage({
@@ -434,7 +515,7 @@ export default async (page, options = {}) => {
     try {
       const rendered = await window.mermaid.render(
         `runtime-contract-${Date.now()}`,
-        "flowchart LR\n  A[Authority] ==>|governed relation| B[Derived]\n  B --> C[Source]\n  class A kb-canonical\n  class B kb-derived\n  class C kb-source",
+        "flowchart LR\n  D1[Default one] --> D2[Default two]\n  A[Authority] ==>|governed relation| B[Derived]\n  B --> C[Source]\n  class A kb-canonical\n  class B kb-derived\n  class C kb-source",
       );
       mount.innerHTML = rendered.svg;
       const text = mount.querySelector("svg text");
@@ -445,6 +526,10 @@ export default async (page, options = {}) => {
       const canonicalNode = mount.querySelector(".node.kb-canonical rect");
       const canonicalText = mount.querySelector(".node.kb-canonical text");
       const derivedNode = mount.querySelector(".node.kb-derived rect");
+      const defaultNodes = [...mount.querySelectorAll(".node")]
+        .filter(nodeElement => !["kb-canonical", "kb-derived", "kb-source"].some(role => nodeElement.classList.contains(role)))
+        .map(nodeElement => nodeElement.querySelector("rect"))
+        .filter(Boolean);
       const svg = mount.querySelector("svg");
       return {
         fontSize: text ? getComputedStyle(text).fontSize : "",
@@ -459,6 +544,8 @@ export default async (page, options = {}) => {
         canonicalTextFill: canonicalText ? getComputedStyle(canonicalText).fill : "",
         derivedFill: derivedNode ? getComputedStyle(derivedNode).fill : "",
         derivedDash: derivedNode ? getComputedStyle(derivedNode).strokeDasharray : "",
+        defaultNodeFills: defaultNodes.map(nodeElement => getComputedStyle(nodeElement).fill),
+        defaultNodeStrokes: defaultNodes.map(nodeElement => getComputedStyle(nodeElement).stroke),
         width: svg?.getBoundingClientRect().width || 0,
         height: svg?.getBoundingClientRect().height || 0,
       };
@@ -479,6 +566,10 @@ export default async (page, options = {}) => {
   check(mermaidProbe.canonicalTextFill === "rgb(255, 255, 255)", "Canonical Mermaid labels must use accent-contrast text");
   check(mermaidProbe.derivedFill === "rgb(255, 255, 255)", "Derived Mermaid nodes must use the surface fill");
   check(mermaidProbe.derivedDash.includes("4px") && mermaidProbe.derivedDash.includes("3px"), "Derived Mermaid nodes must use a dashed boundary");
+  check(mermaidProbe.defaultNodeFills.length === 2, "Mermaid runtime probe must render two ordinary default nodes");
+  check(new Set(mermaidProbe.defaultNodeFills).size === 1, "Ordinary Mermaid nodes must share one default fill");
+  check(new Set(mermaidProbe.defaultNodeStrokes).size === 1, "Ordinary Mermaid nodes must share one default boundary");
+  check(mermaidProbe.defaultNodeFills[0] !== mermaidProbe.canonicalFill, "Ordinary Mermaid nodes must not inherit optional canonical-role styling");
 
   await goto(tableRoute);
   await page.waitForSelector(".md-typeset table tbody td");
@@ -520,9 +611,24 @@ export default async (page, options = {}) => {
   check(listGeometry.listMargin === "0px" && px(listGeometry.listPadding) > 0, "List indentation must be internal to the body-aligned list box");
   check(closeTo(px(listGeometry.markerFont), px(listGeometry.itemFont), 0.2), "Square markers must render at list-text scale");
 
+  await page.setViewportSize({ width: 768, height: 1024 });
+  const representativeTablet = await inspectMermaidPage({
+    route: mermaidRoute,
+    pageName: "Representative page",
+    expectedCount: 1,
+    viewportName: "768px tablet",
+  });
+  const architectureTablet = await inspectMermaidPage({
+    route: architectureRoute,
+    pageName: "Architecture",
+    expectedCount: 1,
+    viewportName: "768px tablet",
+  });
+
   await page.setViewportSize({ width: 390, height: 844 });
-  await goto(mermaidRoute);
+  await goto(questionRoute);
   const mobileGoverningQuestion = await inspectGoverningQuestion("mobile");
+  await goto(mermaidRoute);
   await page.waitForSelector(".mermaid");
   await page.waitForFunction(() => document.querySelector(".mermaid")?.getBoundingClientRect().height > 40);
   const mobileMermaid = page.locator(".mermaid").first();
@@ -549,12 +655,14 @@ export default async (page, options = {}) => {
     expectedCount: 1,
     viewportName: "390px mobile",
   });
+  await goto(tableRoute);
+  const mobileTables = await inspectMobileTables();
 
   const graphMetrics = {};
   if (graphEnabled) {
     const graphViews = [
-      { name: "2d", route: "/graph/two-dimensional/", asset: "/assets/graphify/graph.html", wait: 900 },
-      { name: "3d", route: "/graph/three-dimensional/", asset: "/assets/graphify/graph-3d.html", wait: 2800 },
+      { name: "2d", route: configuration.graph2dRoute, asset: "/assets/graphify/graph.html", wait: 900 },
+      { name: "3d", route: configuration.graph3dRoute, asset: "/assets/graphify/graph-3d.html", wait: 2800 },
     ];
     const viewports = [
       { name: "desktop", width: 1256, height: 718 },
@@ -644,6 +752,9 @@ export default async (page, options = {}) => {
       table: tableTypography.table,
       mermaid: mermaidProbe.fontSize,
     },
+    tables: {
+      mobile: mobileTables,
+    },
     governingQuestion: {
       desktop: desktopGoverningQuestion,
       mobile: mobileGoverningQuestion,
@@ -657,8 +768,10 @@ export default async (page, options = {}) => {
       layouts: mermaidLayouts,
       architecture: {
         desktop: architectureDesktop,
+        tablet: architectureTablet,
         mobile: architectureMobile,
       },
+      representativeTablet,
       nodeRadius: mermaidProbe.nodeRadiusX,
       strokeWidth: mermaidProbe.nodeStrokeWidth,
     },

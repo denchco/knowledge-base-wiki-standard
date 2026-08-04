@@ -3,6 +3,9 @@
 ## 2026-08-04
 
 - **Human Wiki lifecycle semantics**: Added conditional `DKBWS-HUMAN-003` so a displayed draft navigation state combines dedicated edit artwork, readable status text, and trailing-control alignment, while renderers without navigation status markers remain not applicable.
+- **Second-consumer learning**: Promoted Health IT Governance Beyond the NHS implementation findings into existing provenance, lifecycle, verification, graph, security, prompt, design, and Human Wiki requirements without importing its subject research.
+- **Immutable lifecycle identity**: Same-version consumers now compare canonical source, commit ancestry, and inherited requirement sets; missing or unresolved pins block rather than appearing current.
+- **Independent-consumer closure**: Starter policies now include a consumer-owned licence decision, correct graph hooks, schema-valid reserved verification artifacts, and an explicit exclusion of Standard-maintainer documentation synchronization.
 
 ## 2026-08-03
 

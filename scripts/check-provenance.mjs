@@ -40,12 +40,17 @@ function parseArguments(argv) {
 
 function run(command, args, cwd) {
   try {
-    return execFileSync(command, args, {
+    const output = execFileSync(command, args, {
       cwd,
       encoding: "utf8",
       maxBuffer: 1024 * 1024,
       stdio: ["ignore", "pipe", "pipe"],
-    }).trim();
+    });
+    return output.endsWith("\r\n")
+      ? output.slice(0, -2)
+      : output.endsWith("\n")
+        ? output.slice(0, -1)
+        : output;
   } catch (error) {
     if (error?.code === "ENOENT") throw new Error(`Required executable is unavailable: ${command}`);
     const detail = String(error?.stderr ?? error?.message ?? "command failed").trim();
@@ -67,7 +72,8 @@ function compareVersions(left, right) {
 }
 
 function canonicalDirectory(value) {
-  return realpathSync(path.resolve(value));
+  const candidate = path.isAbsolute(value) ? value : path.resolve(value);
+  return realpathSync(candidate);
 }
 
 function assertDirectory(value, label) {

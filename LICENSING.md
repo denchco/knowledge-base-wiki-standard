@@ -8,6 +8,8 @@ The MIT License permits private, public, modified, and commercial use while requ
 
 Third-party dependencies, generated vendor bundles, quoted material, examples derived from upstream projects, and registered sources retain their own licences or usage terms. This repository does not relicense them. Do not redistribute source material merely because it is cited or was available to an agent.
 
+Consumer-derived Standard proposals identify relevant third-party licence evidence and link to redistributable public material rather than copying restricted content. Before a public issue is submitted, remove private paths and material the originating project lacks authority to share; a proposal does not transfer ownership or expand reuse rights.
+
 The MIT licence does not transfer ownership of the DenchCo name or presentation identity. The `docs/assets/brand/denchco-wordmark.png` asset is included to identify this Standard and its Documentation; it is not part of the subject-empty consumer starter. Ordinary identification of the source is allowed; broader branding permissions are not part of this software licence.
 
 ## Bundled third-party assets

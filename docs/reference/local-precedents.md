@@ -16,7 +16,7 @@ status: draft
 - **Tool-tally and READ-SNOMED** — Mermaid and rendered rail geometry; concise cycle guards and durable parked-work reopen conditions.
 - **FOSL** — extraction/OCR and canonical-data-generated analytical surfaces.
 - **EPMA generic scaffold** — prior neutral consolidation point; input material, not authority.
-- **Health IT Governance Beyond the NHS** — user-selected CC0 draft-edit marker, readable draft tooltip, and measured alignment with the navigation chevron column; promoted through consumer commit `4393546e04d26a0c2c0aa79b30b0b881d786fdd9`.
+- **Health IT Governance Beyond the NHS** — independently maintained second-consumer proof. Commit `4393546e04d26a0c2c0aa79b30b0b881d786fdd9` supplied the draft marker precedent; `c96d235c18094243b6493d8aa1c74a38d65eb947` supplied the preferred renderer-default Mermaid comparison; and the `fe474829` through `c96d235c` history exposed reusable defects in trailing-space paths, revision-blind lifecycle comparison, ad hoc reserved receipts, copied maintainer-only synchronization, stale graph hooks, incomplete starter licensing, and proposal authority. Health-specific matrices, route counts, source-link rules, and research claims remain project-specific.
 
 ## Anti-rabbit-hole handoff synthesis
 

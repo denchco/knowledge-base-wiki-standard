@@ -23,4 +23,4 @@ x-denchco:
 
 # Standard production profile
 
-New reference implementations use pinned Zensical, the governed DenchCo visual profile, locally served Mermaid and graph runtimes, real 2D/3D Graphify views, built-output browser verification, and HTTP-200 runtime health. Their maintenance workspaces satisfy `DKBWS-PROV-001` with Git-interoperable history and a colocated Jujutsu workspace; Portable Core and explicit distribution/CI checkouts may remain Git-only.
+New reference implementations use pinned Zensical, the governed DenchCo visual profile, locally served Mermaid and graph runtimes, real 2D/3D Graphify views, built-output browser verification, and HTTP-200 runtime health. Complete graph verification fails closed when either selected-profile view is missing and exercises both at desktop and mobile widths. Maintenance workspaces satisfy `DKBWS-PROV-001` with Git-interoperable history, filesystem-significant root paths, and a colocated Jujutsu workspace; Portable Core and explicit distribution/CI checkouts may remain Git-only.

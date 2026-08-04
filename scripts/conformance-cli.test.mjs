@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   readdirSync,
   rmSync,
   statSync,
@@ -30,6 +32,7 @@ import {
   loadRequirementCatalogue,
   ProfileLoadError,
 } from "./profile-catalogue.mjs";
+import { checkProvenance } from "./check-provenance.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = path.join(ROOT, "scripts/conformance-cli.mjs");
@@ -39,7 +42,9 @@ const NEGATIVE_OKF = path.join(ROOT, "fixtures/nonconforming/okf-v0.2");
 const GUIDANCE = path.join(ROOT, "fixtures/nonconforming/okf-guidance");
 const NEGATIVE_MANIFEST = path.join(ROOT, "fixtures/nonconforming/manifest");
 const NEGATIVE_WAIVER = path.join(ROOT, "fixtures/nonconforming/waiver");
+const INVALID_CONSUMER_RECEIPT = path.join(ROOT, "fixtures/nonconforming/verification-receipt/consumer-summary.json");
 const OLD_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-old");
+const RC3_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-rc3");
 const STARTER_PATH = path.join(ROOT, "starter/starter.yaml");
 const LIFECYCLE_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/lifecycle-plan-v1.json"), "utf8"));
 const MANIFEST_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/manifest-v1.json"), "utf8"));
@@ -150,6 +155,27 @@ function writePortableProject(root, { deviation = null, conceptBody = "# Fixture
     "",
   ].join("\n"), "utf8");
 }
+
+test("provenance preserves a filesystem-significant trailing-space repository root", () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "denchco-provenance-path-"));
+  try {
+    const repositoryRoot = path.join(fixtureRoot, "repository ");
+    const nested = path.join(repositoryRoot, "nested");
+    mkdirSync(nested, { recursive: true });
+    const initialized = spawnSync("git", ["init", "--quiet"], { cwd: repositoryRoot, encoding: "utf8" });
+    assert.equal(initialized.status, 0, initialized.stderr);
+
+    const report = checkProvenance({ root: repositoryRoot, mode: "distribution" });
+    assert.equal(report.git.repositoryRoot, realpathSync(repositoryRoot));
+    assert.match(report.git.repositoryRoot, /repository $/);
+    assert.throws(
+      () => checkProvenance({ root: nested, mode: "distribution" }),
+      /does not equal Git root/,
+    );
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+});
 
 function receiptFor(target, profile, results, options = {}) {
   return {
@@ -589,6 +615,7 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(starter.executable_scope.apply_supported, false);
   assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
   assert.match(starter.executable_scope.standard_production, /complete .* dependency closure/i);
+  assert.match(starter.executable_scope.standard_production, /documentation-sync commands and verify:workspace are excluded/i);
 
   const targets = starter.entries.map((entry) => entry.target);
   assert.equal(new Set(targets).size, targets.length, "starter target paths must be unique");
@@ -602,6 +629,28 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   const projectStatusEntry = starter.entries.find((entry) => entry.target === "docs/project/status.md");
   assert.equal(projectStatusEntry?.classification, "render-template");
   assert.equal(projectStatusEntry?.always, true);
+  const packageEntry = starter.entries.find((entry) => entry.target === "package.json");
+  assert.match(packageEntry?.dependency_closure ?? "", /exclude Standard-maintainer sync:documentation:\* and verify:workspace/i);
+  const licensingEntry = starter.entries.find((entry) => entry.target === "LICENSING.md");
+  assert.equal(licensingEntry?.classification, "render-template");
+  assert.equal(licensingEntry?.always, true);
+  const graphIndexEntry = starter.entries.find((entry) => entry.target === "docs/graph/index.md");
+  assert.equal(graphIndexEntry?.classification, "render-template");
+  const graphIndexTemplate = readFileSync(path.join(ROOT, graphIndexEntry.template), "utf8");
+  assert.match(graphIndexTemplate, /generated discovery aids and are not evidence/);
+  assert.match(graphIndexTemplate, /\[2D\]\(two-dimensional\.md\)/);
+  assert.match(graphIndexTemplate, /\[3D\]\(three-dimensional\.md\)/);
+  for (const [target, view] of [
+    ["docs/graph/two-dimensional.md", "2d"],
+    ["docs/graph/three-dimensional.md", "3d"],
+  ]) {
+    const graphEntry = starter.entries.find((entry) => entry.target === target);
+    assert.equal(graphEntry?.classification, "render-template");
+    const graphTemplate = readFileSync(path.join(ROOT, graphEntry.template), "utf8");
+    assert.match(graphTemplate, /class="graph-shell"/);
+    assert.match(graphTemplate, new RegExp(`data-graph-view="${view}"`));
+    assert.doesNotMatch(graphTemplate, /class="kb-graph"/);
+  }
 
   const forbiddenTemplateContent = /five-project|SRC-00[1-9]|candidate status|local-unpublished/i;
   for (const entry of starter.entries) {
@@ -625,7 +674,7 @@ test("lifecycle diff compares the consumer version and selected profile without 
   const before = treeHash(OLD_CONSUMER);
   const result = run("diff", OLD_CONSUMER, "--date", "2026-08-03", "--json");
   const after = treeHash(OLD_CONSUMER);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(result.status, 1, result.stderr || result.stdout);
   assert.equal(after, before);
   const diff = JSON.parse(result.stdout);
   assertLifecycleSchemaShape(diff);
@@ -633,12 +682,111 @@ test("lifecycle diff compares the consumer version and selected profile without 
   assert.equal(diff.readOnly, true);
   assert.equal(diff.writesPerformed, false);
   assert.equal(diff.summary.versionState, "candidate-newer");
-  assert.equal(diff.summary.blocking, 0);
+  assert.equal(diff.summary.revisionState, "missing");
+  assert.equal(diff.summary.blocking, 1);
+  assert.equal(diff.summary.safeToPlanUpgrade, false);
   assert.ok(diff.requirements.some((item) => item.id === "DKBWS-OKF-001"));
   assert.deepEqual(
     diff.changes.map((change) => [change.id, change.path, change.current, change.proposed]),
-    [["standard-version-update", "/standard/version", "0.0.9", "0.1.0-candidate"]],
+    [
+      ["standard-version-update", "/standard/version", "0.0.9", "0.1.0-candidate"],
+      ["standard-revision-missing", "/standard/revision", null, diff.candidate.standard.revision],
+    ],
   );
+  const headManifest = spawnSync("git", ["show", `${diff.candidate.standard.revision}:.wiki-standard.yaml`], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(headManifest.status, 0, headManifest.stderr);
+  assert.equal(diff.candidate.manifest.sha256, createHash("sha256").update(headManifest.stdout).digest("hex"));
+});
+
+test("lifecycle diff compares equal version labels by immutable revision and requirement IDs", () => {
+  const before = treeHash(RC3_CONSUMER);
+  const result = run("diff", RC3_CONSUMER, "--date", "2026-08-04", "--json");
+  const after = treeHash(RC3_CONSUMER);
+  assert.equal(result.status, 1, result.stderr || result.stdout);
+  assert.equal(after, before);
+  const diff = JSON.parse(result.stdout);
+  assertLifecycleSchemaShape(diff);
+  assert.equal(diff.summary.versionState, "same");
+  assert.equal(diff.summary.revisionState, "candidate-newer");
+  assert.equal(diff.summary.safeToPlanUpgrade, false);
+  assert.match(diff.consumer.resolvedRevision, /^[0-9a-f]{40}$/);
+  assert.ok(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-002"));
+  assert.equal(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-003"), false);
+  assert.ok(diff.changes.some((change) => change.id === "standard-revision-review" && change.blocking));
+  assert.ok(diff.changes.some((change) => (
+    change.id === "requirement-introduced-DKBWS-HUMAN-003"
+    && change.proposed === "DKBWS-HUMAN-003"
+    && change.blocking
+  )));
+  assert.equal(
+    diff.requirements.find((item) => item.id === "DKBWS-HUMAN-003")?.introducedSinceConsumerRevision,
+    true,
+  );
+});
+
+test("lifecycle revision comparison distinguishes the same commit from an unresolved pin", () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "denchco-revision-diff-"));
+  try {
+    const same = path.join(fixtureRoot, "same");
+    const unresolved = path.join(fixtureRoot, "unresolved");
+    cpSync(RC3_CONSUMER, same, { recursive: true });
+    cpSync(RC3_CONSUMER, unresolved, { recursive: true });
+    const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: ROOT, encoding: "utf8" }).stdout.trim();
+
+    const sameManifest = path.join(same, ".wiki-standard.yaml");
+    writeFileSync(
+      sameManifest,
+      readFileSync(sameManifest, "utf8").replace('revision: "v0.1.0-rc.3"', `revision: "${head}"`),
+      "utf8",
+    );
+    const sameResult = run("diff", same, "--json");
+    assert.equal(sameResult.status, 0, sameResult.stderr || sameResult.stdout);
+    const sameDiff = JSON.parse(sameResult.stdout);
+    assert.equal(sameDiff.summary.revisionState, "same");
+    assert.equal(sameDiff.changes.some((change) => change.id.startsWith("standard-revision")), false);
+
+    const unresolvedManifest = path.join(unresolved, ".wiki-standard.yaml");
+    writeFileSync(
+      unresolvedManifest,
+      readFileSync(unresolvedManifest, "utf8").replace('revision: "v0.1.0-rc.3"', `revision: "${"f".repeat(40)}"`),
+      "utf8",
+    );
+    const unresolvedResult = run("diff", unresolved, "--json");
+    assert.equal(unresolvedResult.status, 1, unresolvedResult.stderr || unresolvedResult.stdout);
+    const unresolvedDiff = JSON.parse(unresolvedResult.stdout);
+    assert.equal(unresolvedDiff.summary.revisionState, "unresolved");
+    assert.ok(unresolvedDiff.changes.some((change) => change.id === "standard-revision-unresolved" && change.blocking));
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+});
+
+test("lifecycle diff never plans a version update across Standard sources", () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "denchco-source-diff-"));
+  try {
+    const consumer = path.join(fixtureRoot, "consumer");
+    cpSync(OLD_CONSUMER, consumer, { recursive: true });
+    const manifestPath = path.join(consumer, ".wiki-standard.yaml");
+    writeFileSync(
+      manifestPath,
+      readFileSync(manifestPath, "utf8").replace(
+        "https://github.com/denchco/knowledge-base-wiki-standard",
+        "https://example.invalid/different-standard",
+      ),
+      "utf8",
+    );
+    const result = run("diff", consumer, "--json");
+    assert.equal(result.status, 1, result.stderr || result.stdout);
+    const diff = JSON.parse(result.stdout);
+    assert.equal(diff.summary.revisionState, "not-compared");
+    assert.ok(diff.changes.some((change) => change.id === "standard-source-review" && change.blocking));
+    assert.equal(diff.changes.some((change) => change.id === "standard-version-update"), false);
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 });
 
 test("upgrade requires dry-run and emits a guarded review plan rather than applying", () => {
@@ -649,7 +797,7 @@ test("upgrade requires dry-run and emits a guarded review plan rather than apply
   const before = treeHash(OLD_CONSUMER);
   const result = run("upgrade", OLD_CONSUMER, "--dry-run", "--date", "2026-08-03", "--json");
   const after = treeHash(OLD_CONSUMER);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(result.status, 1, result.stderr || result.stdout);
   assert.equal(after, before);
   const plan = JSON.parse(result.stdout);
   assertLifecycleSchemaShape(plan);
@@ -661,6 +809,8 @@ test("upgrade requires dry-run and emits a guarded review plan rather than apply
   assert.deepEqual(plan.patchPlan.operations.map((operation) => operation.op), ["test", "replace"]);
   assert.ok(plan.patchPlan.preserved.includes("/deviations"));
   assert.ok(plan.patchPlan.preserved.includes("unknown OKF concept fields"));
+  assert.equal(plan.summary.blocking, 1);
+  assert.equal(plan.summary.readyForHumanReview, false);
 });
 
 test("init requires dry-run and plans an absent target without creating it", () => {
@@ -702,7 +852,13 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.equal(plan.targetState.type, "absent");
   assert.equal(plan.proposedManifest.profile, "portable-core");
   assert.equal(plan.proposedManifest.standard.source, "https://github.com/denchco/knowledge-base-wiki-standard");
-  assert.equal(plan.proposedManifest.standard.revision, "v0.1.0-rc.1");
+  const resolvedRc1 = spawnSync("git", ["rev-parse", "--verify", "v0.1.0-rc.1^{commit}"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  }).stdout.trim();
+  assert.match(resolvedRc1, /^[0-9a-f]{40}$/);
+  assert.equal(plan.proposedManifest.standard.revision, resolvedRc1);
+  assert.equal(plan.input.standardRevision, resolvedRc1);
   assert.equal(plan.proposedManifest.roles.okf_bundle, "knowledge");
   assert.equal(plan.input.wikiUrl, "https://example.test/planned-wiki/");
   assert.equal(plan.input.deployment, "none");
@@ -713,8 +869,8 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.match(plan.automaticResolutions[0], /inspect the supplied research seed/);
   assert.equal(plan.summary.readyForRendering, false);
   assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md" && entry.classification === "render-template"));
-  assert.ok(plan.layout.some((entry) => entry.path === "CLAUDE.md" && entry.classification === "render-template"));
-  assert.ok(plan.layout.some((entry) => entry.path === "docs/project/status.md" && entry.classification === "render-template"));
+  assert.equal(plan.layout.some((entry) => entry.path === "CLAUDE.md"), false, "the rc.1 plan must use the starter pinned at rc.1");
+  assert.equal(plan.layout.some((entry) => entry.path === "docs/project/status.md"), false, "the rc.1 plan must not leak current HEAD starter entries");
   assert.equal(plan.candidate.starter.rootCopy, "forbidden");
   assert.equal(plan.candidate.starter.deploymentPolicy, "consumer-owned");
   assert.equal(plan.candidate.starter.executableScope.apply_supported, false);
@@ -746,6 +902,8 @@ test("init plan preserves and reports collisions in an existing target", () => {
   assert.equal(plan.input.proposedAccent, "#0b7285");
   assert.equal(plan.proposedManifest.capabilities.deployment, false);
   assert.equal(plan.candidate.starter.bootstrap.invocation, "standard-repository-url-only");
+  assert.ok(plan.layout.some((entry) => entry.path === "CLAUDE.md" && entry.classification === "render-template"));
+  assert.ok(plan.layout.some((entry) => entry.path === "docs/project/status.md" && entry.classification === "render-template"));
   assert.deepEqual(plan.unresolvedInputs, [
     "starting point: research topic seed or subject-empty local wiki",
     "accent colour (proposed default #0b7285 when no evidenced brand colour exists)",
@@ -853,6 +1011,17 @@ test("full-profile reporting leaves absent gates not checked and rejects unsuppo
   assert.throws(
     () => buildFullProfileReport({ target: POSITIVE, receipt: invalid }),
     (error) => error instanceof ReceiptError && /does not match|no explicit evidence/.test(error.message),
+  );
+});
+
+test("reserved verification receipt paths reject project-only consumer summaries", () => {
+  const summary = JSON.parse(readFileSync(INVALID_CONSUMER_RECEIPT, "utf8"));
+  const validate = new Ajv2020({ strict: false, allErrors: true }).compile(RECEIPT_SCHEMA);
+  assert.equal(validate(summary), false);
+  assert.ok(validate.errors.some((error) => error.keyword === "required"));
+  assert.throws(
+    () => buildFullProfileReport({ target: ROOT, receipt: summary }),
+    (error) => error instanceof ReceiptError && /does not match/.test(error.message),
   );
 });
 

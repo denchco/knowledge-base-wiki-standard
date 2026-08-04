@@ -5,6 +5,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -144,11 +145,31 @@ test("apply refuses an unmanaged snapshot root that has no trusted manifest", (t
   );
 });
 
-function createFixture(t) {
+test("repository discovery preserves trailing-space path components", (t) => {
+  const fixture = createFixture(t, { trailingSpaceRepositoryRoots: true });
+  const canonicalStandardRoot = realpathSync(fixture.standardRoot);
+  const canonicalDocumentationRoot = realpathSync(fixture.documentationRoot);
+  assert.equal(path.basename(fixture.standardRoot), "standard ");
+  assert.equal(path.basename(fixture.documentationRoot), "documentation ");
+
+  const desired = buildDesiredSnapshot({ standardRoot: fixture.standardRoot });
+  assert.equal(desired.manifest.standard.treeState, "clean");
+  assert.equal(desired.standardRoot, canonicalStandardRoot);
+
+  const checked = synchronize({
+    mode: "check",
+    standardRoot: fixture.standardRoot,
+  });
+  assert.equal(checked.status, "drift");
+  assert.equal(checked.documentationRepository, canonicalDocumentationRoot);
+  assert.equal(existsSync(path.join(fixture.documentationRoot, SNAPSHOT_ROOT)), false);
+});
+
+function createFixture(t, { trailingSpaceRepositoryRoots = false } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), "denchco-doc-sync-test-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  const standardRoot = path.join(root, "standard");
-  const documentationRoot = path.join(root, "documentation");
+  const standardRoot = path.join(root, trailingSpaceRepositoryRoots ? "standard " : "standard");
+  const documentationRoot = path.join(root, trailingSpaceRepositoryRoots ? "documentation " : "documentation");
   mkdirSync(standardRoot, { recursive: true });
   mkdirSync(documentationRoot, { recursive: true });
 
@@ -168,7 +189,7 @@ function createFixture(t) {
   write(standardRoot, "scripts/sync-documentation-snapshot.test.mjs", "// fixture tests\n");
   write(standardRoot, CONTRACT_PATH, `${JSON.stringify({
     contractVersion: "1.0",
-    defaultDocumentationRepository: "../documentation",
+    defaultDocumentationRepository: `../${path.basename(documentationRoot)}`,
     snapshotRoot: SNAPSHOT_ROOT,
     manifestPath: `${SNAPSHOT_ROOT}/manifest.json`,
     filesRoot: `${SNAPSHOT_ROOT}/files`,

@@ -91,10 +91,14 @@ const lifecycleCases = [
   {
     label: "generated lifecycle diff",
     args: ["scripts/conformance-cli.mjs", "diff", "fixtures/lifecycle/consumer-old", "--json"],
+    allowedStatuses: [1],
+    expectsBlocking: true,
   },
   {
     label: "generated upgrade plan",
     args: ["scripts/conformance-cli.mjs", "upgrade", "fixtures/lifecycle/consumer-old", "--dry-run", "--json"],
+    allowedStatuses: [1],
+    expectsBlocking: true,
   },
   {
     label: "generated init plan",
@@ -105,11 +109,19 @@ const lifecycleCases = [
   },
 ];
 for (const lifecycleCase of lifecycleCases) {
+  const artifact = runJson(
+    lifecycleCase.args,
+    lifecycleCase.label,
+    lifecycleCase.allowedStatuses,
+  );
   validate(
     "lifecycle-plan-v1.json",
-    runJson(lifecycleCase.args, lifecycleCase.label),
+    artifact,
     lifecycleCase.label,
   );
+  if (lifecycleCase.expectsBlocking && !(artifact?.summary?.blocking > 0)) {
+    failures.push(`${lifecycleCase.label}: revision-less fixture must retain a blocking lifecycle result`);
+  }
 }
 
 const adoptionDirectory = path.join(root, "docs", "conformance", "dogfood");
@@ -181,7 +193,7 @@ function validate(schemaName, value, label) {
   validated.push(label);
 }
 
-function runJson(args, label) {
+function runJson(args, label, allowedStatuses = [0]) {
   const result = spawnSync(process.execPath, args, {
     cwd: root,
     encoding: "utf8",
@@ -191,7 +203,7 @@ function runJson(args, label) {
     failures.push(`${label}: could not run generator: ${result.error.message}`);
     return undefined;
   }
-  if (result.status !== 0) {
+  if (!allowedStatuses.includes(result.status)) {
     failures.push(`${label}: generator exited ${result.status}: ${result.stderr.trim()}`);
     return undefined;
   }

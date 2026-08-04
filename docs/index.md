@@ -19,7 +19,6 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ## The system
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 10, "rankSpacing": 22, "padding": 10}}}%%
 flowchart TB
   accTitle: Governed knowledge base system
   accDescr: Source material becomes inspectable evidence, maintained knowledge, coordinated human, agent, and graph views, and finally a verified local system.
@@ -30,14 +29,9 @@ flowchart TB
   W["Human · agent · graph views"]
   V["Verification"]
   S --> E --> C --> W --> V
-  class S kb-source
-  class E kb-evidence
-  class C kb-canonical
-  class W kb-derived
-  class V kb-verification
 ```
 
-Read from top to bottom: source material becomes inspectable evidence, then maintained knowledge, then coordinated views for people and agents. Verification checks the resulting system. Solid accent marks the maintained authority; the dashed view remains derived from it.
+Read from top to bottom: source material becomes inspectable evidence, then maintained knowledge, then coordinated views for people and agents. Verification checks the resulting system. The labels, order, and this explanation carry the authority distinction without custom node styling.
 
 ## Start here
 
