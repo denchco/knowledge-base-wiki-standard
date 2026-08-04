@@ -46,6 +46,7 @@ const claude = readFileSync("CLAUDE.md", "utf8");
 const starterClaude = readFileSync("starter/templates/CLAUDE.md.tmpl", "utf8");
 const codexSkill = readFileSync(".agents/skills/denchco-kb-wiki-standard/SKILL.md", "utf8");
 const claudeSkill = readFileSync(".claude/skills/denchco-kb-wiki-standard/SKILL.md", "utf8");
+const readme = readFileSync("README.md", "utf8");
 const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
 for (const [name, text] of [["AGENTS.md", agents], ["prompt", prompt]]) {
   if (!text.includes("Question 1 of N")) failures.push(`${name} lacks sequential question protocol`);
@@ -84,14 +85,23 @@ for (const boundary of [
   "current default-branch HEAD",
   "Do not ask the user to choose or supply a release tag or commit",
   "Never recursively copy the standard root",
-  "Target Wiki URL",
-  "Target deployment",
+  "URL-only invocation",
+  "research topic seed",
+  "subject-empty local wiki",
+  "#0b7285",
+  "no external deployment",
   "governing-question",
   "ordinary quotations neutral",
 ]) {
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
 if (/\[immutable release tag or commit\]/i.test(prompt)) failures.push("prompt still requires a user-supplied standard revision");
+if (/Topic and intended scope:|Selected profile:|Target Wiki URL:|Target deployment:/i.test(prompt)) {
+  failures.push("prompt still exposes the removed field-based bootstrap");
+}
+for (const phrase of ["Give this URL to an AI agent", "research topic seed", "subject-empty local wiki", "accent colour"]) {
+  if (!readme.includes(phrase)) failures.push(`README lacks URL-only agent bootstrap: ${phrase}`);
+}
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const licence = readFileSync("LICENSE", "utf8");

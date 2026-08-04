@@ -26,6 +26,7 @@ const LIFECYCLE_SCHEMA = "https://denchco.github.io/knowledge-base-wiki-document
 const LIFECYCLE_VERSION = "1.0";
 const STANDARD_ROOT = standardRoot();
 const STARTER_PATH = "starter/starter.yaml";
+const DEFAULT_ACCENT = "#0b7285";
 const REQUIRED_PRODUCTION_ROLES = {
   okf_bundle: "knowledge",
   source_register: "docs/sources.md",
@@ -518,7 +519,16 @@ export function initPlan(options = {}) {
   if (options.dryRun !== true) {
     throw new CliUsageError("`init` is planning-only in this candidate and requires --dry-run.");
   }
+  if (options.blank && options.seed) {
+    throw new CliUsageError("`init --dry-run` accepts either --seed or --blank, not both.");
+  }
+  if (options.accent && !/^#[0-9a-fA-F]{6}$/.test(options.accent)) {
+    throw new CliUsageError("`--accent` must be a six-digit hex colour such as #0b7285.");
+  }
   const target = path.resolve(options.target ?? ".");
+  if (target === STANDARD_ROOT) {
+    throw new CliUsageError("`init --dry-run` target must be an independent repository path, not the standard repository root.");
+  }
   const profileId = options.profile ?? "standard-production";
   const candidate = candidateState(profileId);
   const standardRevision = options.standardRevision ?? candidate.standard.revision ?? automaticStandardRevision();
@@ -551,13 +561,23 @@ export function initPlan(options = {}) {
     };
   });
   const unresolvedInputs = [];
-  if (!options.topic) unresolvedInputs.push("topic, audience, governing question, and intended outcome");
-  if (!options.title) unresolvedInputs.push("project title");
-  if (!options.wikiUrl) unresolvedInputs.push("consumer-owned canonical Wiki URL");
-  if (!options.deployment) unresolvedInputs.push("consumer-owned deployment choice (`none` is valid)");
+  if (!options.seed && !options.blank) {
+    unresolvedInputs.push("starting point: research topic seed or subject-empty local wiki");
+  } else if (options.blank && !options.title) {
+    unresolvedInputs.push("project title for the subject-empty local wiki");
+  }
+  if (!options.accent) unresolvedInputs.push(`accent colour (proposed default ${DEFAULT_ACCENT} when no evidenced brand colour exists)`);
+  const automaticResolutions = [];
+  if (options.seed) {
+    automaticResolutions.push("Implementation agent must inspect the supplied research seed before deriving subject fields or rendering content; the read-only planner does not fetch or ingest arbitrary seed material.");
+  }
+  if (!options.wikiUrl) {
+    automaticResolutions.push("Implementation must reserve a conflict-free loopback endpoint and record the resulting concrete Wiki URL.");
+  }
   const selectedRequirements = new Set(candidate.profile.requirements);
   const stages = [
     { id: "inspect", purpose: "Read target instructions, repository state, canonical roles, and existing evidence before proposing edits.", always: true },
+    { id: "bootstrap-discovery", purpose: "Inspect the research seed or establish an explicit subject-empty state, infer discoverable setup details, and resolve only material questions sequentially.", always: true },
     { id: "authority", purpose: "Define raw-source, canonical-evidence, generated-output, privacy, copyright, and retention boundaries.", requirements: ["DKBWS-SEC-001"] },
     { id: "okf", purpose: "Establish the first-class OKF v0.2 bundle, stable concepts, source identities, and newest-first logs.", requirements: ["DKBWS-OKF-001", "DKBWS-OKF-003"] },
     { id: "human-llm", purpose: "Build coordinated Human and LLM Wiki surfaces over shared canonical knowledge, including governed accent treatment wherever a governing-question callout is present.", requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-LLM-001"] },
@@ -567,6 +587,8 @@ export function initPlan(options = {}) {
     { id: "provenance", purpose: "Record reviewable Git history and colocated Jujutsu phases after validation.", requirements: ["DKBWS-PROV-001"] },
   ].filter((stage) => stage.always || stage.requirements.some((requirement) => selectedRequirements.has(requirement)))
     .map(({ always, requirements, ...stage }) => stage);
+  const deployment = options.deployment ?? "none";
+  const wikiUrl = options.wikiUrl ?? null;
   return {
     $schema: LIFECYCLE_SCHEMA,
     planVersion: LIFECYCLE_VERSION,
@@ -578,12 +600,18 @@ export function initPlan(options = {}) {
     target,
     targetState: inventory,
     input: {
+      startingPoint: options.seed ? "research-topic-seed" : options.blank ? "subject-empty-local" : null,
+      seed: options.seed ?? null,
+      subjectEmpty: options.blank === true,
       title: options.title ?? null,
       topic: options.topic ?? null,
+      accent: options.accent ?? null,
+      proposedAccent: options.accent ?? DEFAULT_ACCENT,
       profile: profileId,
       standardRevision,
-      wikiUrl: options.wikiUrl ?? null,
-      deployment: options.deployment ?? null,
+      wikiUrl,
+      wikiUrlResolution: options.wikiUrl ? "explicit-override" : "implementation-auto-reserve-conflict-free-loopback",
+      deployment,
     },
     candidate: {
       standard: candidate.standard,
@@ -606,27 +634,31 @@ export function initPlan(options = {}) {
         rootCopy: starter.data.root_copy,
         contentPolicy: starter.data.content_policy,
         deploymentPolicy: starter.data.deployment_policy,
+        bootstrap: starter.data.bootstrap,
         executableScope: starter.data.executable_scope,
         documentation: starter.data.documentation,
       },
     },
-    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision }),
+    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision, deployment }),
     layout,
     stages,
     unresolvedInputs,
+    automaticResolutions,
     clarificationProtocol: {
       sequential: true,
       format: "Question 1 of N",
       rule: "Ask only the first material question; each answer determines the next question and revises N.",
       nextQuestion: unresolvedInputs.length
-        ? `Question 1 of ${unresolvedInputs.length}: Confirm ${unresolvedInputs[0]}.`
+        ? unresolvedInputs[0].startsWith("starting point:")
+          ? `Question 1 of ${unresolvedInputs.length}: What should this wiki start from: a research topic seed (text, file, folder, URL, or repository), or a subject-empty local wiki?`
+          : `Question 1 of ${unresolvedInputs.length}: Confirm ${unresolvedInputs[0]}.`
         : null,
     },
     safety: {
       collisions: layout.filter((entry) => entry.collision).map((entry) => entry.path),
       policy: "Preserve existing files and stronger verified patterns; no file is created, replaced, or merged by this plan. The standard repository root and its subject matter are never copied into a consumer.",
       standardContent: "Reference-only: standard help, specification pages, standard knowledge, evidence, dogfood reports, and fixtures are not consumer content.",
-      consumerContent: "The target's docs, knowledge, sources, synthesis, navigation, URL, and deployment are consumer-owned and subject-specific.",
+      consumerContent: "The target's docs, knowledge, sources, synthesis, navigation, accent, URL, and deployment are consumer-owned and subject-specific; a subject-empty start invents none of them beyond explicit local defaults.",
       rootCopy: starter.data.root_copy,
       deployment: starter.data.deployment_policy,
       externalActions: "No GitHub, deployment, service, Git, or Jujutsu mutation is authorized by init planning.",
@@ -636,6 +668,8 @@ export function initPlan(options = {}) {
       collisions: layout.filter((entry) => entry.collision).length,
       unresolvedInputs: unresolvedInputs.length,
       readyForImplementationReview: unresolvedInputs.length === 0,
+      pendingAutomaticResolutions: automaticResolutions.length,
+      readyForRendering: unresolvedInputs.length === 0 && automaticResolutions.length === 0,
     },
   };
 }

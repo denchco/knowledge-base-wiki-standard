@@ -45,12 +45,15 @@ Options:
   --compact          Emit compact rather than indented JSON.
   --dry-run          Required safety gate for upgrade and init planning.
   --profile <id>     Select a candidate profile for diff/init planning.
+  --seed <reference> Supply a research seed as text, path, URL, or repository.
+  --blank            Select a subject-empty local wiki with no research seed.
   --title <text>     Supply the proposed project title to init planning.
   --topic <text>     Supply topic, audience, question, and outcome context.
+  --accent <hex>     Confirm or override the inferred/default accent colour.
   --standard-revision <revision>
                      Override the automatically resolved standard commit for init.
-  --wiki-url <url>   Supply the consumer-owned canonical Wiki URL for init.
-  --deployment <id> Supply the consumer's deployment adapter; none is valid.
+  --wiki-url <url>   Override automatic conflict-free loopback URL resolution.
+  --deployment <id> Override the default no-deployment state.
   -h, --help         Show this help.
 
 Exit codes:
@@ -78,6 +81,7 @@ function parseArguments(argv) {
     strict: false,
     compact: false,
     dryRun: false,
+    blank: false,
   };
   let targetSeen = false;
   for (let index = 1; index < argv.length; index += 1) {
@@ -86,7 +90,8 @@ function parseArguments(argv) {
     else if (argument === "--strict") options.strict = true;
     else if (argument === "--compact") options.compact = true;
     else if (argument === "--dry-run") options.dryRun = true;
-    else if (["--bundle", "--manifest", "--date", "--profile", "--title", "--topic", "--standard-revision", "--wiki-url", "--deployment"].includes(argument)) {
+    else if (argument === "--blank") options.blank = true;
+    else if (["--bundle", "--manifest", "--date", "--profile", "--seed", "--title", "--topic", "--accent", "--standard-revision", "--wiki-url", "--deployment"].includes(argument)) {
       const value = argv[index + 1];
       if (!value || value.startsWith("--")) throw new CliUsageError(`${argument} requires a value.`);
       index += 1;
@@ -94,8 +99,10 @@ function parseArguments(argv) {
       else if (argument === "--manifest") options.manifest = value;
       else if (argument === "--date") options.evaluationDate = value;
       else if (argument === "--profile") options.profile = value;
+      else if (argument === "--seed") options.seed = value;
       else if (argument === "--title") options.title = value;
       else if (argument === "--topic") options.topic = value;
+      else if (argument === "--accent") options.accent = value;
       else if (argument === "--standard-revision") options.standardRevision = value;
       else if (argument === "--wiki-url") options.wikiUrl = value;
       else options.deployment = value;

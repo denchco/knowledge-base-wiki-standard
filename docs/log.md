@@ -9,6 +9,8 @@ status: draft
 
 ## 2026-08-04
 
+- **URL-only adaptive bootstrap**: Replaced pre-filled topic/profile/URL/deployment fields with a repository-URL-only agent entry point. The first question now selects a research topic seed or subject-empty local initialization; subsequent questions depend on inspected evidence, with exact accent confirmation and automatic local defaults.
+- **Subject-empty semantics**: Blank initialization now preserves an explicit awaiting-seed state and omits the governing-question callout rather than inventing subject claims. External research extent and sensitive-source handling are conditional questions; deployment remains none unless separately authorised.
 - **Automatic bootstrap revision**: Removed the release tag or commit from the user-facing instantiation prompt. Implementations now resolve the standard repository's current default-branch HEAD once, use its exact commit SHA for the run, and record that immutable SHA in the consumer manifest.
 - **Governing-question promotion**: Promoted the mature NHS Data Sharing semantic callout pattern from reusable local precedent to candidate-core Human Wiki requirement `DKBWS-HUMAN-002`; the Standard, Documentation dogfood site, and subject-empty starter now distinguish governed questions from neutral quotations.
 - **Rendered verification**: Required the inline-start rail and all question text to equal the runtime-resolved active accent at desktop and mobile widths, with a negative mismatched-colour fixture and a neutral ordinary-quotation control.

@@ -8,6 +8,22 @@ repository_boundary: "independent-target"
 root_copy: "forbidden"
 content_policy: "subject-specific-create-fresh"
 deployment_policy: "consumer-owned"
+bootstrap:
+  invocation: "standard-repository-url-only"
+  first_question: "research-topic-seed-or-subject-empty-local-wiki"
+  modes: ["research-topic-seed", "subject-empty-local"]
+  defaults:
+    profile: "standard-production"
+    primary_color: "#174a5b"
+    accent_color: "#0b7285"
+    target_path: "infer-independent-local-path"
+    wiki_url: "auto-reserve-conflict-free-loopback"
+    deployment: "none"
+  inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
+  conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
+  required_design_question: "state the inferred or default accent hex and ask whether to use or replace it"
+  accent_derivation: "derive and record an accessible family; verify 4.5:1 normal-text and 3:1 non-text boundary contrast against rendered backgrounds"
+  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment"]
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
@@ -50,6 +66,7 @@ never_copy_as_consumer_content:
 
 consumer_owned:
   - "title, topic, audience, governing question, and intended outcome"
+  - "accent colour and derived accessible colour family"
   - "canonical Wiki URL"
   - "source and evidence corpus"
   - "navigation and synthesis"

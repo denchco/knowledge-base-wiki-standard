@@ -4,12 +4,13 @@ This directory is the reusable starting surface for an independent knowledge-bas
 
 Use `starter.yaml` as the machine-readable boundary. A Codex instance should:
 
-1. resolve the standard repository's current default-branch HEAD automatically and inspect that exact commit;
-2. render only the listed templates into a separate target repository;
-3. author the target's `docs/` and `knowledge/` content from its own topic and sources;
-4. adapt only the explicitly classified implementation files needed by the selected profile;
-5. choose the target's own canonical Wiki URL and deployment adapter; and
-6. validate the completed target against the pinned standard revision.
+1. accept the standard repository URL as the complete bootstrap invocation;
+2. ask first for a research topic seed or a subject-empty local initialization, then inspect before asking follow-ups;
+3. resolve the standard repository's current default-branch HEAD automatically and inspect that exact commit;
+4. infer routine local defaults, state and confirm the accent hex, and render only the listed templates into a separate target repository;
+5. author the target's `docs/` and `knowledge/` content from its own topic and sources, or preserve an explicit awaiting-seed state without invented claims;
+6. adapt only the explicitly classified implementation files needed by the selected profile; and
+7. reserve the target's conflict-free loopback Wiki URL, default deployment to none, and validate the completed target against the pinned standard revision.
 
 The rendered starter installs one shared agent contract in `AGENTS.md`, a root `CLAUDE.md` import for Claude Code, and a project-status record that keeps active priorities separate from parked work. Next Steps are completion-first and capped at three; the contract forbids inventing adjacent work merely to fill the list.
 

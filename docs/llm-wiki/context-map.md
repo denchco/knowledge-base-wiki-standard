@@ -10,7 +10,7 @@ status: draft
 | Task | Required context | Add when needed |
 |---|---|---|
 | Explain the standard | Specification, requirements, profiles | Sources and evidence matrix |
-| Instantiate a wiki | Canonical prompt, starter contract, manifest schema, selected profile, automatically resolved immutable revision | Target URL, target deployment, renderer/runtime adapters |
+| Instantiate a wiki | Repository URL, canonical prompt, starter bootstrap contract, automatically resolved immutable revision | Supplied research seed, existing target, conditional source risks, accent decision |
 | Audit conformance | Manifest, requirements, conformance page | Fixtures and project deviations |
 | Change visual behaviour | `DESIGN.md`, Zensical adapter | Browser fixtures and local precedent |
 | Upgrade the standard | Current manifest, target release, migration notes | Changelog and changed fixtures |

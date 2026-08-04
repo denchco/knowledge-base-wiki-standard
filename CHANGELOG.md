@@ -4,6 +4,9 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Replaced the field-based instantiation prompt with a repository-URL-only bootstrap. The agent now starts with research-seed-versus-subject-empty discovery, inspects supplied material before follow-up, asks questions sequentially, and confirms an evidenced or default accent hex.
+- Added automatic Standard Production, independent local target, conflict-free loopback URL, local runtime, and no-deployment defaults. External publication and deployment remain separately authorised.
+- Migration: callers now provide only the normative GitHub repository URL. Subject-empty starts use an awaiting-seed state instead of inventing a governing question; existing consumers and immutable pins remain unchanged.
 - Simplified the canonical bootstrap prompt so users point only at the standard GitHub repository; the implementation agent now resolves the current default-branch HEAD automatically and pins its exact commit SHA before acting.
 - Migration: remove the user-supplied standard revision from bootstrap prompts. Existing consumer manifests retain their current immutable pins.
 

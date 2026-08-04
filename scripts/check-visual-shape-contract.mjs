@@ -43,8 +43,23 @@ requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry th
 requireIn(starterDesign, "kb-canonical", "starter DESIGN.md must carry the semantic Mermaid role grammar");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
-for (const [name, source] of [["Standard homepage", home], ["starter homepage", starterHome]]) {
-  for (const issue of governingQuestionMarkupIssues(source)) errors.push(`${name} ${issue}`);
+for (const issue of governingQuestionMarkupIssues(home)) errors.push(`Standard homepage ${issue}`);
+requireIn(
+  starterHome,
+  "{{GOVERNING_QUESTION_CALLOUT_OR_SUBJECT_EMPTY_NOTICE}}",
+  "starter homepage must expose the conditional seeded-or-subject-empty insertion point",
+);
+const seededStarterHome = starterHome.replace(
+  "{{GOVERNING_QUESTION_CALLOUT_OR_SUBJECT_EMPTY_NOTICE}}",
+  '<blockquote class="governing-question">\n<p>{{GOVERNING_QUESTION}}</p>\n</blockquote>',
+);
+for (const issue of governingQuestionMarkupIssues(seededStarterHome)) errors.push(`seeded starter homepage ${issue}`);
+const subjectEmptyStarterHome = starterHome.replace(
+  "{{GOVERNING_QUESTION_CALLOUT_OR_SUBJECT_EMPTY_NOTICE}}",
+  "This subject-empty wiki is awaiting a research seed.",
+);
+if (subjectEmptyStarterHome.includes('class="governing-question"')) {
+  errors.push("subject-empty starter homepage must not invent a governing-question marker");
 }
 const mismatchedGoverningQuestionFixture = [
   "<blockquote>",

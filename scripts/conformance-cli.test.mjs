@@ -558,6 +558,9 @@ test("help and package scripts expose only lifecycle planning modes", () => {
   assert.match(help.stdout, /init \[target\] --dry-run/);
   assert.match(help.stdout, /no apply mode/i);
   assert.match(help.stdout, /--standard-revision/);
+  assert.match(help.stdout, /--seed/);
+  assert.match(help.stdout, /--blank/);
+  assert.match(help.stdout, /--accent/);
   assert.match(help.stdout, /--wiki-url/);
   assert.match(help.stdout, /--deployment/);
   const pkg = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8"));
@@ -576,6 +579,13 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(starter.root_copy, "forbidden");
   assert.equal(starter.content_policy, "subject-specific-create-fresh");
   assert.equal(starter.deployment_policy, "consumer-owned");
+  assert.equal(starter.bootstrap.invocation, "standard-repository-url-only");
+  assert.equal(starter.bootstrap.first_question, "research-topic-seed-or-subject-empty-local-wiki");
+  assert.deepEqual(starter.bootstrap.modes, ["research-topic-seed", "subject-empty-local"]);
+  assert.equal(starter.bootstrap.defaults.profile, "standard-production");
+  assert.equal(starter.bootstrap.defaults.accent_color, "#0b7285");
+  assert.equal(starter.bootstrap.defaults.wiki_url, "auto-reserve-conflict-free-loopback");
+  assert.equal(starter.bootstrap.defaults.deployment, "none");
   assert.equal(starter.executable_scope.apply_supported, false);
   assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
   assert.match(starter.executable_scope.standard_production, /complete .* dependency closure/i);
@@ -666,10 +676,14 @@ test("init requires dry-run and plans an absent target without creating it", () 
     "--dry-run",
     "--profile",
     "portable-core",
+    "--seed",
+    "A bounded research brief supplied by the user",
     "--title",
     "Planned Wiki",
     "--topic",
     "A bounded reader task for a known audience",
+    "--accent",
+    "#0b7285",
     "--standard-revision",
     "v0.1.0-rc.1",
     "--wiki-url",
@@ -692,7 +706,12 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.equal(plan.proposedManifest.roles.okf_bundle, "knowledge");
   assert.equal(plan.input.wikiUrl, "https://example.test/planned-wiki/");
   assert.equal(plan.input.deployment, "none");
+  assert.equal(plan.input.startingPoint, "research-topic-seed");
+  assert.equal(plan.input.accent, "#0b7285");
   assert.equal(plan.clarificationProtocol.nextQuestion, null);
+  assert.equal(plan.automaticResolutions.length, 1);
+  assert.match(plan.automaticResolutions[0], /inspect the supplied research seed/);
+  assert.equal(plan.summary.readyForRendering, false);
   assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md" && entry.classification === "render-template"));
   assert.ok(plan.layout.some((entry) => entry.path === "CLAUDE.md" && entry.classification === "render-template"));
   assert.ok(plan.layout.some((entry) => entry.path === "docs/project/status.md" && entry.classification === "render-template"));
@@ -717,15 +736,56 @@ test("init plan preserves and reports collisions in an existing target", () => {
   assert.ok(plan.safety.collisions.includes(".wiki-standard.yaml"));
   assert.ok(plan.safety.collisions.includes("knowledge/index.md"));
   assert.ok(plan.layout.filter((entry) => entry.collision).every((entry) => entry.action === "preserve-and-review"));
-  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 4:/);
+  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 2:/);
+  assert.match(plan.clarificationProtocol.nextQuestion, /research topic seed.*subject-empty local wiki/i);
   assert.match(plan.input.standardRevision, /^[0-9a-f]{40}$/);
   assert.equal(plan.proposedManifest.standard.revision, plan.input.standardRevision);
+  assert.equal(plan.input.wikiUrl, null);
+  assert.equal(plan.input.wikiUrlResolution, "implementation-auto-reserve-conflict-free-loopback");
+  assert.equal(plan.input.deployment, "none");
+  assert.equal(plan.input.proposedAccent, "#0b7285");
+  assert.equal(plan.proposedManifest.capabilities.deployment, false);
+  assert.equal(plan.candidate.starter.bootstrap.invocation, "standard-repository-url-only");
   assert.deepEqual(plan.unresolvedInputs, [
-    "topic, audience, governing question, and intended outcome",
-    "project title",
-    "consumer-owned canonical Wiki URL",
-    "consumer-owned deployment choice (`none` is valid)",
+    "starting point: research topic seed or subject-empty local wiki",
+    "accent colour (proposed default #0b7285 when no evidenced brand colour exists)",
   ]);
+  assert.deepEqual(plan.automaticResolutions, [
+    "Implementation must reserve a conflict-free loopback endpoint and record the resulting concrete Wiki URL.",
+  ]);
+});
+
+test("init discovery rejects conflicting starting modes and invalid accent input", () => {
+  const target = path.join(ROOT, "fixtures/lifecycle/not-created-by-dry-run");
+  const conflicting = run("init", target, "--dry-run", "--seed", "seed", "--blank", "--json");
+  assert.equal(conflicting.status, 2);
+  assert.match(conflicting.stderr, /either --seed or --blank, not both/);
+
+  const invalidAccent = run("init", target, "--dry-run", "--blank", "--accent", "teal", "--json");
+  assert.equal(invalidAccent.status, 2);
+  assert.match(invalidAccent.stderr, /six-digit hex colour/);
+
+  const sameRoot = run("init", ROOT, "--dry-run", "--blank", "--json");
+  assert.equal(sameRoot.status, 2);
+  assert.match(sameRoot.stderr, /independent repository path/);
+});
+
+test("subject-empty discovery asks for a title before the accent and invents no topic", () => {
+  const target = path.join(ROOT, "fixtures/lifecycle/not-created-by-dry-run");
+  const result = run("init", target, "--dry-run", "--blank", "--profile", "portable-core", "--json");
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const plan = JSON.parse(result.stdout);
+  assert.equal(plan.input.startingPoint, "subject-empty-local");
+  assert.equal(plan.input.subjectEmpty, true);
+  assert.equal(plan.input.topic, null);
+  assert.deepEqual(plan.unresolvedInputs, [
+    "project title for the subject-empty local wiki",
+    "accent colour (proposed default #0b7285 when no evidenced brand colour exists)",
+  ]);
+  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 2: Confirm project title/);
+  const homepageTemplate = readFileSync(path.join(ROOT, "starter/templates/docs/index.md.tmpl"), "utf8");
+  assert.match(homepageTemplate, /GOVERNING_QUESTION_CALLOUT_OR_SUBJECT_EMPTY_NOTICE/);
+  assert.doesNotMatch(homepageTemplate, /\{\{GOVERNING_QUESTION\}\}/);
 });
 
 test("full-profile module and CLI emit a schema-valid conformant report from explicit gate evidence", () => {

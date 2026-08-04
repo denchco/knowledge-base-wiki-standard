@@ -9,6 +9,8 @@
 5. `DESIGN.md` for visual changes
 6. Graphify query results when `graphify-out/graph.json` exists
 
+When the user's intent is to instantiate an independent wiki by pointing at this repository, route immediately to `prompts/instantiate-wiki.md` and its URL-only adaptive discovery. Do not require the user to construct the old field-based prompt.
+
 ## Authority and safety
 
 - Canonical knowledge lives in maintained Markdown and registered evidence, never in generated HTML, LLM artifacts, Graphify output, or conversational answers.

@@ -4,6 +4,16 @@ An OKF-compatible standard for evidence-governed, human- and AI-maintained wikis
 
 Public human documentation: <https://denchco.github.io/knowledge-base-wiki-documentation/>
 
+## Give this URL to an AI agent
+
+To start a wiki, point the agent at:
+
+```text
+https://github.com/denchco/knowledge-base-wiki-standard
+```
+
+No release number or filled-in prompt is required. The agent must follow [`prompts/instantiate-wiki.md`](prompts/instantiate-wiki.md), first asking whether it should use a research topic seed or initialize a subject-empty local wiki. It then inspects the seed or workspace, asks only the remaining material questions one at a time—including confirmation of an inferred or default accent colour—and defaults the profile, immutable revision, local target path, loopback Wiki URL, and no-deployment state automatically.
+
 This repository is the canonical source for the specification, profiles, schemas, prompts, subject-empty starter, and reference-qualified conformance tooling. It combines:
 
 - the persistent, compounding wiki model from Karpathy's LLM Wiki;
@@ -72,7 +82,7 @@ npm run conformance:upgrade-plan -- /path/to/consumer --json
 npm run conformance:init-plan -- /path/to/new-wiki --profile standard-production --json
 ```
 
-For a complete independent-target plan, also supply `--standard-revision`, `--wiki-url`, and `--deployment` (`none` is valid). The plan classifies each target path as rendered from a subject-empty template, authored from target evidence, or adapted from the pinned release.
+The initializer models the same adaptive interview with `--seed` or `--blank` and an optional `--accent`. Standard revision, loopback Wiki URL, and no-deployment state resolve automatically; their CLI flags remain explicit overrides. The plan classifies each target path as rendered from a subject-empty template, authored from target evidence, or adapted from the pinned release.
 
 `upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files.
 

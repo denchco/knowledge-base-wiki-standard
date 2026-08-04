@@ -51,6 +51,7 @@ Solid accent marks the canonical authority; the product group is coordinated but
 
 ## Start here
 
+- To create an independent wiki, give an AI agent only <https://github.com/denchco/knowledge-base-wiki-standard>. The repository's canonical prompt begins an adaptive seed-or-subject-empty interview and infers routine local defaults.
 - [Architecture](architecture.md) explains the complete system.
 - [Normative specification](spec/index.md) defines conformance.
 - [Requirements](spec/requirements.md) provides stable rule identifiers.
