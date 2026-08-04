@@ -9,6 +9,7 @@ status: draft
 
 ## 2026-08-04
 
+- **Beginner entry point**: Recast the README around the single repository-address invocation, made the adaptive questions and automatic defaults scannable, moved maintainer mechanics behind progressive disclosure, and added the governed DENCH | CO wordmark plus four trust-oriented badges.
 - **URL-only adaptive bootstrap**: Replaced pre-filled topic/profile/URL/deployment fields with a repository-URL-only agent entry point. The first question now selects a research topic seed or subject-empty local initialization; subsequent questions depend on inspected evidence, with exact accent confirmation and automatic local defaults.
 - **Subject-empty semantics**: Blank initialization now preserves an explicit awaiting-seed state and omits the governing-question callout rather than inventing subject claims. External research extent and sensitive-source handling are conditional questions; deployment remains none unless separately authorised.
 - **Automatic bootstrap revision**: Removed the release tag or commit from the user-facing instantiation prompt. Implementations now resolve the standard repository's current default-branch HEAD once, use its exact commit SHA for the run, and record that immutable SHA in the consumer manifest.

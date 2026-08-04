@@ -15,6 +15,7 @@ const required = [
   "docs/conformance/index.md", "docs/conformance/dogfood/comparison.md",
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
+  "docs/assets/brand/denchco-wordmark.png",
   "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",

@@ -4,6 +4,7 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Reworked the repository README around a first-time user's URL-only AI-agent journey, with explicit adaptive questions, automatic defaults, expected outputs, trust badges, and the governed DENCH | CO wordmark.
 - Replaced the field-based instantiation prompt with a repository-URL-only bootstrap. The agent now starts with research-seed-versus-subject-empty discovery, inspects supplied material before follow-up, asks questions sequentially, and confirms an evidenced or default accent hex.
 - Added automatic Standard Production, independent local target, conflict-free loopback URL, local runtime, and no-deployment defaults. External publication and deployment remain separately authorised.
 - Migration: callers now provide only the normative GitHub repository URL. Subject-empty starts use an awaiting-seed state instead of inventing a governing question; existing consumers and immutable pins remain unchanged.
