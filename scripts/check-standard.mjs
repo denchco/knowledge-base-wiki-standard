@@ -1,8 +1,10 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
+import YAML from "yaml";
 
 const required = [
   "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml",
+  ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/standard-change.yml",
   ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
   ".claude/skills/denchco-kb-wiki-standard/SKILL.md",
   "GOVERNANCE.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "CHANGELOG.md",
@@ -16,6 +18,7 @@ const required = [
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
   "docs/assets/brand/denchco-wordmark.png",
+  "docs/assets/pen-circle.svg",
   "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
@@ -38,7 +41,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-VERIFY-001"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-VERIFY-001"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -49,6 +52,7 @@ const codexSkill = readFileSync(".agents/skills/denchco-kb-wiki-standard/SKILL.m
 const claudeSkill = readFileSync(".claude/skills/denchco-kb-wiki-standard/SKILL.md", "utf8");
 const readme = readFileSync("README.md", "utf8");
 const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
+const contributing = readFileSync("CONTRIBUTING.md", "utf8");
 for (const [name, text] of [["AGENTS.md", agents], ["prompt", prompt]]) {
   if (!text.includes("Question 1 of N")) failures.push(`${name} lacks sequential question protocol`);
 }
@@ -57,6 +61,28 @@ if (!starterClaude.split(/\r?\n/).some((line) => line.trim() === "@AGENTS.md")) 
   failures.push("starter CLAUDE.md template must import AGENTS.md");
 }
 if (codexSkill !== claudeSkill) failures.push("Codex and Claude Standard skills must be byte-identical");
+for (const [name, source] of [["AGENTS.md", agents], ["starter AGENTS.md", starterAgents], ["Standard skill", codexSkill], ["CONTRIBUTING.md", contributing]]) {
+  if (!source.includes("standard-change.yml")) failures.push(`${name} lacks the consumer-to-Standard proposal route`);
+}
+if (!contributing.includes("must not submit it remotely without explicit authority")) {
+  failures.push("CONTRIBUTING.md must keep remote proposal submission behind explicit authority");
+}
+
+const issueForm = YAML.parse(readFileSync(".github/ISSUE_TEMPLATE/standard-change.yml", "utf8"));
+const issueConfig = YAML.parse(readFileSync(".github/ISSUE_TEMPLATE/config.yml", "utf8"));
+if (issueForm?.name !== "Propose a standard change") failures.push("standard-change issue form must retain its governed name");
+if (!(issueForm?.labels ?? []).includes("enhancement")) failures.push("standard-change issue form must use the existing enhancement label");
+const issueFieldIds = new Set((issueForm?.body ?? []).map((field) => field?.id).filter(Boolean));
+for (const id of [
+  "problem", "outcome", "origin", "origin_revision", "reuse_class", "affected_contract",
+  "dependencies_fallback", "evidence", "accessibility_browser", "verification", "migration", "safety",
+]) {
+  if (!issueFieldIds.has(id)) failures.push(`standard-change issue form lacks ${id}`);
+}
+if (issueConfig?.blank_issues_enabled !== false) failures.push("issue configuration must disable blank issues");
+if (!(issueConfig?.contact_links ?? []).some((link) => link?.url === "https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new")) {
+  failures.push("issue configuration must route security reports to private vulnerability reporting");
+}
 
 const agentsHandoff = managedSection(agents, "DKBWS-PROMPT-001-HANDOFF");
 const starterHandoff = managedSection(starterAgents, "DKBWS-PROMPT-001-HANDOFF");
@@ -157,6 +183,13 @@ const documentationSyncContract = JSON.parse(readFileSync("sync/documentation-sy
 const documentationAllowlist = new Set(documentationSyncContract.allowlist ?? []);
 for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conformance", "prompts", "starter", "sync"], /./)) {
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits canonical path ${file}`);
+}
+for (const file of [
+  ".github/ISSUE_TEMPLATE/config.yml",
+  ".github/ISSUE_TEMPLATE/standard-change.yml",
+  "docs/assets/pen-circle.svg",
+]) {
+  if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
 for (const gate of ["build", "check", "check:graphify", "check:browser"]) {

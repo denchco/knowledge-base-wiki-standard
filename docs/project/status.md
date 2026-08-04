@@ -11,7 +11,7 @@ status: draft
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
 | Evidence governance | Implemented candidate |
-| Human Zensical wiki | Governed reference runtime with strict build and local assets |
+| Human Zensical wiki | Governed reference runtime with strict build, local assets, and dedicated readable draft-navigation markers |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, and completion/cycle guards |
 | Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
 | Dependency contract | Exact locks, installation classes, offline boundary, and adapter requalification rule implemented |
@@ -23,6 +23,7 @@ status: draft
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans implemented |
 | Subject-empty starter | Allowlisted planning/templates implemented; root copying and standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
 | Public documentation boundary | Human guidance routes to the separate Pages site; this repository remains normative and local pinned schemas remain the validation input |
+| Standard-change intake | Proposal-first `standard-change.yml` issue form implemented for consumer-derived patterns; remote submission remains explicitly authorised and promotion remains maintainer-governed |
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |

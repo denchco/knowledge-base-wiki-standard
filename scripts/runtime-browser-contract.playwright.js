@@ -108,6 +108,67 @@ export default async (page, options = {}) => {
     check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow at ${viewportName} width`);
     return metrics;
   };
+  const inspectDraftNavigation = async viewportName => {
+    const metrics = await page.evaluate(() => {
+      const visible = element => {
+        if (!element) return false;
+        const style = getComputedStyle(element);
+        const bounds = element.getBoundingClientRect();
+        return style.display !== "none" && style.visibility !== "hidden" && bounds.width > 0 && bounds.height > 0;
+      };
+      const navigation = document.querySelector(".md-nav--primary");
+      const markers = [...(navigation?.querySelectorAll("a.md-nav__link > .md-status--draft") || [])]
+        .filter(visible);
+      const chevrons = [...(navigation?.querySelectorAll(".md-nav__item--nested > label.md-nav__link > .md-nav__icon") || [])]
+        .filter(visible);
+      const marker = markers[0] || null;
+      const chevron = chevrons[0] || null;
+      const markerBounds = marker?.getBoundingClientRect() || null;
+      const chevronBounds = chevron?.getBoundingClientRect() || null;
+      const negative = document.createElement("span");
+      negative.className = "md-status md-status--stable";
+      negative.style.cssText = "position:absolute;left:-10000px;top:0";
+      document.body.append(negative);
+      try {
+        const markerPseudo = marker ? getComputedStyle(marker, "::after") : null;
+        const negativePseudo = getComputedStyle(negative, "::after");
+        return {
+          count: markers.length,
+          titles: [...new Set(markers.map(item => item.getAttribute("title") || ""))],
+          markerMask: markerPseudo?.maskImage || markerPseudo?.webkitMaskImage || "",
+          negativeMask: negativePseudo.maskImage || negativePseudo.webkitMaskImage || "",
+          markerWidth: markerBounds?.width ?? null,
+          markerHeight: markerBounds?.height ?? null,
+          chevronWidth: chevronBounds?.width ?? null,
+          chevronHeight: chevronBounds?.height ?? null,
+          markerCenter: markerBounds ? markerBounds.left + markerBounds.width / 2 : null,
+          chevronCenter: chevronBounds ? chevronBounds.left + chevronBounds.width / 2 : null,
+        };
+      } finally {
+        negative.remove();
+      }
+    });
+    check(metrics.count > 0, `Primary navigation must expose at least one draft marker at ${viewportName} width`);
+    check(
+      metrics.titles.length === 1 && metrics.titles[0] === "Draft — research in progress",
+      `Every draft marker must expose the governed readable status text at ${viewportName} width`,
+    );
+    check(metrics.markerMask.includes("pen-circle.svg"), `Draft markers must use the registered Pen Circle asset at ${viewportName} width`);
+    check(!metrics.negativeMask.includes("pen-circle.svg"), `Non-draft status must not inherit the Pen Circle asset at ${viewportName} width`);
+    check(
+      metrics.markerWidth !== null && metrics.markerHeight !== null &&
+        metrics.chevronWidth !== null && metrics.chevronHeight !== null &&
+        metrics.markerWidth > 0 && metrics.markerHeight > 0 &&
+        closeTo(metrics.markerWidth, metrics.chevronWidth, 0.2) &&
+        closeTo(metrics.markerHeight, metrics.chevronHeight, 0.2),
+      `Draft marker dimensions must match the stock chevron at ${viewportName} width`,
+    );
+    check(
+      metrics.markerCenter !== null && metrics.chevronCenter !== null && closeTo(metrics.markerCenter, metrics.chevronCenter, 0.2),
+      `Draft marker and nested-navigation chevron must share the trailing centreline at ${viewportName} width`,
+    );
+    return metrics;
+  };
   const screenshotPixels = async buffer => {
     const dataUrl = `data:image/png;base64,${buffer.toString("base64")}`;
     return page.evaluate(async imageUrl => {
@@ -254,6 +315,7 @@ export default async (page, options = {}) => {
   await page.setViewportSize({ width: 1256, height: 718 });
   await goto(mermaidRoute);
   const desktopGoverningQuestion = await inspectGoverningQuestion("desktop");
+  const desktopDraftNavigation = await inspectDraftNavigation("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
     header: Boolean(document.querySelector(".md-header__inner")),
@@ -557,7 +619,7 @@ export default async (page, options = {}) => {
 
   const prohibitedCdnHosts = ["unpkg.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"];
   const cdnRequests = requests.filter(requestUrl => prohibitedCdnHosts.some(host => requestUrl.includes(`//${host}/`)));
-  const localAssets = ["/assets/vendor/mermaid.min.js"];
+  const localAssets = ["/assets/vendor/mermaid.min.js", "/assets/pen-circle.svg"];
   if (graphEnabled) localAssets.push("/assets/vendor/vis-network.min.js", "/assets/vendor/3d-force-graph.min.js");
   for (const asset of localAssets) {
     check(requests.some(requestUrl => requestUrl.startsWith(baseUrl) && requestUrl.split(/[?#]/)[0].endsWith(asset)), `Browser contract did not observe local runtime ${asset}`);
@@ -585,6 +647,9 @@ export default async (page, options = {}) => {
     governingQuestion: {
       desktop: desktopGoverningQuestion,
       mobile: mobileGoverningQuestion,
+    },
+    draftNavigation: {
+      desktop: desktopDraftNavigation,
     },
     mermaid: {
       desktop: mermaidPixels,

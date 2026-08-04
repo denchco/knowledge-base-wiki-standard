@@ -40,6 +40,7 @@ body[data-md-color-accent] {
   --compact-data-font-size: .64rem;
   --diagram-text-size: var(--compact-data-font-size);
   --sequential-menu-rail-width: 1.5px;
+  --draft-status-icon-size: .9rem;
 
   /* Material-compatible aliases consumed by the stock Zensical renderer. */
   --md-primary-fg-color: var(--primary);
@@ -84,6 +85,28 @@ body[data-md-color-accent] {
 .md-nav--secondary .md-nav__link--active {
   background-color: var(--accent-transparent);
   color: var(--accent-dark);
+}
+
+/*
+ * Draft status icon: Pen Circle by SVG Repo, CC0 1.0.
+ * https://www.svgrepo.com/svg/532983/pen-circle
+ */
+.md-status--draft::after {
+  -webkit-mask-image: url("pen-circle.svg");
+  mask-image: url("pen-circle.svg");
+}
+
+/* Match the status-marker column to the stock nested-navigation chevron. */
+.md-nav--primary .md-nav__link > .md-status {
+  display: inline-flex;
+  flex: 0 0 var(--draft-status-icon-size);
+  height: var(--draft-status-icon-size);
+  margin-inline-end: calc(var(--draft-status-icon-size) / -2);
+}
+
+.md-nav--primary .md-nav__link > .md-status::after {
+  height: 100%;
+  width: 100%;
 }
 
 .md-header__button {

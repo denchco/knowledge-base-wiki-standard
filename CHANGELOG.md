@@ -4,6 +4,9 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Added conditional `DKBWS-HUMAN-003` for dedicated, readable, trailing-column-aligned draft markers in primary navigation. The Zensical reference adapter uses SVG Repo's CC0 Pen Circle asset and verifies its tooltip, mask, and chevron-centre geometry in built output.
+- Added a proposal-first GitHub issue form for user-authored consumer improvements, plus consumer-agent routing that preserves origin evidence and requires explicit authority before remote submission.
+- Migration: Human Wikis that expose generic draft information markers in primary navigation add a dedicated open-licensed draft-edit asset, readable status mapping, licence record, alignment rule, and browser evidence. Wikis without navigation status markers record `DKBWS-HUMAN-003` as not applicable; equivalent renderer-native markers remain valid.
 - Simplified the reference Mermaid diagrams into short, predominantly linear top-to-bottom flows with no edge labels or cluster-title crossings. Static complexity limits and rendered text/connector collision checks now enforce the clearer layout under `DKBWS-DESIGN-001`.
 - Migration: existing consumers are unchanged. New or adapted entry/architecture diagrams should keep to five nodes and five relationships, use at most one parallel branch, and move detailed distinctions into nearby prose or a separate diagram.
 - Reworked the repository README around a first-time user's URL-only AI-agent journey, with explicit adaptive questions, automatic defaults, expected outputs, trust badges, and the governed DENCH | CO wordmark.

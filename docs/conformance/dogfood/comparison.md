@@ -41,7 +41,7 @@ No `WAIVED` result was recognised. A narrative decision not to adopt OKF, Graph 
 
 These counts are diagnostic rather than rankings. X-Lab deliberately omits capabilities that its purpose does not currently justify. Regulation 28's legacy Level 4 label similarly prevents the audit from silently treating advanced Ask/deployment work as a higher formal claim.
 
-The 22-row catalogue includes the separately added bundle-mapping, governing-question, provenance, and machine-report obligations (`DKBWS-OKF-003`, `DKBWS-HUMAN-002`, `DKBWS-PROV-001`, and `DKBWS-VERIFY-002`). Because these projects predate the candidate and make no DenchCo claim, absent capabilities are reported as `NOT_IMPLEMENTED`, not silently promoted to formal failures. The four existing colocated Git/Jujutsu workspaces are inferred `PASS` evidence for provenance; X-Lab remains `NOT_IMPLEMENTED` because its inspected project record deliberately retained Git without JJ.
+The 23-row catalogue includes the separately added bundle-mapping, governing-question, draft-navigation, provenance, and machine-report obligations (`DKBWS-OKF-003`, `DKBWS-HUMAN-002`, `DKBWS-HUMAN-003`, `DKBWS-PROV-001`, and `DKBWS-VERIFY-002`). Because these projects predate the candidate and make no DenchCo claim, absent capabilities are reported as `NOT_IMPLEMENTED`, not silently promoted to formal failures. The four existing colocated Git/Jujutsu workspaces are inferred `PASS` evidence for provenance; X-Lab remains `NOT_IMPLEMENTED` because its inspected project record deliberately retained Git without JJ.
 
 ## Component comparison
 
@@ -170,6 +170,8 @@ Narrative exclusions must not silently become waivers. A missing mandatory core 
 
 NHS Data Sharing demonstrates the complete reusable pattern: a semantically identified governing-question blockquote whose rail and text both use the active accent, backed by an executable visual check. Palantir shows why rail-only styling is insufficient: its callout has the semantic class and accent rail, while the question text remains at the default colour. Regulation 28, InterSystems, and X-Lab contain no governing-question callout, so this conditional requirement is not applicable to them. `DKBWS-HUMAN-002` therefore requires rendered rail-and-text equality with the active accent rather than accepting class or source-CSS presence alone.
 
+The five 2026-08-03 audits predate `DKBWS-HUMAN-003` and record no dedicated draft marker, readable status mapping, or chevron-alignment evidence. Their added results are therefore conservative low-confidence `NOT_IMPLEMENTED` states, not inferred failures or passes. The separately registered Health IT Governance consumer commit supplies the positive implementation precedent for the new conditional rule.
+
 ## Candidate disposition after the audit
 
 The audit was used as a design test, not left as a static scorecard:
@@ -188,6 +190,7 @@ The audit was used as a design test, not left as a static scorecard:
 | Release ambiguity | The release rule now covers the standard and public implementation releases that advertise conformance. |
 | Status ambiguity | Formal and adoption-audit status algorithms are now normative; waivers require authority plus expiry or review state. |
 | Governing-question visual drift | `DKBWS-HUMAN-002` requires a semantically identified callout to render both its rail and text with the implementation's active accent, proved from built output; projects without such a callout are not applicable. |
+| Generic draft information markers | `DKBWS-HUMAN-003` requires dedicated draft-edit artwork, readable status text, and trailing-control alignment when draft state appears in primary navigation; renderers that omit navigation status markers remain not applicable. |
 
 The audited projects retain their recorded gaps. Candidate improvements do not retroactively make those projects conformant or authorize their migration.
 

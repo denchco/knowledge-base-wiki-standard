@@ -18,6 +18,7 @@ status: draft
 | DKBWS-EVID-002 | Material claims MUST route to evidence state, limitations, or a validation gap. | Evidence profile | Evidence check/manual review |
 | DKBWS-HUMAN-001 | A Human Wiki MUST provide a stable navigable URL and strict build. | Human profile | Build/HTTP check |
 | DKBWS-HUMAN-002 | Every callout designated as a Human Wiki's governing question MUST be machine-identifiable as `governing-question` and MUST render both its inline-start rail and all question text using the implementation's active accent colour. Ordinary quotations MUST remain neutral. | Human profile when a governing-question callout is present | Built-output browser comparison with the resolved active accent token |
+| DKBWS-HUMAN-003 | When a Human Wiki exposes `draft` status in primary navigation, it MUST use a dedicated draft-edit marker rather than a generic information marker, MUST provide human-readable draft-status text, and MUST align the marker with the navigation's trailing expand/collapse-control column. | Human profile when draft status is displayed in primary navigation | Built-output browser check of status text, marker asset, and desktop trailing-centre geometry |
 | DKBWS-LLM-001 | An LLM Wiki MUST define read order, ingest, query, lint, authority, and generated boundaries. | Agent profile | Required-role check |
 | DKBWS-LINK-001 | Canonical pages MUST have contextual inbound links beyond navigation. | Maintained wiki | Concept-link check |
 | DKBWS-GRAPH-001 | Graph-Linked projects MUST publish shared data under a declared, versioned graph-publication schema and provide real 2D/3D views. | Graph profile | Graph/schema/browser check |
@@ -41,3 +42,11 @@ Candidate identifiers remain stable through `0.x`; incompatible renaming require
 The Zensical reference adapter uses `<blockquote class="governing-question">`. Its rail and question text resolve from the same active accent token at every supported viewport, while unmarked blockquotes retain the renderer's neutral quotation treatment. Source markup or CSS inspection alone cannot prove this rendered requirement.
 
 Migration from a release without this rule requires three reviewable changes where a governing-question callout already exists: add the semantic marker, bind both rendered colours to the active accent family, and add browser evidence that compares computed colours with the resolved token. A project with no governing-question callout records the requirement as not applicable rather than creating decorative content.
+
+## Draft navigation rendering
+
+`DKBWS-HUMAN-003` is conditional on rendering draft state inside primary navigation; it does not require lifecycle markers in a Wiki that omits them. The visible marker supplements, rather than replaces, readable status text exposed through a tooltip or equivalent accessible description. Other lifecycle states must not inherit draft artwork.
+
+The Zensical reference adapter maps `.md-status--draft` to the registered CC0 Pen Circle asset, exposes “Draft — research in progress”, and sizes the marker so its trailing centre matches the stock nested-navigation chevron. Another renderer MAY use an equivalent open-licensed draft-edit glyph and native status affordance when its own built-output check proves the same semantic distinction and alignment outcome.
+
+Migration from a generic information marker requires the dedicated draft asset, readable status mapping, renderer-local alignment rule, third-party licence record, and positive browser evidence. A simpler renderer without navigation status markers records the conditional requirement as not applicable; it need not add decoration solely for conformance.

@@ -20,3 +20,5 @@ x-denchco:
 The Human Wiki optimizes reading, navigation, search, diagrams, decisions, and evidence inspection. The LLM Wiki optimizes context selection, maintenance, ingest, query, and lint. They do not become independent duplicate corpora.
 
 When the Human Wiki presents a governing-question callout, `DKBWS-HUMAN-002` makes it machine-identifiable and binds both its rail and question text to the active accent colour. This semantic distinction is reserved for the governing question; ordinary quotations remain neutral evidence content.
+
+When the Human Wiki displays draft state in primary navigation, `DKBWS-HUMAN-003` pairs a dedicated edit marker with readable status text and aligns it to the trailing expand/collapse-control column. The Zensical reference adapter uses the registered CC0 Pen Circle asset; other renderers may use an equivalent open-licensed marker when they prove the same semantic and geometric outcome.

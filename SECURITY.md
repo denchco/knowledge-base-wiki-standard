@@ -2,7 +2,7 @@
 
 ## Reporting
 
-Do not publish suspected vulnerabilities or exposed personal data in an issue. After the public repository is created, use [GitHub private vulnerability reporting](https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new). Until that route is activated during publication, contact Andrew Dench privately through an existing trusted channel.
+Do not publish suspected vulnerabilities or exposed personal data in an issue. [GitHub private vulnerability reporting](https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new) is active for this repository; use that route for security reports.
 
 ## Trust boundaries
 

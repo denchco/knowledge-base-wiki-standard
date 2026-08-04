@@ -50,6 +50,9 @@ nav = [
   ]}
 ]
 
+[project.extra.status]
+draft = "Draft — research in progress"
+
 [project.markdown_extensions]
 admonition = {}
 attr_list = {}

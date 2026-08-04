@@ -1,0 +1,122 @@
+name: Propose a standard change
+description: Route a user-authored consumer improvement or reusable defect into governed Standard review.
+title: "[Standard change]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for an implementation-led proposal. Filing it preserves provenance and starts classification; it does not promote the pattern, authorize a release, or replace private security reporting.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and observed behaviour
+      description: Describe the user or maintainer problem, including the current behaviour that prompted the change.
+      placeholder: What was unclear, unsafe, inconsistent, inaccessible, or needlessly difficult?
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Intended outcome
+      description: State the outcome the Standard should make repeatable without prescribing unnecessary implementation detail.
+      placeholder: What should a conforming implementation enable or prove?
+    validations:
+      required: true
+
+  - type: input
+    id: origin
+    attributes:
+      label: Originating consumer or implementation
+      description: Name or link the project where the pattern was implemented. Do not include private paths or restricted material.
+      placeholder: Repository URL, public artifact, or project name
+    validations:
+      required: true
+
+  - type: input
+    id: origin_revision
+    attributes:
+      label: Immutable originating revision
+      description: Supply the exact commit or release containing the evidence. If unavailable, state why.
+      placeholder: Full commit SHA, immutable release, or “not available — reason”
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reuse_class
+    attributes:
+      label: Proposed reuse class
+      description: Select the strongest class currently supported by evidence; maintainers may reclassify it.
+      options:
+        - Unknown — classify during intake
+        - Experimental
+        - Project-specific
+        - Reusable
+        - Preferred
+        - Core
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_contract
+    attributes:
+      label: Affected profiles and requirements
+      description: List known profiles, requirement IDs, adapters, or schemas. “Unknown” or “new requirement” is valid at intake.
+      placeholder: DKBWS-…; Standard Production; Zensical adapter; unknown/new requirement
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies_fallback
+    attributes:
+      label: Dependencies, limitations, and simpler fallback
+      description: Record the implementation dependencies, known limits, and the least-complex acceptable alternative.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and implementation record
+      description: Link or describe the relevant code, before/after output, user decision, source authority, and third-party licence evidence.
+    validations:
+      required: true
+
+  - type: textarea
+    id: accessibility_browser
+    attributes:
+      label: Accessibility and browser evidence
+      description: State what was checked, which viewports or browsers were covered, and what remains unverified. Use “not applicable” with a reason where appropriate.
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and fixture proposal
+      description: Identify the executable check and positive/negative fixture that could prevent regression.
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration and compatibility impact
+      description: Explain who would need to change, how local deviations are preserved, and whether an existing conforming implementation could break.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety and authority
+      options:
+        - label: I have removed secrets, personal or confidential data, and vulnerability details; security reports use the private advisory route.
+          required: true
+        - label: I have authority to share the linked implementation evidence.
+          required: true
+        - label: I understand that this issue proposes review and does not itself promote the pattern or authorize publication.
+          required: true

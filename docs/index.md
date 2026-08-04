@@ -49,6 +49,7 @@ Read from top to bottom: source material becomes inspectable evidence, then main
 - [Agent entry point](llm-wiki/index.md) gives Codex and other agents the minimum reliable context.
 - [Tools and sources](reference/tools-and-sources.md) records upstream authority.
 - The subject-empty `starter/starter.yaml` recipe creates independent knowledge bases without copying this standard's topic content.
+- [Propose a reusable standard change](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml) routes a user-authored consumer improvement into review without promoting it automatically.
 
 ## Governed implementation
 

@@ -16,6 +16,7 @@ status: draft
 - **Tool-tally and READ-SNOMED** — Mermaid and rendered rail geometry; concise cycle guards and durable parked-work reopen conditions.
 - **FOSL** — extraction/OCR and canonical-data-generated analytical surfaces.
 - **EPMA generic scaffold** — prior neutral consolidation point; input material, not authority.
+- **Health IT Governance Beyond the NHS** — user-selected CC0 draft-edit marker, readable draft tooltip, and measured alignment with the navigation chevron column; promoted through consumer commit `4393546e04d26a0c2c0aa79b30b0b881d786fdd9`.
 
 ## Anti-rabbit-hole handoff synthesis
 

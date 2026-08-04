@@ -7,6 +7,8 @@
   "allowlist": [
     ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
     ".claude/skills/denchco-kb-wiki-standard/SKILL.md",
+    ".github/ISSUE_TEMPLATE/config.yml",
+    ".github/ISSUE_TEMPLATE/standard-change.yml",
     ".github/workflows/verify.yml",
     ".gitignore",
     ".wiki-standard.yaml",
@@ -29,6 +31,7 @@
     "docs/assets/layout-width.css",
     "docs/assets/layout-width.js",
     "docs/assets/mermaid-adapter.js",
+    "docs/assets/pen-circle.svg",
     "docs/assets/theme.css",
     "docs/assets/wiki.js",
     "docs/conformance/dogfood/comparison.md",

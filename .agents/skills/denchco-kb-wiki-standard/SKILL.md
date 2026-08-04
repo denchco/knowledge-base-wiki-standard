@@ -23,6 +23,8 @@ npm run conformance:init-plan -- <target> --profile <profile> --json
 
 `init` and `upgrade` are planning-only in this candidate and never apply changes. Do not publish, deploy, create a repository, or make a formal claim without explicit authority. A waiver requires a named authority and an expiry or review state.
 
+When a user-authored consumer implementation may be reusable, preserve its project and immutable revision and prepare the Standard's `standard-change.yml` issue form with reuse class, dependencies, fallback, evidence, accessibility/browser results, fixtures, and migration impact. Do not submit a remote issue without explicit authority. A filed proposal remains unpromoted until maintainer classification and review.
+
 For `standard-production`, treat `DKBWS-PROV-001` as a maintenance-workspace obligation: use Git-interoperable history and colocated Jujutsu at the same repository root, then run the read-only provenance checker before recording a validated phase. Use distribution/CI mode only for an explicitly Git-only checkout; it reports Jujutsu maintainer provenance as not checked and must not be described as a maintainer-workspace pass. Portable Core remains Git-only compatible.
 
 When material information is genuinely missing, ask one sequential question using `Question 1 of N`; revise `N` after each answer. Do not ask for choices already resolved by the manifest, target evidence, or a reversible standard default.
