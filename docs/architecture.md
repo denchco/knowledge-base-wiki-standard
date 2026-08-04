@@ -24,7 +24,7 @@ Inspect these relationships through the shared [2D and 3D repository graph](grap
 ## Authority
 
 ```mermaid
-%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
 flowchart TB
   accTitle: Knowledge authority and derived surfaces
   accDescr: Sources are registered, assessed as evidence, maintained as canonical knowledge, and then presented through derived human, agent, and graph views.
@@ -32,7 +32,7 @@ flowchart TB
   S["1 · Sources"]
   R["2 · Source register"]
   E["3 · Evidence records"]
-  C[["4 · Canonical knowledge"]]
+  C["4 · Canonical knowledge"]
   W["Human · agent · graph views"]
   S --> R --> E --> C --> W
   class S kb-source

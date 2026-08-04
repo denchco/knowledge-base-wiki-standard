@@ -44,6 +44,10 @@ requireIn(design, 'diagramLabelMaskWidth: "4px"', "DESIGN.md must pin the Mermai
 requireIn(design, "governing-question:", "DESIGN.md must define the governing-question component");
 requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry the governing-question component");
 requireIn(starterDesign, "kb-canonical", "starter DESIGN.md must carry the semantic Mermaid role grammar");
+requireIn(design, "Mermaid's native `basis` connectors", "DESIGN.md must preserve Mermaid's native connector curve");
+requireIn(starterDesign, "Mermaid's native `basis` connectors", "starter DESIGN.md must preserve Mermaid's native connector curve");
+requireIn(starterDesign, "consistent rectangular node geometry", "starter DESIGN.md must carry the default-first node geometry rule");
+requireIn(starterDesign, "ordinary arrows", "starter DESIGN.md must carry the default-first arrow rule");
 requireIn(starterDesign, "no edge labels", "starter DESIGN.md must carry the simplified Mermaid topology rule");
 requireIn(starterDesign, "Draft — research in progress", "starter DESIGN.md must carry the readable draft-status contract");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
@@ -237,7 +241,15 @@ function overviewDiagram(source, label) {
   }
   const diagram = diagrams[0];
   if (!/^flowchart TB$/m.test(diagram)) errors.push(`${label} must use one top-to-bottom reading direction`);
-  if (!diagram.includes('"curve": "linear"')) errors.push(`${label} must use straight connectors`);
+  if (/"curve"\s*:/.test(diagram)) errors.push(`${label} must inherit Mermaid's native basis connectors`);
+  const hasNonRectangleNode = diagram.split("\n").some(line => {
+    const declaration = line.match(/^\s*[A-Za-z][A-Za-z0-9_]*\s*([\[\(\{>@]\S?)/);
+    return declaration && declaration[1] !== '["';
+  });
+  if (hasNonRectangleNode) {
+    errors.push(`${label} must use consistent rectangular node geometry`);
+  }
+  if (/==>|-\.->|--[ox]|[ox]--|<-->|~~~|---(?!>)/.test(diagram)) errors.push(`${label} must use ordinary arrows`);
   if (/^\s*subgraph\b/m.test(diagram)) errors.push(`${label} must remain cluster-free on the narrow content rail`);
   if (/\|[^|\n]+\||(?:--|==)\s+[^>\n]+\s+(?:-->|==>)/.test(diagram)) {
     errors.push(`${label} must not place text on connectors`);

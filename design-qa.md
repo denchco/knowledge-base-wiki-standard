@@ -1,4 +1,4 @@
-# Design QA — Mermaid clarity
+# Design QA — Mermaid default-first clarity
 
 Date: 2026-08-04  
 Result: **Pass**
@@ -9,17 +9,18 @@ Result: **Pass**
 - Standard architecture authority overview.
 - Standard and mobile content widths in the pinned Zensical and Mermaid runtimes.
 
-## Baseline finding
+## Reference and baseline
 
-Both diagrams fit their panes, but external edges entered a derived-products subgraph through its centred title. The homepage then fanned three product paths into three verification paths, making the lower half visually congested.
+The simplified diagrams removed the earlier cluster and fan-out collisions, but the explicit linear curve, mixed node shapes, and emphasized arrows made them feel more controlled than Mermaid's clean default. The selected comparator is `mermaid-default-audit/04-default-boundary-viewport.png` in the local visual audit workspace.
 
 ## Revised result
 
-- Each diagram is a five-node, four-relationship, top-to-bottom flow.
-- Labels are short and connectors are straight.
-- Clusters and edge labels are absent.
-- Detailed product distinctions remain in the adjacent prose and accessible description.
-- No node overlaps or connector/text intersections were detected.
+- Both diagrams remain five-node, four-relationship, top-to-bottom flows.
+- Diagram-level curve overrides are absent, so Mermaid supplies its native `basis` routing.
+- Every node uses the same rectangular geometry and every relationship uses an ordinary arrow.
+- Compact node, rank, and padding values remain bounded for the narrow content rail.
+- Semantic role classes, accessible titles/descriptions, labels, topology, and adjacent explanatory prose are unchanged.
+- No node overlaps, connector/text intersections, displaced scrolling, or page overflow were detected.
 
 ## Verification matrix
 
@@ -30,6 +31,7 @@ Both diagrams fit their panes, but external edges entered a derived-products sub
 | Mobile rendered fit | Pass |
 | Node-overlap probe | Pass |
 | Connector/text collision probe | Pass |
+| Accessibility metadata retained | Pass |
 | In-app visual inspection | Pass |
 
-The before/after screenshots are stored in the local Mermaid audit workspace. The final browser contract also visits the architecture route, which was not covered by the earlier Standard runtime check.
+The final Standard architecture capture is `mermaid-default-audit/10-standard-default-first-authority.png`. The pinned runtime browser contract also visits the architecture route at 1256px desktop and 390px mobile widths.

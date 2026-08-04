@@ -19,16 +19,16 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ## The system
 
 ```mermaid
-%%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
 flowchart TB
   accTitle: Governed knowledge base system
   accDescr: Source material becomes inspectable evidence, maintained knowledge, coordinated human, agent, and graph views, and finally a verified local system.
 
   S["Source material"]
   E["Evidence records"]
-  C[["Maintained knowledge"]]
+  C["Maintained knowledge"]
   W["Human · agent · graph views"]
-  V(["Verification"])
+  V["Verification"]
   S --> E --> C --> W --> V
   class S kb-source
   class E kb-evidence
