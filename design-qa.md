@@ -18,7 +18,7 @@ The simplified diagrams removed the earlier cluster and fan-out collisions, but 
 - Both diagrams remain five-node, four-relationship, top-to-bottom flows.
 - Diagram-level curve overrides are absent, so Mermaid supplies its native `basis` routing.
 - Every node uses the same rectangular geometry and every relationship uses an ordinary arrow.
-- Compact node, rank, and padding values remain bounded for the narrow content rail.
+- Node padding is `10px`, giving labels more breathing room while rank and node spacing remain bounded for the narrow content rail.
 - Semantic role classes, accessible titles/descriptions, labels, topology, and adjacent explanatory prose are unchanged.
 - No node overlaps, connector/text intersections, displaced scrolling, or page overflow were detected.
 

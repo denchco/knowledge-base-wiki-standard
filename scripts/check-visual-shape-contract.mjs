@@ -242,6 +242,7 @@ function overviewDiagram(source, label) {
   const diagram = diagrams[0];
   if (!/^flowchart TB$/m.test(diagram)) errors.push(`${label} must use one top-to-bottom reading direction`);
   if (/"curve"\s*:/.test(diagram)) errors.push(`${label} must inherit Mermaid's native basis connectors`);
+  if (!diagram.includes('"padding": 10')) errors.push(`${label} must use the governed 10px node padding`);
   const hasNonRectangleNode = diagram.split("\n").some(line => {
     const declaration = line.match(/^\s*[A-Za-z][A-Za-z0-9_]*\s*([\[\(\{>@]\S?)/);
     return declaration && declaration[1] !== '["';

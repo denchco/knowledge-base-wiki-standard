@@ -19,7 +19,7 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ## The system
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 10, "rankSpacing": 22, "padding": 6}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 10, "rankSpacing": 22, "padding": 10}}}%%
 flowchart TB
   accTitle: Governed knowledge base system
   accDescr: Source material becomes inspectable evidence, maintained knowledge, coordinated human, agent, and graph views, and finally a verified local system.
