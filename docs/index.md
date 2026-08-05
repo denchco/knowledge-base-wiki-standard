@@ -21,17 +21,25 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ```mermaid
 flowchart TB
   accTitle: Governed knowledge base system
-  accDescr: Source material becomes inspectable evidence, maintained knowledge, coordinated human, agent, and graph views, and finally a verified local system.
+  accDescr: Source material becomes inspectable evidence and maintained knowledge. That knowledge serves separate Human, Agent, and Graph surfaces, whose paths converge on verification.
 
   S["Source material"]
   E["Evidence records"]
   C["Maintained knowledge"]
-  W["Human · agent · graph views"]
+  H["Human"]
+  A["Agent"]
+  G["Graph"]
   V["Verification"]
-  S --> E --> C --> W --> V
+  S --> E --> C
+  C --> H
+  C --> A
+  C --> G
+  H --> V
+  A --> V
+  G --> V
 ```
 
-Read from top to bottom: source material becomes inspectable evidence, then maintained knowledge, then coordinated views for people and agents. Verification checks the resulting system. The labels, order, and this explanation carry the authority distinction without custom node styling.
+Read from top to bottom: source material becomes inspectable evidence, then maintained knowledge. That shared knowledge directly serves three separately presented surfaces: the Human Wiki, the LLM Wiki for agents, and Graphify. Each path then converges on verification. The boxes are views over one corpus, not independent knowledge stores. The labels, order, and this explanation carry the authority distinction without custom node styling.
 
 ## Start here
 

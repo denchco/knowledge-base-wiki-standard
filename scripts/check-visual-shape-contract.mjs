@@ -51,6 +51,10 @@ requireIn(starterDesign, "Mermaid's native `basis` connectors", "starter DESIGN.
 requireIn(starterDesign, "consistent rectangular node geometry", "starter DESIGN.md must carry the default-first node geometry rule");
 requireIn(starterDesign, "ordinary arrows", "starter DESIGN.md must carry the default-first arrow rule");
 requireIn(starterDesign, "no edge labels", "starter DESIGN.md must carry the simplified Mermaid topology rule");
+requireIn(design, "three separately labelled sibling boxes", "DESIGN.md must require separate Human, Agent, and Graph boxes when all three are shown");
+requireIn(starterDesign, "three separately labelled sibling boxes", "starter DESIGN.md must carry the separate Human, Agent, and Graph box rule");
+requireIn(design, "no more than 60px", "DESIGN.md must bound the three-product mobile containment exception");
+requireIn(starterDesign, "no more than 60px", "starter DESIGN.md must carry the bounded three-product mobile containment exception");
 requireIn(starterDesign, "Draft — research in progress", "starter DESIGN.md must carry the readable draft-status contract");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
 requireIn(requirements, "DKBWS-HUMAN-003", "the normative catalogue must define DKBWS-HUMAN-003");
@@ -112,7 +116,10 @@ requireIn(mermaidAdapter, "htmlLabels: false", "Mermaid labels must remain measu
 requireIn(mermaidAdapter, "subGraphTitleMargin: { top: 4, bottom: 10 }", "Mermaid clusters must reserve readable title space");
 requireIn(mermaidAdapter, "paint-order: stroke", "closed-shadow Mermaid downstream cluster fallback must retain a label mask");
 requireIn(mermaidAdapter, "diagram.scrollLeft", "wide Mermaid diagrams must open centrally");
-requireIn(selectorBlock(theme, ".md-typeset .mermaid"), "overflow-x: auto", "Mermaid must scroll within its pane");
+const mermaidHost = selectorBlock(theme, ".md-typeset .mermaid");
+requireIn(mermaidHost, "display: grid", "Mermaid host must establish a centering layout");
+requireIn(mermaidHost, "justify-items: safe center", "Mermaid host must centre fitting surfaces without clipping oversized diagrams");
+requireIn(mermaidHost, "overflow-x: auto", "Mermaid must scroll within its pane");
 for (const role of [
   "kb-source", "kb-evidence", "kb-snapshot", "kb-normative", "kb-canonical",
   "kb-product", "kb-derived", "kb-consumer", "kb-verification",
@@ -120,21 +127,95 @@ for (const role of [
   requireIn(theme, role, `fallback Mermaid CSS must style ${role}`);
   requireIn(mermaidAdapter, role, `closed-shadow Mermaid CSS must style ${role}`);
 }
-const homeDiagram = overviewDiagram(home, "Standard homepage Mermaid");
+const homeTopology = {
+  nodes: {
+    S: "Source material",
+    E: "Evidence records",
+    C: "Maintained knowledge",
+    H: "Human",
+    A: "Agent",
+    G: "Graph",
+    V: "Verification",
+  },
+  edges: [["S", "E"], ["E", "C"], ["C", "H"], ["C", "A"], ["C", "G"], ["H", "V"], ["A", "V"], ["G", "V"]],
+};
+const authorityTopology = {
+  nodes: {
+    S: "1 · Sources",
+    R: "2 · Source register",
+    E: "3 · Evidence records",
+    C: "4 · Canonical knowledge",
+    H: "Human",
+    A: "Agent",
+    G: "Graph",
+  },
+  edges: [["S", "R"], ["R", "E"], ["E", "C"], ["C", "H"], ["C", "A"], ["C", "G"]],
+};
+const homeDiagram = overviewDiagram(home, "Standard homepage Mermaid", homeTopology);
 for (const phrase of [
   "accTitle: Governed knowledge base system",
   "accDescr: Source material becomes inspectable evidence",
-  "S --> E --> C --> W --> V",
+  'H["Human"]',
+  'A["Agent"]',
+  'G["Graph"]',
+  "S --> E --> C",
+  "C --> H",
+  "C --> A",
+  "C --> G",
+  "H --> V",
+  "A --> V",
+  "G --> V",
 ]) {
   requireIn(homeDiagram, phrase, `Standard homepage Mermaid must retain ${phrase}`);
 }
-const authorityDiagram = overviewDiagram(architecture, "Standard authority Mermaid");
+const authorityDiagram = overviewDiagram(architecture, "Standard authority Mermaid", authorityTopology);
 for (const phrase of [
   "accTitle: Knowledge authority and derived surfaces",
   "accDescr: Sources are registered, assessed as evidence",
-  "S --> R --> E --> C --> W",
+  'H["Human"]',
+  'A["Agent"]',
+  'G["Graph"]',
+  "S --> R --> E --> C",
+  "C --> H",
+  "C --> A",
+  "C --> G",
 ]) {
   requireIn(authorityDiagram, phrase, `Standard authority Mermaid must retain ${phrase}`);
+}
+const separatedSurfaceFixture = [
+  "flowchart TB",
+  '  C["Canonical knowledge"]',
+  '  H["Human"]',
+  '  A["Agent"]',
+  '  G["Graph"]',
+  '  V["Verification"]',
+  "  C --> H",
+  "  C --> A",
+  "  C --> G",
+  "  H --> V",
+  "  A --> V",
+  "  G --> V",
+].join("\n");
+const separatedFixtureTopology = {
+  nodes: { C: "Canonical knowledge", H: "Human", A: "Agent", G: "Graph", V: "Verification" },
+  edges: [["C", "H"], ["C", "A"], ["C", "G"], ["H", "V"], ["A", "V"], ["G", "V"]],
+};
+if (topologyIssues(separatedSurfaceFixture, separatedFixtureTopology).length > 0) {
+  errors.push("Mermaid topology fixture must accept separate Human, Agent, and Graph sibling nodes with verification convergence");
+}
+for (const [fixture, label] of [
+  [
+    'flowchart TB\n  C["Canonical knowledge"]\n  W["Human · agent · graph views"]\n  V["Verification"]\n  C --> W --> V',
+    "combined Human, Agent, and Graph node",
+  ],
+  [separatedSurfaceFixture.replace("  G --> V", ""), "missing Graph-to-Verification relationship"],
+  [`${separatedSurfaceFixture}\n  H --> A`, "extra cross-product relationship"],
+  [`${separatedSurfaceFixture}\n  C --> H`, "duplicate relationship"],
+  [separatedSurfaceFixture.replace("  C --> H\n  C --> A\n  C --> G", "  C --> H & A & G"), "grouped-edge syntax"],
+]) {
+  if (topologyIssues(fixture, separatedFixtureTopology).length === 0) {
+    errors.push(`Mermaid topology fixture must reject ${label}`);
+  }
 }
 for (const [fixture, label] of [
   ['  %%{init: {"flowchart": {"padding": 10}}}%%\nflowchart TB\n  A["A"]', "indented init"],
@@ -236,7 +317,7 @@ function selectorBlock(source, selector) {
 function mermaidFences(source) {
   return [...source.matchAll(/```mermaid\s*\n([\s\S]*?)```/g)].map(match => match[1]);
 }
-function overviewDiagram(source, label) {
+function overviewDiagram(source, label, expectedTopology) {
   const diagrams = mermaidFences(source);
   if (diagrams.length !== 1) {
     errors.push(`${label} must contain exactly one diagram; found ${diagrams.length}`);
@@ -262,14 +343,21 @@ function overviewDiagram(source, label) {
     errors.push(`${label} must not place text on connectors`);
   }
   if (/<br\s*\/?\s*>/i.test(diagram)) errors.push(`${label} must keep node labels short without manual line breaks`);
+  if (hasCombinedThreeProductNode(diagram)) {
+    errors.push(`${label} must present Human, Agent, and Graph as separate sibling nodes instead of one combined product node`);
+  }
+  for (const issue of topologyIssues(diagram, expectedTopology)) errors.push(`${label} ${issue}`);
 
   const nodeIds = new Set(
     [...diagram.matchAll(/\b([A-Za-z][A-Za-z0-9_]*)\s*(?=\[\[|\[\(|\[|\(\[|\(\(|\(|\{)/g)]
       .map(match => match[1]),
   );
   const edgeCount = [...diagram.matchAll(/-->|==>|-\.->/g)].length;
-  if (nodeIds.size > 5) errors.push(`${label} must use no more than five nodes; found ${nodeIds.size}`);
-  if (edgeCount > 5) errors.push(`${label} must use no more than five visible relationships; found ${edgeCount}`);
+  const hasThreeProductTopology = hasSeparatedThreeProductTopology(diagram);
+  const nodeLimit = hasThreeProductTopology ? 7 : 5;
+  const edgeLimit = hasThreeProductTopology ? 8 : 5;
+  if (nodeIds.size > nodeLimit) errors.push(`${label} must use no more than ${nodeLimit} nodes; found ${nodeIds.size}`);
+  if (edgeCount > edgeLimit) errors.push(`${label} must use no more than ${edgeLimit} visible relationships; found ${edgeCount}`);
 
   const incoming = new Map();
   const outgoing = new Map();
@@ -287,8 +375,79 @@ function overviewDiagram(source, label) {
     ...[...outgoing].filter(([, count]) => count > 1).map(([id]) => id),
     ...[...incoming].filter(([, count]) => count > 1).map(([id]) => id),
   ]);
-  if (branchNodes.size > 2) errors.push(`${label} must use at most one parallel branch; found ${branchNodes.size} split/merge points`);
+  if (branchNodes.size > 2) errors.push(`${label} must use at most one coordinated fan-out/rejoin group; found ${branchNodes.size} split/merge points`);
   return diagram;
+}
+function topologyIssues(diagram, expected) {
+  const issues = [];
+  const nodes = new Map();
+  const duplicateNodes = new Set();
+  const edges = [];
+  for (const line of diagram.split("\n")) {
+    const node = line.match(/^\s*([A-Za-z][A-Za-z0-9_]*)\s*\["([^"\n]+)"\]\s*$/);
+    if (node) {
+      if (nodes.has(node[1])) duplicateNodes.add(node[1]);
+      nodes.set(node[1], node[2]);
+      continue;
+    }
+    if (!line.includes("-->")) continue;
+    if (line.includes("&")) {
+      issues.push("must not use grouped-edge syntax; declare each visible relationship explicitly");
+      continue;
+    }
+    const trimmed = line.trim();
+    if (!/^[A-Za-z][A-Za-z0-9_]*(?:\s*-->\s*[A-Za-z][A-Za-z0-9_]*)+$/.test(trimmed)) {
+      issues.push(`contains an unsupported relationship declaration: ${trimmed}`);
+      continue;
+    }
+    const ids = trimmed.split(/\s*-->\s*/);
+    for (let index = 0; index < ids.length - 1; index += 1) edges.push([ids[index], ids[index + 1]]);
+  }
+  if (duplicateNodes.size > 0) issues.push(`must not redeclare nodes: ${[...duplicateNodes].join(", ")}`);
+
+  const expectedNodes = new Map(Object.entries(expected.nodes));
+  if (nodes.size !== expectedNodes.size) issues.push(`must declare exactly ${expectedNodes.size} nodes; found ${nodes.size}`);
+  for (const [id, expectedLabel] of expectedNodes) {
+    if (!nodes.has(id)) issues.push(`is missing node ${id}["${expectedLabel}"]`);
+    else if (nodes.get(id) !== expectedLabel) issues.push(`node ${id} must be labelled "${expectedLabel}"; found "${nodes.get(id)}"`);
+  }
+  for (const id of nodes.keys()) {
+    if (!expectedNodes.has(id)) issues.push(`contains unexpected node ${id}`);
+  }
+
+  const edgeKeys = edges.map(([from, to]) => `${from}->${to}`);
+  const duplicateEdges = [...new Set(edgeKeys.filter((edge, index) => edgeKeys.indexOf(edge) !== index))];
+  if (duplicateEdges.length > 0) issues.push(`must not duplicate relationships: ${duplicateEdges.join(", ")}`);
+  for (const [from, to] of edges) {
+    if (!nodes.has(from) || !nodes.has(to)) issues.push(`relationship ${from}->${to} uses an undeclared node`);
+  }
+  const actualEdges = new Set(edgeKeys);
+  const expectedEdges = new Set(expected.edges.map(([from, to]) => `${from}->${to}`));
+  if (edges.length !== expected.edges.length) issues.push(`must declare exactly ${expected.edges.length} relationships; found ${edges.length}`);
+  for (const edge of expectedEdges) {
+    if (!actualEdges.has(edge)) issues.push(`is missing relationship ${edge}`);
+  }
+  for (const edge of actualEdges) {
+    if (!expectedEdges.has(edge)) issues.push(`contains unexpected relationship ${edge}`);
+  }
+  const connected = new Set(edges.flat());
+  for (const id of nodes.keys()) {
+    if (!connected.has(id)) issues.push(`contains disconnected node ${id}`);
+  }
+  return issues;
+}
+function hasSeparatedThreeProductTopology(diagram) {
+  return [
+    'H["Human"]',
+    'A["Agent"]',
+    'G["Graph"]',
+    "C --> H",
+    "C --> A",
+    "C --> G",
+  ].every(phrase => diagram.includes(phrase));
+}
+function hasCombinedThreeProductNode(diagram) {
+  return /\["Human\s*·\s*agent\s*·\s*graph views"\]/i.test(diagram);
 }
 function hasDiagramStylingOptIn(diagram) {
   return /^[ \t]*%%\{init:/m.test(diagram)

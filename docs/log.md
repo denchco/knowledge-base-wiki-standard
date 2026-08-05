@@ -11,6 +11,8 @@ status: draft
 
 - **Development-turn provenance boundary**: Strengthened `DKBWS-PROV-001` from reviewable validated phases to an explicit JJ commit at the end of every file-changing development turn. Verification and Git/Jujutsu inspection run first; failed or unrun checks are disclosed in the local commit and final response, no subjective significance threshold applies, and no-change turns create no empty commit.
 - **Prospective migration**: Synchronized the root and starter instructions, Codex/Claude skills, maintenance guidance, dependency contract, initialization prompt, lifecycle stage, conformance aggregation, and executable helper fixture. Existing JJ history remains intact and the rule applies from the upgraded revision forward.
+- **Independent product surfaces**: Restored the `v0.1.0-rc.3` Human, Agent, and Graph fan-out under renderer-default Mermaid treatment. The three separately presented surfaces derive from one shared canonical corpus; the homepage paths reconverge on verification, and none of the product boxes gains evidence authority.
+- **Bounded topology contract**: Expanded only the three-product reference topology to seven nodes and eight visible relationships, retained the five-node/five-relationship limit elsewhere, and added positive separate-node plus negative combined-node fixtures with responsive fit and collision verification. Fitting surfaces use safe grid centring; the native three-column rank retains governed centred pane containment on the 390px reference viewport without page overflow.
 
 ## 2026-08-04
 

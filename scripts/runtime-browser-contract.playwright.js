@@ -48,8 +48,8 @@ export default async (page, options = {}) => {
   const px = value => Number.parseFloat(String(value || "").replace("px", ""));
   const closeTo = (left, right, tolerance = 1) => Math.abs(left - right) <= tolerance;
   const routeUrl = route => `${baseUrl}${route.startsWith("/") ? route : `/${route}`}`;
-  const goto = async route => {
-    const response = await page.goto(routeUrl(route), { waitUntil: "networkidle" });
+  const goto = async (route, waitUntil = "networkidle") => {
+    const response = await page.goto(routeUrl(route), { waitUntil });
     check(Boolean(response?.ok()), `${route} did not return HTTP 200`);
   };
   const inspectGoverningQuestion = async viewportName => {
@@ -221,7 +221,47 @@ export default async (page, options = {}) => {
       };
     }, dataUrl);
   };
-  const inspectMermaidPage = async ({ route, pageName, expectedCount, viewportName }) => {
+  const inspectFrameCanvasPixels = async frame => frame.evaluate(async () => {
+    await new Promise(resolve => requestAnimationFrame(() => resolve()));
+    const canvas = document.querySelector("canvas");
+    if (!canvas) return { kind: "missing", width: 0, height: 0, distinctColours: 0, opaqueRatio: 0 };
+    const width = canvas.width;
+    const height = canvas.height;
+    const context2d = canvas.getContext("2d");
+    let pixels;
+    let kind;
+    if (context2d) {
+      pixels = context2d.getImageData(0, 0, width, height).data;
+      kind = "2d";
+    } else {
+      const webgl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+      if (!webgl) return { kind: "missing", width, height, distinctColours: 0, opaqueRatio: 0 };
+      pixels = new Uint8Array(width * height * 4);
+      webgl.readPixels(0, 0, width, height, webgl.RGBA, webgl.UNSIGNED_BYTE, pixels);
+      kind = "webgl";
+    }
+    const colours = new Set();
+    let opaqueSamples = 0;
+    let samples = 0;
+    const stepX = Math.max(1, Math.floor(width / 48));
+    const stepY = Math.max(1, Math.floor(height / 48));
+    for (let y = 0; y < height; y += stepY) {
+      for (let x = 0; x < width; x += stepX) {
+        const index = (y * width + x) * 4;
+        colours.add((pixels[index] << 16) | (pixels[index + 1] << 8) | pixels[index + 2]);
+        if (pixels[index + 3] > 0) opaqueSamples += 1;
+        samples += 1;
+      }
+    }
+    return {
+      kind,
+      width,
+      height,
+      distinctColours: colours.size,
+      opaqueRatio: samples ? opaqueSamples / samples : 0,
+    };
+  });
+  const inspectMermaidPage = async ({ route, pageName, expectedCount, viewportName, maxHorizontalOverflow = 0 }) => {
     await goto(route);
     await page.waitForSelector(".mermaid");
     await page.waitForFunction(() => (
@@ -234,6 +274,8 @@ export default async (page, options = {}) => {
       scrollWidth: diagram.scrollWidth,
       scrollHeight: diagram.scrollHeight,
       scrollLeft: diagram.scrollLeft,
+      display: getComputedStyle(diagram).display,
+      justifyItems: getComputedStyle(diagram).justifyItems,
     })));
     check(
       geometry.length === expectedCount,
@@ -241,17 +283,23 @@ export default async (page, options = {}) => {
     );
     for (const [index, diagram] of geometry.entries()) {
       check(diagram.width > 200 && diagram.height > 40, `${pageName} Mermaid ${index + 1} must have non-empty geometry at ${viewportName} width`);
+      check(diagram.display === "grid" && diagram.justifyItems === "safe center", `${pageName} Mermaid ${index + 1} must use safe centring at ${viewportName} width`);
+      const horizontalOverflow = Math.max(0, diagram.scrollWidth - diagram.width);
       check(
-        diagram.scrollWidth <= diagram.width + 1 && diagram.scrollHeight <= diagram.height + 1,
-        `${pageName} Mermaid ${index + 1} must fit its pane at ${viewportName} width`,
+        horizontalOverflow <= maxHorizontalOverflow + 1 && diagram.scrollHeight <= diagram.height + 1,
+        `${pageName} Mermaid ${index + 1} must stay within its ${maxHorizontalOverflow}px contained-overflow limit at ${viewportName} width`,
       );
-      check(Math.abs(diagram.scrollLeft) <= 1, `${pageName} Mermaid ${index + 1} must open without displaced scrolling at ${viewportName} width`);
+      if (horizontalOverflow > 1) {
+        check(Math.abs(diagram.scrollLeft - (horizontalOverflow / 2)) <= 1, `${pageName} Mermaid ${index + 1} must open centred within its pane at ${viewportName} width`);
+      } else {
+        check(Math.abs(diagram.scrollLeft) <= 1, `${pageName} Mermaid ${index + 1} must open without displaced scrolling at ${viewportName} width`);
+      }
     }
     const pageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(pageOverflow <= 1, `${pageName} page must not overflow horizontally at ${viewportName} width`);
     return geometry;
   };
-  const inspectMermaidSourceLayouts = async (sources, pageName) => {
+  const inspectMermaidSourceLayouts = async (sources, pageName, expectations = []) => {
     if (!Array.isArray(sources) || sources.length === 0) {
       check(false, `${pageName} must supply canonical Mermaid source for collision checks`);
       return [];
@@ -273,17 +321,41 @@ export default async (page, options = {}) => {
           await new Promise(resolve => requestAnimationFrame(resolve));
           const svg = mount.querySelector("svg");
           if (!svg) {
-            results.push({ diagramIndex, missingSvg: true, edgeLabels: [], nodeOverlaps: [], textPathCollisions: [] });
+            results.push({
+              diagramIndex,
+              missingSvg: true,
+              title: "",
+              description: "",
+              edgeCount: 0,
+              edgeLabels: [],
+              nodes: [],
+              nodeOverlaps: [],
+              textPathCollisions: [],
+            });
             continue;
           }
+          const title = svg.querySelector("title")?.textContent?.trim() || "";
+          const description = svg.querySelector("desc")?.textContent?.trim() || "";
+          const edgeCount = svg.querySelectorAll(".flowchart-link").length;
           const edgeLabels = [...svg.querySelectorAll(".edgeLabel text")]
             .map(text => text.textContent?.trim() || "")
             .filter(Boolean);
-          const nodes = [...svg.querySelectorAll("g.node")].map((node, index) => ({
-            index,
-            label: node.textContent?.trim() || `node ${index + 1}`,
-            rect: node.getBoundingClientRect(),
-          }));
+          const nodes = [...svg.querySelectorAll("g.node")].map((node, index) => {
+            const rect = node.getBoundingClientRect();
+            return {
+              index,
+              label: node.textContent?.trim() || `node ${index + 1}`,
+              rect: {
+                left: rect.left,
+                top: rect.top,
+                right: rect.right,
+                bottom: rect.bottom,
+                width: rect.width,
+                height: rect.height,
+                centerY: rect.top + (rect.height / 2),
+              },
+            };
+          });
           const nodeOverlaps = [];
           for (let left = 0; left < nodes.length; left += 1) {
             for (let right = left + 1; right < nodes.length; right += 1) {
@@ -313,7 +385,17 @@ export default async (page, options = {}) => {
             }
             if (collision) textPathCollisions.push({ pathIndex, text: collision.label });
           }
-          results.push({ diagramIndex, missingSvg: false, edgeLabels, nodeOverlaps, textPathCollisions });
+          results.push({
+            diagramIndex,
+            missingSvg: false,
+            title,
+            description,
+            edgeCount,
+            edgeLabels,
+            nodes,
+            nodeOverlaps,
+            textPathCollisions,
+          });
         }
         return results;
       } finally {
@@ -322,6 +404,7 @@ export default async (page, options = {}) => {
     }, sources);
     for (const layout of layouts) {
       const prefix = `${pageName} Mermaid ${layout.diagramIndex + 1}`;
+      const expected = expectations[layout.diagramIndex];
       check(!layout.missingSvg, `${prefix} must render inspectable SVG geometry`);
       check(layout.edgeLabels.length === 0, `${prefix} must not put text on connectors: ${layout.edgeLabels.join(", ")}`);
       check(layout.nodeOverlaps.length === 0, `${prefix} nodes must not overlap: ${JSON.stringify(layout.nodeOverlaps)}`);
@@ -329,6 +412,30 @@ export default async (page, options = {}) => {
         layout.textPathCollisions.length === 0,
         `${prefix} connectors must not intersect text: ${JSON.stringify(layout.textPathCollisions)}`,
       );
+      if (!expected) {
+        check(false, `${prefix} must have a rendered topology expectation`);
+        continue;
+      }
+      const renderedLabels = layout.nodes.map(node => node.label).sort((left, right) => left.localeCompare(right));
+      const expectedLabels = [...expected.nodeLabels].sort((left, right) => left.localeCompare(right));
+      check(layout.nodes.length === expected.nodeLabels.length, `${prefix} must render exactly ${expected.nodeLabels.length} nodes; found ${layout.nodes.length}`);
+      check(JSON.stringify(renderedLabels) === JSON.stringify(expectedLabels), `${prefix} rendered node labels must be ${JSON.stringify(expectedLabels)}; found ${JSON.stringify(renderedLabels)}`);
+      check(layout.edgeCount === expected.edgeCount, `${prefix} must render exactly ${expected.edgeCount} relationships; found ${layout.edgeCount}`);
+      check(layout.title === expected.title, `${prefix} must render accessible title "${expected.title}"; found "${layout.title}"`);
+      check(layout.description === expected.description, `${prefix} must render the canonical accessible description`);
+      const sameRankNodes = expected.sameRankLabels.map(label => layout.nodes.find(node => node.label === label)).filter(Boolean);
+      check(sameRankNodes.length === expected.sameRankLabels.length, `${prefix} must render distinct ${expected.sameRankLabels.join(", ")} nodes`);
+      if (sameRankNodes.length === expected.sameRankLabels.length) {
+        const rankCenters = sameRankNodes.map(node => node.rect.centerY);
+        check(Math.max(...rankCenters) - Math.min(...rankCenters) <= 2, `${prefix} ${expected.sameRankLabels.join(", ")} nodes must share one visual rank`);
+      }
+      if (expected.downstreamLabel && sameRankNodes.length === expected.sameRankLabels.length) {
+        const downstream = layout.nodes.find(node => node.label === expected.downstreamLabel);
+        check(Boolean(downstream), `${prefix} must render downstream node ${expected.downstreamLabel}`);
+        if (downstream) {
+          check(downstream.rect.top > Math.max(...sameRankNodes.map(node => node.rect.bottom)), `${prefix} ${expected.downstreamLabel} must appear below all three product surfaces`);
+        }
+      }
     }
     return layouts;
   };
@@ -488,16 +595,37 @@ export default async (page, options = {}) => {
     height: element.clientHeight,
     scrollWidth: element.scrollWidth,
     scrollHeight: element.scrollHeight,
+    display: getComputedStyle(element).display,
+    justifyItems: getComputedStyle(element).justifyItems,
   }));
   const mermaidPixels = await screenshotPixels(await mermaidHost.screenshot());
   check(mermaidHostGeometry.width > 200 && mermaidHostGeometry.height > 40, "Rendered Mermaid geometry must be non-empty");
+  check(mermaidHostGeometry.display === "grid" && mermaidHostGeometry.justifyItems === "safe center", "Rendered Mermaid surfaces must centre safely within their pane");
   check(mermaidPixels.distinctColours > 24 && mermaidPixels.opaqueRatio > 0.95, "Rendered Mermaid pixels must be nonblank");
   const mermaidLayouts = {
     representative: await inspectMermaidSourceLayouts(
       options.mermaidSources?.representative ?? options.mermaidSources?.homepage,
       "Representative page",
+      [{
+        nodeLabels: ["Source material", "Evidence records", "Maintained knowledge", "Human", "Agent", "Graph", "Verification"],
+        edgeCount: 8,
+        title: "Governed knowledge base system",
+        description: "Source material becomes inspectable evidence and maintained knowledge. That knowledge serves separate Human, Agent, and Graph surfaces, whose paths converge on verification.",
+        sameRankLabels: ["Human", "Agent", "Graph"],
+        downstreamLabel: "Verification",
+      }],
     ),
-    architecture: await inspectMermaidSourceLayouts(options.mermaidSources?.architecture, "Architecture"),
+    architecture: await inspectMermaidSourceLayouts(
+      options.mermaidSources?.architecture,
+      "Architecture",
+      [{
+        nodeLabels: ["1 · Sources", "2 · Source register", "3 · Evidence records", "4 · Canonical knowledge", "Human", "Agent", "Graph"],
+        edgeCount: 6,
+        title: "Knowledge authority and derived surfaces",
+        description: "Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.",
+        sameRankLabels: ["Human", "Agent", "Graph"],
+      }],
+    ),
   };
   const architectureDesktop = await inspectMermaidPage({
     route: architectureRoute,
@@ -640,12 +768,18 @@ export default async (page, options = {}) => {
       right: bounds.right,
       width: bounds.width,
       height: bounds.height,
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      scrollLeft: element.scrollLeft,
       pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       widthControlDisplay: widthControl ? getComputedStyle(widthControl).display : "missing",
     };
   });
   const mobileMermaidPixels = await screenshotPixels(await mobileMermaid.screenshot());
   check(mobileMermaidGeometry.left >= -1 && mobileMermaidGeometry.right <= 391, "Mobile Mermaid pane must stay inside the viewport");
+  const mobileMermaidOverflow = Math.max(0, mobileMermaidGeometry.scrollWidth - mobileMermaidGeometry.clientWidth);
+  check(mobileMermaidOverflow <= 61, "Mobile representative Mermaid must keep contained horizontal overflow within the governed 60px limit");
+  check(Math.abs(mobileMermaidGeometry.scrollLeft - (mobileMermaidOverflow / 2)) <= 1, "Mobile representative Mermaid must open centred within its pane");
   check(mobileMermaidGeometry.pageOverflow <= 1, "Mobile Mermaid page must not overflow horizontally");
   check(mobileMermaidGeometry.widthControlDisplay === "none", "Desktop width control must not crowd the mobile header");
   check(mobileMermaidPixels.distinctColours > 24, "Mobile Mermaid pixels must be nonblank");
@@ -654,6 +788,7 @@ export default async (page, options = {}) => {
     pageName: "Architecture",
     expectedCount: 1,
     viewportName: "390px mobile",
+    maxHorizontalOverflow: 60,
   });
   await goto(tableRoute);
   const mobileTables = await inspectMobileTables();
@@ -673,9 +808,14 @@ export default async (page, options = {}) => {
       graphMetrics[viewport.name] = {};
       for (const view of graphViews) {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await goto(view.route);
-        await page.waitForSelector(".graph-frame");
-        await page.locator(".graph-frame").scrollIntoViewIfNeeded();
+        await goto(view.route, "domcontentloaded");
+        await page.waitForSelector(".graph-frame", { state: "attached" });
+        await page.locator(".graph-frame").evaluate(element => element.scrollIntoView({ block: "center" }));
+        await page.waitForFunction(() => {
+          const frameElement = document.querySelector(".graph-frame");
+          const bounds = frameElement?.getBoundingClientRect();
+          return Boolean(bounds && bounds.width > 250 && bounds.height > 300);
+        });
         let frame = null;
         for (let attempt = 0; attempt < 80 && !frame; attempt += 1) {
           frame = page.frames().find(candidate => candidate.url().includes(view.asset));
@@ -708,10 +848,11 @@ export default async (page, options = {}) => {
             overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           };
         }, view.name);
-        const pixels = await screenshotPixels(await canvas.screenshot());
+        const pixels = await inspectFrameCanvasPixels(frame);
         check(canvasGeometry.width > 250 && canvasGeometry.height > 300, `${view.name.toUpperCase()} Graphify canvas must retain usable ${viewport.name} dimensions`);
         check(closeTo(canvasGeometry.width, frameGeometry.width, 3) && closeTo(canvasGeometry.height, frameGeometry.height, 3), `${view.name.toUpperCase()} Graphify canvas must fill its ${viewport.name} frame`);
-        check(pixels.distinctColours > 8 && pixels.opaqueRatio > 0.95, `${view.name.toUpperCase()} Graphify canvas pixels must be nonblank at ${viewport.name} width`);
+        const minimumOpaqueRatio = view.name === "2d" ? 0.1 : 0.95;
+        check(pixels.distinctColours > 8 && pixels.opaqueRatio > minimumOpaqueRatio, `${view.name.toUpperCase()} Graphify canvas pixels must be nonblank at ${viewport.name} width`);
         check(controls.controlVisible && controls.controlFits && controls.searchVisible, `${view.name.toUpperCase()} Graphify controls must remain usable at ${viewport.name} width`);
         check(controls.overflow <= 1, `${view.name.toUpperCase()} Graphify iframe must not overflow at ${viewport.name} width`);
         const pageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

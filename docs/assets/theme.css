@@ -328,6 +328,8 @@ input.md-option:is(:focus-visible, .focus-visible) + label,
 .md-typeset .mermaid {
   border: 0;
   background: transparent;
+  display: grid;
+  justify-items: safe center;
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-inline: contain;

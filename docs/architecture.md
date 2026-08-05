@@ -26,17 +26,22 @@ Inspect these relationships through the shared [2D and 3D repository graph](grap
 ```mermaid
 flowchart TB
   accTitle: Knowledge authority and derived surfaces
-  accDescr: Sources are registered, assessed as evidence, maintained as canonical knowledge, and then presented through derived human, agent, and graph views.
+  accDescr: Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.
 
   S["1 · Sources"]
   R["2 · Source register"]
   E["3 · Evidence records"]
   C["4 · Canonical knowledge"]
-  W["Human · agent · graph views"]
-  S --> R --> E --> C --> W
+  H["Human"]
+  A["Agent"]
+  G["Graph"]
+  S --> R --> E --> C
+  C --> H
+  C --> A
+  C --> G
 ```
 
-The numbered authority chain ends at canonical knowledge. The final node represents the derived views that help people and agents use it; those views cannot create evidence.
+The numbered authority chain ends at canonical knowledge. Separate Human Wiki, LLM Wiki for agents, and Graphify surfaces each derive directly from that shared corpus. They are not independent corpora and cannot create evidence.
 
 ## Distribution boundary
 
