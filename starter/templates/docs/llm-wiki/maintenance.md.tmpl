@@ -12,10 +12,11 @@ status: "draft"
 3. Preserve stronger verified local patterns and unknown OKF fields.
 4. Update sources, concepts, evidence, links, and logs together.
 5. Rebuild generated outputs and run every applicable check.
-6. Review Git and Jujutsu state before recording a validated phase.
-7. For a potentially reusable user-authored improvement, keep the verified implementation project-owned and prepare ignored `output/standard-change-proposal.md` only after the local phase is complete.
-8. Search existing Standard issues read-only and draft the problem, outcome, origin and immutable revision, reuse class, affected contract, dependencies and fallback, evidence, accessibility/browser implications, regression fixture, and migration impact.
-9. Scrub private paths, credentials, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Show the exact repository, title, body, and labels and obtain explicit authorization before any remote submission; if the issue form is unavailable, stop with the local draft.
+6. Review Git and Jujutsu state.
+7. Before the development turn ends, record all persistent changes from that turn in a JJ commit. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
+8. For a potentially reusable user-authored improvement, keep the verified implementation project-owned and prepare ignored `output/standard-change-proposal.md` only after the local turn commit is complete.
+9. Search existing Standard issues read-only and draft the problem, outcome, origin and immutable revision, reuse class, affected contract, dependencies and fallback, evidence, accessibility/browser implications, regression fixture, and migration impact.
+10. Scrub private paths, credentials, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Show the exact repository, title, body, and labels and obtain explicit authorization before any remote submission; if the issue form is unavailable, stop with the local draft.
 
 Standard upgrades use an immutable source revision and a reviewable diff. Equal version labels do not prove equal revisions. Upgrades never replace local topic content silently, and filing a proposal does not change the pinned revision or authorize migration.
 

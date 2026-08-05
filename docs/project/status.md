@@ -16,7 +16,7 @@ status: draft
 | Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
 | Dependency contract | Exact locks, installation classes, offline boundary, adapter requalification, consumer/maintainer separation, and reserved verification-artifact rules implemented |
 | Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, and completion-first anti-rabbit-hole handoff implemented |
-| Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: Git and colocated Jujutsu are active, with a read-only root/version/current-change checker; `jj 0.39.0` is reference-qualified and explicit Git-only distribution mode does not claim maintainer provenance |
+| Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, `jj 0.39.0` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
 | Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
 | Built-output browser contract | Independent representative routes; desktop/mobile geometry, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
 | Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |

@@ -20,7 +20,7 @@ status: draft
 | Diagrams | Mermaid, served locally |
 | Browser proof | Playwright with pinned Chromium |
 | Versioning | Git and GitHub Releases |
-| Local phases | [Jujutsu](https://github.com/jj-vcs/jj): `0.39.0` reference-qualified; `0.42.0` available but awaiting deliberate requalification |
+| Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): `0.39.0` reference-qualified; `0.42.0` available but awaiting deliberate requalification |
 | Local service | Repo wrapper plus OS adapter and HTTP-200 health |
 | Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |

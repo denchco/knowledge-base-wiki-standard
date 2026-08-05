@@ -31,6 +31,14 @@ Question 2 of N
 
 Update `N` as uncertainty narrows or expands. Do not ask a routine question when the standard, manifest, target evidence, or a reversible default resolves it safely.
 
+<!-- DKBWS-PROV-001-TURN:START -->
+## Development-turn completion
+
+- In a Standard Production maintenance workspace, every development turn that changes persistent repository files MUST end with that turn's changes recorded in a Jujutsu commit before the agent gives its final response.
+- Run the repository's complete applicable verification and the read-only maintainer provenance check first, then inspect Git and Jujutsu state and commit the turn's changes. A failed or unrun required check MUST be reported in the commit description and final response; it does not permit an uncommitted final handoff.
+- The boundary is the end of the development turn, not a subjective judgement that work is “substantive.” If the turn changed no persistent files, do not create an empty commit.
+<!-- DKBWS-PROV-001-TURN:END -->
+
 <!-- DKBWS-PROMPT-001-HANDOFF:START -->
 ## Completion and handoff
 
@@ -48,6 +56,6 @@ Update `N` as uncertainty narrows or expands. Do not ask a routine question when
 - Changes derived from a project remain proposals until classified as project-specific, reusable, preferred, or core.
 - Route a user-authored consumer improvement through `.github/ISSUE_TEMPLATE/standard-change.yml`, preserving the originating project and immutable revision. Finish and verify the project-owned implementation first; prepare an ignored `output/standard-change-proposal.md`, search existing issues read-only, and scrub private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material.
 - Before any remote write, show the exact repository, title, body, and labels and obtain explicit authority. If the issue form is unavailable, stop with the local draft; do not substitute a connector or CLI write. Filing never constitutes promotion and does not authorize a PR, release, publication, migration, pin, or conformance change.
-- Run `npm run verify`, run the read-only provenance check in maintainer mode, inspect `git status` and `jj status`, then record a JJ phase for substantive validated work.
+- Before ending each file-changing development turn, apply the managed `DKBWS-PROV-001` completion policy above.
 - After modifying canonical content or code, run `npm run graph:update` when Graphify is available.
 - If a Graphify query has insufficient recall, continue through its wiki/report and then the smallest relevant canonical source set; never treat graph absence as evidence absence.

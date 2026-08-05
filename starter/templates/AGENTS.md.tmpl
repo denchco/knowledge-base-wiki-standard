@@ -30,6 +30,14 @@
 
 Where material uncertainty remains, ask one individually numbered question at a time using `Question 1 of N`. Revise `N` as each answer changes the remaining uncertainty.
 
+<!-- DKBWS-PROV-001-TURN:START -->
+## Development-turn completion
+
+- In a Standard Production maintenance workspace, every development turn that changes persistent repository files MUST end with that turn's changes recorded in a Jujutsu commit before the agent gives its final response.
+- Run the repository's complete applicable verification and the read-only maintainer provenance check first, then inspect Git and Jujutsu state and commit the turn's changes. A failed or unrun required check MUST be reported in the commit description and final response; it does not permit an uncommitted final handoff.
+- The boundary is the end of the development turn, not a subjective judgement that work is “substantive.” If the turn changed no persistent files, do not create an empty commit.
+<!-- DKBWS-PROV-001-TURN:END -->
+
 <!-- DKBWS-PROMPT-001-HANDOFF:START -->
 ## Completion and handoff
 

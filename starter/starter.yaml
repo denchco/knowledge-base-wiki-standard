@@ -84,7 +84,7 @@ entries:
     role: "agent-contract"
     classification: "render-template"
     template: "starter/templates/AGENTS.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROV-001"]
     always: true
   - target: "CLAUDE.md"
     role: "claude-agent-contract"
@@ -96,7 +96,7 @@ entries:
     role: "dependency-contract"
     classification: "render-template"
     template: "starter/templates/DEPENDENCIES.md.tmpl"
-    requirements: ["DKBWS-VERIFY-001"]
+    requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
     always: true
   - target: "SECURITY.md"
     role: "security-policy"
@@ -162,7 +162,7 @@ entries:
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
@@ -172,7 +172,7 @@ entries:
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001"]
   - target: "docs/project/status.md"
     role: "project-status"
     classification: "render-template"
@@ -218,6 +218,13 @@ entries:
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
     requirements: ["DKBWS-VERIFY-001"]
+  - target: "scripts/jj-phase.mjs"
+    role: "development-turn-provenance"
+    classification: "adapt-from-release"
+    source: "scripts/jj-phase.mjs"
+    planning_only: true
+    dependency_closure: "the target's complete verification command, Git/Jujutsu status inspection, failed-check disclosure, clean-turn guard, and end-of-turn commit tests"
+    requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
   - target: "package-lock.json"
     role: "node-lock"
     classification: "adapt-from-release"

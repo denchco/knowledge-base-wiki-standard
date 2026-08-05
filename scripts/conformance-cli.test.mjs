@@ -1061,6 +1061,36 @@ test("distribution provenance cannot satisfy Standard Production maintainer prov
   assert.equal(report.summary.evaluationComplete, false);
 });
 
+test("maintainer provenance also requires the end-of-development-turn instruction and helper gate", () => {
+  const provenance = {
+    requirement: "DKBWS-PROV-001",
+    mode: "maintainer",
+    status: "pass",
+    readOnly: true,
+    git: { status: "pass" },
+    jujutsu: { status: "pass" },
+  };
+  const missingPolicy = buildFullProfileReport({
+    target: ROOT,
+    receipt: receiptFor(ROOT, "standard-production", [], { provenance, gates: [] }),
+  });
+  const missingResult = missingPolicy.requirementResults.find((item) => item.requirement === "DKBWS-PROV-001");
+  assert.equal(missingResult.status, "not-checked");
+  assert.match(missingResult.reason, /instruction\/helper gate/);
+
+  const completePolicy = buildFullProfileReport({
+    target: ROOT,
+    receipt: receiptFor(ROOT, "standard-production", [{
+      requirement: "DKBWS-PROV-001",
+      status: "pass",
+      evidence: ["suite"],
+    }], { provenance }),
+  });
+  const completeResult = completePolicy.requirementResults.find((item) => item.requirement === "DKBWS-PROV-001");
+  assert.equal(completeResult.status, "pass");
+  assert.match(completeResult.reason, /end-of-development-turn commit mechanism/);
+});
+
 test("full-profile conformance fails required-false and exact-value capability drift", () => {
   withTemporaryRoot((root) => {
     writePortableProject(root);

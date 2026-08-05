@@ -28,4 +28,6 @@ Use the [Graphify workflow](graphify.md) for query-first discovery, the six requ
 
 Never treat an LLM answer, rendered page, graph edge, or generated export as new evidence.
 
+In a Standard Production maintenance workspace, a file-changing development turn remains incomplete until its persistent changes are recorded in the required end-of-turn JJ commit under `DKBWS-PROV-001`.
+
 Codex reads the shared root `AGENTS.md`; Claude Code reaches the same contract through the root `CLAUDE.md` import. Use project status for zero to three current priorities and the validation queue for parked work. A completed response does not acquire a Next Steps section merely as boilerplate: apply the completion and cycle guard in `AGENTS.md` first.

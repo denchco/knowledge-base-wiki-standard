@@ -4,6 +4,8 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Strengthened `DKBWS-PROV-001` so every file-changing Standard Production development turn ends with its persistent changes in a JJ commit after verification and Git/Jujutsu inspection. Failed or unrun checks are disclosed in the commit and response rather than used to leave work uncommitted; no subjective “substantive work” threshold or no-change empty commit remains.
+- Migration: Standard Production maintainers update shared agent instructions, maintenance guidance, and the end-of-turn helper, then apply the rule prospectively from the upgraded revision. Existing JJ history is not rewritten; Portable Core and explicit Git-only distribution/CI checkouts are unchanged.
 - Added conditional `DKBWS-HUMAN-003` for dedicated, readable, trailing-column-aligned draft markers in primary navigation. The Zensical reference adapter uses SVG Repo's CC0 Pen Circle asset and verifies its tooltip, mask, and chevron-centre geometry in built output.
 - Extended `DKBWS-HUMAN-003` browser proof to require vertical row centring for the draft marker and stock chevron plus absence of page overflow.
 - Added a proposal-first GitHub issue form for user-authored consumer improvements, plus consumer-agent routing that preserves origin evidence, uses an ignored scrubbed draft and read-only duplicate search, requires exact-payload authority before remote submission, and grants no implicit PR, release, publication, migration, pin, or conformance authority.

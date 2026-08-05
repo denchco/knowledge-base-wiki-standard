@@ -167,7 +167,8 @@ function buildReceipt(provenance) {
     evidence("evidence-matrix", "evidence-matrix", "Claims mapped to support, state, and limitations.", "docs/evidence-matrix.md"),
     evidence("llm-wiki", "agent-contract", "Read order plus ingest, query, lint, authority, and generation boundaries.", "docs/llm-wiki/index.md"),
     evidence("prompt-contract", "prompt-contract", "Sequential clarification plus completion-first, bounded, anti-rabbit-hole handoff protocol.", "prompts/instantiate-wiki.md"),
-    evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, and parked-work boundary.", "AGENTS.md"),
+    evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, parked-work boundary, and end-of-development-turn JJ commit rule.", "AGENTS.md"),
+    evidence("jj-turn-helper", "test-suite", "End-of-turn helper verifies, inspects Git/Jujutsu state, commits changed turns including disclosed verification failures, and refuses empty commits.", "scripts/jj-phase.test.mjs"),
   ];
   const gatesWithEvidence = [
     {
@@ -196,6 +197,7 @@ function buildReceipt(provenance) {
         result("DKBWS-LINK-001", ["canonical-content"]),
         result("DKBWS-DESIGN-001", ["design-contract"]),
         result("DKBWS-PROMPT-001", ["standard-check", "prompt-contract", "agent-instruction-parity"]),
+        result("DKBWS-PROV-001", ["standard-check", "agent-instruction-parity", "jj-turn-helper"], "The shared instructions and executable helper enforce a disclosed JJ commit at every file-changing development-turn boundary."),
         result("DKBWS-UPDATE-001", ["conformance-fixtures"]),
         result("DKBWS-VERIFY-002", ["conformance-fixtures", "schema-artifacts"]),
         {

@@ -16,7 +16,7 @@ status: draft
 7. Run `npm run verify`.
 8. Refresh Graphify explicitly.
 9. Inspect Git and Jujutsu state.
-10. Record a validated JJ phase and prepare a reviewable Git change.
+10. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
 ## Consumer-derived proposals
 

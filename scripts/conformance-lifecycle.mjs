@@ -774,7 +774,7 @@ export function initPlan(options = {}) {
     { id: "renderer-design", purpose: "Apply the selected renderer and design-governance contracts.", requirements: ["DKBWS-RENDER-001", "DKBWS-DESIGN-001"] },
     { id: "graph-runtime", purpose: "Add Graphify publication, local runtimes, and stable service adapters required by the profile.", requirements: ["DKBWS-GRAPH-001", "DKBWS-RUNTIME-001"] },
     { id: "verification", purpose: "Run every selected deterministic and manual check without overstating proof.", always: true },
-    { id: "provenance", purpose: "Record reviewable Git history and colocated Jujutsu phases after validation.", requirements: ["DKBWS-PROV-001"] },
+    { id: "provenance", purpose: "End every file-changing development turn with a disclosed Jujutsu commit after verification and Git/Jujutsu inspection.", requirements: ["DKBWS-PROV-001"] },
   ].filter((stage) => stage.always || stage.requirements.some((requirement) => selectedRequirements.has(requirement)))
     .map(({ always, requirements, ...stage }) => stage);
   const deployment = options.deployment ?? "none";

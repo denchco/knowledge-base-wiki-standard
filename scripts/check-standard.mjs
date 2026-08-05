@@ -37,7 +37,7 @@ const required = [
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs",
-  "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/verify.mjs",
+  "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
   "sync/documentation-sync-contract-v1.json"
 ];
@@ -51,6 +51,8 @@ for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-H
 
 const agents = readFileSync("AGENTS.md", "utf8");
 const starterAgents = readFileSync("starter/templates/AGENTS.md.tmpl", "utf8");
+const maintenance = readFileSync("docs/llm-wiki/maintenance.md", "utf8");
+const starterMaintenance = readFileSync("starter/templates/docs/llm-wiki/maintenance.md.tmpl", "utf8");
 const claude = readFileSync("CLAUDE.md", "utf8");
 const starterClaude = readFileSync("starter/templates/CLAUDE.md.tmpl", "utf8");
 const codexSkill = readFileSync(".agents/skills/denchco-kb-wiki-standard/SKILL.md", "utf8");
@@ -64,6 +66,19 @@ const starterTargets = starterEntries.map((entry) => entry?.target);
 if (new Set(starterTargets).size !== starterTargets.length) failures.push("starter target paths must be unique");
 for (const entry of starterEntries.filter((candidate) => candidate?.classification === "render-template")) {
   if (!entry.template || !existsSync(entry.template)) failures.push(`starter render-template ${entry.target} has no existing template`);
+}
+for (const target of ["AGENTS.md", "DEPENDENCIES.md", "docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md"]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (!(entry?.requirements ?? []).includes("DKBWS-PROV-001")) {
+    failures.push(`starter ${target} must carry the DKBWS-PROV-001 development-turn boundary`);
+  }
+}
+const starterJjPhase = starterEntries.find((candidate) => candidate?.target === "scripts/jj-phase.mjs");
+if (starterJjPhase?.classification !== "adapt-from-release"
+  || starterJjPhase?.source !== "scripts/jj-phase.mjs"
+  || starterJjPhase?.planning_only !== true
+  || !(starterJjPhase?.requirements ?? []).includes("DKBWS-PROV-001")) {
+  failures.push("starter must adapt the pinned end-of-development-turn JJ helper for DKBWS-PROV-001");
 }
 for (const target of ["SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
@@ -156,6 +171,33 @@ if (!starterHandoff) failures.push("starter AGENTS.md template lacks the managed
 if (agentsHandoff && starterHandoff && agentsHandoff !== starterHandoff) {
   failures.push("root and starter completion/handoff policies have drifted");
 }
+
+const agentsTurnCompletion = managedSection(agents, "DKBWS-PROV-001-TURN");
+const starterTurnCompletion = managedSection(starterAgents, "DKBWS-PROV-001-TURN");
+if (!agentsTurnCompletion) failures.push("AGENTS.md lacks the managed development-turn completion policy");
+if (!starterTurnCompletion) failures.push("starter AGENTS.md template lacks the managed development-turn completion policy");
+if (agentsTurnCompletion && starterTurnCompletion && agentsTurnCompletion !== starterTurnCompletion) {
+  failures.push("root and starter development-turn completion policies have drifted");
+}
+for (const phrase of [
+  "every development turn that changes persistent repository files",
+  "before the agent gives its final response",
+  "failed or unrun required check",
+  "does not permit an uncommitted final handoff",
+  "not a subjective judgement",
+  "do not create an empty commit",
+]) {
+  if (!agentsTurnCompletion?.includes(phrase)) failures.push(`development-turn completion policy lacks: ${phrase}`);
+}
+for (const [name, source] of [
+  ["Standard maintenance", maintenance],
+  ["starter maintenance", starterMaintenance],
+  ["Standard skill", codexSkill],
+]) {
+  for (const phrase of ["development turn", "failed or unrun", "substantive", "empty commit"]) {
+    if (!source.includes(phrase)) failures.push(`${name} lacks development-turn completion phrase: ${phrase}`);
+  }
+}
 for (const phrase of [
   "Complete the requested scope before proposing further work",
   "recommendations, not continuation authority",
@@ -243,6 +285,9 @@ if (!pkg.scripts?.["conformance:test"]?.includes("html-script-json.test.mjs")) {
 }
 if (!pkg.scripts?.["conformance:test"]?.includes("runtime-browser-contract-config.test.mjs")) {
   failures.push("conformance:test does not exercise fail-closed representative browser route selection");
+}
+if (!pkg.scripts?.["conformance:test"]?.includes("jj-phase.test.mjs")) {
+  failures.push("conformance:test does not exercise end-of-development-turn JJ commit semantics");
 }
 if (!pkg.scripts?.check?.includes("check:visual-shape")) failures.push("check does not exercise check:visual-shape");
 if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("check does not exercise Draft 2020-12 artifact validation");

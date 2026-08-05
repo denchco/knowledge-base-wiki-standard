@@ -36,7 +36,7 @@
     "sync:documentation:check": "node scripts/sync-documentation-snapshot.mjs --check",
     "sync:documentation:apply": "node scripts/sync-documentation-snapshot.mjs --apply",
     "sync:documentation:test": "node --test scripts/sync-documentation-snapshot.test.mjs",
-    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/html-script-json.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/sync-documentation-snapshot.test.mjs",
+    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/sync-documentation-snapshot.test.mjs",
     "check": "node scripts/check-standard.mjs && npm run check:canonical-content && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
     "verify": "node scripts/verify.mjs",
     "verify:workspace": "npm run verify && npm run sync:documentation:check",

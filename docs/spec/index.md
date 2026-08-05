@@ -40,5 +40,6 @@ It incorporates:
 - The standard's help, knowledge, evidence, dogfood, fixture, and documentation-deployment content MUST NOT be installed as a consumer's subject corpus.
 - OKF portability results MUST remain distinct from stricter DenchCo profile results.
 - Conformance inspection and validation MUST be read-only and emit stable machine diagnostics.
+- Standard Production maintenance MUST close every file-changing development turn with a disclosed Jujutsu commit after verification and state inspection.
 
 See [Requirements](requirements.md), [Profiles](profiles.md), and [Conformance](conformance.md).

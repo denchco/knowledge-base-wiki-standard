@@ -7,6 +7,11 @@ status: draft
 
 # Research and change log
 
+## 2026-08-05
+
+- **Development-turn provenance boundary**: Strengthened `DKBWS-PROV-001` from reviewable validated phases to an explicit JJ commit at the end of every file-changing development turn. Verification and Git/Jujutsu inspection run first; failed or unrun checks are disclosed in the local commit and final response, no subjective significance threshold applies, and no-change turns create no empty commit.
+- **Prospective migration**: Synchronized the root and starter instructions, Codex/Claude skills, maintenance guidance, dependency contract, initialization prompt, lifecycle stage, conformance aggregation, and executable helper fixture. Existing JJ history remains intact and the rule applies from the upgraded revision forward.
+
 ## 2026-08-04
 
 - **Draft navigation promotion**: Promoted the user-directed Health IT Governance consumer pattern as conditional Human Wiki requirement `DKBWS-HUMAN-003`: draft pages use a dedicated edit marker, readable status text, and the same trailing centreline as nested-navigation chevrons.

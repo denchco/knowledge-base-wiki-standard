@@ -230,18 +230,19 @@ function provenanceResult(receipt, contributions) {
     };
   }
   const provenance = receipt.provenance;
-  const passes = provenance?.requirement === "DKBWS-PROV-001"
+  const workspacePasses = provenance?.requirement === "DKBWS-PROV-001"
     && provenance.mode === "maintainer"
     && provenance.status === "pass"
     && provenance.readOnly === true
     && provenance.git?.status === "pass"
     && provenance.jujutsu?.status === "pass";
-  if (passes) {
+  const turnPolicyPasses = contributions.some((item) => item.status === "pass");
+  if (workspacePasses && turnPolicyPasses) {
     return {
       requirement: "DKBWS-PROV-001",
       status: "pass",
-      reason: "The read-only maintainer receipt proves colocated, reference-qualified Git/Jujutsu provenance.",
-      evidence: ["provenance-receipt"],
+      reason: "The read-only maintainer receipt proves colocated, reference-qualified Git/Jujutsu provenance, and the successful instruction/helper gate proves the end-of-development-turn commit mechanism.",
+      evidence: ["provenance-receipt", ...combineEvidence(contributions)],
     };
   }
   return {
@@ -249,8 +250,10 @@ function provenanceResult(receipt, contributions) {
     status: "not-checked",
     reason: provenance?.mode === "distribution"
       ? "Distribution mode proves only the Git-distributed surface; maintainer Jujutsu provenance remains not checked."
-      : "No successful maintainer-mode Git/Jujutsu provenance receipt was supplied.",
-    evidence: provenance ? ["provenance-receipt"] : [],
+      : workspacePasses
+        ? "The maintainer workspace passed, but no successful end-of-development-turn instruction/helper gate was supplied."
+        : "No successful maintainer-mode Git/Jujutsu provenance receipt was supplied.",
+    evidence: [...(provenance ? ["provenance-receipt"] : []), ...combineEvidence(contributions)],
   };
 }
 

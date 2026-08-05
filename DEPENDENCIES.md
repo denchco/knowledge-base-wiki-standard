@@ -48,8 +48,11 @@ The repeatable commands are:
 | `npm run sync:documentation:apply` | Explicitly refreshes only the sibling documentation repository's managed standard snapshot; refuses local edits and unmanaged snapshot paths. |
 | `npm run sync:documentation:check` | Read-only comparison of every allowlisted file hash, byte count, mode, contract digest, and standard revision. |
 | `npm run verify:workspace` | Runs complete standard verification and then proves the real sibling documentation snapshot is current. |
+| `npm run jj:phase -- -m "Development-turn summary"` | Runs complete verification, inspects Git and Jujutsu state, and records the turn's persistent changes in a JJ commit. A failed verification is disclosed in the commit and returned as a failing command; a clean turn creates no empty commit. |
 
 The provenance checker is read-only and has two explicit modes. Maintainer mode proves `DKBWS-PROV-001` by checking the Git root and version, the `jj` version, the colocated Jujutsu/Git roots, and a readable current Jujutsu change with working-copy snapshotting disabled. Distribution/CI mode checks only the Git-distributed surface and reports Jujutsu as not checked; it does not prove a Standard Production maintenance workspace.
+
+The read-only probe proves the workspace substrate. The end-of-development-turn helper and instruction fixture prove the required operating mechanism; reviewable JJ history remains the evidence that completed turns actually used it. The commit trigger is every file-changing development-turn boundary, not a subjective significance threshold.
 
 Successful `npm run verify` writes an ignored `output/verification/receipt.json` and `output/verification/conformance-report.json`. The receipt records each command gate, local evidence identifiers and digests, the canonical-input before/after result, and the explicit provenance mode. The report builder schema-validates both inputs and output, distinguishes evaluation completeness from conformance outcome, and refuses to infer passes for missing gates. Maintainer verification requires a conformant complete report. Git-only CI permits only the explicit `DKBWS-PROV-001` `not-checked` gap; any other failure or unevaluated requirement still fails CI.
 

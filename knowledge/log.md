@@ -1,5 +1,9 @@
 # Bundle update log
 
+## 2026-08-05
+
+- **Development-turn provenance**: Standard Production now records every file-changing development turn in a JJ commit before the final response, after verification and state inspection. Failed or unrun checks are disclosed, no subjective “substantive” threshold applies, and no-change turns do not create empty commits.
+
 ## 2026-08-04
 
 - **Human Wiki lifecycle semantics**: Added conditional `DKBWS-HUMAN-003` so a displayed draft navigation state combines dedicated edit artwork, readable status text, and trailing-control alignment, while renderers without navigation status markers remain not applicable.
