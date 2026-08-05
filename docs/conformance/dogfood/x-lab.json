@@ -81,7 +81,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo upgrade/diff mechanism exists."},
     {"id": "bounded-ask-wiki", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm/chat-function.md"], "finding": "Chat is a planned design, not a deployed capability."}
   ],
-  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 9},
+  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 10},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check_wiki.py"], "finding": "Canonical knowledge is Markdown with checked relative links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares version, role mappings, capabilities or deviations."},
@@ -95,6 +95,7 @@
     {"id": "DKBWS-HUMAN-003", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no dedicated draft marker, readable status mapping, or chevron-alignment evidence; no pass is inferred."},
     {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm/index.md", "docs/llm/maintenance-contract.md", "AGENTS.md"], "finding": "Read order, maintenance, query routing, authority and generated boundaries are defined."},
     {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm/index.md", "docs/llm/context-map.md", "scripts/check_wiki.py"], "finding": "Context maps and operational links go beyond navigation; local links are checked."},
+    {"id": "DKBWS-LINK-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no exact source-row navigation or registered-authority-link evidence; no pass is inferred."},
     {"id": "DKBWS-GRAPH-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/operating-model/conformance.md", "graphify-out/graph.json"], "finding": "Raw Graphify exists, but shared reader-facing 2D/3D publication is explicitly absent."},
     {"id": "DKBWS-DESIGN-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "Makefile"], "finding": "Named tokens exist, but no lint/check demonstrates a lintable design contract."},
     {"id": "DKBWS-RENDER-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["mkdocs.yml"], "finding": "Material compatibility is selected, not the Zensical standard-production profile."},

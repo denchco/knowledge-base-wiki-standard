@@ -17,4 +17,4 @@ x-denchco:
 
 # Evidence governance
 
-Authority flows from primary sources through registered source identity, evidence state, canonical synthesis, and operational context. Rendered pages, graphs, LLM bundles, exports, and generated answers remain derived discovery surfaces.
+Authority flows from primary sources through registered source identity, evidence state, canonical synthesis, and operational context. Under `DKBWS-LINK-002`, every registered identity displayed to a Human Wiki reader independently navigates to its exact internal source-register row, where any named primary authority URL is governed. Rendered pages, graphs, LLM bundles, exports, and generated answers remain derived discovery surfaces.

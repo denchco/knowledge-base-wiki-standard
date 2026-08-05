@@ -23,9 +23,9 @@ const REPORT_SCHEMA_PATH = path.join(ROOT, "schema/conformance-report-v1.json");
 const RECEIPT_SCHEMA_ID = "https://denchco.github.io/knowledge-base-wiki-documentation/schema/verification-receipt-v1.json";
 const CAPABILITY_REQUIREMENTS = Object.freeze({
   evidence_governance: ["DKBWS-EVID-001", "DKBWS-EVID-002"],
-  human_wiki: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003"],
+  human_wiki: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002"],
   llm_wiki: ["DKBWS-LLM-001"],
-  human_renderer: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-RENDER-001"],
+  human_renderer: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002", "DKBWS-RENDER-001"],
   graphify: ["DKBWS-GRAPH-001"],
   local_browser_runtimes: ["DKBWS-RENDER-001"],
   browser_verification: ["DKBWS-VERIFY-001", "DKBWS-VERIFY-002"],

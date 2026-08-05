@@ -146,6 +146,7 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 - Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. Keep ordinary quotations neutral.
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
+- Render every displayed `SRC-NNN` as an independently focusable internal link to its exact source-register row while preserving the visible `[SRC-NNN]` grammar. Lists keep separate link targets and compact ranges link their displayed endpoints. Do not suppress the native focus indication or make brackets the only accessible label.
 - When primary navigation exposes a page's `draft` status, use the registered Pen Circle edit marker with the native “Draft — research in progress” tooltip. In the Zensical reference adapter its trailing centre aligns with the stock nested-navigation chevron column; stable or deprecated states retain their own semantics and artwork.
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.
 - Avoid marketing heroes, nested cards, decorative panels, and prose that overstates evidence.

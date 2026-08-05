@@ -3,6 +3,7 @@ import fs from "node:fs";
 const errors = [];
 const design = read("DESIGN.md");
 const theme = read("docs/assets/theme.css");
+const content = read("docs/assets/content.css");
 const layout = read("docs/assets/layout-width.css");
 const graph = read("docs/assets/graph.css");
 const publisher = read("scripts/publish-graphify-assets.mjs");
@@ -58,8 +59,14 @@ requireIn(starterDesign, "no more than 60px", "starter DESIGN.md must carry the 
 requireIn(starterDesign, "Draft — research in progress", "starter DESIGN.md must carry the readable draft-status contract");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
 requireIn(requirements, "DKBWS-HUMAN-003", "the normative catalogue must define DKBWS-HUMAN-003");
+requireIn(requirements, "DKBWS-LINK-002", "the normative catalogue must define DKBWS-LINK-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-003", "the Human and Agent profile must require DKBWS-HUMAN-003");
+requireIn(humanProfile, "- DKBWS-LINK-002", "the Human and Agent profile must require DKBWS-LINK-002");
+requireIn(design, "independently focusable internal link", "DESIGN.md must preserve independent source-row links");
+requireIn(starterDesign, "independently focusable internal link", "starter DESIGN.md must preserve independent source-row links");
+requireIn(content, '.md-typeset a[href*="#src-"]::before', "source-row links must restore the visible opening bracket");
+requireIn(content, '.md-typeset a[href*="#src-"]::after', "source-row links must restore the visible closing bracket");
 for (const issue of governingQuestionMarkupIssues(home)) errors.push(`Standard homepage ${issue}`);
 requireIn(
   starterHome,

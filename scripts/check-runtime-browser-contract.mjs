@@ -29,7 +29,7 @@ try {
   console.error(`Runtime browser contract configuration failed: ${error.message}`);
   process.exit(1);
 }
-const { routes, sources, graph } = contractConfiguration;
+const { routes, sources, graph, sourceLinks } = contractConfiguration;
 
 const server = spawn(process.execPath, [serverProgram], {
   cwd: root,
@@ -47,6 +47,9 @@ try {
   initialUrl.searchParams.set("architecture", routes.architecture);
   initialUrl.searchParams.set("table", routes.table);
   initialUrl.searchParams.set("list", routes.list);
+  initialUrl.searchParams.set("sourceLinks", routes.sourceLinks);
+  initialUrl.searchParams.set("sourceRegister", routes.sourceRegister);
+  initialUrl.searchParams.set("sourceLinksEnabled", sourceLinks.required ? "1" : "0");
   initialUrl.searchParams.set("graph", graph.required ? "1" : "0");
   initialUrl.searchParams.set("graph2d", routes.graph2d);
   initialUrl.searchParams.set("graph3d", routes.graph3d);

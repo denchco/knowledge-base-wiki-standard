@@ -28,6 +28,10 @@ const required = [
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
   "schema/documentation-sync-snapshot-v1.json",
+  "fixtures/conforming/reader-source-links/docs/sources.md",
+  "fixtures/conforming/reader-source-links/docs/evidence-matrix.md",
+  "fixtures/nonconforming/reader-source-links/docs/sources.md",
+  "fixtures/nonconforming/reader-source-links/docs/evidence-matrix.md",
   "profiles/portable-core.yaml",
   "profiles/standard-production.yaml", "scripts/sync-runtime-assets.mjs",
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
@@ -36,6 +40,7 @@ const required = [
   "scripts/runtime-browser-contract-config.mjs", "scripts/runtime-browser-contract-config.test.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
+  "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
@@ -46,7 +51,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -79,6 +84,13 @@ if (starterJjPhase?.classification !== "adapt-from-release"
   || starterJjPhase?.planning_only !== true
   || !(starterJjPhase?.requirements ?? []).includes("DKBWS-PROV-001")) {
   failures.push("starter must adapt the pinned end-of-development-turn JJ helper for DKBWS-PROV-001");
+}
+const starterSourceLinks = starterEntries.find((candidate) => candidate?.target === "scripts/link-source-citations.mjs");
+if (starterSourceLinks?.classification !== "adapt-from-release"
+  || starterSourceLinks?.source !== "scripts/link-source-citations.mjs"
+  || starterSourceLinks?.planning_only !== true
+  || !(starterSourceLinks?.requirements ?? []).includes("DKBWS-LINK-002")) {
+  failures.push("starter must adapt the pinned reader source-link checker for DKBWS-LINK-002");
 }
 for (const target of ["SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
@@ -258,6 +270,11 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (actual !== expected) failures.push(`dependency ${dependency} must be exactly ${expected}; found ${actual ?? "unlisted"}`);
 }
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
+for (const command of ["check:source-links", "sources:link"]) {
+  if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
+}
+if (!pkg.scripts?.check?.includes("check:source-links")) failures.push("npm run check must include the reader source-link gate");
+if (!pkg.scripts?.["conformance:test"]?.includes("link-source-citations.test.mjs")) failures.push("conformance:test must include reader source-link fixtures");
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
 if (pkg.engines?.node !== ">=24") failures.push(`Node engine must be >=24; found ${pkg.engines?.node ?? "unlisted"}`);
 const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));

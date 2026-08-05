@@ -692,7 +692,9 @@ function sourceCatalog() {
       ? cells[sourceCellIndex].match(new RegExp(sourceIdPattern))?.[0]
       : undefined;
     if (!id || sources.has(id)) continue;
-    const title = cells[sourceCellIndex + 1] ?? id;
+    const title = (cells[sourceCellIndex + 1] ?? id)
+      .replace(/<span\s+id="src-\d{3}"><\/span>/gi, "")
+      .trim();
     sources.set(id, { id, title });
   }
   return sources;

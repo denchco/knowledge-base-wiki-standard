@@ -18,6 +18,12 @@ status: draft
 9. Inspect Git and Jujutsu state.
 10. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
+## Reader source links
+
+- Add a stable anchor to every mapped source-register row. Link each visible source identity independently to its exact internal row; link every list member and only the displayed endpoints of a compact range.
+- Use a registered primary URL when prose directly links a specifically named official authority, guidance, or publication. Do not turn generic institution names into decorative authority links.
+- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, lost visible brackets, and broken destination journeys.
+
 ## Consumer-derived proposals
 
 When a user-authored consumer change appears reusable, preserve its originating project and immutable revision and use the [standard-change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml). Complete and verify the project-owned request first, search existing issues read-only, and prepare ignored `output/standard-change-proposal.md` with classification, affected contract, evidence, accessibility/browser results, dependencies, fallback, fixtures, and migration impact. Scrub private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material.

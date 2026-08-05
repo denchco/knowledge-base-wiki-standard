@@ -8,6 +8,9 @@ export default async (page, options = {}) => {
       architectureRoute: current.searchParams.get("architecture"),
       tableRoute: current.searchParams.get("table"),
       listRoute: current.searchParams.get("list"),
+      sourceLinksRoute: current.searchParams.get("sourceLinks"),
+      sourceRegisterRoute: current.searchParams.get("sourceRegister") || "/sources/",
+      sourceLinksEnabled: current.searchParams.get("sourceLinksEnabled") === "1",
       graphEnabled: current.searchParams.get("graph") === "1",
       graph2dRoute: current.searchParams.get("graph2d") || "/graph/two-dimensional/",
       graph3dRoute: current.searchParams.get("graph3d") || "/graph/three-dimensional/",
@@ -19,6 +22,9 @@ export default async (page, options = {}) => {
   const architectureRoute = configuration.architectureRoute || mermaidRoute;
   const tableRoute = configuration.tableRoute || mermaidRoute;
   const listRoute = configuration.listRoute || mermaidRoute;
+  const sourceLinksRoute = configuration.sourceLinksRoute || questionRoute;
+  const sourceRegisterRoute = configuration.sourceRegisterRoute;
+  const sourceLinksEnabled = configuration.sourceLinksEnabled;
   const graphEnabled = configuration.graphEnabled;
   const failures = [];
   const requests = [];
@@ -111,6 +117,46 @@ export default async (page, options = {}) => {
     );
     check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow at ${viewportName} width`);
     return metrics;
+  };
+  const inspectSourceLink = async (viewportName, followDestination = false) => {
+    if (!sourceLinksEnabled) return null;
+    await goto(sourceLinksRoute);
+    const citation = page.locator('.md-content__inner a[href*="#src-"]').first();
+    await citation.waitFor({ state: "visible" });
+    const metrics = await citation.evaluate(element => ({
+      id: element.textContent.trim(),
+      accessibleName: element.getAttribute("aria-label") || element.textContent.trim(),
+      href: element.href,
+      tabIndex: element.tabIndex,
+      before: getComputedStyle(element, "::before").content,
+      after: getComputedStyle(element, "::after").content,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
+    const target = new URL(metrics.href);
+    check(/^SRC-\d{3}$/.test(metrics.id), `The representative source link must retain its stable identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.accessibleName.includes(metrics.id), `The representative source link must keep an intelligible accessible identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.tabIndex === 0, `The representative source link must be keyboard focusable at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.before === '"["' && metrics.after === '"]"', `The representative source link must visibly render as [${metrics.id}] at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(target.pathname === sourceRegisterRoute && target.hash === `#${metrics.id.toLowerCase()}`, `The representative source link must target its exact mapped source row at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.pageOverflow <= 1, `Reader source links must not create page overflow at ${viewportName} width`);
+    await citation.focus();
+    check(await citation.evaluate(element => document.activeElement === element), `The representative source link must accept keyboard focus at ${viewportName} width`);
+
+    if (!followDestination) return metrics;
+    await Promise.all([
+      page.waitForURL(url => url.pathname === sourceRegisterRoute && url.hash === `#${metrics.id.toLowerCase()}`),
+      citation.click(),
+    ]);
+    const anchor = page.locator(`#${metrics.id.toLowerCase()}`);
+    await anchor.waitFor({ state: "attached" });
+    const destination = await anchor.evaluate((element, id) => ({
+      row: element.closest("tr")?.textContent.replace(/\s+/g, " ").trim() || "",
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      id,
+    }), metrics.id);
+    check(destination.row.includes(metrics.id), `The source fragment must belong to the matching source-register row: ${JSON.stringify(destination)}`);
+    check(destination.pageOverflow <= 1, `The source-register destination must not overflow at ${viewportName} width`);
+    return { ...metrics, destination };
   };
   const inspectDraftNavigation = async viewportName => {
     const metrics = await page.evaluate(() => {
@@ -738,6 +784,7 @@ export default async (page, options = {}) => {
   check(listGeometry.listStyle === "square", "Unordered content lists must use square markers");
   check(listGeometry.listMargin === "0px" && px(listGeometry.listPadding) > 0, "List indentation must be internal to the body-aligned list box");
   check(closeTo(px(listGeometry.markerFont), px(listGeometry.itemFont), 0.2), "Square markers must render at list-text scale");
+  const desktopSourceLink = await inspectSourceLink("desktop", true);
 
   await page.setViewportSize({ width: 768, height: 1024 });
   const representativeTablet = await inspectMermaidPage({
@@ -756,6 +803,7 @@ export default async (page, options = {}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await goto(questionRoute);
   const mobileGoverningQuestion = await inspectGoverningQuestion("mobile");
+  const mobileSourceLink = await inspectSourceLink("mobile");
   await goto(mermaidRoute);
   await page.waitForSelector(".mermaid");
   await page.waitForFunction(() => document.querySelector(".mermaid")?.getBoundingClientRect().height > 40);
@@ -902,6 +950,10 @@ export default async (page, options = {}) => {
     },
     draftNavigation: {
       desktop: desktopDraftNavigation,
+    },
+    sourceLinks: {
+      desktop: desktopSourceLink,
+      mobile: mobileSourceLink,
     },
     mermaid: {
       desktop: mermaidPixels,

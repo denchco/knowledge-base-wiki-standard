@@ -79,7 +79,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo standard diff/upgrade workflow exists."},
     {"id": "bounded-ask-wiki", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["docs/project/conformance.md"], "finding": "Ask Wiki is explicitly not part of this topic profile."}
   ],
-  "requirement_summary": {"PASS": 12, "FAIL": 4, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 6},
+  "requirement_summary": {"PASS": 12, "FAIL": 4, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 7},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-content.mjs"], "finding": "Canonical knowledge is Markdown with checked local source links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares version, roles, capabilities or deviations."},
@@ -93,6 +93,7 @@
     {"id": "DKBWS-HUMAN-003", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no dedicated draft marker, readable status mapping, or chevron-alignment evidence; no pass is inferred."},
     {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "AGENTS.md", "package.json"], "finding": "Required semantics are distributed but present."},
     {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/canonical-concept-links.json", "scripts/check-content.mjs"], "finding": "Required contextual inbound links are checked."},
+    {"id": "DKBWS-LINK-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no exact source-row navigation or registered-authority-link evidence; no pass is inferred."},
     {"id": "DKBWS-GRAPH-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "scripts/check-graphify-assets.mjs"], "finding": "One enriched dataset drives checked real 2D and 3D publications."},
     {"id": "DKBWS-DESIGN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "scripts/check-content.mjs"], "finding": "Named tokens and an executable project check exist."},
     {"id": "DKBWS-RENDER-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["pyproject.toml", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html"], "finding": "Zensical is exactly pinned, but production graph browser runtimes are remote unpkg dependencies."},

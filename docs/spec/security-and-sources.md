@@ -22,4 +22,6 @@ Each subcontrol is reported as pass, fail, waived, not applicable, or not checke
 
 The canonical repository policies are `SECURITY.md` and `SOURCE_POLICY.md`. Selected profiles MAY strengthen them but MUST NOT weaken secret handling, evidence authority, non-execution of untrusted source content, or explicit authorization for state-changing external operations.
 
+Where `DKBWS-LINK-002` applies, the mapped source register is also the authority for reader link targets. A displayed source identity routes internally to its exact row; a direct link that specifically names an official authority or publication uses a URL registered for that source. This link registration does not grant redistribution rights or promote the rendered page to evidence authority.
+
 An MCP server is optional. It MUST NOT become the only means of reading the standard, and write-capable tools MUST be separately authorized from read-only resources and validation.

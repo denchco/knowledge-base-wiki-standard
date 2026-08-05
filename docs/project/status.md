@@ -10,7 +10,7 @@ status: draft
 | Surface | State |
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
-| Evidence governance | Implemented candidate |
+| Evidence governance | Implemented candidate with stable row anchors, individual internal citation links, registered named-authority URLs, and exact-destination lint |
 | Human Zensical wiki | Governed reference runtime with strict build, local assets, and dedicated readable draft-navigation markers |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, and completion/cycle guards |
 | Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
@@ -18,10 +18,10 @@ status: draft
 | Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, and completion-first anti-rabbit-hole handoff implemented |
 | Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, `jj 0.39.0` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
 | Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
-| Built-output browser contract | Independent representative routes; desktop/mobile geometry, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
+| Built-output browser contract | Independent representative routes; desktop/mobile geometry, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
 | Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
-| Subject-empty starter | Allowlisted policy/graph/planning templates implemented with consumer-owned licensing and maintainer-sync exclusion; root copying and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
+| Subject-empty starter | Allowlisted policy/graph/planning templates implemented with conditional reader-evidence navigation, consumer-owned licensing, and maintainer-sync exclusion; root copying, invented citations, and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
 | Public documentation boundary | Human guidance routes to the separate Pages site; this repository remains normative and local pinned schemas remain the validation input |
 | Standard-change intake | Proposal-first `standard-change.yml` route implemented with verified-local-first, scrubbed ignored draft, read-only duplicate search, exact remote-payload authority, no write fallback, and separate promotion/release/migration authority |
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |

@@ -231,6 +231,7 @@ test("canonical profiles resolve inheritance and align with the requirement cata
   assert.ok(portable.requirements.includes("DKBWS-OKF-003"));
   assert.ok(production.requirements.includes("DKBWS-OKF-003"));
   assert.ok(production.requirements.includes("DKBWS-HUMAN-002"));
+  assert.ok(production.requirements.includes("DKBWS-LINK-002"));
   assert.ok(production.requirements.includes("DKBWS-VERIFY-002"));
   assert.deepEqual(
     production.sources.map((source) => source.path),

@@ -4,3 +4,14 @@
   background-color: var(--md-accent-fg-color--transparent);
   color: var(--md-default-fg-color);
 }
+
+/* Source-row links preserve the visible [SRC-NNN] grammar while each identity
+   remains its own native, keyboard-focusable link. */
+
+.md-typeset a[href*="#src-"]::before {
+  content: "[";
+}
+
+.md-typeset a[href*="#src-"]::after {
+  content: "]";
+}

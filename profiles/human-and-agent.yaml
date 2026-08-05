@@ -8,6 +8,7 @@ requires:
   - DKBWS-HUMAN-003
   - DKBWS-LLM-001
   - DKBWS-LINK-001
+  - DKBWS-LINK-002
   - DKBWS-PROMPT-001
 capabilities:
   human_wiki: required

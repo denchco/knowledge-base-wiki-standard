@@ -2,6 +2,8 @@
 
 Every source record should state identity, origin, retrieval date, source type, licence or usage basis, confidentiality, personal-data classification, retention location, integrity/hash where useful, and known limitations.
 
+When a reader-facing page directly names and links an official authority, guidance, or publication, use the primary URL registered in that source record. Displayed stable source identities link internally to their exact source-register rows; the register remains the governed hop to external authority.
+
 ## Storage tiers
 
 - **Raw**: immutable originals. Large, sensitive, licensed, or binary material may remain outside Git in controlled object storage with a content hash and retrieval record.

@@ -13,6 +13,7 @@ const routeEnvironment = {
   architecture: "DKBWS_BROWSER_ARCHITECTURE_ROUTE",
   table: "DKBWS_BROWSER_TABLE_ROUTE",
   list: "DKBWS_BROWSER_LIST_ROUTE",
+  sourceLinks: "DKBWS_BROWSER_SOURCE_LINKS_ROUTE",
   graph2d: "DKBWS_BROWSER_GRAPH_2D_ROUTE",
   graph3d: "DKBWS_BROWSER_GRAPH_3D_ROUTE",
 };
@@ -114,17 +115,33 @@ export function resolveRuntimeBrowserConfiguration(options = {}) {
   const mermaid = configuredRoute("mermaid", question);
   const architectureDefault = fs.existsSync(siteFileForRoute(root, "/architecture/")) ? "/architecture/" : mermaid;
   const tableDefault = fs.existsSync(siteFileForRoute(root, "/spec/requirements/")) ? "/spec/requirements/" : question;
+  const sourceLinksDefault = fs.existsSync(siteFileForRoute(root, "/evidence-matrix/")) ? "/evidence-matrix/" : question;
+  const sourceRegister = routeFromMarkdownPath(manifest.roles?.source_register);
   const routes = {
     question,
     mermaid,
     architecture: configuredRoute("architecture", architectureDefault),
     table: configuredRoute("table", tableDefault),
     list: configuredRoute("list", question),
+    sourceLinks: configuredRoute("sourceLinks", sourceLinksDefault),
+    sourceRegister,
     graph2d: configuredRoute("graph2d", "/graph/two-dimensional/"),
     graph3d: configuredRoute("graph3d", "/graph/three-dimensional/"),
   };
 
-  for (const name of ["question", "mermaid", "architecture", "table", "list"]) {
+  const sourceLinksRequired = profile.requirements.includes("DKBWS-LINK-002")
+    && !(manifest.deviations ?? []).some(deviation => (
+      deviation?.requirement === "DKBWS-LINK-002" && deviation?.status === "not-applicable"
+    ));
+  if (sourceLinksRequired && (
+    typeof manifest.roles?.source_register !== "string"
+    || !manifest.roles.source_register.endsWith(".md")
+  )) {
+    throw new Error("DKBWS-LINK-002 requires a mapped roles.source_register Markdown path.");
+  }
+  const requiredRoutes = ["question", "mermaid", "architecture", "table", "list"];
+  if (sourceLinksRequired) requiredRoutes.push("sourceLinks", "sourceRegister");
+  for (const name of requiredRoutes) {
     if (!fs.existsSync(siteFileForRoute(root, routes[name]))) {
       throw new Error(`Runtime browser contract ${name} route is missing from the built site: ${routes[name]}`);
     }
@@ -170,6 +187,9 @@ export function resolveRuntimeBrowserConfiguration(options = {}) {
       required: graphRequired,
       selectedByProfile: profileRequiresGraph,
       selectedByManifest: manifestSelectsGraph,
+    },
+    sourceLinks: {
+      required: sourceLinksRequired,
     },
   };
 }

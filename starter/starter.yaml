@@ -84,7 +84,7 @@ entries:
     role: "agent-contract"
     classification: "render-template"
     template: "starter/templates/AGENTS.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROV-001"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-LINK-002"]
     always: true
   - target: "CLAUDE.md"
     role: "claude-agent-contract"
@@ -108,7 +108,7 @@ entries:
     role: "source-policy"
     classification: "render-template"
     template: "starter/templates/SOURCE_POLICY.md.tmpl"
-    requirements: ["DKBWS-SEC-001"]
+    requirements: ["DKBWS-SEC-001", "DKBWS-LINK-002"]
     always: true
   - target: "LICENSING.md"
     role: "licensing-record"
@@ -137,32 +137,32 @@ entries:
     role: "source-register"
     classification: "render-template"
     template: "starter/templates/docs/sources.md.tmpl"
-    requirements: ["DKBWS-EVID-001"]
+    requirements: ["DKBWS-EVID-001", "DKBWS-LINK-002"]
   - target: "docs/evidence-matrix.md"
     role: "evidence-matrix"
     classification: "render-template"
     template: "starter/templates/docs/evidence-matrix.md.tmpl"
-    requirements: ["DKBWS-EVID-002"]
+    requirements: ["DKBWS-EVID-002", "DKBWS-LINK-002"]
   - target: "docs/validation-queue.md"
     role: "validation-queue"
     classification: "render-template"
     template: "starter/templates/docs/validation-queue.md.tmpl"
-    requirements: ["DKBWS-EVID-002"]
+    requirements: ["DKBWS-EVID-002", "DKBWS-LINK-002"]
   - target: "docs/log.md"
     role: "research-log"
     classification: "render-template"
     template: "starter/templates/docs/log.md.tmpl"
-    requirements: ["DKBWS-EVID-002"]
+    requirements: ["DKBWS-EVID-002", "DKBWS-LINK-002"]
   - target: "docs/index.md"
     role: "human-wiki"
     classification: "render-template"
     template: "starter/templates/docs/index.md.tmpl"
-    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003"]
+    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002"]
   - target: "docs/llm-wiki/index.md"
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-LINK-002"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
@@ -172,7 +172,7 @@ entries:
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-LINK-002"]
   - target: "docs/project/status.md"
     role: "project-status"
     classification: "render-template"
@@ -183,7 +183,7 @@ entries:
     role: "design-contract"
     classification: "render-template"
     template: "starter/templates/DESIGN.md.tmpl"
-    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003"]
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002"]
   - target: "zensical.toml"
     role: "renderer-config"
     classification: "render-template"
@@ -195,7 +195,7 @@ entries:
     source: "docs/assets/"
     planning_only: true
     dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates"
-    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003"]
+    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002"]
   - target: "docs/graph/index.md"
     role: "graph-entry"
     classification: "render-template"
@@ -217,7 +217,7 @@ entries:
     source: "package.json"
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
-    requirements: ["DKBWS-VERIFY-001"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-LINK-002"]
   - target: "scripts/jj-phase.mjs"
     role: "development-turn-provenance"
     classification: "adapt-from-release"
@@ -225,6 +225,13 @@ entries:
     planning_only: true
     dependency_closure: "the target's complete verification command, Git/Jujutsu status inspection, failed-check disclosure, clean-turn guard, and end-of-turn commit tests"
     requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/link-source-citations.mjs"
+    role: "reader-source-link-check"
+    classification: "adapt-from-release"
+    source: "scripts/link-source-citations.mjs"
+    planning_only: true
+    dependency_closure: "mapped reader evidence surfaces, source-register path and identity grammar, stable row anchors, optional idempotent rewrite, lint fixtures, visible citation styling, and built-output exact-row browser proof"
+    requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
   - target: "package-lock.json"
     role: "node-lock"
     classification: "adapt-from-release"
@@ -252,4 +259,4 @@ entries:
     source: ".github/workflows/verify.yml"
     planning_only: true
     dependency_closure: "every consumer command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow; exclude Standard-maintainer documentation synchronization unless independently declared"
-    requirements: ["DKBWS-VERIFY-001"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-LINK-002"]

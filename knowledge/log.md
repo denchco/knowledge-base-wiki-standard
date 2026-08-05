@@ -2,6 +2,7 @@
 
 ## 2026-08-05
 
+- **Reader evidence navigation**: Added conditional `DKBWS-LINK-002`, making every registered identity displayed in a Human Wiki an independent internal link to its exact source-register row. Named authority links use registered URLs, automatic rewriting remains optional, and subject-empty or citation-free Wikis do not invent evidence.
 - **Development-turn provenance**: Standard Production now records every file-changing development turn in a JJ commit before the final response, after verification and state inspection. Failed or unrun checks are disclosed, no subjective “substantive” threshold applies, and no-change turns do not create empty commits.
 
 ## 2026-08-04
