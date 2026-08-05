@@ -12,7 +12,7 @@ okf_version: "0.2"
 
 The DenchCo Knowledge Base Wiki Standard defines a canonical and repeatable repository pattern for evidence-governed knowledge bases maintained by humans and AI agents.
 
-This repository is the sole normative authority. Public human guidance at <https://denchco.github.io/knowledge-base-wiki-documentation/> is a separate explanatory publication and cannot change conformance requirements.
+This Wiki is the separate human help, explanation, and documentation publication available at <https://denchco.github.io/knowledge-base-wiki-documentation/>. The public [DenchCo Knowledge Base Wiki Standard repository](https://github.com/denchco/knowledge-base-wiki-standard) is the sole normative authority; its URL is the complete starting prompt given to an AI agent to create an independent Knowledge Base Wiki, and the repository links back to this Wiki for human guidance. This Wiki explains how to understand and use the Standard but cannot define or change conformance requirements.
 
 It incorporates:
 
