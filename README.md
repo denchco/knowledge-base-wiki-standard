@@ -64,6 +64,7 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 
 - **Plain Markdown source** that remains readable and editable without specialist software.
 - **A searchable Human Wiki** for reading, explaining, and navigating the subject.
+- **One consistent governing question** wherever its exact wording is deliberately repeated for readers.
 - **An LLM Wiki** that helps AI agents find the right context and maintain the same knowledge safely.
 - **Source and evidence records** that distinguish supported claims, uncertainty, gaps, and work still to validate, with each displayed source identity linked to its exact registered row.
 - **Diagrams and a knowledge graph** where the selected profile requires them.

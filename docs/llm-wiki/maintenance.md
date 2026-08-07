@@ -25,6 +25,12 @@ status: draft
 - Use a registered primary URL when prose directly links a specifically named official authority, guidance, or publication. Do not turn generic institution names into decorative authority links.
 - Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, lost visible brackets, and broken destination journeys.
 
+## Canonical governing question
+
+- When one canonical governing question is declared, map its authoritative source and maintain a finite `reader_sources` set in the manifest capability contract.
+- Run the exact-text repetition lint after editing any bounded reader source. Every verbatim repetition uses the same governed callout; paraphrases, unrelated quotations, and historical/source records outside the bounded set remain ordinary content.
+- Run the built-output browser contract across every discovered repetition route at desktop and mobile widths. A subject-empty or question-free Wiki records `DKBWS-HUMAN-004` as not applicable and does not manufacture a callout.
+
 ## Consumer-derived proposals
 
 When a user-authored consumer change appears reusable, preserve its originating project and immutable revision and use the [standard-change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml). Complete and verify the project-owned request first, search existing issues read-only, and prepare ignored `output/standard-change-proposal.md` with classification, affected contract, evidence, accessibility/browser results, dependencies, fallback, fixtures, and migration impact. Scrub private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material.

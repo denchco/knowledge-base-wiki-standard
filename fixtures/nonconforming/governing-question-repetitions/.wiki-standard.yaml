@@ -1,0 +1,11 @@
+profile: fixture
+roles:
+  governing_question: docs/index.md
+capabilities:
+  governing_question:
+    reader_sources:
+      - docs/index.md
+      - docs/plain.md
+      - docs/mismatch.md
+      - ../escape.md
+deviations: []

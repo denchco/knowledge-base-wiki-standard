@@ -770,7 +770,7 @@ export function initPlan(options = {}) {
     { id: "bootstrap-discovery", purpose: "Inspect the research seed or establish an explicit subject-empty state, infer discoverable setup details, and resolve only material questions sequentially.", always: true },
     { id: "authority", purpose: "Define raw-source, canonical-evidence, generated-output, privacy, copyright, and retention boundaries.", requirements: ["DKBWS-SEC-001"] },
     { id: "okf", purpose: "Establish the first-class OKF v0.2 bundle, stable concepts, source identities, and newest-first logs.", requirements: ["DKBWS-OKF-001", "DKBWS-OKF-003"] },
-    { id: "human-llm", purpose: "Build coordinated Human and LLM Wiki surfaces over shared canonical knowledge, including governed accent treatment wherever a governing-question callout is present.", requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-LLM-001"] },
+    { id: "human-llm", purpose: "Build coordinated Human and LLM Wiki surfaces over shared canonical knowledge, including governed accent treatment and exact repetition consistency wherever a canonical governing question is declared.", requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LLM-001"] },
     { id: "renderer-design", purpose: "Apply the selected renderer and design-governance contracts.", requirements: ["DKBWS-RENDER-001", "DKBWS-DESIGN-001"] },
     { id: "graph-runtime", purpose: "Add Graphify publication, local runtimes, and identity-verified managed service adapters required by the profile.", requirements: ["DKBWS-GRAPH-001", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"] },
     { id: "verification", purpose: "Run every selected deterministic and manual check without overstating proof.", always: true },

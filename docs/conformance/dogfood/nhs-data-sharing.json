@@ -79,7 +79,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version diff, deviation-preserving patch or migration workflow exists yet."},
     {"id": "bounded-ask-wiki", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": [], "finding": "This topic profile does not claim Ask Wiki."}
   ],
-  "requirement_summary": {"PASS": 13, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 6},
+  "requirement_summary": {"PASS": 13, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 7},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-links.mjs"], "finding": "Canonical knowledge is UTF-8 Markdown with checked relative links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No .wiki-standard.yaml declares standard version, roles, capabilities and deviations."},
@@ -91,6 +91,7 @@
     {"id": "DKBWS-HUMAN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["zensical.toml", "package.json", "docs/project/conformance.md"], "finding": "Strict build and stable public/local URLs are declared; local URL returned 200."},
     {"id": "DKBWS-HUMAN-002", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/index.md", "docs/assets/nhs-data-sharing.css", "scripts/check-visual-shape.mjs"], "finding": "Governing questions use the shared semantic blockquote class, and the executable visual check requires both their rail and text to use the active accent colour."},
     {"id": "DKBWS-HUMAN-003", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no dedicated draft marker, readable status mapping, or chevron-alignment evidence; no pass is inferred."},
+    {"id": "DKBWS-HUMAN-004", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no canonical-question mapping, bounded reader-set equality lint, or complete repetition-route browser proof; no pass is inferred."},
     {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "AGENTS.md"], "finding": "All required operational semantics are present across mapped agent files."},
     {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/canonical-concept-links.json", "scripts/check-canonical-concept-links.mjs"], "finding": "Contextual inbound links beyond navigation are executable obligations."},
     {"id": "DKBWS-LINK-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no exact source-row navigation or registered-authority-link evidence; no pass is inferred."},

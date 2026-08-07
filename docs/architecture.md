@@ -7,6 +7,10 @@ status: draft
 
 # Standard architecture
 
+<blockquote class="governing-question">
+<p>How should a durable knowledge base serve humans and AI agents while remaining portable, evidence-grounded, inspectable, and safely updateable?</p>
+</blockquote>
+
 ## Canonical layers
 
 1. **Raw sources** — immutable or content-addressed source material.

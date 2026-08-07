@@ -12,12 +12,17 @@ roles:
   validation_queue: "docs/validation-queue.md"
   research_log: "docs/log.md"
   human_wiki: "docs/index.md"
+  governing_question: "docs/index.md"
   llm_wiki: "docs/llm-wiki/index.md"
   design_contract: "DESIGN.md"
   okf_bundle: "knowledge"
 capabilities:
   evidence_governance: true
   human_wiki: true
+  governing_question:
+    reader_sources:
+      - "docs/index.md"
+      - "docs/architecture.md"
   llm_wiki: true
   human_renderer: "zensical"
   llm_artifacts: true

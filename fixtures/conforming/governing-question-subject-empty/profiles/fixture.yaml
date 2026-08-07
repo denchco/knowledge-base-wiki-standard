@@ -1,0 +1,5 @@
+id: fixture
+version: "1"
+requires:
+  - DKBWS-HUMAN-004
+capabilities: {}

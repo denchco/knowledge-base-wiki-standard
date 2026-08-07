@@ -2,6 +2,7 @@
 
 ## 2026-08-07
 
+- **Canonical governing-question consistency**: Added conditional `DKBWS-HUMAN-004` from independently verified consumer evidence. A seeded Human Wiki maps one canonical question and a bounded reader-source set, governs every exact reader-facing repetition, and reports the requirement explicitly; paraphrases, ordinary quotations, out-of-scope historical/source records, and subject-empty Wikis remain neutral or not applicable.
 - **Managed local preview identity**: Added core `DKBWS-RUNTIME-002` after a verified consumer collision showed that a listener and HTTP 200 can belong to the wrong Wiki. Persistent services now use serialized and atomically published shared-register reservations, stable project identity, live-listener refusal, versioned static marker, composite adapter status, and exact registered-URL browser handoff; ephemeral browser servers prove only baseline runtime health.
 
 ## 2026-08-05

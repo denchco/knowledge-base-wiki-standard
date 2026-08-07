@@ -3,6 +3,7 @@ import path from "node:path";
 
 import YAML from "yaml";
 
+import { inspectGoverningQuestionRepetitions } from "./check-governing-question-repetitions.mjs";
 import { loadProfile } from "./profile-catalogue.mjs";
 
 const LOCAL_ORIGIN = "https://runtime-contract.invalid";
@@ -139,11 +140,32 @@ export function resolveRuntimeBrowserConfiguration(options = {}) {
   )) {
     throw new Error("DKBWS-LINK-002 requires a mapped roles.source_register Markdown path.");
   }
+
+  const governingQuestionInspection = inspectGoverningQuestionRepetitions(root);
+  if (governingQuestionInspection.applicable && governingQuestionInspection.issues.length) {
+    throw new Error(
+      `DKBWS-HUMAN-004 source contract failed:\n- ${governingQuestionInspection.issues.join("\n- ")}`,
+    );
+  }
+  const governingQuestionRepetitionRoutes = governingQuestionInspection.applicable
+    ? governingQuestionInspection.repetitionRoutes.map(entry => ({
+      ...entry,
+      route: normalizeBrowserRoute(entry.route, `DKBWS-HUMAN-004 repetition route for ${entry.source}`),
+    }))
+    : [];
+
   const requiredRoutes = ["question", "mermaid", "architecture", "table", "list"];
   if (sourceLinksRequired) requiredRoutes.push("sourceLinks", "sourceRegister");
   for (const name of requiredRoutes) {
     if (!fs.existsSync(siteFileForRoute(root, routes[name]))) {
       throw new Error(`Runtime browser contract ${name} route is missing from the built site: ${routes[name]}`);
+    }
+  }
+  for (const entry of governingQuestionRepetitionRoutes) {
+    if (!fs.existsSync(siteFileForRoute(root, entry.route))) {
+      throw new Error(
+        `DKBWS-HUMAN-004 repetition route is missing from the built site: ${entry.route} (${entry.source})`,
+      );
     }
   }
 
@@ -190,6 +212,13 @@ export function resolveRuntimeBrowserConfiguration(options = {}) {
     },
     sourceLinks: {
       required: sourceLinksRequired,
+    },
+    governingQuestion: {
+      selected: governingQuestionInspection.selected,
+      applicable: governingQuestionInspection.applicable,
+      canonicalSource: governingQuestionInspection.canonicalSource,
+      canonicalQuestion: governingQuestionInspection.canonicalQuestion,
+      repetitionRoutes: governingQuestionRepetitionRoutes,
     },
   };
 }

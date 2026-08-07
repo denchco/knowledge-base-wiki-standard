@@ -11,15 +11,15 @@ status: draft
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
 | Evidence governance | Implemented candidate with stable row anchors, individual internal citation links, registered named-authority URLs, and exact-destination lint |
-| Human Zensical wiki | Governed reference runtime with strict build, local assets, and dedicated readable draft-navigation markers |
+| Human Zensical wiki | Governed reference runtime with strict build, local assets, dedicated readable draft-navigation markers, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, and completion/cycle guards |
-| Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
+| Manifest and stable requirements | Implemented candidate with machine schemas, stable diagnostics, and explicit result accounting for every requirement inherited from the selected profile |
 | Dependency contract | Exact locks, installation classes, offline boundary, adapter requalification, consumer/maintainer separation, and reserved verification-artifact rules implemented |
 | Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, and completion-first anti-rabbit-hole handoff implemented |
 | Managed local preview | `DKBWS-RUNTIME-002` implemented with serialized reservation and atomic shared-register replacement, registered and live-listener deconfliction, `service-identity-v1` marker, composite status, fixtures, and exact canonical browser handoff |
 | Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, `jj 0.39.0` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
 | Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
-| Built-output browser contract | Independent representative routes; desktop/mobile geometry, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
+| Built-output browser contract | Independent representative routes; desktop/mobile geometry, every canonical-question repetition route, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
 | Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
 | Subject-empty starter | Allowlisted policy/graph/planning templates implemented with conditional reader-evidence navigation, consumer-owned licensing, and maintainer-sync exclusion; root copying, invented citations, and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |

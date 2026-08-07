@@ -359,6 +359,11 @@ test("standard-production requirement results come from the resolved profile cha
   assert.equal(requirements.get("DKBWS-HUMAN-002")?.status, "not-checked");
   assert.equal(requirements.get("DKBWS-VERIFY-002")?.status, "not-checked");
   assert.match(requirements.get("DKBWS-VERIFY-002")?.reason ?? "", /complete profile verification pipeline/);
+
+  const strict = run("validate", ROOT, "--date", "2026-08-03", "--json", "--strict");
+  assert.equal(strict.status, 0, strict.stderr || strict.stdout);
+  const strictReport = JSON.parse(strict.stdout);
+  assert.equal(strictReport.diagnostics.some(item => item.code === "DKBWS-MANIFEST-ROLE-006"), false);
 });
 
 test("positive fixture validates as hard OKF v0.2 and preserves extension discovery", () => {

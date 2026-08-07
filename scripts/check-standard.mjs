@@ -33,6 +33,12 @@ const required = [
   "fixtures/conforming/reader-source-links/docs/evidence-matrix.md",
   "fixtures/nonconforming/reader-source-links/docs/sources.md",
   "fixtures/nonconforming/reader-source-links/docs/evidence-matrix.md",
+  "fixtures/conforming/governing-question-repetitions/.wiki-standard.yaml",
+  "fixtures/conforming/governing-question-repetitions/docs/index.md",
+  "fixtures/conforming/governing-question-repetitions/docs/research/answer.md",
+  "fixtures/conforming/governing-question-subject-empty/.wiki-standard.yaml",
+  "fixtures/nonconforming/governing-question-repetitions/.wiki-standard.yaml",
+  "fixtures/nonconforming/governing-question-repetitions/docs/plain.md",
   "profiles/portable-core.yaml",
   "profiles/standard-production.yaml", "scripts/sync-runtime-assets.mjs",
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
@@ -41,6 +47,7 @@ const required = [
   "scripts/runtime-browser-contract-config.mjs", "scripts/runtime-browser-contract-config.test.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
+  "scripts/check-governing-question-repetitions.mjs", "scripts/check-governing-question-repetitions.test.mjs",
   "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
@@ -52,7 +59,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -66,6 +73,7 @@ const claudeSkill = readFileSync(".claude/skills/denchco-kb-wiki-standard/SKILL.
 const readme = readFileSync("README.md", "utf8");
 const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
 const contributing = readFileSync("CONTRIBUTING.md", "utf8");
+const standardManifest = YAML.parse(readFileSync(".wiki-standard.yaml", "utf8"));
 const starterManifest = YAML.parse(readFileSync("starter/starter.yaml", "utf8"));
 const starterEntries = starterManifest?.entries ?? [];
 const starterTargets = starterEntries.map((entry) => entry?.target);
@@ -92,6 +100,20 @@ if (starterSourceLinks?.classification !== "adapt-from-release"
   || starterSourceLinks?.planning_only !== true
   || !(starterSourceLinks?.requirements ?? []).includes("DKBWS-LINK-002")) {
   failures.push("starter must adapt the pinned reader source-link checker for DKBWS-LINK-002");
+}
+const starterGoverningQuestion = starterEntries.find((candidate) => candidate?.target === "scripts/check-governing-question-repetitions.mjs");
+if (starterGoverningQuestion?.classification !== "adapt-from-release"
+  || starterGoverningQuestion?.source !== "scripts/check-governing-question-repetitions.mjs"
+  || starterGoverningQuestion?.planning_only !== true
+  || !(starterGoverningQuestion?.requirements ?? []).includes("DKBWS-HUMAN-004")) {
+  failures.push("starter must adapt the bounded governing-question consistency checker for DKBWS-HUMAN-004");
+}
+if (standardManifest?.roles?.governing_question !== "docs/index.md") {
+  failures.push("Standard manifest must map the authoritative governing-question source");
+}
+const questionReaderSources = standardManifest?.capabilities?.governing_question?.reader_sources;
+if (!Array.isArray(questionReaderSources) || !questionReaderSources.includes("docs/index.md") || !questionReaderSources.includes("docs/architecture.md")) {
+  failures.push("Standard manifest must bound both canonical governing-question reader routes");
 }
 const starterService = starterEntries.find((candidate) => candidate?.target === "scripts/dev-service.mjs");
 if (starterService?.classification !== "adapt-from-release"
@@ -252,6 +274,8 @@ for (const boundary of [
   "#0b7285",
   "no external deployment",
   "governing-question",
+  "bounded reader-source set",
+  "every discovered repetition route",
   "ordinary quotations neutral",
   "verification-receipt-v1",
   "project-only summary must use a different path",
@@ -291,6 +315,9 @@ if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent un
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
 }
+if (!pkg.scripts?.["check:governing-question"]?.includes("check-governing-question-repetitions.mjs")) failures.push("missing check:governing-question command");
+if (!pkg.scripts?.check?.includes("check:governing-question")) failures.push("npm run check must include the governing-question repetition gate");
+if (!pkg.scripts?.["conformance:test"]?.includes("check-governing-question-repetitions.test.mjs")) failures.push("conformance:test must include governing-question repetition fixtures");
 if (!pkg.scripts?.check?.includes("check:source-links")) failures.push("npm run check must include the reader source-link gate");
 if (!pkg.scripts?.["conformance:test"]?.includes("link-source-citations.test.mjs")) failures.push("conformance:test must include reader source-link fixtures");
 if (!pkg.scripts?.["conformance:test"]?.includes("dev-service.test.mjs")) failures.push("conformance:test must include managed local service fixtures");
@@ -349,6 +376,23 @@ for (const file of [
   "docs/assets/pen-circle.svg",
   "docs/assets/service-identity.json",
   "scripts/dev-service.test.mjs",
+  "scripts/check-governing-question-repetitions.mjs",
+  "scripts/check-governing-question-repetitions.test.mjs",
+  "fixtures/conforming/governing-question-repetitions/.wiki-standard.yaml",
+  "fixtures/conforming/governing-question-repetitions/profiles/fixture.yaml",
+  "fixtures/conforming/governing-question-repetitions/docs/index.md",
+  "fixtures/conforming/governing-question-repetitions/docs/research/answer.md",
+  "fixtures/conforming/governing-question-repetitions/docs/research/neutral.md",
+  "fixtures/conforming/governing-question-repetitions/docs/research/masked.md",
+  "fixtures/conforming/governing-question-repetitions/knowledge/history.md",
+  "fixtures/conforming/governing-question-subject-empty/.wiki-standard.yaml",
+  "fixtures/conforming/governing-question-subject-empty/profiles/fixture.yaml",
+  "fixtures/conforming/governing-question-subject-empty/docs/index.md",
+  "fixtures/nonconforming/governing-question-repetitions/.wiki-standard.yaml",
+  "fixtures/nonconforming/governing-question-repetitions/profiles/fixture.yaml",
+  "fixtures/nonconforming/governing-question-repetitions/docs/index.md",
+  "fixtures/nonconforming/governing-question-repetitions/docs/plain.md",
+  "fixtures/nonconforming/governing-question-repetitions/docs/mismatch.md",
 ]) {
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }

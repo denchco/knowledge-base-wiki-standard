@@ -41,6 +41,8 @@ It incorporates five distinct foundations and governed choices. Each item links 
 - OKF portability results MUST remain distinct from stricter DenchCo profile results.
 - Conformance inspection and validation MUST be read-only and emit stable machine diagnostics.
 - A displayed registered source identity in a Human Wiki MUST navigate to its exact internal source-register row.
+- A declared canonical governing question MUST be mapped once and rendered consistently at every verbatim reader-facing repetition in its bounded reader set.
+- Every inherited requirement in a selected profile MUST be explicitly accounted for; conditional inapplicability is evidence, not silent omission.
 - Standard Production maintenance MUST close every file-changing development turn with a disclosed Jujutsu commit after verification and state inspection.
 
 See [Requirements](requirements.md), [Profiles](profiles.md), and [Conformance](conformance.md).

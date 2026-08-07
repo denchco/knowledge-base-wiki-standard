@@ -44,6 +44,8 @@ requireIn(design, 'diagramEmphasisLineWidth: "3px"', "DESIGN.md must pin the Mer
 requireIn(design, 'diagramLabelMaskWidth: "4px"', "DESIGN.md must pin the Mermaid label mask");
 requireIn(design, "governing-question:", "DESIGN.md must define the governing-question component");
 requireIn(starterDesign, "governing-question:", "starter DESIGN.md must carry the governing-question component");
+requireIn(design, "every verbatim repetition in its bounded reader set", "DESIGN.md must govern every canonical-question repetition");
+requireIn(starterDesign, "every verbatim repetition in its bounded reader set", "starter DESIGN.md must govern every canonical-question repetition");
 requireIn(design, "Mermaid's ordinary node treatment", "DESIGN.md must make ordinary Mermaid nodes the reference default");
 requireIn(starterDesign, "ordinary node treatment", "starter DESIGN.md must make ordinary Mermaid nodes the reference default");
 requireIn(starterDesign, "they are not the default", "starter DESIGN.md must keep semantic Mermaid roles optional");
@@ -59,15 +61,18 @@ requireIn(starterDesign, "no more than 60px", "starter DESIGN.md must carry the 
 requireIn(starterDesign, "Draft — research in progress", "starter DESIGN.md must carry the readable draft-status contract");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
 requireIn(requirements, "DKBWS-HUMAN-003", "the normative catalogue must define DKBWS-HUMAN-003");
+requireIn(requirements, "DKBWS-HUMAN-004", "the normative catalogue must define DKBWS-HUMAN-004");
 requireIn(requirements, "DKBWS-LINK-002", "the normative catalogue must define DKBWS-LINK-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-003", "the Human and Agent profile must require DKBWS-HUMAN-003");
+requireIn(humanProfile, "- DKBWS-HUMAN-004", "the Human and Agent profile must require DKBWS-HUMAN-004");
 requireIn(humanProfile, "- DKBWS-LINK-002", "the Human and Agent profile must require DKBWS-LINK-002");
 requireIn(design, "independently focusable internal link", "DESIGN.md must preserve independent source-row links");
 requireIn(starterDesign, "independently focusable internal link", "starter DESIGN.md must preserve independent source-row links");
 requireIn(content, '.md-typeset a[href*="#src-"]::before', "source-row links must restore the visible opening bracket");
 requireIn(content, '.md-typeset a[href*="#src-"]::after', "source-row links must restore the visible closing bracket");
 for (const issue of governingQuestionMarkupIssues(home)) errors.push(`Standard homepage ${issue}`);
+for (const issue of governingQuestionMarkupIssues(architecture)) errors.push(`Standard architecture ${issue}`);
 requireIn(
   starterHome,
   "{{GOVERNING_QUESTION_CALLOUT_OR_SUBJECT_EMPTY_NOTICE}}",

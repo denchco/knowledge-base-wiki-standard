@@ -143,7 +143,7 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 ## Content And Navigation
 
 - Use one governing question and answer-first routes when the topic is a decision, comparison, compliance, purchase, build, migration, or operational interpretation.
-- Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. Keep ordinary quotations neutral.
+- Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. When the Wiki declares one canonical question, use that governed component for every verbatim repetition in its bounded reader set. Keep paraphrases and unrelated quotations neutral.
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
 - Render every displayed `SRC-NNN` as an independently focusable internal link to its exact source-register row while preserving the visible `[SRC-NNN]` grammar. Lists keep separate link targets and compact ranges link their displayed endpoints. Do not suppress the native focus indication or make brackets the only accessible label.

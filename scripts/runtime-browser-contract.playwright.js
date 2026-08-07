@@ -26,6 +26,13 @@ export default async (page, options = {}) => {
   const sourceRegisterRoute = configuration.sourceRegisterRoute;
   const sourceLinksEnabled = configuration.sourceLinksEnabled;
   const graphEnabled = configuration.graphEnabled;
+  const governingQuestionRepetitionApplicable = options.governingQuestion?.applicable === true;
+  const canonicalGoverningQuestion = typeof options.governingQuestion?.canonicalQuestion === "string"
+    ? options.governingQuestion.canonicalQuestion
+    : null;
+  const governingQuestionRepetitionRoutes = Array.isArray(options.governingQuestion?.repetitionRoutes)
+    ? options.governingQuestion.repetitionRoutes.filter(entry => entry && typeof entry.route === "string")
+    : [];
   const failures = [];
   const requests = [];
   const localResponseFailures = [];
@@ -58,7 +65,8 @@ export default async (page, options = {}) => {
     const response = await page.goto(routeUrl(route), { waitUntil });
     check(Boolean(response?.ok()), `${route} did not return HTTP 200`);
   };
-  const inspectGoverningQuestion = async viewportName => {
+  const inspectGoverningQuestion = async (viewportName, route, expectedQuestion = null, expectedCount = 1) => {
+    await goto(route);
     const metrics = await page.evaluate(() => {
       const article = document.querySelector(".md-typeset");
       const questions = [...document.querySelectorAll(".md-typeset blockquote.governing-question")];
@@ -86,6 +94,16 @@ export default async (page, options = {}) => {
         const negativeText = negative.querySelector("p");
         return {
           count: questions.length,
+          questionText: questionText?.textContent ?? "",
+          questions: questions.map(item => {
+            const text = item.querySelector(":scope > p");
+            return {
+              questionText: text?.textContent ?? "",
+              rail: getComputedStyle(item).borderInlineStartColor,
+              text: text ? getComputedStyle(text).color : "",
+              weight: text ? getComputedStyle(text).fontWeight : "",
+            };
+          }),
           accent,
           rail: question ? getComputedStyle(question).borderInlineStartColor : "",
           text: questionText ? getComputedStyle(questionText).color : "",
@@ -102,21 +120,52 @@ export default async (page, options = {}) => {
         negative.remove();
       }
     });
-    check(metrics.count === 1, `The configured question page must expose exactly one governing-question marker at ${viewportName} width`);
-    check(Boolean(metrics.accent), `The active accent token must resolve at ${viewportName} width`);
-    check(metrics.rail === metrics.accent, `The governing-question rail must equal the active accent at ${viewportName} width`);
-    check(metrics.text === metrics.accent, `The governing-question text must equal the active accent at ${viewportName} width`);
-    check(Number.parseInt(metrics.weight, 10) >= 700, `The governing-question text must remain bold at ${viewportName} width`);
+    const location = `${route} at ${viewportName} width`;
+    check(metrics.count === expectedCount, `The governing-question route ${location} must expose ${expectedCount} governing-question marker${expectedCount === 1 ? "" : "s"}`);
+    if (expectedQuestion !== null) {
+      check(
+        metrics.questions.every(item => item.questionText === expectedQuestion),
+        `Every governing-question marker on ${location} must render the identical canonical question text`,
+      );
+    }
+    check(Boolean(metrics.accent), `The active accent token must resolve on ${location}`);
+    check(metrics.questions.every(item => item.rail === metrics.accent), `Every governing-question rail must equal the active accent on ${location}`);
+    check(metrics.questions.every(item => item.text === metrics.accent), `Every governing-question text must equal the active accent on ${location}`);
+    check(metrics.questions.every(item => Number.parseInt(item.weight, 10) >= 700), `Every governing-question text must remain bold on ${location}`);
     check(
       metrics.ordinaryRail !== metrics.accent && metrics.ordinaryText !== metrics.accent,
-      `An ordinary quotation must remain neutral at ${viewportName} width`,
+      `An ordinary quotation must remain neutral on ${location}`,
     );
     check(
       metrics.negativeRail !== metrics.accent && metrics.negativeText !== metrics.accent,
-      `The negative mismatched-colour fixture must be rejected at ${viewportName} width`,
+      `The negative mismatched-colour fixture must be rejected on ${location}`,
     );
-    check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow at ${viewportName} width`);
-    return metrics;
+    check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow on ${location}`);
+    return { route, ...metrics };
+  };
+  const inspectGoverningQuestionRepetitionRoutes = async (viewportName, primaryMetrics) => {
+    if (!governingQuestionRepetitionApplicable) return [];
+    check(Boolean(canonicalGoverningQuestion), "DKBWS-HUMAN-004 browser verification requires canonical governing-question text");
+    check(governingQuestionRepetitionRoutes.length > 0, "DKBWS-HUMAN-004 browser verification requires at least one repetition route");
+    const results = [];
+    for (const entry of governingQuestionRepetitionRoutes) {
+      if (entry.route === questionRoute
+        && primaryMetrics.count === entry.repetitions
+        && primaryMetrics.questions.every(item => item.questionText === canonicalGoverningQuestion)) {
+        results.push({ ...entry, metrics: primaryMetrics });
+        continue;
+      }
+      results.push({
+        ...entry,
+        metrics: await inspectGoverningQuestion(
+          viewportName,
+          entry.route,
+          canonicalGoverningQuestion,
+          entry.repetitions,
+        ),
+      });
+    }
+    return results;
   };
   const inspectSourceLink = async (viewportName, followDestination = false) => {
     if (!sourceLinksEnabled) return null;
@@ -544,8 +593,22 @@ export default async (page, options = {}) => {
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
+  const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
+    && governingQuestionRepetitionRoutes.some(entry => entry.route === questionRoute);
+  const questionRouteRepetitionCount = questionRouteIsGovernedRepetition
+    ? governingQuestionRepetitionRoutes.find(entry => entry.route === questionRoute).repetitions
+    : 1;
+  const desktopGoverningQuestion = await inspectGoverningQuestion(
+    "desktop",
+    questionRoute,
+    questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null,
+    questionRouteRepetitionCount,
+  );
+  const desktopGoverningQuestionRepetitions = await inspectGoverningQuestionRepetitionRoutes(
+    "desktop",
+    desktopGoverningQuestion,
+  );
   await goto(questionRoute);
-  const desktopGoverningQuestion = await inspectGoverningQuestion("desktop");
   const desktopDraftNavigation = await inspectDraftNavigation("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
@@ -801,8 +864,16 @@ export default async (page, options = {}) => {
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await goto(questionRoute);
-  const mobileGoverningQuestion = await inspectGoverningQuestion("mobile");
+  const mobileGoverningQuestion = await inspectGoverningQuestion(
+    "mobile",
+    questionRoute,
+    questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null,
+    questionRouteRepetitionCount,
+  );
+  const mobileGoverningQuestionRepetitions = await inspectGoverningQuestionRepetitionRoutes(
+    "mobile",
+    mobileGoverningQuestion,
+  );
   const mobileSourceLink = await inspectSourceLink("mobile");
   await goto(mermaidRoute);
   await page.waitForSelector(".mermaid");
@@ -947,6 +1018,12 @@ export default async (page, options = {}) => {
     governingQuestion: {
       desktop: desktopGoverningQuestion,
       mobile: mobileGoverningQuestion,
+      repetitionRouteCount: governingQuestionRepetitionRoutes.length,
+      repetitionRoutes: governingQuestionRepetitionRoutes,
+      repetitions: {
+        desktop: desktopGoverningQuestionRepetitions,
+        mobile: mobileGoverningQuestionRepetitions,
+      },
     },
     draftNavigation: {
       desktop: desktopDraftNavigation,

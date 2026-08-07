@@ -1,0 +1,7 @@
+profile: fixture
+roles: {}
+capabilities: {}
+deviations:
+  - requirement: DKBWS-HUMAN-004
+    status: not-applicable
+    reason: Subject-empty fixture has no canonical governing question.
