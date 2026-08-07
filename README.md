@@ -100,6 +100,25 @@ The npm package uses `0.1.0-candidate`. Python project metadata represents the c
 </details>
 
 <details>
+<summary><strong>Propose a reusable change</strong></summary>
+
+A consumer wiki follows the [tracked Standard proposal workflow](docs/llm-wiki/standard-proposals.md) and keeps each reusable improvement in a `standard-proposals/` record. The record is the durable authority for the originating project and immutable revision, the verified local implementation, the exact reviewed public payload, and every later decision. Generated files under `output/standard-proposals/` are disposable previews only.
+
+```sh
+npm run standard:proposal -- new <slug>
+npm run standard:proposal -- check --all
+npm run standard:proposal -- prepare <id>
+npm run standard:proposal -- show <id>
+npm run standard:proposal -- open <id>
+```
+
+`check` and `show` are read-only. `prepare` creates a local preview, and `open` performs only a fail-closed availability check before opening the governed issue form in the user's browser. The command never submits an issue or uploads attachments. The exact prepared payload needs explicit digest-bound approval, and the user remains responsible for the form's final Submit action.
+
+An issue is only intake. Acceptance is a separate Standard-maintainer decision; release publication is a separate release-authority action; and changing a consumer's Standard pin is a separate adoption decision recorded by that consumer. A closed issue proves none of those later states.
+
+</details>
+
+<details>
 <summary><strong>For Standard maintainers</strong></summary>
 
 Standard Production maintenance requires Git `2.41` or newer and the reference-qualified Jujutsu `0.39.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
@@ -143,6 +162,7 @@ Canonical entry points:
 - [`docs/llm-wiki/index.md`](docs/llm-wiki/index.md)—compact agent-facing wiki.
 - [`docs/project/status.md`](docs/project/status.md)—current bounded priorities and parked work.
 - [`docs/conformance/index.md`](docs/conformance/index.md)—dogfood reports and conformance evidence.
+- [`docs/llm-wiki/standard-proposals.md`](docs/llm-wiki/standard-proposals.md)—tracked proposal records, Standard decision registry, and release/adoption boundaries.
 
 The lifecycle CLI is read-only or planning-only in this candidate:
 
@@ -153,6 +173,7 @@ npm run conformance:export-okf -- .
 npm run conformance:diff -- /path/to/consumer --json
 npm run conformance:upgrade-plan -- /path/to/consumer --json
 npm run conformance:init-plan -- /path/to/new-wiki --profile standard-production --json
+npm run standard:proposal -- check --all
 ```
 
 `upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files.

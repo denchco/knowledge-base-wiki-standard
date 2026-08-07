@@ -31,6 +31,7 @@ const CAPABILITY_REQUIREMENTS = Object.freeze({
   browser_verification: ["DKBWS-VERIFY-001", "DKBWS-VERIFY-002"],
   local_service: ["DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"],
   jujutsu: ["DKBWS-PROV-001"],
+  standard_change_intake: ["DKBWS-UPDATE-002"],
 });
 
 const HELP = `DenchCo full-profile conformance report builder

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-registry-v1.json",
+  "registryVersion": "1.0",
+  "targetRepository": "https://github.com/denchco/knowledge-base-wiki-standard",
+  "entries": []
+}

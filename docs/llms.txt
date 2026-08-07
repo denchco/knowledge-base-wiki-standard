@@ -9,6 +9,7 @@ Normative repository: https://github.com/denchco/knowledge-base-wiki-standard
 
 - [Normative specification](spec/): Requirements, profiles, conformance, dependencies, security, and prompt contract.
 - [LLM Wiki](llm-wiki/): Read order, context routing, maintenance, and Graphify workflow.
+- [Standard proposals](llm-wiki/standard-proposals/): Tracked consumer provenance, scrubbed payload approval, governed intake, explicit Standard decisions, release mapping, and optional adoption.
 - [Architecture](architecture/): Authority and product boundaries.
 - [Conformance evidence](conformance/): Machine-readable reports and five-project dogfooding.
 - [Sources](sources/): Registered upstream authorities.
@@ -28,6 +29,7 @@ If the user points at the normative repository to start a wiki, follow `prompts/
 - `prompts/instantiate-wiki.md` is the repeatable bootstrap prompt.
 - `starter/starter.yaml` is the subject-empty allowlist for independent consumer repositories.
 - `node scripts/conformance-cli.mjs --help` describes the read-only and planning-only CLI.
+- `node scripts/standard-proposal-cli.mjs --help` describes the local-only, fail-closed proposal workflow; it never submits an issue, publishes a release, or changes a consumer pin.
 
 ## Authority warning
 

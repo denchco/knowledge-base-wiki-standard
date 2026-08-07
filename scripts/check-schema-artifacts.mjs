@@ -139,6 +139,30 @@ for (const name of readdirSync(adoptionDirectory).filter((entry) => entry.endsWi
   validate("adoption-audit-report-v1.json", report, `docs/conformance/dogfood/${name}`);
 }
 
+const proposalDirectory = path.join(root, "standard-proposals");
+const proposalRegistry = parseJsonStrict(
+  readFileSync(path.join(proposalDirectory, "registry.json"), "utf8"),
+  "standard-proposals/registry.json",
+);
+validate("standard-proposal-registry-v1.json", proposalRegistry, "standard-proposals/registry.json");
+for (const name of readdirSync(proposalDirectory).filter((entry) => entry.endsWith(".json") && entry !== "registry.json").sort()) {
+  const proposal = parseJsonStrict(
+    readFileSync(path.join(proposalDirectory, name), "utf8"),
+    `standard-proposals/${name}`,
+  );
+  validate("standard-proposal-record-v1.json", proposal, `standard-proposals/${name}`);
+}
+const proposalFixture = parseJsonStrict(
+  readFileSync(path.join(root, "fixtures/conforming/standard-proposal-valid/record.json"), "utf8"),
+  "fixtures/conforming/standard-proposal-valid/record.json",
+);
+validate("standard-proposal-record-v1.json", proposalFixture, "fixtures/conforming/standard-proposal-valid/record.json");
+const proposalRegistryFixture = parseJsonStrict(
+  readFileSync(path.join(root, "fixtures/conforming/standard-proposal-valid/remote/registry.json"), "utf8"),
+  "fixtures/conforming/standard-proposal-valid/remote/registry.json",
+);
+validate("standard-proposal-registry-v1.json", proposalRegistryFixture, "fixtures/conforming/standard-proposal-valid/remote/registry.json");
+
 const graphPath = path.join(root, "docs", "assets", "graphify", "graph.json");
 const summaryPath = path.join(root, "docs", "assets", "graphify", "summary.json");
 const graphPresent = fileExists(graphPath);

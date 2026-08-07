@@ -1,0 +1,6 @@
+{
+  "fixture": "unsafe-private-secret",
+  "mutation": {
+    "change.problem": "Credential token=ghp_abcdefghijklmnopqrstuvwxyz123456 at /Users/example/private"
+  }
+}

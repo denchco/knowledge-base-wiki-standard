@@ -1,0 +1,134 @@
+{
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-record-v1.json",
+  "schemaVersion": "1.0",
+  "id": "DKBWS-PROP-reader-navigation-746ab2a2f27a6553c8543414e5c2cc49",
+  "slug": "reader-navigation",
+  "title": "Make source navigation deterministic",
+  "target": {
+    "repository": "https://github.com/denchco/knowledge-base-wiki-standard",
+    "issueForm": ".github/ISSUE_TEMPLATE/standard-change.yml",
+    "issueFormVersion": "1.0",
+    "issueFormSha256": "9ce76315cb0b96f2d6d8f9be0e8415a2011c91d486f72f3168d68d1168e937bd",
+    "labels": [
+      "enhancement",
+      "standard-change"
+    ]
+  },
+  "origin": {
+    "project": "Consumer fixture",
+    "publicUrl": "https://example.test/consumer",
+    "implementationCommit": "1111111111111111111111111111111111111111",
+    "jjChangeId": null,
+    "pinnedStandardRevision": "2222222222222222222222222222222222222222"
+  },
+  "change": {
+    "problem": "Displayed source identities did not always reach their exact registered row.",
+    "intendedOutcome": "Every displayed source identity reaches its exact registered source row.",
+    "reuseClassification": "reusable",
+    "affectedProfiles": [
+      "human-and-agent"
+    ],
+    "affectedRequirements": [
+      "DKBWS-LINK-002"
+    ],
+    "implementationEvidence": [
+      "scripts/example-source-link-check.mjs"
+    ],
+    "verificationEvidence": [
+      {
+        "command": "npm run verify",
+        "result": "pass",
+        "completedAt": "2026-08-07T12:00:00Z",
+        "evidence": "output/example-verification-summary.json",
+        "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      }
+    ],
+    "dependencies": [
+      "Existing source register and browser verifier"
+    ],
+    "limitations": [
+      "Semantic paraphrases remain outside exact-string lint"
+    ],
+    "fallback": "Keep source identities as ordinary text when no source register is declared.",
+    "migration": "Add stable source-row anchors and update each displayed identity independently.",
+    "accessibility": {
+      "status": "applicable",
+      "evidence": "Keyboard focus and accessible names passed."
+    },
+    "browser": {
+      "status": "applicable",
+      "evidence": "Desktop and mobile exact-destination journeys passed."
+    }
+  },
+  "disclosure": {
+    "licensingStatus": "cleared",
+    "licensingEvidence": [
+      "Original implementation is available for governed review"
+    ],
+    "authorityToShare": true,
+    "secrets": false,
+    "privateAbsolutePaths": false,
+    "personalData": false,
+    "confidentialOrRestrictedEvidence": false,
+    "vulnerabilityDetails": false,
+    "unlicensedMaterial": false,
+    "automaticUploads": false
+  },
+  "workflow": {
+    "local": {
+      "observationStatus": "recorded",
+      "implementationStatus": "complete",
+      "verificationStatus": "pass"
+    },
+    "payload": {
+      "status": "unprepared",
+      "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-reader-navigation-746ab2a2f27a6553c8543414e5c2cc49 -->",
+      "digest": null,
+      "formSha256": null,
+      "preparedAt": null
+    },
+    "approval": {
+      "status": "pending",
+      "digest": null,
+      "formSha256": null,
+      "authority": null,
+      "approvedAt": null
+    },
+    "issue": {
+      "status": "not-submitted",
+      "observedState": "unknown",
+      "url": null,
+      "number": null,
+      "linkedAt": null,
+      "observedAt": null,
+      "remotePayloadDigest": null
+    },
+    "upstream": {
+      "classification": "pending",
+      "decision": "pending",
+      "decidedAt": null,
+      "decisionRevision": null,
+      "evidence": null,
+      "rationale": null
+    },
+    "acceptance": {
+      "requirementIds": []
+    },
+    "release": {
+      "status": "pending",
+      "tag": null,
+      "revision": null,
+      "recordedAt": null,
+      "registryRevision": null
+    },
+    "adoption": {
+      "status": "not-considered",
+      "authority": null,
+      "fromStandardRevision": null,
+      "toStandardRevision": null,
+      "consumerRevision": null,
+      "adoptedAt": null,
+      "verification": []
+    }
+  }
+}

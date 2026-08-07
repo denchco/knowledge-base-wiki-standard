@@ -82,7 +82,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware upgrade and deviation merge exists."},
     {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/ask.md", "functions/api/ask.js", "DEPLOYMENT.md"], "finding": "Cloudflare Ask is bounded by retrieval, source links, secrets and documented authority limits."}
   ],
-  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 8},
+  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 9},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-mkdocs.mjs"], "finding": "Canonical knowledge is Markdown and strict-built with portable local links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, roles, capabilities or deviations."},
@@ -108,6 +108,7 @@
     {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Sequential Question 1 of N clarification is explicit."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo standard upgrade workflow exists."},
+    {"id": "DKBWS-UPDATE-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates the tracked consumer-to-Standard proposal record, digest-bound governed intake, explicit decision/release registry, and separately authorised adoption workflow; no pass is inferred."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "This audit does not treat project hosting as a DenchCo public standard release."},
     {"id": "DKBWS-SEC-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["DEPLOYMENT.md", "docs/llm-wiki/maintenance.md", "docs/sources.md"], "finding": "Ask secrets and evidence boundaries exist, but complete repository personal-data, copyright/licensing and source-retention policies are not declared as one mapped contract."}
   ],

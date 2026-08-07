@@ -1,0 +1,28 @@
+---
+type: "Workflow Guide"
+title: "Standard proposals"
+description: "Durable consumer-to-Standard proposal workflow for {{PROJECT_TITLE}}."
+status: "draft"
+---
+
+# Standard proposals
+
+Potentially reusable improvements remain owned by `{{PROJECT_TITLE}}`. Each proposal has one canonical, schema-valid JSON record under `standard-proposals/`. Generated previews under `output/standard-proposals/` are ignored and disposable.
+
+## Local workflow
+
+1. Complete, verify, and commit the implementation in its own JJ phase.
+2. Record the full Git commit, optional JJ change ID, and immutable pinned Standard revision.
+3. Create and complete a proposal with `npm run standard:proposal -- new <slug>`.
+4. Validate offline with `check <id>` or `check --all`.
+5. Generate a scrubbed preview with `prepare <id>` and inspect it with `show <id>`.
+6. Bind approval to the exact payload digest and governed form revision.
+7. Run `open <id>` only when requested. It may check and open the form, but the user performs the final Submit action.
+
+Do not include consumer files, secrets, private absolute paths, personal or confidential data, restricted evidence, public vulnerability detail, or material the project lacks authority to share.
+
+## Separate authority
+
+The tracked workflow distinguishes local verification, payload approval/submission, explicit Standard classification and decision, immutable release inclusion, and optional adoption back into this project. Record each transition in its own JJ phase. Issue closure is not acceptance; acceptance is not release; and release does not change `.wiki-standard.yaml`, conformance status, deviations, or the pinned revision automatically.
+
+If the form, required label, marker search, provenance, exact digest, or remote result is missing, changed, duplicated, or ambiguous, stop with the durable local record. Never substitute an automated issue write or attachment upload.

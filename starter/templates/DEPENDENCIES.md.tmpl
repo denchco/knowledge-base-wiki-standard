@@ -13,12 +13,15 @@ This repository implements `{{PROFILE}}` of the DenchCo Knowledge Base Wiki Stan
 | Managed local preview | Persistent canonical Wiki URL | {{LOCAL_SERVICE_ADAPTER}}, a user-scoped shared register, and `service-identity-v1` marker health |
 | Deployment | Consumer-owned publication | {{DEPLOYMENT_ADAPTER_OR_NONE}} |
 | Verification artifacts | Complete profile evaluation | `output/verification/receipt.json` conforming to verification-receipt v1 and paired `output/verification/conformance-report.json` |
+| Standard proposals | Optional reusable-change handoff | Existing Node, schema validator, and YAML dependencies for the thin local CLI; browser/network access only for an explicitly requested governed-form open or upstream registry comparison |
 
 Commit exact lock files for every selected implementation dependency. Record optional and deployment dependencies separately from portable knowledge requirements.
 
 For a Standard Production maintenance workspace, adapt a repository-local end-of-development-turn command from the pinned Standard release. It must run complete applicable verification, inspect Git and Jujutsu state, record every file-changing turn in a JJ commit before the final response, disclose failed or unrun required checks, and create no empty commit for a no-change turn. The boundary must not depend on whether an agent considers the work “substantive.”
 
 The complete verification command must emit the schema-valid receipt and build its paired schema-valid conformance report. A project-only verification summary may be useful, but it must use another path and must not occupy either reserved artifact path.
+
+When proposal integration is selected, adapt the pinned record and registry schemas, versioned governed form, proposal core/CLI, fixtures, and tests as one dependency closure. The thin package wrapper is `standard:proposal`, and `npm run check` invokes `standard:proposal -- check --all` to validate every tracked `standard-proposals/` record offline. `prepare` may write only disposable `output/standard-proposals/` previews, and `open` performs fail-closed GET checks plus a browser open. No command submits an issue, uploads a file, records a Standard decision, publishes a release, changes the consumer pin, or claims adoption automatically. The Standard-maintained registry is read-only consumer input and is never instantiated as consumer authority.
 
 When `DKBWS-LINK-002` applies, adapt the pinned source-link checker, its fixtures, visible citation styling, and a built-output browser journey from a configured reader page to the manifest-mapped source-register row. Keep any rewrite command explicit and optional; routine checks and upgrade plans remain read-only. Citation-free and subject-empty targets record the conditional requirement as not applicable instead of creating evidence.
 

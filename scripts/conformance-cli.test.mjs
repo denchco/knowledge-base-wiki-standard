@@ -1187,8 +1187,9 @@ test("full-profile conformance fails required-false and exact-value capability d
     });
     const report = buildFullProfileReport({ target: root, receipt });
     assert.equal(report.summary.profileComplete, false);
-    assert.equal(report.summary.failedCapabilities, 2);
+    assert.equal(report.summary.failedCapabilities, 3);
     assert.equal(report.capabilityStates.find((item) => item.id === "evidence_governance").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "human_renderer").verificationStatus, "fail");
+    assert.equal(report.capabilityStates.find((item) => item.id === "standard_change_intake").verificationStatus, "fail");
   });
 });

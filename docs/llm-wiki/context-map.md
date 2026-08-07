@@ -16,4 +16,4 @@ status: draft
 | Upgrade the standard | Current manifest, canonical source, immutable consumer/candidate revisions, migration notes | Pinned profile/catalogue diff, changelog, and changed fixtures |
 | Research a concept | Source register, evidence matrix, relevant canonical page | Validation queue and Graphify |
 | Select follow-up work | User's requested outcome and project status | Failed or unrun checks and currently unparked validation items |
-| Promote a consumer change | Verified originating revision, issue form, and ignored scrubbed proposal draft | Existing issues, licence/browser evidence, fixture, migration impact, and exact remote payload |
+| Propose a consumer change | [Tracked proposal workflow](standard-proposals.md), verified originating revision, governed issue form, and immutable Standard pin | Existing marker matches, licence/browser evidence, affected contract, fixture, migration impact, payload/form digest, registry decision, release mapping, and consumer adoption authority |

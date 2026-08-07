@@ -25,6 +25,7 @@ const derivedOutputs = [
   "docs/assets/vendor/",
   "docs/assets/graphify/",
   "output/verification/",
+  "output/standard-proposals/",
   "GRAPH_REPORT.md",
 ];
 const environmentRoots = new Set([".git", ".jj", ".venv", "node_modules", ".playwright-cli"]);
@@ -161,6 +162,12 @@ function buildReceipt(provenance) {
     evidence("reader-source-links", "verification-script", "Stable source-row anchors, individual visible identities, registered authority URLs, and optional idempotent migration.", "scripts/link-source-citations.mjs"),
     evidence("reader-source-link-fixtures", "test-suite", "Positive, negative, ignored-region, Unicode, fence, destination, authority, and idempotence fixtures.", "scripts/link-source-citations.test.mjs"),
     evidence("conformance-fixtures", "test-suite", "Positive, negative, lifecycle, receipt, and lossless OKF fixtures.", "scripts/conformance-cli.test.mjs"),
+    evidence("standard-proposal-core", "verification-script", "Tracked proposal validation, deterministic scrubbed rendering, form- and digest-bound approval, fail-closed marker/form/label reconciliation, and separately authorised lifecycle transitions.", "scripts/standard-proposal-core.mjs"),
+    evidence("standard-proposal-cli", "command-adapter", "Thin local command boundary for read-only checks, disposable preparation, GET-only browser open, and explicit local record transitions.", "scripts/standard-proposal-cli.mjs"),
+    evidence("standard-proposal-fixtures", "test-suite", "Positive and negative provenance, state, safety, form/label, marker/deduplication, registry, release, adoption, and remote-write fixtures.", "scripts/standard-proposal-cli.test.mjs"),
+    evidence("standard-proposal-record-schema", "schema-validation", "Versioned tracked consumer proposal authority.", "schema/standard-proposal-record-v1.json"),
+    evidence("standard-proposal-registry", "decision-register", "Explicit Standard decision, accepted-requirement, and immutable-release ledger independent of issue state.", "standard-proposals/registry.json"),
+    evidence("standard-proposal-form", "governed-form", "Versioned issue-form bytes, required labels, and stable field contract.", "standard-proposals/standard-change-form-v1.yml"),
     evidence("schema-artifacts", "schema-validation", "Ajv Draft 2020-12 compilation and validation of real generated artifacts.", "scripts/check-schema-artifacts.mjs"),
     evidence("design-contract", "design-validation", "Lintable design tokens and governed visual-shape checks.", "DESIGN.md"),
     evidence("dependency-lock", "dependency-lock", "Exact npm dependency graph used by build and browser checks.", "package-lock.json"),
@@ -209,6 +216,7 @@ function buildReceipt(provenance) {
         result("DKBWS-PROMPT-001", ["standard-check", "prompt-contract", "agent-instruction-parity"]),
         result("DKBWS-PROV-001", ["standard-check", "agent-instruction-parity", "jj-turn-helper"], "The shared instructions and executable helper enforce a disclosed JJ commit at every file-changing development-turn boundary."),
         result("DKBWS-UPDATE-001", ["conformance-fixtures"]),
+        result("DKBWS-UPDATE-002", ["standard-check", "standard-proposal-core", "standard-proposal-cli", "standard-proposal-fixtures", "standard-proposal-record-schema", "standard-proposal-registry", "standard-proposal-form", "schema-artifacts"], "The proposal fixtures proved tracked immutable origin, deterministic form- and digest-bound approval, disclosure rejection, marker deduplication and ambiguous outcomes, fail-closed form/label checks, explicit issue/decision/release/adoption states, and absence of automatic remote writes or pin changes."),
         result("DKBWS-VERIFY-002", ["conformance-fixtures", "schema-artifacts"]),
         result("DKBWS-RUNTIME-002", ["local-service-contract", "local-service-fixtures", "service-identity-marker", "service-identity-schema"], "The managed-service fixtures serialize concurrent reservations, recover only dead stale owners, atomically replace the register, reject registered and live-listener collisions, reject a wrong service returning HTTP 200, and require registry, installation, load, and exact marker identity for status."),
         {

@@ -81,7 +81,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware deviation-preserving upgrade mechanism exists."},
     {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/about/ask-wiki.md", "docs/llm-wiki/maintenance.md", "functions/api/ask.js", "scripts/check-ask-wiki.mjs"], "finding": "Bounded retrieval, fail-closed secrets, authority disclaimer and endpoint tests are implemented."}
   ],
-  "requirement_summary": {"PASS": 12, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 8},
+  "requirement_summary": {"PASS": 12, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 9},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-content.mjs"], "finding": "Canonical maintained knowledge is Markdown with checked portable links; canonical structured data is CSV."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, role mappings, capabilities or deviations."},
@@ -107,6 +107,7 @@
     {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Blocking clarification questions are sequential and numbered Question X of N."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No candidate-standard upgrade workflow exists."},
+    {"id": "DKBWS-UPDATE-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates the tracked consumer-to-Standard proposal record, digest-bound governed intake, explicit decision/release registry, and separately authorised adoption workflow; no pass is inferred."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "Project publication is not a public DenchCo standard release; exact-commit deployment was assessed separately."},
     {"id": "DKBWS-SEC-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/about/governance-privacy-corrections.md", "docs/llm-wiki/maintenance.md", "DEPLOYMENT.md"], "finding": "Strong redaction, privacy and secret boundaries exist, but complete copyright/licensing and source-retention declarations are not consolidated."}
   ],

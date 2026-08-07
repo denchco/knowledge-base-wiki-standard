@@ -15,6 +15,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
 | Deployment adapter | Not selected | No deployment CLI or credentials are required; add and qualify a locked adapter before publication to a hosting target |
 | Documentation synchronization | Standard maintainer integration | Sibling Git repository at the contract's portable default path or an explicit runtime path; uses the existing Node, Ajv, and YAML dependencies and stores no absolute path |
+| Proposal integration | Optional consumer-to-Standard handoff | Existing Node, Ajv, and YAML dependencies for local record validation and preview generation; a browser and network are used only for an explicitly requested governed-form check/open or registry comparison |
 | MCP integration | Optional | GitHub MCP Server initially; a dedicated standard MCP is a later adapter |
 
 ## Repeatable reference build
@@ -40,9 +41,12 @@ The repeatable commands are:
 | `npm run graph:update` | Prepares local runtimes, updates Graphify, enriches six relationship layers, and publishes the shared 2D/3D dataset. |
 | `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. |
 | `npm run build` | Regenerates the graph publication and then performs the strict site build. |
-| `npm run check` | Runs source/content, canonical governing-question consistency, exact reader-to-source-row links, adoption, lifecycle, Draft 2020-12 artifact, provenance, npm/Python vulnerability, design, and visual-contract checks without starting a server. |
+| `npm run check` | Runs source/content, tracked Standard-proposal, canonical governing-question consistency, exact reader-to-source-row links, adoption, lifecycle, Draft 2020-12 artifact, provenance, npm/Python vulnerability, design, and visual-contract checks without starting a server or making remote writes. |
 | `npm run check:governing-question` | Checks the manifest-mapped canonical question and every exact repetition in its bounded reader-source set; subject-empty or non-selected profiles report a deliberate not-applicable result. |
 | `npm run sources:link` | Optionally and idempotently converts visible source identities on bounded reader evidence surfaces into individual exact-row links; it is an explicit authoring migration, never part of read-only checking or upgrade planning. |
+| `npm run standard:proposal -- check --all` | Read-only validation of every tracked proposal record and its state transitions; it performs no network access. |
+| `npm run standard:proposal -- prepare <id>` | Builds a disposable scrubbed payload preview from one valid tracked record; it performs no remote write. |
+| `npm run standard:proposal -- open <id>` | Fails closed unless the governed form, required label, immutable prepared payload, and submission marker agree, then performs only a browser open; the user submits the form. |
 | `npm run conformance:full-report -- --target . --receipt output/verification/receipt.json` | Consumes an explicit schema-valid verification receipt and emits the selected-profile report; absent gates remain `not-checked`. |
 | `npm run audit:node` | Audits the exact npm lock graph and fails high or critical known vulnerabilities. |
 | `npm run audit:python` | Audits the locally installed environment reconstructed from `uv.lock`; run after `uv sync --frozen`. |
@@ -67,9 +71,11 @@ Successful `npm run verify` writes an ignored `output/verification/receipt.json`
 
 Those two output paths are reserved for their declared schemas in Standard and consumer adapters. An ad hoc build/browser summary uses a different filename. Normal consumers also exclude this Standard's `sync:documentation:*`, `verify:workspace`, and sibling-documentation snapshot contract unless they independently declare and implement that maintainer integration.
 
+Proposal records under `standard-proposals/` are canonical, tracked consumer or Standard-maintainer records. Prepared payloads under `output/standard-proposals/` are generated, ignored, and reconstructible. Local validation never needs network access; the CLI performs no issue submission, attachment upload, release publication, or consumer-pin mutation. Those actions remain with their separately named human authorities.
+
 The CI reference uses Node 24 Active LTS with `actions/checkout` pinned to `de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2), full Git history (`fetch-depth: 0`) so revision-aware lifecycle fixtures can resolve immutable historical pins, `actions/setup-node` pinned to `48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e` (v6.4.0), and `astral-sh/setup-uv` pinned to `08807647e7069bb48b6ef5acd8ec9567f424441b` (v8.1.0). CI explicitly selects provenance `distribution` mode; that receipt remains `not-checked` for Jujutsu and is not a maintainer-provenance pass.
 
-`docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `GRAPH_REPORT.md`, and `site/` are generated and ignored. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
+`docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `output/standard-proposals/`, `GRAPH_REPORT.md`, and `site/` are generated and ignored. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
 
 No rendered page may load Mermaid, vis-network, or 3d-force-graph from a public CDN. The browser contract resolves question, Mermaid, architecture, table, list, reader-source-link, source-register, and graph representatives independently; records requests; fails closed when a selected-profile graph route is absent; and rejects public-CDN use, failed local assets, console errors, blank diagrams/canvases, broken exact-row citation journeys, unusable controls, uncontained mobile tables, or desktop/mobile overflow.
 

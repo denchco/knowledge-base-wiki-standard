@@ -22,6 +22,8 @@ Do not publish suspected vulnerabilities or exposed personal data in an issue. [
 - Dependencies are locked, audited, and upgraded through reviewed changes.
 - CI uses read-only permissions unless a job's narrowly defined purpose requires more.
 - Validators are read-only; generators write only declared derived paths; upgrades produce reviewable patches.
+- Proposal `check`, `show`, and `sync --check` are read-only. `prepare` writes only a sanitised disposable payload below ignored `output/standard-proposals/`; `record` updates only the selected tracked proposal record; `open` performs GET-only form, label, and duplicate checks and never submits an issue.
+- Proposal tooling rejects secrets, private absolute paths, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Suspected vulnerabilities leave the public proposal workflow and use private reporting; patches, screenshots, and evidence files are never uploaded automatically.
 - Local services bind to loopback. Persistent managed previews reserve their endpoint in the user-scoped shared register, refuse unmanaged listeners, expose only the non-secret static service identity marker, and require its exact ID in addition to HTTP 200.
 
 ## MCP controls

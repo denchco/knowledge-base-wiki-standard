@@ -1,0 +1,1247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-record-v1.json",
+  "title": "DenchCo Standard proposal record v1",
+  "description": "Tracked consumer-to-Standard proposal provenance and lifecycle record.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "id",
+    "slug",
+    "title",
+    "target",
+    "origin",
+    "change",
+    "disclosure",
+    "workflow"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-record-v1.json"
+    },
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/proposalId"
+    },
+    "slug": {
+      "$ref": "#/$defs/slug"
+    },
+    "title": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "repository",
+        "issueForm",
+        "issueFormVersion",
+        "issueFormSha256",
+        "labels"
+      ],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/denchco/knowledge-base-wiki-standard"
+        },
+        "issueForm": {
+          "const": ".github/ISSUE_TEMPLATE/standard-change.yml"
+        },
+        "issueFormVersion": {
+          "const": "1.0"
+        },
+        "issueFormSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "labels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "prefixItems": [
+            {
+              "const": "enhancement"
+            },
+            {
+              "const": "standard-change"
+            }
+          ],
+          "items": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "origin": {
+      "type": "object",
+      "required": [
+        "project",
+        "publicUrl",
+        "implementationCommit",
+        "jjChangeId",
+        "pinnedStandardRevision"
+      ],
+      "properties": {
+        "project": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "publicUrl": {
+          "$ref": "#/$defs/nullableHttpsUrl"
+        },
+        "implementationCommit": {
+          "$ref": "#/$defs/commit"
+        },
+        "jjChangeId": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]{16,64}$"
+            }
+          ]
+        },
+        "pinnedStandardRevision": {
+          "$ref": "#/$defs/commit"
+        }
+      },
+      "additionalProperties": false
+    },
+    "change": {
+      "type": "object",
+      "required": [
+        "problem",
+        "intendedOutcome",
+        "reuseClassification",
+        "affectedProfiles",
+        "affectedRequirements",
+        "implementationEvidence",
+        "verificationEvidence",
+        "dependencies",
+        "limitations",
+        "fallback",
+        "migration",
+        "accessibility",
+        "browser"
+      ],
+      "properties": {
+        "problem": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "intendedOutcome": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reuseClassification": {
+          "$ref": "#/$defs/classification"
+        },
+        "affectedProfiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              {
+                "const": "unknown"
+              }
+            ]
+          }
+        },
+        "affectedRequirements": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/requirementId"
+              },
+              {
+                "const": "new-requirement"
+              },
+              {
+                "const": "unknown"
+              }
+            ]
+          }
+        },
+        "implementationEvidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evidenceReference"
+          }
+        },
+        "verificationEvidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "command",
+              "result",
+              "completedAt",
+              "evidence",
+              "sha256"
+            ],
+            "properties": {
+              "command": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "result": {
+                "enum": [
+                  "pass",
+                  "fail",
+                  "not-checked"
+                ]
+              },
+              "completedAt": {
+                "$ref": "#/$defs/dateTime"
+              },
+              "evidence": {
+                "$ref": "#/$defs/evidenceReference"
+              },
+              "sha256": {
+                "$ref": "#/$defs/nullableSha256"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "fallback": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "migration": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "accessibility": {
+          "$ref": "#/$defs/conditionalEvidence"
+        },
+        "browser": {
+          "$ref": "#/$defs/conditionalEvidence"
+        }
+      },
+      "additionalProperties": false
+    },
+    "disclosure": {
+      "type": "object",
+      "required": [
+        "licensingStatus",
+        "licensingEvidence",
+        "authorityToShare",
+        "secrets",
+        "privateAbsolutePaths",
+        "personalData",
+        "confidentialOrRestrictedEvidence",
+        "vulnerabilityDetails",
+        "unlicensedMaterial",
+        "automaticUploads"
+      ],
+      "properties": {
+        "licensingStatus": {
+          "enum": [
+            "cleared",
+            "not-applicable"
+          ]
+        },
+        "licensingEvidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "authorityToShare": {
+          "const": true
+        },
+        "secrets": {
+          "const": false
+        },
+        "privateAbsolutePaths": {
+          "const": false
+        },
+        "personalData": {
+          "const": false
+        },
+        "confidentialOrRestrictedEvidence": {
+          "const": false
+        },
+        "vulnerabilityDetails": {
+          "const": false
+        },
+        "unlicensedMaterial": {
+          "const": false
+        },
+        "automaticUploads": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "workflow": {
+      "type": "object",
+      "required": [
+        "local",
+        "payload",
+        "approval",
+        "issue",
+        "upstream",
+        "acceptance",
+        "release",
+        "adoption"
+      ],
+      "properties": {
+        "local": {
+          "type": "object",
+          "required": [
+            "observationStatus",
+            "implementationStatus",
+            "verificationStatus"
+          ],
+          "properties": {
+            "observationStatus": {
+              "const": "recorded"
+            },
+            "implementationStatus": {
+              "enum": [
+                "pending",
+                "complete"
+              ]
+            },
+            "verificationStatus": {
+              "enum": [
+                "pending",
+                "pass",
+                "fail"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "status",
+            "marker",
+            "digest",
+            "formSha256",
+            "preparedAt"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "unprepared",
+                "prepared"
+              ]
+            },
+            "marker": {
+              "$ref": "#/$defs/marker"
+            },
+            "digest": {
+              "$ref": "#/$defs/nullableSha256"
+            },
+            "formSha256": {
+              "$ref": "#/$defs/nullableSha256"
+            },
+            "preparedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            }
+          },
+          "additionalProperties": false
+        },
+        "approval": {
+          "type": "object",
+          "required": [
+            "status",
+            "digest",
+            "formSha256",
+            "authority",
+            "approvedAt"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "approved",
+                "stale"
+              ]
+            },
+            "digest": {
+              "$ref": "#/$defs/nullableSha256"
+            },
+            "formSha256": {
+              "$ref": "#/$defs/nullableSha256"
+            },
+            "authority": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "approvedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            }
+          },
+          "additionalProperties": false
+        },
+        "issue": {
+          "type": "object",
+          "required": [
+            "status",
+            "observedState",
+            "url",
+            "number",
+            "linkedAt",
+            "observedAt",
+            "remotePayloadDigest"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "not-submitted",
+                "submission-ambiguous",
+                "submitted-unlinked",
+                "linked"
+              ]
+            },
+            "observedState": {
+              "enum": [
+                "unknown",
+                "open",
+                "closed"
+              ]
+            },
+            "url": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^https://github\\.com/denchco/knowledge-base-wiki-standard/issues/[1-9][0-9]*$"
+                }
+              ]
+            },
+            "number": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              ]
+            },
+            "linkedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            },
+            "observedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            },
+            "remotePayloadDigest": {
+              "$ref": "#/$defs/nullableSha256"
+            }
+          },
+          "additionalProperties": false
+        },
+        "upstream": {
+          "type": "object",
+          "required": [
+            "classification",
+            "decision",
+            "decidedAt",
+            "decisionRevision",
+            "evidence",
+            "rationale"
+          ],
+          "properties": {
+            "classification": {
+              "anyOf": [
+                {
+                  "const": "pending"
+                },
+                {
+                  "$ref": "#/$defs/classification"
+                }
+              ]
+            },
+            "decision": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected",
+                "withdrawn"
+              ]
+            },
+            "decidedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            },
+            "decisionRevision": {
+              "$ref": "#/$defs/nullableCommit"
+            },
+            "evidence": {
+              "$ref": "#/$defs/nullableString"
+            },
+            "rationale": {
+              "$ref": "#/$defs/nullableString"
+            }
+          },
+          "additionalProperties": false
+        },
+        "acceptance": {
+          "type": "object",
+          "required": [
+            "requirementIds"
+          ],
+          "properties": {
+            "requirementIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/requirementId"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "release": {
+          "type": "object",
+          "required": [
+            "status",
+            "tag",
+            "revision",
+            "recordedAt",
+            "registryRevision"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "included",
+                "not-applicable"
+              ]
+            },
+            "tag": {
+              "$ref": "#/$defs/nullableTag"
+            },
+            "revision": {
+              "$ref": "#/$defs/nullableCommit"
+            },
+            "recordedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            },
+            "registryRevision": {
+              "$ref": "#/$defs/nullableCommit"
+            }
+          },
+          "additionalProperties": false
+        },
+        "adoption": {
+          "type": "object",
+          "required": [
+            "status",
+            "authority",
+            "fromStandardRevision",
+            "toStandardRevision",
+            "consumerRevision",
+            "adoptedAt",
+            "verification"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "not-considered",
+                "deferred",
+                "declined",
+                "adopted"
+              ]
+            },
+            "authority": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "by",
+                    "at"
+                  ],
+                  "properties": {
+                    "by": {
+                      "$ref": "#/$defs/nonEmptyString"
+                    },
+                    "at": {
+                      "$ref": "#/$defs/dateTime"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "fromStandardRevision": {
+              "$ref": "#/$defs/nullableCommit"
+            },
+            "toStandardRevision": {
+              "$ref": "#/$defs/nullableCommit"
+            },
+            "consumerRevision": {
+              "$ref": "#/$defs/nullableCommit"
+            },
+            "adoptedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            },
+            "verification": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/evidenceReference"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "status": {
+                    "const": "unprepared"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "digest": {
+                    "type": "null"
+                  },
+                  "formSha256": {
+                    "type": "null"
+                  },
+                  "preparedAt": {
+                    "type": "null"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "status": {
+                    "const": "prepared"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "digest": {
+                    "$ref": "#/$defs/sha256"
+                  },
+                  "formSha256": {
+                    "$ref": "#/$defs/sha256"
+                  },
+                  "preparedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "approval": {
+                "properties": {
+                  "status": {
+                    "const": "pending"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "approval": {
+                "properties": {
+                  "digest": {
+                    "type": "null"
+                  },
+                  "formSha256": {
+                    "type": "null"
+                  },
+                  "authority": {
+                    "type": "null"
+                  },
+                  "approvedAt": {
+                    "type": "null"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "approval": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "approved",
+                      "stale"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "approval": {
+                "properties": {
+                  "digest": {
+                    "$ref": "#/$defs/sha256"
+                  },
+                  "formSha256": {
+                    "$ref": "#/$defs/sha256"
+                  },
+                  "authority": {
+                    "$ref": "#/$defs/nonEmptyString"
+                  },
+                  "approvedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "issue": {
+                "properties": {
+                  "status": {
+                    "const": "linked"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "issue": {
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "number": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "linkedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  },
+                  "observedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  },
+                  "remotePayloadDigest": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "upstream": {
+                "properties": {
+                  "decision": {
+                    "const": "accepted"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "upstream": {
+                "properties": {
+                  "classification": {
+                    "enum": [
+                      "experimental",
+                      "project-specific",
+                      "reusable",
+                      "preferred",
+                      "core"
+                    ]
+                  },
+                  "decidedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  },
+                  "decisionRevision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "evidence": {
+                    "$ref": "#/$defs/nonEmptyString"
+                  },
+                  "rationale": {
+                    "$ref": "#/$defs/nonEmptyString"
+                  }
+                },
+                "type": "object"
+              },
+              "acceptance": {
+                "properties": {
+                  "requirementIds": {
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "release": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "pending",
+                      "included"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "upstream": {
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "rejected",
+                      "withdrawn"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "upstream": {
+                "properties": {
+                  "decidedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  },
+                  "decisionRevision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "evidence": {
+                    "$ref": "#/$defs/nonEmptyString"
+                  },
+                  "rationale": {
+                    "$ref": "#/$defs/nonEmptyString"
+                  }
+                },
+                "type": "object"
+              },
+              "acceptance": {
+                "properties": {
+                  "requirementIds": {
+                    "maxItems": 0,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "release": {
+                "properties": {
+                  "status": {
+                    "const": "not-applicable"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "release": {
+                "properties": {
+                  "status": {
+                    "const": "included"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "release": {
+                "properties": {
+                  "tag": {
+                    "$ref": "#/$defs/tag"
+                  },
+                  "revision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "recordedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  },
+                  "registryRevision": {
+                    "$ref": "#/$defs/commit"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "adoption": {
+                "properties": {
+                  "status": {
+                    "const": "adopted"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "adoption": {
+                "properties": {
+                  "authority": {
+                    "type": "object"
+                  },
+                  "fromStandardRevision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "toStandardRevision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "consumerRevision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "adoptedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  },
+                  "verification": {
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      ]
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$",
+      "minLength": 3,
+      "maxLength": 80
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^DKBWS-PROP-[a-z0-9][a-z0-9-]*[a-z0-9]-[0-9a-f]{32}$"
+    },
+    "marker": {
+      "type": "string",
+      "pattern": "^<!-- dkbws-standard-proposal:v1:DKBWS-PROP-[a-z0-9][a-z0-9-]*[a-z0-9]-[0-9a-f]{32} -->$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullableSha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/sha256"
+        }
+      ]
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "nullableCommit": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/commit"
+        }
+      ]
+    },
+    "dateTime": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "nullableDateTime": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/dateTime"
+        }
+      ]
+    },
+    "tag": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "nullableTag": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/tag"
+        }
+      ]
+    },
+    "nullableHttpsUrl": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
+        }
+      ]
+    },
+    "classification": {
+      "enum": [
+        "unknown",
+        "experimental",
+        "project-specific",
+        "reusable",
+        "preferred",
+        "core"
+      ]
+    },
+    "requirementId": {
+      "type": "string",
+      "pattern": "^DKBWS-[A-Z]+-[0-9]{3}$"
+    },
+    "evidenceReference": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "pattern": "^(?:/|[A-Za-z]:[\\\\/]|file:)"
+      }
+    },
+    "conditionalEvidence": {
+      "type": "object",
+      "required": [
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "applicable",
+            "not-applicable"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

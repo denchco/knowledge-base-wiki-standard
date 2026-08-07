@@ -33,9 +33,9 @@ status: draft
 
 ## Consumer-derived proposals
 
-When a user-authored consumer change appears reusable, preserve its originating project and immutable revision and use the [standard-change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml). Complete and verify the project-owned request first, search existing issues read-only, and prepare ignored `output/standard-change-proposal.md` with classification, affected contract, evidence, accessibility/browser results, dependencies, fallback, fixtures, and migration impact. Scrub private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material.
+Use the tracked [Standard proposal workflow](standard-proposals.md) for a user-authored consumer improvement that may be reusable. Finish and verify the project-owned implementation first. Preserve its full Git commit, optional JJ identity, pinned Standard revision, bounded evidence, fallback, fixture and migration effects in the canonical proposal record; do not make an ignored Markdown draft authoritative.
 
-Before any remote write, show the exact repository, title, body, and labels and obtain explicit authority. If the form is unavailable, stop with the local draft rather than substituting a connector or CLI write. Filing does not promote the pattern or authorize a PR, release, publication, migration, pin, or conformance change.
+Validate the record offline, prepare a disposable scrubbed payload, and review its exact digest and form revision. The CLI may check and open the governed form but never submits or uploads; final submission remains with the user. Keep issue state separate from explicit maintainer classification and acceptance, keep acceptance separate from immutable release inclusion, and keep release separate from any consumer adoption or pin change. A closed issue is not acceptance. Record each authorised transition in its own JJ phase and fail closed on missing form, label, marker, provenance, or digest evidence.
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
 

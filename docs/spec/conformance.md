@@ -16,6 +16,7 @@ A conformance claim MUST state:
 - selected profile;
 - role-to-path mappings;
 - capability states;
+- tracked proposal identifiers and lifecycle states when Standard-change intake applies;
 - deviations and waivers with reasons;
 - last verification result and environment;
 - manual checks that remain outstanding.
@@ -27,6 +28,8 @@ The selected profile is an exhaustive requirement closure. A formal report MUST 
 The conformance kit contains positive and negative fixtures. A source/configuration assertion cannot prove browser-visible behaviour; rendered claims require built-output browser checks. In particular, `DKBWS-HUMAN-002` passes only when computed governing-question rail and text colours both equal the runtime-resolved active accent at each supported verification viewport and an ordinary quotation remains neutral. `DKBWS-HUMAN-004` additionally requires an authoritative question mapping, an exact-text scan over the declared bounded reader set, and desktop/mobile browser proof on every route where that question repeats; paraphrases and records outside the bounded reader set remain neutral controls. `DKBWS-HUMAN-003` measures the draft marker and stock chevron against their own row centres and rejects horizontal page overflow. `DKBWS-LINK-002` requires source lint and a built-output journey that focuses a representative source link, preserves its accessible identity and citation grammar, follows its exact fragment, and confirms the destination anchor belongs to the intended source-register row at desktop and mobile widths.
 
 `inspect` and `validate` are wholly read-only. `verify` MUST leave canonical inputs unchanged, but MAY rebuild declared derived outputs in deterministic paths so freshness can be proved. A project MUST list those derived paths; unexpected worktree changes fail verification. Upgrade remains a separate explicit, reviewable operation.
+
+For `DKBWS-UPDATE-002`, conformance validates every tracked proposal and the Standard acceptance/release registry against their pinned schemas. It proves immutable implementation provenance, legal state transitions, unique proposal identifiers and hidden markers, deterministic payload bytes and SHA-256 approval binding, sanitized public content, issue linkage, explicit decision, immutable-release mapping, and later adoption separation. A closed issue is never acceptance evidence. Proposal validation and verification perform no remote writes, and repeated read-only checks leave no Jujutsu working-copy change.
 
 ## Formal claims and adoption audits
 
@@ -71,6 +74,8 @@ npm run conformance:test
 No command above modifies the target. A caller MAY redirect export output to a new artifact; the CLI never selects or overwrites an output file itself.
 
 The full-profile report builder consumes `schema/verification-receipt-v1.json`. A receipt names the selected profile, evaluation date, environment, canonical-input mutation result, and explicit gate results with evidence references. An absent gate remains `not-checked`; a successful command does not implicitly pass requirements that its receipt does not name. The report builder materializes an explicit result for every inherited requirement, so missing evidence cannot make an obligation disappear. `DKBWS-PROV-001` accepts only the read-only maintainer-mode provenance receipt with both Git and Jujutsu passing plus a successful instruction/helper gate for the development-turn commit rule, and `DKBWS-SEC-001` requires all four subcontrols. The generated report distinguishes complete evaluation from a conformant outcome and validates itself against `schema/conformance-report-v1.json` before emission. The reference paths `output/verification/receipt.json` and `output/verification/conformance-report.json` are reserved for those two schema-valid artifacts; an ad hoc project summary at either path is a failing fixture, not partial evidence.
+
+When Standard Production selects `standard_change_intake`, the full-profile receipt MUST include an explicit `DKBWS-UPDATE-002` gate result. A manifest declaration alone cannot pass it; absent proposal-schema, transition, payload-binding, registry, disclosure, and remote-write-negative evidence remains `not-checked`.
 
 ## Lifecycle diff and plans
 
@@ -143,6 +148,7 @@ Graph-assisted inspection is query-first, not graph-only. If a scoped query has 
 - `schema/adoption-audit-report-v1.json` defines portable, confidence-qualified inferred audit records separately from formal claims.
 - `schema/okf-export-v1.json` defines the lossless JSON rendition.
 - `schema/lifecycle-plan-v1.json` defines diff, upgrade-plan, and init-plan artifacts.
+- `schema/standard-proposal-record-v1.json` and `schema/standard-proposal-registry-v1.json` define consumer proposal state and Standard decision/release mapping independently of GitHub issue state.
 - `fixtures/conforming/okf-v0.2` includes provenance, both trust forms, lifecycle, attested computation, and a nested unknown extension.
 - `fixtures/nonconforming/okf-v0.2` proves every hard structural failure class.
 - `fixtures/nonconforming/okf-guidance` proves the portable-versus-strict distinction.

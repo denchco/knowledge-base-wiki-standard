@@ -24,7 +24,7 @@ Use the [Graphify workflow](graphify.md) for query-first discovery, the six requ
 - **Ingest**: register the source, preserve raw identity, add its stable exact-row anchor, update relevant concepts and evidence, add links, and record the change.
 - **Query**: start from the context map and graph, read the smallest authoritative set, expose uncertainty, and cite registered evidence through individual internal source-row links.
 - **Lint**: find contradictions, stale claims, unsupported authority language, ungoverned exact repetitions of the declared canonical question, bare or misdirected source identities, unregistered named-authority URLs, orphans, duplicate concepts, missing contextual links, broken generated surfaces, and profile drift.
-- **Promote**: after a user-authored local innovation is complete and verified, preserve its immutable origin, search upstream issues read-only, scrub an ignored proposal draft, and require exact-payload authority before remote submission. A pattern becomes Standard only with applicability, fallback, verification, fixture, migration impact, and maintainer classification.
+- **Propose**: after a user-authored local innovation is complete and verified, preserve its immutable origin in a tracked [Standard proposal](standard-proposals.md). Validate offline, generate a disposable scrubbed payload, bind approval to its exact digest and governed form revision, and leave final submission with the user. Intake, explicit Standard acceptance, immutable release inclusion, and optional consumer adoption are separate authorities and JJ phases.
 
 Never treat an LLM answer, rendered page, graph edge, or generated export as new evidence.
 

@@ -15,9 +15,10 @@ status: "draft"
 6. Rebuild generated outputs and run every applicable check.
 7. Review Git and Jujutsu state.
 8. Before the development turn ends, record all persistent changes from that turn in a JJ commit. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
-9. For a potentially reusable user-authored improvement, keep the verified implementation project-owned and prepare ignored `output/standard-change-proposal.md` only after the local turn commit is complete.
-10. Search existing Standard issues read-only and draft the problem, outcome, origin and immutable revision, reuse class, affected contract, dependencies and fallback, evidence, accessibility/browser implications, regression fixture, and migration impact.
-11. Scrub private paths, credentials, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Show the exact repository, title, body, and labels and obtain explicit authorization before any remote submission; if the issue form is unavailable, stop with the local draft.
+9. For a potentially reusable user-authored improvement, keep the verified implementation project-owned and commit its full Git revision, optional JJ identity, and pinned Standard revision to a tracked `standard-proposals/` record after the local implementation phase is complete.
+10. Validate the record offline. Prepare and inspect a disposable scrubbed payload containing the problem, outcome, reuse class, affected contract, dependencies and fallback, bounded evidence, accessibility/browser implications, regression fixture, and migration impact.
+11. Scrub private paths, credentials, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Bind explicit approval to the exact payload/form digest. The CLI may fail-closed check and open the governed form but never submits or uploads; the user submits.
+12. Record unambiguous issue linkage, explicit Standard decision, immutable release mapping, and optional consumer adoption as independent authorised JJ phases. A closed issue is not acceptance, and an accepted or released change does not update this project's pin automatically.
 
 Standard upgrades use an immutable source revision and a reviewable diff. Equal version labels do not prove equal revisions. Upgrades never replace local topic content silently, and filing a proposal does not change the pinned revision or authorize migration.
 

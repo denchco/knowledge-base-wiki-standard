@@ -22,12 +22,12 @@ status: "draft"
 - **Ingest**: register a target source, preserve its identity, add its stable exact-row anchor, update the relevant concept and evidence state, add links, and record the change.
 - **Query**: select the smallest authoritative target context, expose uncertainty, and cite registered evidence through individual internal source-row links.
 - **Lint**: find contradictions, stale claims, unsupported authority, ungoverned exact repetitions of the declared canonical question, bare or misdirected source identities, unregistered named-authority URLs, missing links, and generated-output drift.
-- **Propose**: after a user-authored reusable improvement is implemented, verified, and recorded locally, search upstream issues read-only and prepare the ignored `output/standard-change-proposal.md`. Keep the pattern project-owned, scrub public content, and require explicit authorization for the exact repository, title, body, and labels before any remote write.
+- **Propose**: after a user-authored reusable improvement is implemented, verified, and committed locally, preserve it in a tracked [Standard proposal](standard-proposals.md). Validate offline, prepare a disposable scrubbed payload, and bind approval to the exact digest and governed form revision. The user submits; intake, Standard decision, release inclusion, and optional adoption remain separate authorities.
 
 Never treat an LLM answer, rendered page, or graph edge as new evidence.
 
 In a Standard Production maintenance workspace, a file-changing development turn remains incomplete until its persistent changes are recorded in the required end-of-turn JJ commit under `DKBWS-PROV-001`.
 
-Use the [Standard change issue form](https://github.com/denchco/knowledge-base-wiki-standard/issues/new?template=standard-change.yml) for a governed upstream handoff. If the form is unavailable, preserve the local draft and stop; filing does not amend the pinned Standard or authorize migration.
+Use the tracked proposal workflow for a governed upstream handoff. If the form, label, marker search, provenance, or digest evidence is unavailable or ambiguous, preserve the record and stop; filing does not amend the pinned Standard or authorize migration.
 
 Use project status for zero to three current priorities and the validation queue for parked work. Apply the `AGENTS.md` completion and cycle guard before recommending any follow-up; a completed answer does not need a Next Steps section.

@@ -10,7 +10,7 @@ const required = [
   "GOVERNANCE.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "CHANGELOG.md",
   "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md",
   "docs/sources.md", "docs/evidence-matrix.md", "docs/validation-queue.md",
-  "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "prompts/instantiate-wiki.md",
+  "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "docs/llm-wiki/standard-proposals.md", "prompts/instantiate-wiki.md",
   "starter/README.md", "starter/starter.yaml", "starter/templates/wiki-standard.yaml.tmpl",
   "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl",
   "starter/templates/LICENSING.md.tmpl",
@@ -19,6 +19,8 @@ const required = [
   "starter/templates/docs/graph/three-dimensional.md.tmpl",
   "starter/templates/docs/assets/service-identity.json.tmpl",
   "starter/templates/docs/project/status.md.tmpl",
+  "starter/templates/docs/llm-wiki/standard-proposals.md.tmpl",
+  "starter/templates/standard-proposals/README.md.tmpl",
   "docs/conformance/index.md", "docs/conformance/dogfood/comparison.md",
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
@@ -29,6 +31,18 @@ const required = [
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
   "schema/documentation-sync-snapshot-v1.json",
+  "schema/standard-proposal-record-v1.json", "schema/standard-proposal-registry-v1.json",
+  "fixtures/conforming/standard-proposal-valid/record.json",
+  "fixtures/conforming/standard-proposal-valid/standard-change.yml",
+  "fixtures/conforming/standard-proposal-valid/remote/standard-change.yml",
+  "fixtures/conforming/standard-proposal-valid/remote/labels.json",
+  "fixtures/conforming/standard-proposal-valid/remote/issues.json",
+  "fixtures/conforming/standard-proposal-valid/remote/registry.json",
+  "fixtures/nonconforming/standard-proposal-state/record.json",
+  "fixtures/nonconforming/standard-proposal-safety/record.json",
+  "fixtures/nonconforming/standard-proposal-duplicate/first.json",
+  "fixtures/nonconforming/standard-proposal-duplicate/second.json",
+  "fixtures/nonconforming/standard-proposal-form/standard-change.yml",
   "fixtures/conforming/reader-source-links/docs/sources.md",
   "fixtures/conforming/reader-source-links/docs/evidence-matrix.md",
   "fixtures/nonconforming/reader-source-links/docs/sources.md",
@@ -52,6 +66,8 @@ const required = [
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
+  "scripts/standard-proposal-core.mjs", "scripts/standard-proposal-cli.mjs", "scripts/standard-proposal-cli.test.mjs",
+  "standard-proposals/README.md", "standard-proposals/registry.json", "standard-proposals/standard-change-form-v1.yml",
   "sync/documentation-sync-contract-v1.json"
 ];
 
@@ -59,7 +75,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -108,8 +124,51 @@ if (starterGoverningQuestion?.classification !== "adapt-from-release"
   || !(starterGoverningQuestion?.requirements ?? []).includes("DKBWS-HUMAN-004")) {
   failures.push("starter must adapt the bounded governing-question consistency checker for DKBWS-HUMAN-004");
 }
+for (const [target, classification, source] of [
+  ["scripts/standard-proposal-core.mjs", "adapt-from-release", "scripts/standard-proposal-core.mjs"],
+  ["scripts/standard-proposal-cli.mjs", "adapt-from-release", "scripts/standard-proposal-cli.mjs"],
+  ["scripts/standard-proposal-cli.test.mjs", "adapt-from-release", "scripts/standard-proposal-cli.test.mjs"],
+  ["schema/standard-proposal-record-v1.json", "adapt-from-release", "schema/standard-proposal-record-v1.json"],
+  ["schema/standard-proposal-registry-v1.json", "adapt-from-release", "schema/standard-proposal-registry-v1.json"],
+  ["standard-proposals/standard-change-form-v1.yml", "adapt-from-release", "standard-proposals/standard-change-form-v1.yml"],
+  ["fixtures/conforming/standard-proposal-valid/", "adapt-from-release", "fixtures/conforming/standard-proposal-valid/"],
+  ["fixtures/nonconforming/standard-proposal-state/", "adapt-from-release", "fixtures/nonconforming/standard-proposal-state/"],
+  ["fixtures/nonconforming/standard-proposal-safety/", "adapt-from-release", "fixtures/nonconforming/standard-proposal-safety/"],
+  ["fixtures/nonconforming/standard-proposal-duplicate/", "adapt-from-release", "fixtures/nonconforming/standard-proposal-duplicate/"],
+  ["fixtures/nonconforming/standard-proposal-form/", "adapt-from-release", "fixtures/nonconforming/standard-proposal-form/"],
+]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (entry?.classification !== classification
+    || entry?.source !== source
+    || entry?.planning_only !== true
+    || !(entry?.requirements ?? []).includes("DKBWS-UPDATE-002")) {
+    failures.push(`starter must adapt ${target} for DKBWS-UPDATE-002`);
+  }
+}
+for (const [target, template] of [
+  ["standard-proposals/README.md", "starter/templates/standard-proposals/README.md.tmpl"],
+  ["docs/llm-wiki/standard-proposals.md", "starter/templates/docs/llm-wiki/standard-proposals.md.tmpl"],
+]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (entry?.classification !== "render-template"
+    || entry?.template !== template
+    || !(entry?.requirements ?? []).includes("DKBWS-UPDATE-002")) {
+    failures.push(`starter must render ${target} for DKBWS-UPDATE-002`);
+  }
+}
+for (const target of [".wiki-standard.yaml", "AGENTS.md", "DEPENDENCIES.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "docs/llm-wiki/index.md", "docs/llm-wiki/context-map.md", "docs/llm-wiki/maintenance.md", "package.json", ".github/workflows/verify.yml"]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (!(entry?.requirements ?? []).includes("DKBWS-UPDATE-002")) {
+    failures.push(`starter ${target} must carry the DKBWS-UPDATE-002 proposal boundary`);
+  }
+}
+const starterWikiManifest = readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8");
+if (!starterWikiManifest.includes("standard_change_intake: true")) failures.push("starter manifest must select the DKBWS-UPDATE-002 proposal capability");
 if (standardManifest?.roles?.governing_question !== "docs/index.md") {
   failures.push("Standard manifest must map the authoritative governing-question source");
+}
+if (standardManifest?.capabilities?.standard_change_intake !== true) {
+  failures.push("Standard manifest must select the DKBWS-UPDATE-002 standard_change_intake capability");
 }
 const questionReaderSources = standardManifest?.capabilities?.governing_question?.reader_sources;
 if (!Array.isArray(questionReaderSources) || !questionReaderSources.includes("docs/index.md") || !questionReaderSources.includes("docs/architecture.md")) {
@@ -181,36 +240,95 @@ if (!starterClaude.split(/\r?\n/).some((line) => line.trim() === "@AGENTS.md")) 
   failures.push("starter CLAUDE.md template must import AGENTS.md");
 }
 if (codexSkill !== claudeSkill) failures.push("Codex and Claude Standard skills must be byte-identical");
+for (const [name, source] of [
+  ["AGENTS.md", agents],
+  ["starter AGENTS.md", starterAgents],
+  ["Standard skill", codexSkill],
+  ["CONTRIBUTING.md", contributing],
+  ["Standard maintenance", maintenance],
+  ["starter maintenance", starterMaintenance],
+]) {
+  for (const phrase of ["tracked", "pinned Standard", "user", "closed issue", "acceptance", "release", "adoption"]) {
+    if (!source.includes(phrase)) failures.push(`${name} lacks DKBWS-UPDATE-002 proposal safeguard: ${phrase}`);
+  }
+  if (source.includes("output/standard-change-proposal.md")) failures.push(`${name} retains the obsolete ignored Markdown proposal authority`);
+}
 for (const [name, source] of [["AGENTS.md", agents], ["starter AGENTS.md", starterAgents], ["Standard skill", codexSkill], ["CONTRIBUTING.md", contributing]]) {
-  if (!source.includes("standard-change.yml")) failures.push(`${name} lacks the consumer-to-Standard proposal route`);
+  for (const phrase of ["standard-proposals/", "full Git", "standard:proposal"]) {
+    if (!source.includes(phrase)) failures.push(`${name} lacks executable DKBWS-UPDATE-002 proposal contract: ${phrase}`);
+  }
 }
 for (const phrase of [
-  "output/standard-change-proposal.md",
-  "Search existing Standard issues read-only",
-  "exact repository, title, body, and labels",
-  "If the form is unavailable",
-  "does not authorize a pull request",
+  "output/standard-proposals/",
+  "private paths",
+  "stable hidden marker",
+  "exact repository, title, body, labels, stable hidden marker, form revision, and payload digest",
+  "must never submit it",
+  "Issue state",
+  "own JJ phase",
 ]) {
   if (!starterAgents.includes(phrase)) failures.push(`starter AGENTS.md lacks proposal safeguard: ${phrase}`);
 }
-if (!contributing.includes("must not submit it remotely without explicit authority")) {
-  failures.push("CONTRIBUTING.md must keep remote proposal submission behind explicit authority");
+for (const phrase of ["exact repository, title, labels, body", "`standard-change` label", "user performs GitHub's final submission", "never substitute an automatic issue write", "Do not upload patches, screenshots, or evidence automatically"]) {
+  if (!contributing.includes(phrase)) failures.push(`CONTRIBUTING.md lacks proposal submission boundary: ${phrase}`);
 }
 
-const issueForm = YAML.parse(readFileSync(".github/ISSUE_TEMPLATE/standard-change.yml", "utf8"));
+const liveIssueFormBytes = readFileSync(".github/ISSUE_TEMPLATE/standard-change.yml");
+const versionedIssueFormBytes = readFileSync("standard-proposals/standard-change-form-v1.yml");
+if (!liveIssueFormBytes.equals(versionedIssueFormBytes)) {
+  failures.push("published standard-change issue form must be byte-identical to standard-proposals/standard-change-form-v1.yml");
+}
+const fixtureIssueFormBytes = readFileSync("fixtures/conforming/standard-proposal-valid/standard-change.yml");
+const fixtureRemoteIssueFormBytes = readFileSync("fixtures/conforming/standard-proposal-valid/remote/standard-change.yml");
+const changedFixtureIssueFormBytes = readFileSync("fixtures/nonconforming/standard-proposal-form/standard-change.yml");
+if (!fixtureIssueFormBytes.equals(fixtureRemoteIssueFormBytes)) failures.push("conforming proposal form fixture must be byte-identical to its remote observation");
+if (fixtureIssueFormBytes.equals(changedFixtureIssueFormBytes)) failures.push("nonconforming proposal form fixture must change the bound form bytes");
+const fixtureLabels = JSON.parse(readFileSync("fixtures/conforming/standard-proposal-valid/remote/labels.json", "utf8"));
+if (JSON.stringify(fixtureLabels) !== JSON.stringify(["enhancement", "standard-change"])) failures.push("conforming proposal remote fixture must expose both governed labels");
+const issueForm = YAML.parse(liveIssueFormBytes.toString("utf8"));
 const issueConfig = YAML.parse(readFileSync(".github/ISSUE_TEMPLATE/config.yml", "utf8"));
 if (issueForm?.name !== "Propose a standard change") failures.push("standard-change issue form must retain its governed name");
-if (!(issueForm?.labels ?? []).includes("enhancement")) failures.push("standard-change issue form must use the existing enhancement label");
+if (JSON.stringify(issueForm?.labels) !== JSON.stringify(["enhancement", "standard-change"])) {
+  failures.push("standard-change issue form must require exactly the enhancement and standard-change labels in governed order");
+}
 const issueFieldIds = new Set((issueForm?.body ?? []).map((field) => field?.id).filter(Boolean));
 for (const id of [
-  "problem", "outcome", "origin", "origin_revision", "reuse_class", "affected_contract",
-  "dependencies_fallback", "evidence", "accessibility_browser", "verification", "migration", "safety",
+  "schema_version", "proposal_id", "problem", "outcome", "origin", "origin_revision", "origin_jj",
+  "standard_revision", "reuse_class", "affected_contract", "dependencies_fallback", "evidence",
+  "accessibility_browser", "verification", "migration", "safety", "proposal_marker",
 ]) {
   if (!issueFieldIds.has(id)) failures.push(`standard-change issue form lacks ${id}`);
 }
 if (issueConfig?.blank_issues_enabled !== false) failures.push("issue configuration must disable blank issues");
 if (!(issueConfig?.contact_links ?? []).some((link) => link?.url === "https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new")) {
   failures.push("issue configuration must route security reports to private vulnerability reporting");
+}
+
+const proposalRegistry = JSON.parse(readFileSync("standard-proposals/registry.json", "utf8"));
+const registryEntries = proposalRegistry?.entries ?? [];
+const registryIds = registryEntries.map((entry) => entry?.id);
+if (new Set(registryIds).size !== registryIds.length) failures.push("standard proposal registry IDs must be unique");
+if (JSON.stringify(registryIds) !== JSON.stringify([...registryIds].sort())) failures.push("standard proposal registry entries must be sorted by ID");
+const registryMarkers = registryEntries.map((entry) => entry?.marker);
+if (new Set(registryMarkers).size !== registryMarkers.length) failures.push("standard proposal registry markers must be unique");
+const registryIssueNumbers = registryEntries.filter((entry) => entry?.issue).map((entry) => entry.issue.number);
+if (new Set(registryIssueNumbers).size !== registryIssueNumbers.length) failures.push("standard proposal registry issue numbers must be unique");
+for (const entry of registryEntries) {
+  if (entry.marker !== `<!-- dkbws-standard-proposal:v1:${entry.id} -->`) failures.push(`standard proposal registry marker does not match ${entry.id}`);
+  const accepted = entry.acceptedRequirements ?? [];
+  if (new Set(accepted).size !== accepted.length || JSON.stringify(accepted) !== JSON.stringify([...accepted].sort())) {
+    failures.push(`standard proposal registry accepted requirements must be unique and sorted for ${entry.id}`);
+  }
+}
+const gitignore = readFileSync(".gitignore", "utf8");
+if (/^\/?standard-proposals\/?$/m.test(gitignore)) failures.push("tracked standard-proposals/ authority must not be ignored");
+if (!/^output\/$/m.test(gitignore)) failures.push("generated proposal payloads must remain under ignored output/");
+const proposalCoreSource = readFileSync("scripts/standard-proposal-core.mjs", "utf8");
+const proposalCliSource = readFileSync("scripts/standard-proposal-cli.mjs", "utf8");
+if (!proposalCoreSource.includes('method: "GET"')) failures.push("proposal remote adapter must expose an explicit GET-only request boundary");
+if (/method:\s*["'](?:POST|PUT|PATCH|DELETE)["']/i.test(proposalCoreSource)) failures.push("proposal remote adapter contains a write-capable HTTP method");
+if (/gh\s+issue\s+create|\b(?:createIssue|updateIssue|uploadFile|uploadAttachment)\s*\(/i.test(`${proposalCoreSource}\n${proposalCliSource}`)) {
+  failures.push("proposal CLI contains a forbidden issue-write or upload path");
 }
 
 const agentsHandoff = managedSection(agents, "DKBWS-PROMPT-001-HANDOFF");
@@ -320,6 +438,9 @@ if (!pkg.scripts?.check?.includes("check:governing-question")) failures.push("np
 if (!pkg.scripts?.["conformance:test"]?.includes("check-governing-question-repetitions.test.mjs")) failures.push("conformance:test must include governing-question repetition fixtures");
 if (!pkg.scripts?.check?.includes("check:source-links")) failures.push("npm run check must include the reader source-link gate");
 if (!pkg.scripts?.["conformance:test"]?.includes("link-source-citations.test.mjs")) failures.push("conformance:test must include reader source-link fixtures");
+if (pkg.scripts?.["standard:proposal"] !== "node scripts/standard-proposal-cli.mjs") failures.push("standard:proposal must use the governed proposal CLI");
+if (!pkg.scripts?.check?.includes("standard:proposal -- check --all")) failures.push("npm run check must validate every tracked proposal record offline");
+if (!pkg.scripts?.["conformance:test"]?.includes("standard-proposal-cli.test.mjs")) failures.push("conformance:test must include proposal lifecycle fixtures");
 if (!pkg.scripts?.["conformance:test"]?.includes("dev-service.test.mjs")) failures.push("conformance:test must include managed local service fixtures");
 if (pkg.codexDevServer?.serviceId !== "denchco-kb-wiki-standard") failures.push("managed local service must retain its stable Standard identity");
 if (pkg.codexDevServer?.host !== "127.0.0.1" || pkg.codexDevServer?.port !== 8017) failures.push("managed local service must retain its canonical loopback endpoint");
@@ -373,6 +494,7 @@ for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conform
 for (const file of [
   ".github/ISSUE_TEMPLATE/config.yml",
   ".github/ISSUE_TEMPLATE/standard-change.yml",
+  "docs/llm-wiki/standard-proposals.md",
   "docs/assets/pen-circle.svg",
   "docs/assets/service-identity.json",
   "scripts/dev-service.test.mjs",
@@ -393,6 +515,23 @@ for (const file of [
   "fixtures/nonconforming/governing-question-repetitions/docs/index.md",
   "fixtures/nonconforming/governing-question-repetitions/docs/plain.md",
   "fixtures/nonconforming/governing-question-repetitions/docs/mismatch.md",
+  "fixtures/conforming/standard-proposal-valid/record.json",
+  "fixtures/conforming/standard-proposal-valid/standard-change.yml",
+  "fixtures/conforming/standard-proposal-valid/remote/standard-change.yml",
+  "fixtures/conforming/standard-proposal-valid/remote/labels.json",
+  "fixtures/conforming/standard-proposal-valid/remote/issues.json",
+  "fixtures/conforming/standard-proposal-valid/remote/registry.json",
+  "fixtures/nonconforming/standard-proposal-state/record.json",
+  "fixtures/nonconforming/standard-proposal-safety/record.json",
+  "fixtures/nonconforming/standard-proposal-duplicate/first.json",
+  "fixtures/nonconforming/standard-proposal-duplicate/second.json",
+  "fixtures/nonconforming/standard-proposal-form/standard-change.yml",
+  "scripts/standard-proposal-core.mjs",
+  "scripts/standard-proposal-cli.mjs",
+  "scripts/standard-proposal-cli.test.mjs",
+  "standard-proposals/README.md",
+  "standard-proposals/registry.json",
+  "standard-proposals/standard-change-form-v1.yml",
 ]) {
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }

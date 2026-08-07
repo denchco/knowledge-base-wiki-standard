@@ -64,6 +64,7 @@ never_copy_as_consumer_content:
   - "dogfood reports or fixtures"
   - "the standard's source register, evidence matrix, validation queue, or research log"
   - "the standard documentation repository or its Pages workflow"
+  - "the Standard-maintained standard-proposals/registry.json or any Standard decision/release authority"
 
 consumer_owned:
   - "title, topic, audience, governing question, and intended outcome"
@@ -74,19 +75,20 @@ consumer_owned:
   - "repository licence decision, rights holder, and any resulting LICENSE text"
   - "navigation and synthesis"
   - "deployment adapter, credentials, repository settings, and domain"
+  - "tracked proposal origin records, payload approvals, issue observations, and optional adoption decisions"
 
 entries:
   - target: ".wiki-standard.yaml"
     role: "manifest"
     classification: "render-template"
     template: "starter/templates/wiki-standard.yaml.tmpl"
-    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004"]
+    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004", "DKBWS-UPDATE-002"]
     always: true
   - target: "AGENTS.md"
     role: "agent-contract"
     classification: "render-template"
     template: "starter/templates/AGENTS.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "CLAUDE.md"
     role: "claude-agent-contract"
@@ -98,25 +100,31 @@ entries:
     role: "dependency-contract"
     classification: "render-template"
     template: "starter/templates/DEPENDENCIES.md.tmpl"
-    requirements: ["DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-VERIFY-001"]
+    requirements: ["DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
     always: true
   - target: "SECURITY.md"
     role: "security-policy"
     classification: "render-template"
     template: "starter/templates/SECURITY.md.tmpl"
-    requirements: ["DKBWS-SEC-001"]
+    requirements: ["DKBWS-SEC-001", "DKBWS-UPDATE-002"]
     always: true
   - target: "SOURCE_POLICY.md"
     role: "source-policy"
     classification: "render-template"
     template: "starter/templates/SOURCE_POLICY.md.tmpl"
-    requirements: ["DKBWS-SEC-001", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-SEC-001", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "LICENSING.md"
     role: "licensing-record"
     classification: "render-template"
     template: "starter/templates/LICENSING.md.tmpl"
-    requirements: ["DKBWS-SEC-001"]
+    requirements: ["DKBWS-SEC-001", "DKBWS-UPDATE-002"]
+    always: true
+  - target: "standard-proposals/README.md"
+    role: "consumer-proposal-boundary"
+    classification: "render-template"
+    template: "starter/templates/standard-proposals/README.md.tmpl"
+    requirements: ["DKBWS-UPDATE-002"]
     always: true
   - target: "knowledge/index.md"
     role: "okf-index"
@@ -164,17 +172,22 @@ entries:
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/context-map.md.tmpl"
-    requirements: ["DKBWS-LLM-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/maintenance.md"
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+  - target: "docs/llm-wiki/standard-proposals.md"
+    role: "consumer-proposal-workflow"
+    classification: "render-template"
+    template: "starter/templates/docs/llm-wiki/standard-proposals.md.tmpl"
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-UPDATE-002"]
   - target: "docs/project/status.md"
     role: "project-status"
     classification: "render-template"
@@ -225,7 +238,7 @@ entries:
     source: "package.json"
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
-    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "scripts/dev-service.mjs"
     role: "managed-local-service"
     classification: "adapt-from-release"
@@ -275,6 +288,83 @@ entries:
     planning_only: true
     dependency_closure: "the adapted governing-question checker and conforming, nonconforming, neutral, historical-record, and subject-empty fixture corpus"
     requirements: ["DKBWS-HUMAN-004", "DKBWS-VERIFY-001"]
+  - target: "scripts/standard-proposal-core.mjs"
+    role: "standard-proposal-core"
+    classification: "adapt-from-release"
+    source: "scripts/standard-proposal-core.mjs"
+    planning_only: true
+    dependency_closure: "the tracked proposal directory, record and registry schemas, governed form revision/labels, immutable origin checks, scrubbed payload renderer, marker search, explicit transition authorities, and test fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/standard-proposal-cli.mjs"
+    role: "standard-proposal-cli"
+    classification: "adapt-from-release"
+    source: "scripts/standard-proposal-cli.mjs"
+    planning_only: true
+    dependency_closure: "the proposal core, package wrapper, tracked records, disposable output directory, schemas, governed form, and browser-open adapter; no remote-write dependency"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/standard-proposal-cli.test.mjs"
+    role: "standard-proposal-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/standard-proposal-cli.test.mjs"
+    planning_only: true
+    dependency_closure: "the proposal core/CLI plus positive and negative provenance, state, duplicate-marker, safety, form/label, release-ledger, and adoption fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/conforming/standard-proposal-valid/"
+    role: "standard-proposal-positive-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/conforming/standard-proposal-valid/"
+    planning_only: true
+    dependency_closure: "valid tracked record, byte-bound form, and offline remote form/label/issue/registry observations"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-state/"
+    role: "standard-proposal-state-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-state/"
+    planning_only: true
+    dependency_closure: "invalid lifecycle transition fixture and proposal validator"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-safety/"
+    role: "standard-proposal-safety-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-safety/"
+    planning_only: true
+    dependency_closure: "unsafe disclosure/content fixture and proposal validator"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-duplicate/"
+    role: "standard-proposal-deduplication-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-duplicate/"
+    planning_only: true
+    dependency_closure: "duplicate identifier/marker fixtures and proposal validator"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-form/"
+    role: "standard-proposal-form-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-form/"
+    planning_only: true
+    dependency_closure: "changed/missing governed form and label fail-closed fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "standard-proposals/standard-change-form-v1.yml"
+    role: "governed-standard-proposal-form"
+    classification: "adapt-from-release"
+    source: "standard-proposals/standard-change-form-v1.yml"
+    planning_only: true
+    dependency_closure: "the proposal record's exact form version and SHA-256 binding, required enhancement/standard-change labels, fail-closed published-form comparison, and CLI fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "schema/standard-proposal-record-v1.json"
+    role: "standard-proposal-record-schema"
+    classification: "adapt-from-release"
+    source: "schema/standard-proposal-record-v1.json"
+    planning_only: true
+    dependency_closure: "tracked consumer proposal records and schema-artifact validation"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-002"]
+  - target: "schema/standard-proposal-registry-v1.json"
+    role: "standard-proposal-registry-schema"
+    classification: "adapt-from-release"
+    source: "schema/standard-proposal-registry-v1.json"
+    planning_only: true
+    dependency_closure: "read-only validation/comparison of the Standard-maintained registry; never instantiate registry authority in the consumer"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-002"]
   - target: "package-lock.json"
     role: "node-lock"
     classification: "adapt-from-release"
@@ -302,4 +392,4 @@ entries:
     source: ".github/workflows/verify.yml"
     planning_only: true
     dependency_closure: "every consumer command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow; exclude Standard-maintainer documentation synchronization unless independently declared"
-    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
