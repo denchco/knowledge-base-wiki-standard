@@ -23,7 +23,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): `0.39.0` reference-qualified; `0.42.0` available but awaiting deliberate requalification |
-| Local service | Repo wrapper plus OS adapter and HTTP-200 health |
+| Local service | Repo wrapper, serialized and atomically replaced user-scoped register, live-listener preflight, platform user-service adapter, and exact static-marker health |
 | Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |
 | Future domain integration | DenchCo Wiki Standard MCP is currently no-go; reconsider only if a future consumer proves a named gap left by Git, GitHub, and the stable CLI |

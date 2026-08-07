@@ -66,6 +66,12 @@ for (const [name, schema] of schemas) {
 const manifest = parse(readFileSync(path.join(root, ".wiki-standard.yaml"), "utf8"));
 validate("manifest-v1.json", manifest, ".wiki-standard.yaml");
 
+const serviceIdentity = parseJsonStrict(
+  readFileSync(path.join(root, "docs/assets/service-identity.json"), "utf8"),
+  "docs/assets/service-identity.json",
+);
+validate("service-identity-v1.json", serviceIdentity, "docs/assets/service-identity.json");
+
 const conformance = runJson([
   "scripts/conformance-cli.mjs", "validate", ".", "--strict", "--json",
 ], "self conformance report");

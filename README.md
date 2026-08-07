@@ -124,7 +124,7 @@ End every file-changing development turn with the helper below before giving the
 npm run jj:phase -- -m "Development-turn summary"
 ```
 
-The [local Standard wiki](http://127.0.0.1:8017/) is reserved on port `8017`.
+The [local Standard wiki](http://127.0.0.1:8017/) is reserved as `denchco-kb-wiki-standard` on port `8017`. `service:start` serializes the user-scoped register and live-bind checks under an exclusive lock, atomically publishes the reservation, and then installs the LaunchAgent. `service:status` succeeds only when the exact registration, installed and loaded adapter, and [`service-identity.json`](docs/assets/service-identity.json) marker all agree; an unrelated HTTP 200 is unhealthy.
 
 </details>
 

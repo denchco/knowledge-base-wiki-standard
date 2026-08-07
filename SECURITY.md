@@ -22,7 +22,7 @@ Do not publish suspected vulnerabilities or exposed personal data in an issue. [
 - Dependencies are locked, audited, and upgraded through reviewed changes.
 - CI uses read-only permissions unless a job's narrowly defined purpose requires more.
 - Validators are read-only; generators write only declared derived paths; upgrades produce reviewable patches.
-- Local services bind to loopback by default and define health as HTTP 200.
+- Local services bind to loopback. Persistent managed previews reserve their endpoint in the user-scoped shared register, refuse unmanaged listeners, expose only the non-secret static service identity marker, and require its exact ID in addition to HTTP 200.
 
 ## MCP controls
 

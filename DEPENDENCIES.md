@@ -46,12 +46,17 @@ The repeatable commands are:
 | `npm run audit:node` | Audits the exact npm lock graph and fails high or critical known vulnerabilities. |
 | `npm run audit:python` | Audits the locally installed environment reconstructed from `uv.lock`; run after `uv sync --frozen`. |
 | `npm run verify` | Snapshots every tracked and unignored canonical file, runs build/check/Graphify/browser gates, and fails any canonical mutation while permitting only declared ignored derived outputs. |
+| `npm run service:register` | Serializes shared-register and live-listener checks under an exclusive bounded lock, atomically reserves the configured service ID and loopback endpoint, and refuses conflicts without stopping another service. |
+| `npm run service:start` | Registers, installs, and loads the macOS user LaunchAgent, then waits for the exact static service identity marker. |
+| `npm run service:status` | Fails unless registry ownership, LaunchAgent installation/load, HTTP 200, and the configured marker service ID all agree. |
 | `npm run sync:documentation:apply` | Explicitly refreshes only the sibling documentation repository's managed standard snapshot; refuses local edits and unmanaged snapshot paths. |
 | `npm run sync:documentation:check` | Read-only comparison of every allowlisted file hash, byte count, mode, contract digest, and standard revision. |
 | `npm run verify:workspace` | Runs complete standard verification and then proves the real sibling documentation snapshot is current. |
 | `npm run jj:phase -- -m "Development-turn summary"` | Runs complete verification, inspects Git and Jujutsu state, and records the turn's persistent changes in a JJ commit. A failed verification is disclosed in the commit and returned as a failing command; a clean turn creates no empty commit. |
 
 The provenance checker is read-only and has two explicit modes. Maintainer mode proves `DKBWS-PROV-001` by checking the Git root and version, the `jj` version, the colocated Jujutsu/Git roots, and a readable current Jujutsu change with working-copy snapshotting disabled. Distribution/CI mode checks only the Git-distributed surface and reports Jujutsu as not checked; it does not prove a Standard Production maintenance workspace.
+
+The macOS managed-preview adapter keeps its versioned inventory at `~/.config/codex-dev-servers/registry.json`, its exclusive lock beside that file, generated LaunchAgent under `~/Library/LaunchAgents/`, and service logs under `~/.local/state/codex-dev-servers/`. The registry binds a stable service ID to its owning project root, endpoint, command, adapter label, and health path. One bounded lock transaction reloads the register, checks registered assignments, and probes an exclusive live bind before a same-directory atomic rename publishes the complete update. Stale recovery removes only an aged lock whose recorded owner process is no longer live. Registration never kills or overwrites a listener to make a requested port free. The static `/assets/service-identity.json` marker conforms to `schema/service-identity-v1.json`. Foreground or port-zero browser checks remain useful `DKBWS-RUNTIME-001` evidence but cannot prove this persistent adapter.
 
 The read-only probe proves the workspace substrate. The end-of-development-turn helper and instruction fixture prove the required operating mechanism; reviewable JJ history remains the evidence that completed turns actually used it. The commit trigger is every file-changing development-turn boundary, not a subjective significance threshold.
 

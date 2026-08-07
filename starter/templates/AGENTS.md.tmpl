@@ -17,6 +17,7 @@
 - The standard is pinned by source and immutable revision in `.wiki-standard.yaml`; public help is at <https://denchco.github.io/knowledge-base-wiki-documentation/>.
 - Do not import the standard's help pages, knowledge bundle, evidence records, dogfood reports, fixtures, or deployment workflow as this repository's content.
 - Preserve unknown OKF fields and declared local deviations.
+- For a persistent managed preview, serialize the shared-register reload, live-listener checks, and atomic reservation of the project-unique service ID and loopback endpoint under a bounded user-local lock. Never kill or overwrite another listener. Require the exact static service marker plus adapter installation/load for status, and hand a requested preview to the selected browser at the registered canonical URL rather than an alternate test port.
 - Do not publish, change deployment, expose credentials, or alter evidence status without explicit authorization.
 
 ## Consumer-to-Standard proposals

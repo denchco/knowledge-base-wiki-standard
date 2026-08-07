@@ -18,6 +18,7 @@ This policy covers the `{{PROJECT_TITLE}}` repository, its build, generated outp
 - Personal or confidential data is excluded, redacted before entry, or kept in a separately declared access-controlled store.
 - Deletion and correction propagate from the authoritative source record to affected claims, concepts, and regenerated outputs without retaining deleted sensitive content in logs.
 - Dependencies remain locked and audited; generators write only to declared derived paths.
+- Managed previews bind to loopback, reserve endpoints through the shared local register, reject unmanaged listeners, and expose only the non-secret static service identity marker.
 - Report suspected vulnerabilities or exposed personal data through `{{SECURITY_REPORTING_CHANNEL}}`, never a public issue.
 
 ## Supported revisions

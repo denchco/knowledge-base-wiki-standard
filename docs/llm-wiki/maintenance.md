@@ -13,10 +13,11 @@ status: draft
 4. Register new external evidence before changing normative claims.
 5. Add or amend stable requirements, applicability, diagnostics, and migration effects.
 6. Update schemas, profile, prompts, LLM context, fixtures, and changelog together.
-7. Run `npm run verify`.
-8. Refresh Graphify explicitly.
-9. Inspect Git and Jujutsu state.
-10. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
+7. For managed-preview changes, serialize the shared-register reload and live-listener probe, publish the reservation atomically, preserve other services, validate the exact marker, and prove composite adapter status plus canonical browser handoff.
+8. Run `npm run verify`.
+9. Refresh Graphify explicitly.
+10. Inspect Git and Jujutsu state.
+11. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
 ## Reader source links
 

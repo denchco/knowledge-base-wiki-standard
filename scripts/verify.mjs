@@ -171,6 +171,10 @@ function buildReceipt(provenance) {
     evidence("prompt-contract", "prompt-contract", "Sequential clarification plus completion-first, bounded, anti-rabbit-hole handoff protocol.", "prompts/instantiate-wiki.md"),
     evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, parked-work boundary, and end-of-development-turn JJ commit rule.", "AGENTS.md"),
     evidence("jj-turn-helper", "test-suite", "End-of-turn helper verifies, inspects Git/Jujutsu state, commits changed turns including disclosed verification failures, and refuses empty commits.", "scripts/jj-phase.test.mjs"),
+    evidence("local-service-contract", "verification-script", "Serialized registry ownership, atomic publication, live-listener deconfliction, versioned marker health, and fail-closed managed status.", "scripts/dev-service.mjs"),
+    evidence("local-service-fixtures", "test-suite", "Concurrent locking, stale-owner safety, atomic replacement, wrong-site HTTP 200, live-listener, registry ownership, loopback alias, and status-composition fixtures.", "scripts/dev-service.test.mjs"),
+    evidence("service-identity-marker", "runtime-identity", "Static identity marker for the registered Standard service.", "docs/assets/service-identity.json"),
+    evidence("service-identity-schema", "schema-validation", "Versioned machine contract for managed local service identity markers.", "schema/service-identity-v1.json"),
   ];
   const gatesWithEvidence = [
     {
@@ -203,6 +207,7 @@ function buildReceipt(provenance) {
         result("DKBWS-PROV-001", ["standard-check", "agent-instruction-parity", "jj-turn-helper"], "The shared instructions and executable helper enforce a disclosed JJ commit at every file-changing development-turn boundary."),
         result("DKBWS-UPDATE-001", ["conformance-fixtures"]),
         result("DKBWS-VERIFY-002", ["conformance-fixtures", "schema-artifacts"]),
+        result("DKBWS-RUNTIME-002", ["local-service-contract", "local-service-fixtures", "service-identity-marker", "service-identity-schema"], "The managed-service fixtures serialize concurrent reservations, recover only dead stale owners, atomically replace the register, reject registered and live-listener collisions, reject a wrong service returning HTTP 200, and require registry, installation, load, and exact marker identity for status."),
         {
           ...result("DKBWS-SEC-001", ["canonical-content", "security-policy", "source-policy", "licensing-decision"]),
           subcontrols: [

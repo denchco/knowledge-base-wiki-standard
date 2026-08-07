@@ -82,7 +82,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware upgrade and deviation merge exists."},
     {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/ask.md", "functions/api/ask.js", "DEPLOYMENT.md"], "finding": "Cloudflare Ask is bounded by retrieval, source links, secrets and documented authority limits."}
   ],
-  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 7},
+  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 8},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-mkdocs.mjs"], "finding": "Canonical knowledge is Markdown and strict-built with portable local links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, roles, capabilities or deviations."},
@@ -104,6 +104,7 @@
     {"id": "DKBWS-VERIFY-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "scripts/check-graphify-freshness.mjs"], "finding": "One check command covers declared capabilities and regenerates Graphify only in a temporary copy."},
     {"id": "DKBWS-VERIFY-002", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No schema-valid DenchCo conformance report with stable diagnostic codes is emitted."},
     {"id": "DKBWS-RUNTIME-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/project-ops/deployment.md"], "finding": "The canonical local URL returned HTTP 404, demonstrating that process/listener state is not health."},
+    {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Sequential Question 1 of N clarification is explicit."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo standard upgrade workflow exists."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "This audit does not treat project hosting as a DenchCo public standard release."},

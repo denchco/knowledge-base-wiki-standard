@@ -233,6 +233,8 @@ test("canonical profiles resolve inheritance and align with the requirement cata
   assert.ok(production.requirements.includes("DKBWS-HUMAN-002"));
   assert.ok(production.requirements.includes("DKBWS-LINK-002"));
   assert.ok(production.requirements.includes("DKBWS-VERIFY-002"));
+  assert.ok(production.requirements.includes("DKBWS-RUNTIME-002"));
+  assert.equal(production.capabilities.local_service, "required");
   assert.deepEqual(
     production.sources.map((source) => source.path),
     [
@@ -612,6 +614,7 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(starter.bootstrap.defaults.profile, "standard-production");
   assert.equal(starter.bootstrap.defaults.accent_color, "#0b7285");
   assert.equal(starter.bootstrap.defaults.wiki_url, "auto-reserve-conflict-free-loopback");
+  assert.equal(starter.bootstrap.defaults.local_service, "auto-select-platform-user-service-adapter");
   assert.equal(starter.bootstrap.defaults.deployment, "none");
   assert.equal(starter.executable_scope.apply_supported, false);
   assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
@@ -632,6 +635,14 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(projectStatusEntry?.always, true);
   const packageEntry = starter.entries.find((entry) => entry.target === "package.json");
   assert.match(packageEntry?.dependency_closure ?? "", /exclude Standard-maintainer sync:documentation:\* and verify:workspace/i);
+  assert.ok(packageEntry?.requirements.includes("DKBWS-RUNTIME-002"));
+  const serviceEntry = starter.entries.find((entry) => entry.target === "scripts/dev-service.mjs");
+  assert.equal(serviceEntry?.classification, "adapt-from-release");
+  assert.ok(serviceEntry?.requirements.includes("DKBWS-RUNTIME-002"));
+  const serviceMarkerEntry = starter.entries.find((entry) => entry.target === "docs/assets/service-identity.json");
+  assert.equal(serviceMarkerEntry?.classification, "render-template");
+  assert.equal(serviceMarkerEntry?.always, true);
+  assert.ok(serviceMarkerEntry?.requirements.includes("DKBWS-RUNTIME-002"));
   const licensingEntry = starter.entries.find((entry) => entry.target === "LICENSING.md");
   assert.equal(licensingEntry?.classification, "render-template");
   assert.equal(licensingEntry?.always, true);
@@ -726,6 +737,30 @@ test("lifecycle diff compares equal version labels by immutable revision and req
     diff.requirements.find((item) => item.id === "DKBWS-HUMAN-003")?.introducedSinceConsumerRevision,
     true,
   );
+});
+
+test("the current lifecycle catalogue introduces managed preview identity after rc.3", () => {
+  const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
+  const current = loadProfile("standard-production", {
+    standardRoot: ROOT,
+    requirementIds: catalogue.ids,
+  });
+  const readRc3Source = (relativePath) => {
+    const result = spawnSync("git", ["show", `v0.1.0-rc.3:${relativePath}`], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout;
+  };
+  const rc3Catalogue = loadRequirementCatalogue({ standardRoot: ROOT, readSource: readRc3Source });
+  const rc3 = loadProfile("standard-production", {
+    standardRoot: ROOT,
+    readSource: readRc3Source,
+    requirementIds: rc3Catalogue.ids,
+  });
+  const introduced = current.requirements.filter((requirement) => !rc3.requirements.includes(requirement));
+  assert.ok(introduced.includes("DKBWS-RUNTIME-002"));
 });
 
 test("lifecycle revision comparison distinguishes the same commit from an unresolved pin", () => {
@@ -910,7 +945,7 @@ test("init plan preserves and reports collisions in an existing target", () => {
     "accent colour (proposed default #0b7285 when no evidenced brand colour exists)",
   ]);
   assert.deepEqual(plan.automaticResolutions, [
-    "Implementation must reserve a conflict-free loopback endpoint and record the resulting concrete Wiki URL.",
+    "Implementation must serialize shared-register and live-listener checks, atomically reserve a conflict-free loopback endpoint, publish its exact service identity marker, and record the resulting concrete Wiki URL.",
   ]);
 });
 
@@ -1113,6 +1148,7 @@ test("full-profile conformance fails required-false and exact-value capability d
       "  graphify: true",
       "  local_browser_runtimes: true",
       "  browser_verification: true",
+      "  local_service: fixture-user-service",
       "  jujutsu: true",
       "deviations: []",
       "",

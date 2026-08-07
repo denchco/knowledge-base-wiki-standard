@@ -7,6 +7,13 @@ status: draft
 
 # Research and change log
 
+## 2026-08-07
+
+- **Managed-preview classification**: Classified the verified consumer collision pattern as core rather than project-specific: an HTTP 200 from an occupied canonical port can identify the wrong Wiki, so listener presence and generic HTTP health are insufficient.
+- **Normative runtime split**: Retained `DKBWS-RUNTIME-001` as the baseline canonical-URL HTTP check and added `DKBWS-RUNTIME-002` for persistent managed previews. The new requirement binds a stable service ID, project root, endpoint, adapter, and health path in a serialized, atomically published shared-register transaction; rejects registered and unmanaged-listener collisions without killing another process; and requires an exact versioned marker.
+- **Reference implementation**: Hardened the macOS LaunchAgent wrapper, added bounded exclusive locking with conservative stale-owner recovery and same-directory atomic replacement, added `service-identity-v1`, static marker and concurrency/wrong-service/live-listener/composite-status fixtures, required the `local_service` capability in Standard Production, and mapped the fixture evidence into full-profile verification.
+- **Instantiation and migration**: Updated the URL-only prompt, starter, lifecycle planner, dependency/security boundaries, and browser handoff. A persistent consumer now inventories first, moves only its own service configuration on conflict, updates canonical URL references together, starts the selected adapter, and opens the registered URL only after identity-aware status passes. Port-zero verification remains separate baseline evidence.
+
 ## 2026-08-05
 
 - **Reader evidence navigation**: Promoted the independently verified Health IT Governance consumer pattern as conditional Human Wiki requirement `DKBWS-LINK-002`. Every displayed registered identity now links independently to its exact internal source-register row; lists retain each identity, compact ranges retain their displayed endpoints, and named official-publication links use registered source URLs.

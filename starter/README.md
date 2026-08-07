@@ -10,7 +10,7 @@ Use `starter.yaml` as the machine-readable boundary. A Codex instance should:
 4. infer routine local defaults, state and confirm the accent hex, and render only the listed templates into a separate target repository;
 5. author the target's `docs/` and `knowledge/` content from its own topic and sources, or preserve an explicit awaiting-seed state without invented claims;
 6. adapt only the explicitly classified implementation files needed by the selected profile; and
-7. reserve the target's conflict-free loopback Wiki URL, default deployment to none, and validate the completed target against the pinned standard revision.
+7. reserve the target's conflict-free loopback Wiki URL through a serialized, atomically published shared-register transaction with live-listener preflight, install its project-unique static service marker and platform user-service adapter, default deployment to none, and validate the completed target against the pinned standard revision.
 
 The rendered starter installs one shared agent contract in `AGENTS.md`, a root `CLAUDE.md` import for Claude Code, security/source/licensing boundaries, exact reader-to-source-row navigation when citations exist, correct 2D and 3D graph mount hooks, and a project-status record that keeps active priorities separate from parked work. Standard Production instructions close every file-changing development turn with a disclosed JJ commit after verification and state inspection; there is no subjective “substantive work” threshold and no empty commit for a no-change turn. Next Steps are completion-first and capped at three; the contract forbids inventing adjacent work merely to fill the list.
 

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/service-identity-v1.json",
+  "title": "DenchCo managed local service identity",
+  "description": "Static identity marker returned by a managed local Wiki service.",
+  "type": "object",
+  "required": ["schemaVersion", "serviceId"],
+  "properties": {
+    "$schema": {
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/service-identity-v1.json"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "serviceId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    }
+  },
+  "additionalProperties": false
+}

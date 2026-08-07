@@ -22,6 +22,7 @@ status: draft
 11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
 12. Added the governed accent-colour question invariant, restored semantic responsive Mermaid architecture, and proved deterministic repository/local retention versus public-Pages omission of project-specific adoption guidance, then published the changes as immutable prerelease `v0.1.0-rc.3`.
 13. Exercised lifecycle, starter, browser, graph, security, verification, proposal, and dual-agent boundaries against the independently maintained Health IT Governance Beyond the NHS consumer; promoted reusable defects and preferred patterns while excluding its subject-specific research.
+14. Classified a verified consumer managed-preview port collision as a core runtime control, added `DKBWS-RUNTIME-002`, and implemented serialized and atomically published shared-register ownership, live-listener refusal, versioned marker identity, fail-closed status, and exact canonical browser handoff.
 
 ## Next evidence gates
 

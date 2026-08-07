@@ -29,6 +29,7 @@ const CAPABILITY_REQUIREMENTS = Object.freeze({
   graphify: ["DKBWS-GRAPH-001"],
   local_browser_runtimes: ["DKBWS-RENDER-001"],
   browser_verification: ["DKBWS-VERIFY-001", "DKBWS-VERIFY-002"],
+  local_service: ["DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"],
   jujutsu: ["DKBWS-PROV-001"],
 });
 

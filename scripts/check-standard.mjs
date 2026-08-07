@@ -17,13 +17,14 @@ const required = [
   "starter/templates/docs/graph/index.md.tmpl",
   "starter/templates/docs/graph/two-dimensional.md.tmpl",
   "starter/templates/docs/graph/three-dimensional.md.tmpl",
+  "starter/templates/docs/assets/service-identity.json.tmpl",
   "starter/templates/docs/project/status.md.tmpl",
   "docs/conformance/index.md", "docs/conformance/dogfood/comparison.md",
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
   "docs/assets/brand/denchco-wordmark.png",
-  "docs/assets/pen-circle.svg",
-  "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json",
+  "docs/assets/pen-circle.svg", "docs/assets/service-identity.json",
+  "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json", "schema/service-identity-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
@@ -41,7 +42,7 @@ const required = [
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
-  "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs",
+  "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
   "sync/documentation-sync-contract-v1.json"
@@ -51,7 +52,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -91,6 +92,20 @@ if (starterSourceLinks?.classification !== "adapt-from-release"
   || starterSourceLinks?.planning_only !== true
   || !(starterSourceLinks?.requirements ?? []).includes("DKBWS-LINK-002")) {
   failures.push("starter must adapt the pinned reader source-link checker for DKBWS-LINK-002");
+}
+const starterService = starterEntries.find((candidate) => candidate?.target === "scripts/dev-service.mjs");
+if (starterService?.classification !== "adapt-from-release"
+  || starterService?.source !== "scripts/dev-service.mjs"
+  || starterService?.planning_only !== true
+  || !(starterService?.requirements ?? []).includes("DKBWS-RUNTIME-002")) {
+  failures.push("starter must adapt the managed local service contract for DKBWS-RUNTIME-002");
+}
+const starterServiceMarker = starterEntries.find((candidate) => candidate?.target === "docs/assets/service-identity.json");
+if (starterServiceMarker?.classification !== "render-template"
+  || starterServiceMarker?.template !== "starter/templates/docs/assets/service-identity.json.tmpl"
+  || starterServiceMarker?.always !== true
+  || !(starterServiceMarker?.requirements ?? []).includes("DKBWS-RUNTIME-002")) {
+  failures.push("starter must render a project-owned managed service marker for DKBWS-RUNTIME-002");
 }
 for (const target of ["SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
@@ -241,6 +256,9 @@ for (const boundary of [
   "verification-receipt-v1",
   "project-only summary must use a different path",
   "Do not copy Standard-maintainer `sync:documentation:*` commands",
+  "shared local register",
+  "service-identity-v1",
+  "exact registered canonical URL",
 ]) {
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
@@ -275,6 +293,14 @@ for (const command of ["check:source-links", "sources:link"]) {
 }
 if (!pkg.scripts?.check?.includes("check:source-links")) failures.push("npm run check must include the reader source-link gate");
 if (!pkg.scripts?.["conformance:test"]?.includes("link-source-citations.test.mjs")) failures.push("conformance:test must include reader source-link fixtures");
+if (!pkg.scripts?.["conformance:test"]?.includes("dev-service.test.mjs")) failures.push("conformance:test must include managed local service fixtures");
+if (pkg.codexDevServer?.serviceId !== "denchco-kb-wiki-standard") failures.push("managed local service must retain its stable Standard identity");
+if (pkg.codexDevServer?.host !== "127.0.0.1" || pkg.codexDevServer?.port !== 8017) failures.push("managed local service must retain its canonical loopback endpoint");
+if (pkg.codexDevServer?.healthPath !== "/assets/service-identity.json") failures.push("managed local service must declare the static identity health path");
+const serviceIdentity = JSON.parse(readFileSync("docs/assets/service-identity.json", "utf8"));
+if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.codexDevServer.serviceId) {
+  failures.push("static managed service marker must match the configured service identity");
+}
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
 if (pkg.engines?.node !== ">=24") failures.push(`Node engine must be >=24; found ${pkg.engines?.node ?? "unlisted"}`);
 const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
@@ -321,6 +347,8 @@ for (const file of [
   ".github/ISSUE_TEMPLATE/config.yml",
   ".github/ISSUE_TEMPLATE/standard-change.yml",
   "docs/assets/pen-circle.svg",
+  "docs/assets/service-identity.json",
+  "scripts/dev-service.test.mjs",
 ]) {
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }

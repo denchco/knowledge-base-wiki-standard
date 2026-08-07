@@ -81,7 +81,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo upgrade/diff mechanism exists."},
     {"id": "bounded-ask-wiki", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm/chat-function.md"], "finding": "Chat is a planned design, not a deployed capability."}
   ],
-  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 10},
+  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 11},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check_wiki.py"], "finding": "Canonical knowledge is Markdown with checked relative links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares version, role mappings, capabilities or deviations."},
@@ -103,6 +103,7 @@
     {"id": "DKBWS-VERIFY-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["Makefile", ".github/workflows/validate.yml"], "finding": "make verify covers the project's claimed capabilities without changing canonical knowledge."},
     {"id": "DKBWS-VERIFY-002", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No schema-valid DenchCo conformance report with stable diagnostic codes is emitted."},
     {"id": "DKBWS-RUNTIME-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/operating-model/conformance.md"], "finding": "No runtime adapter or canonical URL is selected."},
+    {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Clarification is sequential and numbered Question 1 of N."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No candidate-standard migration workflow exists."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["docs/operating-model/conformance.md"], "finding": "No public wiki or DenchCo standard release is claimed."},

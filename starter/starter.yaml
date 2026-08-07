@@ -18,6 +18,7 @@ bootstrap:
     accent_color: "#0b7285"
     target_path: "infer-independent-local-path"
     wiki_url: "auto-reserve-conflict-free-loopback"
+    local_service: "auto-select-platform-user-service-adapter"
     deployment: "none"
   inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
   conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
@@ -68,6 +69,7 @@ consumer_owned:
   - "title, topic, audience, governing question, and intended outcome"
   - "accent colour and derived accessible colour family"
   - "canonical Wiki URL"
+  - "stable local service identity, registered endpoint, and platform user-service adapter"
   - "source and evidence corpus"
   - "repository licence decision, rights holder, and any resulting LICENSE text"
   - "navigation and synthesis"
@@ -96,7 +98,7 @@ entries:
     role: "dependency-contract"
     classification: "render-template"
     template: "starter/templates/DEPENDENCIES.md.tmpl"
-    requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
+    requirements: ["DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-VERIFY-001"]
     always: true
   - target: "SECURITY.md"
     role: "security-policy"
@@ -194,8 +196,14 @@ entries:
     classification: "adapt-from-release"
     source: "docs/assets/"
     planning_only: true
-    dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates"
+    dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates; exclude the Standard's service marker because the project-owned marker is rendered separately"
     requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-LINK-002"]
+  - target: "docs/assets/service-identity.json"
+    role: "managed-service-identity"
+    classification: "render-template"
+    template: "starter/templates/docs/assets/service-identity.json.tmpl"
+    requirements: ["DKBWS-RUNTIME-002"]
+    always: true
   - target: "docs/graph/index.md"
     role: "graph-entry"
     classification: "render-template"
@@ -217,7 +225,28 @@ entries:
     source: "package.json"
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
-    requirements: ["DKBWS-VERIFY-001", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-LINK-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"]
+  - target: "scripts/dev-service.mjs"
+    role: "managed-local-service"
+    classification: "adapt-from-release"
+    source: "scripts/dev-service.mjs"
+    planning_only: true
+    dependency_closure: "project-unique service identity, versioned static marker, serialized and atomically replaced user-scoped shared register, live-listener preflight, platform user-service install/load/status checks, exact canonical browser handoff, and fixture suite"
+    requirements: ["DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/dev-service.test.mjs"
+    role: "managed-local-service-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/dev-service.test.mjs"
+    planning_only: true
+    dependency_closure: "the adapted managed-service wrapper, Node test runner, temporary loopback listeners, and project service identity"
+    requirements: ["DKBWS-RUNTIME-002", "DKBWS-VERIFY-001"]
+  - target: "schema/service-identity-v1.json"
+    role: "managed-service-identity-schema"
+    classification: "adapt-from-release"
+    source: "schema/service-identity-v1.json"
+    planning_only: true
+    dependency_closure: "the static service marker and schema-validation gate"
+    requirements: ["DKBWS-RUNTIME-002", "DKBWS-VERIFY-002"]
   - target: "scripts/jj-phase.mjs"
     role: "development-turn-provenance"
     classification: "adapt-from-release"

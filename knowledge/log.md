@@ -1,5 +1,9 @@
 # Bundle update log
 
+## 2026-08-07
+
+- **Managed local preview identity**: Added core `DKBWS-RUNTIME-002` after a verified consumer collision showed that a listener and HTTP 200 can belong to the wrong Wiki. Persistent services now use serialized and atomically published shared-register reservations, stable project identity, live-listener refusal, versioned static marker, composite adapter status, and exact registered-URL browser handoff; ephemeral browser servers prove only baseline runtime health.
+
 ## 2026-08-05
 
 - **Reader evidence navigation**: Added conditional `DKBWS-LINK-002`, making every registered identity displayed in a Human Wiki an independent internal link to its exact source-register row. Named authority links use registered URLs, automatic rewriting remains optional, and subject-empty or citation-free Wikis do not invent evidence.

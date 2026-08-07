@@ -16,6 +16,7 @@ status: draft
 | Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
 | Dependency contract | Exact locks, installation classes, offline boundary, adapter requalification, consumer/maintainer separation, and reserved verification-artifact rules implemented |
 | Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, and completion-first anti-rabbit-hole handoff implemented |
+| Managed local preview | `DKBWS-RUNTIME-002` implemented with serialized reservation and atomic shared-register replacement, registered and live-listener deconfliction, `service-identity-v1` marker, composite status, fixtures, and exact canonical browser handoff |
 | Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, `jj 0.39.0` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
 | Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
 | Built-output browser contract | Independent representative routes; desktop/mobile geometry, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
@@ -30,7 +31,7 @@ status: draft
 | Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and exact-commit CI gates established; `v0.1.0-rc.3` is the current immutable prerelease |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
-The local Zensical service is registered at `http://127.0.0.1:8017/`; health requires HTTP 200.
+The local Zensical service is registered as `denchco-kb-wiki-standard` at `http://127.0.0.1:8017/`; managed health requires the exact register, LaunchAgent installation/load, and `service-identity-v1` marker in addition to HTTP 200.
 
 ## Current bounded priorities
 

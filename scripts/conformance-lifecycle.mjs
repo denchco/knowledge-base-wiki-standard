@@ -762,7 +762,7 @@ export function initPlan(options = {}) {
     automaticResolutions.push("Implementation agent must inspect the supplied research seed before deriving subject fields or rendering content; the read-only planner does not fetch or ingest arbitrary seed material.");
   }
   if (!options.wikiUrl) {
-    automaticResolutions.push("Implementation must reserve a conflict-free loopback endpoint and record the resulting concrete Wiki URL.");
+    automaticResolutions.push("Implementation must serialize shared-register and live-listener checks, atomically reserve a conflict-free loopback endpoint, publish its exact service identity marker, and record the resulting concrete Wiki URL.");
   }
   const selectedRequirements = new Set(candidate.profile.requirements);
   const stages = [
@@ -772,7 +772,7 @@ export function initPlan(options = {}) {
     { id: "okf", purpose: "Establish the first-class OKF v0.2 bundle, stable concepts, source identities, and newest-first logs.", requirements: ["DKBWS-OKF-001", "DKBWS-OKF-003"] },
     { id: "human-llm", purpose: "Build coordinated Human and LLM Wiki surfaces over shared canonical knowledge, including governed accent treatment wherever a governing-question callout is present.", requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-LLM-001"] },
     { id: "renderer-design", purpose: "Apply the selected renderer and design-governance contracts.", requirements: ["DKBWS-RENDER-001", "DKBWS-DESIGN-001"] },
-    { id: "graph-runtime", purpose: "Add Graphify publication, local runtimes, and stable service adapters required by the profile.", requirements: ["DKBWS-GRAPH-001", "DKBWS-RUNTIME-001"] },
+    { id: "graph-runtime", purpose: "Add Graphify publication, local runtimes, and identity-verified managed service adapters required by the profile.", requirements: ["DKBWS-GRAPH-001", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"] },
     { id: "verification", purpose: "Run every selected deterministic and manual check without overstating proof.", always: true },
     { id: "provenance", purpose: "End every file-changing development turn with a disclosed Jujutsu commit after verification and Git/Jujutsu inspection.", requirements: ["DKBWS-PROV-001"] },
   ].filter((stage) => stage.always || stage.requirements.some((requirement) => selectedRequirements.has(requirement)))
