@@ -57,6 +57,7 @@ Read from top to bottom: source material becomes inspectable evidence, then main
 
 - [Dependencies](spec/dependencies.md) and [security/source boundaries](spec/security-and-sources.md) define the executable and trust perimeter.
 - [Prompt rules](spec/prompts.md), [LLM maintenance](llm-wiki/maintenance.md), and the [context map](llm-wiki/context-map.md) govern repeatable agent work.
+- Development responses navigate Wiki content through the configured live canonical HTTP(S) origin; file and editor links never substitute for rendered Wiki routes.
 - [Sources](sources.md), the [evidence matrix](evidence-matrix.md), [validation queue](validation-queue.md), and [research log](log.md) keep authority and uncertainty inspectable.
 - [Roadmap](roadmap.md), [project status](project/status.md), and [local precedents](reference/local-precedents.md) separate completed candidate work from remaining release decisions.
 - [Conformance evidence](conformance/index.md) keeps formal declarations distinct from inferred dogfood audits.

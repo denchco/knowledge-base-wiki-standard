@@ -82,19 +82,19 @@ entries:
     role: "manifest"
     classification: "render-template"
     template: "starter/templates/wiki-standard.yaml.tmpl"
-    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "AGENTS.md"
     role: "agent-contract"
     classification: "render-template"
     template: "starter/templates/AGENTS.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "CLAUDE.md"
     role: "claude-agent-contract"
     classification: "render-template"
     template: "starter/templates/CLAUDE.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002"]
     always: true
   - target: "DEPENDENCIES.md"
     role: "dependency-contract"
@@ -172,17 +172,17 @@ entries:
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/context-map.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/maintenance.md"
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/standard-proposals.md"
     role: "consumer-proposal-workflow"
     classification: "render-template"
@@ -238,7 +238,7 @@ entries:
     source: "package.json"
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
-    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "scripts/dev-service.mjs"
     role: "managed-local-service"
     classification: "adapt-from-release"
@@ -267,6 +267,20 @@ entries:
     planning_only: true
     dependency_closure: "the target's complete verification command, Git/Jujutsu status inspection, failed-check disclosure, clean-turn guard, and end-of-turn commit tests"
     requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/development-response-links.mjs"
+    role: "development-response-link-check"
+    classification: "adapt-from-release"
+    source: "scripts/development-response-links.mjs"
+    planning_only: true
+    dependency_closure: "the target's configured canonical Wiki URL, captured response Markdown, managed service identity/route evidence, stable diagnostics, and positive/negative fixtures"
+    requirements: ["DKBWS-PROMPT-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/development-response-links.test.mjs"
+    role: "development-response-link-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/development-response-links.test.mjs"
+    planning_only: true
+    dependency_closure: "the adapted response-link checker plus live-origin, relative-file, absolute-file, editor-URI, wrong-origin, code-region, and implementation-path fixtures"
+    requirements: ["DKBWS-PROMPT-002", "DKBWS-VERIFY-001"]
   - target: "scripts/link-source-citations.mjs"
     role: "reader-source-link-check"
     classification: "adapt-from-release"
@@ -392,4 +406,4 @@ entries:
     source: ".github/workflows/verify.yml"
     planning_only: true
     dependency_closure: "every consumer command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow; exclude Standard-maintainer documentation synchronization unless independently declared"
-    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]

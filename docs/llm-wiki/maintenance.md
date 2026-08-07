@@ -19,6 +19,13 @@ status: draft
 10. Inspect Git and Jujutsu state.
 11. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
+## Development response navigation
+
+- Resolve the Wiki's configured canonical URL from its manifest or registered managed-preview endpoint. Before displaying a user-facing Human or LLM Wiki destination in a development response, verify that absolute HTTP(S) route against the live service.
+- Do not substitute `file://` URLs, IDE or editor URLs, local-filesystem Markdown links, or repository-relative Markdown links for Wiki navigation. If the canonical service or route is unavailable, report that state rather than falling back to a file link.
+- Use a plain repository path only to identify an implementation artifact that has no Wiki route, and never present that path as Wiki navigation.
+- When a draft response is captured, run `npm run response:links:check -- --base-url <canonical-url>`; pair its syntax result with the managed identity and HTTP route evidence needed to call a local URL live.
+
 ## Reader source links
 
 - Add a stable anchor to every mapped source-register row. Link each visible source identity independently to its exact internal row; link every list member and only the displayed endpoints of a compact range.

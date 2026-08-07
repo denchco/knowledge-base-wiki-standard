@@ -81,7 +81,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo upgrade/diff mechanism exists."},
     {"id": "bounded-ask-wiki", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm/chat-function.md"], "finding": "Chat is a planned design, not a deployed capability."}
   ],
-  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 12},
+  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 13},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check_wiki.py"], "finding": "Canonical knowledge is Markdown with checked relative links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares version, role mappings, capabilities or deviations."},
@@ -106,6 +106,7 @@
     {"id": "DKBWS-RUNTIME-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/operating-model/conformance.md"], "finding": "No runtime adapter or canonical URL is selected."},
     {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Clarification is sequential and numbered Question 1 of N."},
+    {"id": "DKBWS-PROMPT-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and lacks captured-response, exact-origin, and route-health proof; no pass is inferred."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No candidate-standard migration workflow exists."},
     {"id": "DKBWS-UPDATE-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates the tracked consumer-to-Standard proposal record, digest-bound governed intake, explicit decision/release registry, and separately authorised adoption workflow; no pass is inferred."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["docs/operating-model/conformance.md"], "finding": "No public wiki or DenchCo standard release is claimed."},

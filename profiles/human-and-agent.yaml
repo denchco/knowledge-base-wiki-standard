@@ -11,6 +11,8 @@ requires:
   - DKBWS-LINK-001
   - DKBWS-LINK-002
   - DKBWS-PROMPT-001
+  - DKBWS-PROMPT-002
 capabilities:
   human_wiki: required
   llm_wiki: required
+  development_response_links: live-wiki

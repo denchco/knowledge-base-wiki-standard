@@ -26,6 +26,8 @@ Use the [Graphify workflow](graphify.md) for query-first discovery, the six requ
 - **Lint**: find contradictions, stale claims, unsupported authority language, ungoverned exact repetitions of the declared canonical question, bare or misdirected source identities, unregistered named-authority URLs, orphans, duplicate concepts, missing contextual links, broken generated surfaces, and profile drift.
 - **Propose**: after a user-authored local innovation is complete and verified, preserve its immutable origin in a tracked [Standard proposal](standard-proposals.md). Validate offline, generate a disposable scrubbed payload, bind approval to its exact digest and governed form revision, and leave final submission with the user. Intake, explicit Standard acceptance, immutable release inclusion, and optional consumer adoption are separate authorities and JJ phases.
 
+Development responses route Human or LLM Wiki destinations through the configured live canonical HTTP(S) origin under `DKBWS-PROMPT-002`. File, editor, absolute-path, and repository-relative Markdown links do not substitute for Wiki navigation; plain repository paths identify only implementation artifacts with no rendered route. Captured drafts use the response-link checker, while managed local URLs additionally require identity and route health during the turn.
+
 Never treat an LLM answer, rendered page, graph edge, or generated export as new evidence.
 
 In a Standard Production maintenance workspace, a file-changing development turn remains incomplete until its persistent changes are recorded in the required end-of-turn JJ commit under `DKBWS-PROV-001`.

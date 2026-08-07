@@ -542,6 +542,21 @@ test("Attested Computation runtime remains soft guidance and report schemas reje
   const validateReceipt = ajv.compile(RECEIPT_SCHEMA);
   const sample = receiptFor(POSITIVE, "portable-core", [] , { gates: [] });
   assert.equal(validateReceipt(sample), true, JSON.stringify(validateReceipt.errors));
+
+  const validateManifest = ajv.compile(MANIFEST_SCHEMA);
+  const liveResponseManifest = {
+    schema: "https://example.test/manifest-v1.json",
+    standard: { name: "DenchCo Knowledge Base Wiki Standard", version: "fixture", source: "local-test" },
+    profile: "human-and-agent",
+    okf_version: "0.2",
+    roles: { okf_bundle: "knowledge" },
+    capabilities: { development_response_links: "live-wiki", human_wiki_url: "docs/index.md" },
+    deviations: [],
+  };
+  assert.equal(validateManifest(liveResponseManifest), false);
+  assert.ok(validateManifest.errors.some((item) => item.instancePath === "/capabilities/human_wiki_url"));
+  liveResponseManifest.capabilities.human_wiki_url = "http://127.0.0.1:8017/";
+  assert.equal(validateManifest(liveResponseManifest), true, JSON.stringify(validateManifest.errors));
 });
 
 test("invalid DenchCo manifest is diagnosed independently from OKF", () => {
@@ -744,7 +759,7 @@ test("lifecycle diff compares equal version labels by immutable revision and req
   );
 });
 
-test("the current lifecycle catalogue introduces managed preview identity after rc.3", () => {
+test("the current lifecycle catalogue introduces managed preview and live response links after rc.3", () => {
   const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
   const current = loadProfile("standard-production", {
     standardRoot: ROOT,
@@ -766,6 +781,8 @@ test("the current lifecycle catalogue introduces managed preview identity after 
   });
   const introduced = current.requirements.filter((requirement) => !rc3.requirements.includes(requirement));
   assert.ok(introduced.includes("DKBWS-RUNTIME-002"));
+  assert.ok(introduced.includes("DKBWS-PROMPT-002"));
+  assert.equal(current.capabilities.development_response_links, "live-wiki");
 });
 
 test("lifecycle revision comparison distinguishes the same commit from an unresolved pin", () => {
@@ -1187,9 +1204,10 @@ test("full-profile conformance fails required-false and exact-value capability d
     });
     const report = buildFullProfileReport({ target: root, receipt });
     assert.equal(report.summary.profileComplete, false);
-    assert.equal(report.summary.failedCapabilities, 3);
+    assert.equal(report.summary.failedCapabilities, 4);
     assert.equal(report.capabilityStates.find((item) => item.id === "evidence_governance").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "human_renderer").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "standard_change_intake").verificationStatus, "fail");
+    assert.equal(report.capabilityStates.find((item) => item.id === "development_response_links").verificationStatus, "fail");
   });
 });

@@ -31,6 +31,8 @@ The conformance kit contains positive and negative fixtures. A source/configurat
 
 For `DKBWS-UPDATE-002`, conformance validates every tracked proposal and the Standard acceptance/release registry against their pinned schemas. It proves immutable implementation provenance, legal state transitions, unique proposal identifiers and hidden markers, deterministic payload bytes and SHA-256 approval binding, sanitized public content, issue linkage, explicit decision, immutable-release mapping, and later adoption separation. A closed issue is never acceptance evidence. Proposal validation and verification perform no remote writes, and repeated read-only checks leave no Jujutsu working-copy change.
 
+For `DKBWS-PROMPT-002`, conformance requires the exact `development_response_links: live-wiki` capability, an absolute HTTP(S) `human_wiki_url`, managed root/starter instruction parity, and positive/negative response-link fixtures. A captured response passes only when every clickable Wiki destination uses the configured origin and no file or editor link substitutes for a rendered route. Managed local URLs additionally require exact service identity and HTTP route evidence from the turn. Repository verification cannot inspect an uncaptured conversational response, so host-level pre-send enforcement remains an explicit adapter boundary rather than an inferred guarantee.
+
 ## Formal claims and adoption audits
 
 Formal conformance and inferred adoption evidence are different report modes:
@@ -76,6 +78,8 @@ No command above modifies the target. A caller MAY redirect export output to a n
 The full-profile report builder consumes `schema/verification-receipt-v1.json`. A receipt names the selected profile, evaluation date, environment, canonical-input mutation result, and explicit gate results with evidence references. An absent gate remains `not-checked`; a successful command does not implicitly pass requirements that its receipt does not name. The report builder materializes an explicit result for every inherited requirement, so missing evidence cannot make an obligation disappear. `DKBWS-PROV-001` accepts only the read-only maintainer-mode provenance receipt with both Git and Jujutsu passing plus a successful instruction/helper gate for the development-turn commit rule, and `DKBWS-SEC-001` requires all four subcontrols. The generated report distinguishes complete evaluation from a conformant outcome and validates itself against `schema/conformance-report-v1.json` before emission. The reference paths `output/verification/receipt.json` and `output/verification/conformance-report.json` are reserved for those two schema-valid artifacts; an ad hoc project summary at either path is a failing fixture, not partial evidence.
 
 When Standard Production selects `standard_change_intake`, the full-profile receipt MUST include an explicit `DKBWS-UPDATE-002` gate result. A manifest declaration alone cannot pass it; absent proposal-schema, transition, payload-binding, registry, disclosure, and remote-write-negative evidence remains `not-checked`.
+
+When a Human-and-Agent profile selects `development_response_links: live-wiki`, the full-profile receipt MUST include an explicit `DKBWS-PROMPT-002` result. Capability declaration alone cannot pass it; absent canonical-URL validation, instruction parity, response-lint fixtures, or live managed-route evidence remains `not-checked`.
 
 ## Lifecycle diff and plans
 

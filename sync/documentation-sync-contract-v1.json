@@ -176,6 +176,8 @@
     "scripts/conformance-lifecycle.mjs",
     "scripts/dev-service.mjs",
     "scripts/dev-service.test.mjs",
+    "scripts/development-response-links.mjs",
+    "scripts/development-response-links.test.mjs",
     "scripts/full-profile-report.mjs",
     "scripts/html-script-json.mjs",
     "scripts/html-script-json.test.mjs",

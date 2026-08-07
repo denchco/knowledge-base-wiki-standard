@@ -18,6 +18,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Codex discovery | `AGENTS.md`, `.agents/skills/`, and `llms.txt` |
 | Claude Code discovery | `CLAUDE.md` importing `AGENTS.md`, plus `.claude/skills/` |
 | Follow-up state | `docs/project/status.md` for zero to three active priorities; validation queue fields for parked work and reopen triggers |
+| Development-response navigation | Configured canonical Human Wiki origin, exact managed-service identity and route health, plus `npm run response:links:check -- --base-url <canonical-url>` for captured drafts; uncaptured pre-send interception requires a host hook |
 | Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify), vis-network, and 3d-force-graph |
 | Diagrams | Mermaid, served locally |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
@@ -43,7 +44,7 @@ DenchCo adds the controls that turn the two foundations into a reviewable produc
 
 - [Sources](../sources.md), the [evidence matrix](../evidence-matrix.md), the [validation queue](../validation-queue.md), and the [research log](../log.md) make authority, uncertainty, and gaps inspectable. Displayed source identities route through [exact internal source rows](../spec/requirements.md#reader-evidence-navigation) before a reader leaves the Wiki for a registered authority, and every exact reader-facing repetition of a declared [canonical governing question](../spec/requirements.md#canonical-governing-question-consistency) retains its governed presentation.
 - The [standard architecture](../architecture.md#canonical-layers) and [repository graph](../graph/index.md) connect canonical knowledge to Human, Agent, and Graph discovery surfaces without granting generated views evidence authority.
-- The [requirements catalogue](../spec/requirements.md), [profiles](../spec/profiles.md), and canonical [DenchCo design contract](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md) define the governed implementation choices.
+- The [requirements catalogue](../spec/requirements.md), [profiles](../spec/profiles.md), and canonical [DenchCo design contract](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md) define the governed implementation choices. Development responses that navigate the Wiki use its verified canonical live routes; file/editor links and clickable repository paths do not substitute for Wiki navigation.
 - [Conformance](../spec/conformance.md), [dependencies](../spec/dependencies.md), and the [roadmap](../roadmap.md) explain verification, runtime, migration, and release state.
 
 These choices are defined by the [DenchCo Standard repository](https://github.com/denchco/knowledge-base-wiki-standard), not by any upstream tool.

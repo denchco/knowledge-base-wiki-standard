@@ -22,6 +22,16 @@ When the user's intent is to instantiate an independent wiki by pointing at this
 - Conformance `inspect`, `validate`, `export-okf`, and `diff` are read-only. Candidate `upgrade` and `init` require `--dry-run`, emit review plans only, and have no apply mode.
 - Use Git for interoperable history and GitHub releases. Standard Production maintenance workspaces use colocated Jujutsu for local phase provenance under `DKBWS-PROV-001`; explicit distribution/CI mode is Git-only and does not prove that maintainer obligation.
 
+<!-- DKBWS-PROMPT-002-LIVE-URL:START -->
+## Development response navigation
+
+- In every development response, user-facing navigation to Human or LLM Wiki content MUST use live absolute HTTP(S) URLs rooted at the Wiki's configured canonical URL.
+- Resolve that origin from `capabilities.human_wiki_url` when declared, otherwise from the registered canonical managed-preview endpoint. Verify the exact service identity and every displayed route during the turn before calling a managed local URL live.
+- `file://` URLs, IDE or editor URLs, clickable local-filesystem paths, and repository-relative Markdown links MUST NOT substitute for Wiki navigation. If a route is unavailable, report that state rather than falling back to a file link.
+- A plain repository path MAY identify an implementation artifact with no Wiki route, but it MUST NOT be clickable or presented as Wiki navigation.
+- When the response-link checker is present, validate a captured draft with `npm run response:links:check -- --base-url <canonical-url>`.
+<!-- DKBWS-PROMPT-002-LIVE-URL:END -->
+
 ## Clarification protocol
 
 Where requirements are uncertain, ask sequential, individual, independent questions only. Each answer must inform the next question. Prefix each question with the current running form:

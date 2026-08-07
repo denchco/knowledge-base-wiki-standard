@@ -25,6 +25,7 @@ const CAPABILITY_REQUIREMENTS = Object.freeze({
   evidence_governance: ["DKBWS-EVID-001", "DKBWS-EVID-002"],
   human_wiki: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"],
   llm_wiki: ["DKBWS-LLM-001"],
+  development_response_links: ["DKBWS-PROMPT-002"],
   human_renderer: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RENDER-001"],
   graphify: ["DKBWS-GRAPH-001"],
   local_browser_runtimes: ["DKBWS-RENDER-001"],

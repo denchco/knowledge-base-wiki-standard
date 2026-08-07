@@ -58,7 +58,7 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 - A title, audience, reader task, intended outcome, and source boundary are inferred where the material supports them.
 - An accessible colour family is derived from the confirmed accent colour and checked for contrast.
 - External publishing stays off unless you explicitly ask for it.
-- The wiki is built, checked, and handed back with its local address and any known limitations.
+- The wiki is built, checked, and handed back with its verified live local address and any known limitations; file or editor links do not substitute for Wiki navigation.
 
 ## What you receive
 
@@ -69,6 +69,7 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 - **Source and evidence records** that distinguish supported claims, uncertainty, gaps, and work still to validate, with each displayed source identity linked to its exact registered row.
 - **Diagrams and a knowledge graph** where the selected profile requires them.
 - **Repeatable checks** and a record of exactly which Standard revision was used.
+- **Live Wiki navigation in development responses**, rooted at the configured canonical address and checked against file/editor or clickable repository-path fallbacks.
 
 A subject-empty start creates the structure without inventing research claims, evidence, concepts, or a governing question.
 
@@ -145,6 +146,14 @@ npm run jj:phase -- -m "Development-turn summary"
 ```
 
 The [local Standard wiki](http://127.0.0.1:8017/) is reserved as `denchco-kb-wiki-standard` on port `8017`. `service:start` serializes the user-scoped register and live-bind checks under an exclusive lock, atomically publishes the reservation, and then installs the LaunchAgent. `service:status` succeeds only when the exact registration, installed and loaded adapter, and [`service-identity.json`](docs/assets/service-identity.json) marker all agree; an unrelated HTTP 200 is unhealthy.
+
+Before a development response presents Wiki navigation, verify the managed service identity and every displayed route, then validate the captured draft:
+
+```sh
+npm run response:links:check -- --base-url http://127.0.0.1:8017/
+```
+
+`DKBWS-PROMPT-002` rejects file/editor URLs, clickable local-filesystem paths, repository-relative links, and live Wiki URLs outside the configured origin. A plain repository path may identify a non-Wiki implementation artifact, but it is not Wiki navigation. The checker makes captured violations nonconforming; absolute interception of an uncaptured response requires a host-provided pre-send hook.
 
 </details>
 

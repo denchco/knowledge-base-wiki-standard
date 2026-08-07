@@ -19,11 +19,13 @@ roles:
 capabilities:
   evidence_governance: true
   human_wiki: true
+  human_wiki_url: "http://127.0.0.1:8017/"
   governing_question:
     reader_sources:
       - "docs/index.md"
       - "docs/architecture.md"
   llm_wiki: true
+  development_response_links: "live-wiki"
   human_renderer: "zensical"
   llm_artifacts: true
   graphify: true

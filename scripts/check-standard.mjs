@@ -63,6 +63,7 @@ const required = [
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/check-governing-question-repetitions.mjs", "scripts/check-governing-question-repetitions.test.mjs",
   "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
+  "scripts/development-response-links.mjs", "scripts/development-response-links.test.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
@@ -75,7 +76,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -90,10 +91,15 @@ const readme = readFileSync("README.md", "utf8");
 const prompt = readFileSync("prompts/instantiate-wiki.md", "utf8");
 const contributing = readFileSync("CONTRIBUTING.md", "utf8");
 const standardManifest = YAML.parse(readFileSync(".wiki-standard.yaml", "utf8"));
+const humanAndAgentProfile = YAML.parse(readFileSync("profiles/human-and-agent.yaml", "utf8"));
 const starterManifest = YAML.parse(readFileSync("starter/starter.yaml", "utf8"));
 const starterEntries = starterManifest?.entries ?? [];
 const starterTargets = starterEntries.map((entry) => entry?.target);
 if (new Set(starterTargets).size !== starterTargets.length) failures.push("starter target paths must be unique");
+if (!(humanAndAgentProfile?.requires ?? []).includes("DKBWS-PROMPT-002")
+  || humanAndAgentProfile?.capabilities?.development_response_links !== "live-wiki") {
+  failures.push("human-and-agent profile must require DKBWS-PROMPT-002 and exact live-wiki response links");
+}
 for (const entry of starterEntries.filter((candidate) => candidate?.classification === "render-template")) {
   if (!entry.template || !existsSync(entry.template)) failures.push(`starter render-template ${entry.target} has no existing template`);
 }
@@ -123,6 +129,15 @@ if (starterGoverningQuestion?.classification !== "adapt-from-release"
   || starterGoverningQuestion?.planning_only !== true
   || !(starterGoverningQuestion?.requirements ?? []).includes("DKBWS-HUMAN-004")) {
   failures.push("starter must adapt the bounded governing-question consistency checker for DKBWS-HUMAN-004");
+}
+for (const target of ["scripts/development-response-links.mjs", "scripts/development-response-links.test.mjs"]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (entry?.classification !== "adapt-from-release"
+    || entry?.source !== target
+    || entry?.planning_only !== true
+    || !(entry?.requirements ?? []).includes("DKBWS-PROMPT-002")) {
+    failures.push(`starter must adapt ${target} for DKBWS-PROMPT-002`);
+  }
 }
 for (const [target, classification, source] of [
   ["scripts/standard-proposal-core.mjs", "adapt-from-release", "scripts/standard-proposal-core.mjs"],
@@ -162,13 +177,28 @@ for (const target of [".wiki-standard.yaml", "AGENTS.md", "DEPENDENCIES.md", "SE
     failures.push(`starter ${target} must carry the DKBWS-UPDATE-002 proposal boundary`);
   }
 }
+for (const target of [".wiki-standard.yaml", "AGENTS.md", "CLAUDE.md", "docs/llm-wiki/index.md", "docs/llm-wiki/context-map.md", "docs/llm-wiki/maintenance.md", "package.json", ".github/workflows/verify.yml"]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (!(entry?.requirements ?? []).includes("DKBWS-PROMPT-002")) {
+    failures.push(`starter ${target} must carry the DKBWS-PROMPT-002 live-Wiki response boundary`);
+  }
+}
 const starterWikiManifest = readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8");
 if (!starterWikiManifest.includes("standard_change_intake: true")) failures.push("starter manifest must select the DKBWS-UPDATE-002 proposal capability");
+if (!starterWikiManifest.includes('development_response_links: "live-wiki"') || !starterWikiManifest.includes('human_wiki_url: "{{WIKI_URL}}"')) {
+  failures.push("starter manifest must select DKBWS-PROMPT-002 with a rendered canonical Wiki URL");
+}
 if (standardManifest?.roles?.governing_question !== "docs/index.md") {
   failures.push("Standard manifest must map the authoritative governing-question source");
 }
 if (standardManifest?.capabilities?.standard_change_intake !== true) {
   failures.push("Standard manifest must select the DKBWS-UPDATE-002 standard_change_intake capability");
+}
+if (standardManifest?.capabilities?.development_response_links !== "live-wiki") {
+  failures.push("Standard manifest must select the exact DKBWS-PROMPT-002 live-wiki capability");
+}
+if (standardManifest?.capabilities?.human_wiki_url !== "http://127.0.0.1:8017/") {
+  failures.push("Standard manifest must declare its exact canonical live Wiki URL");
 }
 const questionReaderSources = standardManifest?.capabilities?.governing_question?.reader_sources;
 if (!Array.isArray(questionReaderSources) || !questionReaderSources.includes("docs/index.md") || !questionReaderSources.includes("docs/architecture.md")) {
@@ -339,6 +369,36 @@ if (agentsHandoff && starterHandoff && agentsHandoff !== starterHandoff) {
   failures.push("root and starter completion/handoff policies have drifted");
 }
 
+const agentsLiveWikiLinks = managedSection(agents, "DKBWS-PROMPT-002-LIVE-URL");
+const starterLiveWikiLinks = managedSection(starterAgents, "DKBWS-PROMPT-002-LIVE-URL");
+if (!agentsLiveWikiLinks) failures.push("AGENTS.md lacks the managed live-Wiki response-link policy");
+if (!starterLiveWikiLinks) failures.push("starter AGENTS.md template lacks the managed live-Wiki response-link policy");
+if (agentsLiveWikiLinks && starterLiveWikiLinks && agentsLiveWikiLinks !== starterLiveWikiLinks) {
+  failures.push("root and starter live-Wiki response-link policies have drifted");
+}
+for (const phrase of [
+  "live absolute HTTP(S) URLs",
+  "capabilities.human_wiki_url",
+  "Verify the exact service identity and every displayed route",
+  "clickable local-filesystem paths",
+  "MUST NOT substitute for Wiki navigation",
+  "MUST NOT be clickable",
+  "response:links:check",
+]) {
+  if (!agentsLiveWikiLinks?.includes(phrase)) failures.push(`live-Wiki response-link policy lacks: ${phrase}`);
+}
+for (const [name, source] of [
+  ["Standard skill", codexSkill],
+  ["Standard maintenance", maintenance],
+  ["starter maintenance", starterMaintenance],
+  ["canonical prompt", prompt],
+]) {
+  for (const phrase of ["live", "HTTP(S)", "file", "Wiki navigation"]) {
+    if (!source.includes(phrase)) failures.push(`${name} lacks DKBWS-PROMPT-002 phrase: ${phrase}`);
+  }
+}
+if (/canonical file links/i.test(prompt)) failures.push("prompt still permits canonical file links in development handoffs");
+
 const agentsTurnCompletion = managedSection(agents, "DKBWS-PROV-001-TURN");
 const starterTurnCompletion = managedSection(starterAgents, "DKBWS-PROV-001-TURN");
 if (!agentsTurnCompletion) failures.push("AGENTS.md lacks the managed development-turn completion policy");
@@ -442,6 +502,8 @@ if (pkg.scripts?.["standard:proposal"] !== "node scripts/standard-proposal-cli.m
 if (!pkg.scripts?.check?.includes("standard:proposal -- check --all")) failures.push("npm run check must validate every tracked proposal record offline");
 if (!pkg.scripts?.["conformance:test"]?.includes("standard-proposal-cli.test.mjs")) failures.push("conformance:test must include proposal lifecycle fixtures");
 if (!pkg.scripts?.["conformance:test"]?.includes("dev-service.test.mjs")) failures.push("conformance:test must include managed local service fixtures");
+if (pkg.scripts?.["response:links:check"] !== "node scripts/development-response-links.mjs") failures.push("response:links:check must use the governed DKBWS-PROMPT-002 linter");
+if (!pkg.scripts?.["conformance:test"]?.includes("development-response-links.test.mjs")) failures.push("conformance:test must include development-response-link fixtures");
 if (pkg.codexDevServer?.serviceId !== "denchco-kb-wiki-standard") failures.push("managed local service must retain its stable Standard identity");
 if (pkg.codexDevServer?.host !== "127.0.0.1" || pkg.codexDevServer?.port !== 8017) failures.push("managed local service must retain its canonical loopback endpoint");
 if (pkg.codexDevServer?.healthPath !== "/assets/service-identity.json") failures.push("managed local service must declare the static identity health path");

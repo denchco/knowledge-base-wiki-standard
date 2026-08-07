@@ -21,6 +21,16 @@
 - For a persistent managed preview, serialize the shared-register reload, live-listener checks, and atomic reservation of the project-unique service ID and loopback endpoint under a bounded user-local lock. Never kill or overwrite another listener. Require the exact static service marker plus adapter installation/load for status, and hand a requested preview to the selected browser at the registered canonical URL rather than an alternate test port.
 - Do not publish, change deployment, expose credentials, or alter evidence status without explicit authorization.
 
+<!-- DKBWS-PROMPT-002-LIVE-URL:START -->
+## Development response navigation
+
+- In every development response, user-facing navigation to Human or LLM Wiki content MUST use live absolute HTTP(S) URLs rooted at the Wiki's configured canonical URL.
+- Resolve that origin from `capabilities.human_wiki_url` when declared, otherwise from the registered canonical managed-preview endpoint. Verify the exact service identity and every displayed route during the turn before calling a managed local URL live.
+- `file://` URLs, IDE or editor URLs, clickable local-filesystem paths, and repository-relative Markdown links MUST NOT substitute for Wiki navigation. If a route is unavailable, report that state rather than falling back to a file link.
+- A plain repository path MAY identify an implementation artifact with no Wiki route, but it MUST NOT be clickable or presented as Wiki navigation.
+- When the response-link checker is present, validate a captured draft with `npm run response:links:check -- --base-url <canonical-url>`.
+<!-- DKBWS-PROMPT-002-LIVE-URL:END -->
+
 ## Consumer-to-Standard proposals
 
 - A user-authored improvement remains project-owned until it is accepted into the Standard and included in an immutable release. Do not change this repository's Standard pin, conformance claims, or deviations merely because a proposal exists.

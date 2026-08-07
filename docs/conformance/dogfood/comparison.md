@@ -33,15 +33,15 @@ No `WAIVED` result was recognised. A narrative decision not to adopt OKF, Graph 
 
 | Project | Closest candidate position | PASS | FAIL | WAIVED | NOT APPLICABLE | NOT IMPLEMENTED |
 |---|---|---:|---:|---:|---:|---:|
-| [NHS Data Sharing](nhs-data-sharing.json) | Standard Production + Question-Led | 13 | 5 | 0 | 1 | 8 |
-| [Regulation 28](regulation-28.json) | Evidence/Human/Graph/Design + Generated Analytical + Ask | 12 | 3 | 0 | 3 | 9 |
-| [InterSystems](intersystems.json) | Evidence/Human/Graph/Design + Material compatibility | 11 | 3 | 0 | 4 | 9 |
-| [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 4 | 12 |
-| [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 4 | 0 | 1 | 10 |
+| [NHS Data Sharing](nhs-data-sharing.json) | Standard Production + Question-Led | 13 | 5 | 0 | 1 | 9 |
+| [Regulation 28](regulation-28.json) | Evidence/Human/Graph/Design + Generated Analytical + Ask | 12 | 3 | 0 | 3 | 10 |
+| [InterSystems](intersystems.json) | Evidence/Human/Graph/Design + Material compatibility | 11 | 3 | 0 | 4 | 10 |
+| [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 4 | 13 |
+| [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 4 | 0 | 1 | 11 |
 
 These counts are diagnostic rather than rankings. X-Lab deliberately omits capabilities that its purpose does not currently justify. Regulation 28's legacy Level 4 label similarly prevents the audit from silently treating advanced Ask/deployment work as a higher formal claim.
 
-The 27-row catalogue includes the separately added bundle-mapping, governing-question presentation, draft-navigation, canonical-question repetition, reader-source-navigation, provenance, machine-report, managed-preview-identity, and durable consumer-proposal obligations (`DKBWS-OKF-003`, `DKBWS-HUMAN-002`, `DKBWS-HUMAN-003`, `DKBWS-HUMAN-004`, `DKBWS-LINK-002`, `DKBWS-PROV-001`, `DKBWS-VERIFY-002`, `DKBWS-RUNTIME-002`, and `DKBWS-UPDATE-002`). Because these projects predate the candidate and make no DenchCo claim, absent capabilities are reported as `NOT_IMPLEMENTED`, not silently promoted to formal failures. The historical audits therefore infer no `DKBWS-RUNTIME-002` pass from generic HTTP health alone and no `DKBWS-UPDATE-002` pass from an untracked issue draft or generic upgrade notes. The four existing colocated Git/Jujutsu workspaces are inferred `PASS` evidence for provenance; X-Lab remains `NOT_IMPLEMENTED` because its inspected project record deliberately retained Git without JJ.
+The 28-row catalogue includes the separately added bundle-mapping, governing-question presentation, draft-navigation, canonical-question repetition, reader-source-navigation, provenance, machine-report, managed-preview-identity, live-Wiki development-response navigation, and durable consumer-proposal obligations (`DKBWS-OKF-003`, `DKBWS-HUMAN-002`, `DKBWS-HUMAN-003`, `DKBWS-HUMAN-004`, `DKBWS-LINK-002`, `DKBWS-PROV-001`, `DKBWS-VERIFY-002`, `DKBWS-RUNTIME-002`, `DKBWS-PROMPT-002`, and `DKBWS-UPDATE-002`). Because these projects predate the candidate and make no DenchCo claim, absent capabilities are reported as `NOT_IMPLEMENTED`, not silently promoted to formal failures. The historical audits therefore infer no `DKBWS-RUNTIME-002` pass from generic HTTP health alone, no `DKBWS-PROMPT-002` pass from a configured URL or uncaptured agent behaviour, and no `DKBWS-UPDATE-002` pass from an untracked issue draft or generic upgrade notes. The four existing colocated Git/Jujutsu workspaces are inferred `PASS` evidence for provenance; X-Lab remains `NOT_IMPLEMENTED` because its inspected project record deliberately retained Git without JJ.
 
 ## Component comparison
 
@@ -53,6 +53,7 @@ The 27-row catalogue includes the separately added bundle-mapping, governing-que
 | Governing-question accent rail and text | PASS | NOT APPLICABLE: no callout | NOT APPLICABLE: no callout | NOT APPLICABLE: no callout | FAIL: accent rail, default text |
 | Canonical-question verbatim repetitions | NOT IMPLEMENTED: historical audit lacks complete repetition proof | NOT APPLICABLE: no declaration or callout | NOT APPLICABLE: no declaration or callout | NOT APPLICABLE: no declaration or callout | NOT IMPLEMENTED: historical audit lacks complete repetition proof |
 | Operational LLM Wiki | PASS | PASS | PASS | PASS | PASS |
+| Live Wiki links in development responses | NOT IMPLEMENTED: historical audit lacks captured-response, exact-origin, and route-health proof | NOT IMPLEMENTED: historical audit lacks captured-response, exact-origin, and route-health proof | NOT IMPLEMENTED: historical audit lacks captured-response, exact-origin, and route-health proof | NOT IMPLEMENTED: historical audit lacks captured-response, exact-origin, and route-health proof | NOT IMPLEMENTED: historical audit lacks captured-response, exact-origin, and route-health proof |
 | Stable source identities | PASS | PASS | PASS | FAIL | PASS |
 | Claim limitations/gaps | PASS | PASS | PASS | PASS | PASS |
 | OKF v0.2 | FAIL: custom catalogue | NOT IMPLEMENTED | NOT IMPLEMENTED | NOT IMPLEMENTED | NOT IMPLEMENTED |
@@ -179,6 +180,8 @@ The five 2026-08-03 audits predate `DKBWS-HUMAN-003` and record no dedicated dra
 
 Those audits also predate `DKBWS-LINK-002` and did not test independent citation targets, stable destination-row anchors, registered named-authority URLs, or a built-output exact-fragment journey. Their added reader-source-navigation results are therefore conservative low-confidence `NOT_IMPLEMENTED` states. The independently verified Health IT Governance consumer revision supplies the positive implementation evidence; it does not retroactively change the historical five-project results.
 
+They also predate `DKBWS-PROMPT-002`. None includes a captured development response checked for live absolute Wiki URLs, proof that those URLs use the exact configured origin, or route-health evidence for every displayed Wiki destination. Each project therefore records a low-confidence `NOT_IMPLEMENTED`; a configured URL or generic root HTTP result alone is not treated as response-navigation proof.
+
 They likewise predate `DKBWS-UPDATE-002`. None of the five historical audits proves a canonical tracked proposal record, immutable origin and Standard pin, offline validation, digest- and form-bound approval, fail-closed marker intake, explicit Standard decision/release registry, or separately authorised consumer adoption. Every added result is therefore low-confidence `NOT_IMPLEMENTED`; the new workflow does not retroactively create proposal, acceptance, release, or adoption history for any audited project.
 
 ## Candidate disposition after the audit
@@ -201,6 +204,7 @@ The audit was used as a design test, not left as a static scorecard:
 | Governing-question visual drift | `DKBWS-HUMAN-002` requires a semantically identified callout to render both its rail and text with the implementation's active accent, proved from built output; projects without such a callout are not applicable. |
 | Ungoverned verbatim governing-question repetitions | `DKBWS-HUMAN-004` requires every exact reader-facing repetition of a declared canonical question in the bounded reader set to remain a governed callout; projects without a declaration or callout are not applicable. |
 | Generic draft information markers | `DKBWS-HUMAN-003` requires dedicated draft-edit artwork, readable status text, and trailing-control alignment when draft state appears in primary navigation; renderers that omit navigation status markers remain not applicable. |
+| File or repository links substituted for live Wiki navigation in development responses | `DKBWS-PROMPT-002` requires a captured response to use live absolute Wiki URLs at the exact configured origin and to prove every displayed route healthy; historical project URLs and uncaptured agent behaviour do not establish a pass. |
 | Ephemeral or authority-collapsed consumer proposals | `DKBWS-UPDATE-002` requires a tracked origin record and separately authorised, verifiable intake, Standard decision, immutable release, and optional consumer-adoption states; generated drafts and issue closure have no independent authority. |
 
 The audited projects retain their recorded gaps. Candidate improvements do not retroactively make those projects conformant or authorize their migration.

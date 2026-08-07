@@ -79,7 +79,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version diff, deviation-preserving patch or migration workflow exists yet."},
     {"id": "bounded-ask-wiki", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": [], "finding": "This topic profile does not claim Ask Wiki."}
   ],
-  "requirement_summary": {"PASS": 13, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 8},
+  "requirement_summary": {"PASS": 13, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 1, "NOT_IMPLEMENTED": 9},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-links.mjs"], "finding": "Canonical knowledge is UTF-8 Markdown with checked relative links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No .wiki-standard.yaml declares standard version, roles, capabilities and deviations."},
@@ -104,6 +104,7 @@
     {"id": "DKBWS-RUNTIME-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "docs/project/conformance.md"], "finding": "Canonical local URL returned HTTP 200 at audit time."},
     {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Blocking clarification is explicitly one-at-a-time and numbered Question X of N."},
+    {"id": "DKBWS-PROMPT-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and lacks captured-response, exact-origin, and route-health proof; no pass is inferred."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No candidate-standard upgrade mechanism exists."},
     {"id": "DKBWS-UPDATE-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates the tracked consumer-to-Standard proposal record, digest-bound governed intake, explicit decision/release registry, and separately authorised adoption workflow; no pass is inferred."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "The inferred standard-production profile is not a public DenchCo standard distribution claim; project deployment controls were assessed separately."},

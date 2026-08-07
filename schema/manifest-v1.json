@@ -108,6 +108,33 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "capabilities": {
+            "type": "object",
+            "properties": {
+              "development_response_links": { "const": "live-wiki" }
+            },
+            "required": ["development_response_links"]
+          }
+        },
+        "required": ["capabilities"]
+      },
+      "then": {
+        "properties": {
+          "capabilities": {
+            "type": "object",
+            "properties": {
+              "human_wiki_url": { "$ref": "#/$defs/httpUrl" }
+            },
+            "required": ["human_wiki_url"]
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": false,
   "$defs": {
     "date": {
@@ -123,6 +150,10 @@
           { "pattern": "(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)" }
         ]
       }
+    },
+    "httpUrl": {
+      "type": "string",
+      "pattern": "^https?://[^\\s]+$"
     },
     "capabilityValue": {
       "oneOf": [
