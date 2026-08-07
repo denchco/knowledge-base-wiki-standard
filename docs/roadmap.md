@@ -21,8 +21,12 @@ status: draft
 10. Replaced the unconditional three-item handoff quota with a maximum of three eligible recommendations, plus explicit cycle, parking, reopen, and completion gates.
 11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
 12. Added the governed accent-colour question invariant, restored semantic responsive Mermaid architecture, and proved deterministic repository/local retention versus public-Pages omission of project-specific adoption guidance, then published the changes as immutable prerelease `v0.1.0-rc.3`.
+
+## Completed in the unreleased local candidate
+
 13. Exercised lifecycle, starter, browser, graph, security, verification, proposal, and dual-agent boundaries against the independently maintained Health IT Governance Beyond the NHS consumer; promoted reusable defects and preferred patterns while excluding its subject-specific research.
 14. Classified a verified consumer managed-preview port collision as a core runtime control, added `DKBWS-RUNTIME-002`, and implemented serialized and atomically published shared-register ownership, live-listener refusal, versioned marker identity, fail-closed status, and exact canonical browser handoff.
+15. Added `DKBWS-UPDATE-002` and the durable consumer-to-Standard proposal lifecycle: tracked schema-validated records, deterministic form-bound approval, GET-only issue reconciliation, an explicit Standard decision/release registry, the historical `DKBWS-LINK-002` bridge, and separately authorised consumer adoption.
 
 ## Next evidence gates
 

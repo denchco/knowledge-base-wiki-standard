@@ -23,6 +23,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): `0.39.0` reference-qualified; `0.42.0` available but awaiting deliberate requalification |
+| Standard proposal lifecycle | Tracked records, strict schemas, the [durable Standard proposal workflow](../llm-wiki/standard-proposals.md), deterministic form-bound approval, and GET-only GitHub reconciliation; the user performs final submission |
 | Local service | Repo wrapper, serialized and atomically replaced user-scoped register, live-listener preflight, platform user-service adapter, and exact static-marker health |
 | Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |

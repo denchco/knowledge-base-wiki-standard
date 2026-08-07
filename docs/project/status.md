@@ -24,15 +24,15 @@ status: draft
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
 | Subject-empty starter | Allowlisted policy/graph/planning templates implemented with conditional reader-evidence navigation, consumer-owned licensing, and maintainer-sync exclusion; root copying, invented citations, and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
 | Public documentation boundary | Human guidance routes to the separate Pages site; this repository remains normative and local pinned schemas remain the validation input |
-| Standard-change intake | Proposal-first `standard-change.yml` route implemented with verified-local-first, scrubbed ignored draft, read-only duplicate search, exact remote-payload authority, no write fallback, and separate promotion/release/migration authority |
+| Standard-change intake | `DKBWS-UPDATE-002` implemented locally with tracked versioned records, strict schemas, deterministic payload-and-form approval, stable-marker reconciliation across open and closed issues, explicit upstream decisions, immutable release evidence, and separately authorised adoption; remote reconciliation is GET-only, no command performs a remote write, and the user performs final submission |
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
-| Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and exact-commit CI gates established; `v0.1.0-rc.3` is the current immutable prerelease |
+| Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and exact-commit CI gates established; `v0.1.0-rc.3` is the current immutable prerelease and does not yet include the local `DKBWS-UPDATE-002` workflow |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
 The local Zensical service is registered as `denchco-kb-wiki-standard` at `http://127.0.0.1:8017/`; managed health requires the exact register, LaunchAgent installation/load, and `service-identity-v1` marker in addition to HTTP 200.
 
 ## Current bounded priorities
 
-No active priority remains from the second-consumer pass. Compatibility work is parked until a consumer selects a new exact adapter/environment, and a dedicated Standard MCP remains a no-go because the observed discovery and update-inspection tasks were served by the local CLI, Git, and governed GitHub issue route.
+No active priority remains from the second-consumer pass. Public release of the local proposal workflow is parked until separately authorised, compatibility work is parked until a consumer selects a new exact adapter/environment, and a dedicated Standard MCP remains a no-go because the observed discovery and update-inspection tasks are served by the local CLI, Git, and governed GitHub issue route.
