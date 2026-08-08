@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 
 const REQUIREMENT = "DKBWS-PROV-001";
 const MINIMUM_GIT_VERSION = "2.41.0";
-const QUALIFIED_JJ_VERSION = "0.39.0";
+const QUALIFIED_JJ_VERSION = "0.44.0";
 const MODES = new Set(["maintainer", "distribution"]);
 
 function usage() {
@@ -130,7 +130,7 @@ export function checkProvenance({ root = process.cwd(), mode = "maintainer" } = 
   if (jjVersion !== QUALIFIED_JJ_VERSION) {
     throw new Error(
       `Jujutsu ${QUALIFIED_JJ_VERSION} is the reference-qualified candidate version; found ${jjVersionOutput}. ` +
-      "Newer upstream versions, including 0.42.0, require deliberate requalification before a maintainer-workspace pass.",
+      "Another Jujutsu version requires deliberate requalification before a maintainer-workspace pass.",
     );
   }
 

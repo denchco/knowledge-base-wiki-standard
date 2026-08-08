@@ -11,7 +11,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.16.0`, `vis-network==10.1.0`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.62.1` and its matching Chromium binary |
 | Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
-| Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.39.0` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
+| Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.44.0` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
 | Deployment adapter | Not selected | No deployment CLI or credentials are required; add and qualify a locked adapter before publication to a hosting target |
 | Documentation synchronization | Standard maintainer integration | Sibling Git repository at the contract's portable default path or an explicit runtime path; uses the existing Node, Ajv, and YAML dependencies and stores no absolute path |
@@ -99,4 +99,4 @@ The Zensical reference adapter is tested and supported at exactly `zensical==0.0
 
 ## Provenance compatibility note
 
-The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.39.0`. Git `2.41` is the minimum supported Git boundary because current Jujutsu Git interoperability no longer supports older Git versions. Upstream Jujutsu `0.42.0` is recorded as available as of 3 August 2026, but it is **not yet reference-qualified** for this candidate: it must not replace `0.39.0` until the read-only provenance check and complete Standard Production verification suite pass and the dependency contract is deliberately updated.
+The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.44.0`. Git `2.41` is the minimum supported Git boundary because current Jujutsu Git interoperability no longer supports older Git versions. Qualification covered the read-only maintainer provenance probe, the repository's complete Standard Production verification contract, and real colocated initialization, root, Git-root, raw Git-SHA lookup, log-template, status, and commit operations. Jujutsu remains a pre-1.0 exact dependency: another version requires the same deliberate qualification and contract update rather than being inferred compatible from a range.

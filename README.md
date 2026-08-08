@@ -122,7 +122,7 @@ An issue is only intake. Acceptance is a separate Standard-maintainer decision; 
 <details>
 <summary><strong>For Standard maintainers</strong></summary>
 
-Standard Production maintenance requires Git `2.41` or newer and the reference-qualified Jujutsu `0.39.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+Standard Production maintenance requires Git `2.41` or newer and the reference-qualified Jujutsu `0.44.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
 
 ```sh
 git --version
@@ -137,7 +137,7 @@ npm run service:register
 npm run service:start
 ```
 
-`jj --version` must report `jj 0.39.0` for this candidate. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
+`jj --version` must report `jj 0.44.0` for this candidate. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
 
 End every file-changing development turn with the helper below before giving the final response. It runs complete verification, inspects Git and Jujutsu state, records the turn's changes in a JJ commit, discloses a verification failure in that commit while returning the failing status, and creates no empty commit for a clean turn:
 

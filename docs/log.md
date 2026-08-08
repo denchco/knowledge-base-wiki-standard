@@ -7,6 +7,11 @@ status: draft
 
 # Research and change log
 
+## 2026-08-08
+
+- **Jujutsu 0.44 qualification**: Replaced the exact Standard Production maintainer pin `0.39.0` with `0.44.0` after auditing every upstream breaking change from 0.40 through 0.44 against the repository's actual command and configuration surface. None affected the governed root, Git-root, raw Git-SHA, log-template, status, commit, or colocated-initialization operations.
+- **Executable compatibility evidence**: Verified the official 0.44.0 arm64 binary in a disposable colocated copy before changing the shared installation, then required the installed 0.44.0 binary to pass maintainer provenance and the complete repository verification contract. Removed `STD-VAL-004` because the intentional qualification trigger was satisfied; later pre-1.0 versions remain separate exact qualification decisions.
+
 ## 2026-08-07
 
 - **Live Wiki development-response navigation**: Added `DKBWS-PROMPT-002` after auditing the prompt, requirement catalogue, profile, and shared instructions. The previous bootstrap explicitly allowed both canonical file links and Wiki URLs, while runtime identity rules governed browser handoff rather than development-response hyperlinks; no stable requirement, exact capability, or response fixture closed that gap.
