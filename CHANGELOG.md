@@ -4,6 +4,8 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Recorded the accepted historical UK Digital Health `DKBWS-LINK-002` bridge as included in exact immutable `v0.1.0-rc.4` revision `4aae4d4efbcea526f28ec8bcbfaf203dae34bc25` through a strictly later registry ledger. No issue, release authority, consumer pin, or adoption state is fabricated or combined.
+
 ## 0.1.0-rc.4 — 2026-08-09
 
 - Hardened `DKBWS-RUNTIME-002` so managed status exact-matches all twelve governed registration fields, byte-compares the installed LaunchAgent with the generated job contract, requires the exact job loaded, and uses `service:preview` for a fail-closed exact canonical-URL handoff. Live `service:status` is now maintainer-only verification evidence; distribution/CI records the persistent service requirement and capability as not checked.
