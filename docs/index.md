@@ -23,9 +23,9 @@ flowchart TB
   accTitle: Governed knowledge base system
   accDescr: Source material becomes inspectable evidence and maintained knowledge. That knowledge serves separate Human, Agent, and Graph surfaces, whose paths converge on verification.
 
-  S["Source material"]
-  E["Evidence records"]
-  C["Maintained knowledge"]
+  S["Source"]
+  E["Evidence"]
+  C["Knowledge"]
   H["Human"]
   A["Agent"]
   G["Graph"]

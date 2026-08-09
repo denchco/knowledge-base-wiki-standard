@@ -33,9 +33,9 @@ flowchart TB
   accDescr: Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.
 
   S["1 · Sources"]
-  R["2 · Source register"]
-  E["3 · Evidence records"]
-  C["4 · Canonical knowledge"]
+  R["2 · Register"]
+  E["3 · Evidence"]
+  C["4 · Knowledge"]
   H["Human"]
   A["Agent"]
   G["Graph"]

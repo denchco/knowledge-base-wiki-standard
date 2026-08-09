@@ -382,7 +382,7 @@ export default async (page, options = {}) => {
       const horizontalOverflow = Math.max(0, diagram.scrollWidth - diagram.width);
       check(
         horizontalOverflow <= maxHorizontalOverflow + 1 && diagram.scrollHeight <= diagram.height + 1,
-        `${pageName} Mermaid ${index + 1} must stay within its ${maxHorizontalOverflow}px contained-overflow limit at ${viewportName} width`,
+        `${pageName} Mermaid ${index + 1} must stay within its ${maxHorizontalOverflow}px contained-overflow limit at ${viewportName} width: ${horizontalOverflow}px actual horizontal overflow versus ${maxHorizontalOverflow}px governed limit (+1px measurement tolerance)`,
       );
       if (horizontalOverflow > 1) {
         check(Math.abs(diagram.scrollLeft - (horizontalOverflow / 2)) <= 1, `${pageName} Mermaid ${index + 1} must open centred within its pane at ${viewportName} width`);
@@ -716,7 +716,7 @@ export default async (page, options = {}) => {
       options.mermaidSources?.representative ?? options.mermaidSources?.homepage,
       "Representative page",
       [{
-        nodeLabels: ["Source material", "Evidence records", "Maintained knowledge", "Human", "Agent", "Graph", "Verification"],
+        nodeLabels: ["Source", "Evidence", "Knowledge", "Human", "Agent", "Graph", "Verification"],
         edgeCount: 8,
         title: "Governed knowledge base system",
         description: "Source material becomes inspectable evidence and maintained knowledge. That knowledge serves separate Human, Agent, and Graph surfaces, whose paths converge on verification.",
@@ -728,7 +728,7 @@ export default async (page, options = {}) => {
       options.mermaidSources?.architecture,
       "Architecture",
       [{
-        nodeLabels: ["1 · Sources", "2 · Source register", "3 · Evidence records", "4 · Canonical knowledge", "Human", "Agent", "Graph"],
+        nodeLabels: ["1 · Sources", "2 · Register", "3 · Evidence", "4 · Knowledge", "Human", "Agent", "Graph"],
         edgeCount: 6,
         title: "Knowledge authority and derived surfaces",
         description: "Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.",
@@ -897,7 +897,10 @@ export default async (page, options = {}) => {
   const mobileMermaidPixels = await screenshotPixels(await mobileMermaid.screenshot());
   check(mobileMermaidGeometry.left >= -1 && mobileMermaidGeometry.right <= 391, "Mobile Mermaid pane must stay inside the viewport");
   const mobileMermaidOverflow = Math.max(0, mobileMermaidGeometry.scrollWidth - mobileMermaidGeometry.clientWidth);
-  check(mobileMermaidOverflow <= 61, "Mobile representative Mermaid must keep contained horizontal overflow within the governed 60px limit");
+  check(
+    mobileMermaidOverflow <= 61,
+    `Mobile representative Mermaid must keep contained horizontal overflow within the governed 60px limit: ${mobileMermaidOverflow}px actual versus 60px governed limit (+1px measurement tolerance)`,
+  );
   check(Math.abs(mobileMermaidGeometry.scrollLeft - (mobileMermaidOverflow / 2)) <= 1, "Mobile representative Mermaid must open centred within its pane");
   check(mobileMermaidGeometry.pageOverflow <= 1, "Mobile Mermaid page must not overflow horizontally");
   check(mobileMermaidGeometry.widthControlDisplay === "none", "Desktop width control must not crowd the mobile header");
