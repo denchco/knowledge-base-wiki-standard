@@ -1,6 +1,7 @@
 import fs from "node:fs";
 
 const errors = [];
+const governedThreeProductLayout = '%%{init: {"flowchart": {"nodeSpacing": 40}}}%%';
 const design = read("DESIGN.md");
 const theme = read("docs/assets/theme.css");
 const content = read("docs/assets/content.css");
@@ -239,6 +240,9 @@ for (const [fixture, label] of [
 if (hasDiagramStylingOptIn('flowchart TB\n  A["A"] --> B["B"]')) {
   errors.push("Mermaid native-default guard must accept plain Mermaid source");
 }
+if (hasDiagramStylingOptIn(`${governedThreeProductLayout}\nflowchart TB\n  A["A"] --> B["B"]`)) {
+  errors.push("Mermaid native-default guard must accept the exact governed three-product layout override");
+}
 requireIn(theme, "border-inline-start: var(--sequential-menu-rail-width) solid var(--border)", "page outline must use its quiet rail");
 const draftMarker = selectorBlock(theme, ".md-status--draft::after");
 requireIn(draftMarker, 'mask-image: url("pen-circle.svg")', "draft status must use the registered Pen Circle mask");
@@ -337,7 +341,10 @@ function overviewDiagram(source, label, expectedTopology) {
   }
   const diagram = diagrams[0];
   if (!/^flowchart TB$/m.test(diagram)) errors.push(`${label} must use one top-to-bottom reading direction`);
-  if (/^[ \t]*%%\{init:/m.test(diagram)) errors.push(`${label} must inherit pinned Mermaid defaults without a diagram-level init override`);
+  const initDirectives = [...diagram.matchAll(/^[ \t]*%%\{init:.*$/gm)].map(match => match[0].trim());
+  if (initDirectives.some(directive => directive !== governedThreeProductLayout)) {
+    errors.push(`${label} must use no diagram-level init override other than the exact governed three-product node spacing`);
+  }
   if (hasDiagramStylingOptIn(diagram)) {
     errors.push(`${label} must use ordinary Mermaid node treatment without diagram-level styling opt-ins`);
   }
@@ -366,6 +373,9 @@ function overviewDiagram(source, label, expectedTopology) {
   );
   const edgeCount = [...diagram.matchAll(/-->|==>|-\.->/g)].length;
   const hasThreeProductTopology = hasSeparatedThreeProductTopology(diagram);
+  if (hasThreeProductTopology && !diagram.startsWith(`${governedThreeProductLayout}\nflowchart TB\n`)) {
+    errors.push(`${label} must begin with the exact governed 40px three-product node-spacing override`);
+  }
   const nodeLimit = hasThreeProductTopology ? 7 : 5;
   const edgeLimit = hasThreeProductTopology ? 8 : 5;
   if (nodeIds.size > nodeLimit) errors.push(`${label} must use no more than ${nodeLimit} nodes; found ${nodeIds.size}`);
@@ -462,7 +472,9 @@ function hasCombinedThreeProductNode(diagram) {
   return /\["Human\s*·\s*agent\s*·\s*graph views"\]/i.test(diagram);
 }
 function hasDiagramStylingOptIn(diagram) {
-  return /^[ \t]*%%\{init:/m.test(diagram)
+  const hasUngovernedInit = [...diagram.matchAll(/^[ \t]*%%\{init:.*$/gm)]
+    .some(match => match[0].trim() !== governedThreeProductLayout);
+  return hasUngovernedInit
     || /^[ \t]*(?:class|classDef|style|linkStyle)\b/m.test(diagram)
     || /:::[A-Za-z]/.test(diagram);
 }

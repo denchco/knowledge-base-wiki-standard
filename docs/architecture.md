@@ -28,6 +28,7 @@ Inspect these relationships through the shared [2D and 3D repository graph](grap
 ## Authority
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 40}}}%%
 flowchart TB
   accTitle: Knowledge authority and derived surfaces
   accDescr: Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.
