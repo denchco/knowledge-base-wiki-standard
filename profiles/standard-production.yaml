@@ -10,10 +10,14 @@ requires:
   - DKBWS-VERIFY-001
   - DKBWS-VERIFY-002
   - DKBWS-RUNTIME-001
+  - DKBWS-RUNTIME-002
   - DKBWS-UPDATE-001
+  - DKBWS-UPDATE-002
 capabilities:
   human_renderer: zensical
   graphify: required
   local_browser_runtimes: required
   browser_verification: required
+  local_service: required
   jujutsu: required
+  standard_change_intake: required

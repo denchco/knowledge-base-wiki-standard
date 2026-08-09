@@ -13,12 +13,17 @@ roles:
   validation_queue: "docs/validation-queue.md"
   research_log: "docs/log.md"
   human_wiki: "docs/index.md"
+{{GOVERNING_QUESTION_ROLE_BLOCK_OR_EMPTY}}
   llm_wiki: "docs/llm-wiki/index.md"
   design_contract: "DESIGN.md"
 capabilities:
   evidence_governance: true
   human_wiki: true
+{{GOVERNING_QUESTION_CAPABILITY_BLOCK_OR_FALSE}}
   llm_wiki: true
+  development_response_links: "live-wiki"
+  standard_change_intake: true
   human_wiki_url: "{{WIKI_URL}}"
+  local_service: "{{LOCAL_SERVICE_ADAPTER}}"
   deployment: "{{DEPLOYMENT_ADAPTER_OR_NONE}}"
-deviations: []
+deviations: {{CONDITIONAL_DEVIATIONS_OR_EMPTY}}

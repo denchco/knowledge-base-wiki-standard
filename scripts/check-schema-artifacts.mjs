@@ -66,6 +66,12 @@ for (const [name, schema] of schemas) {
 const manifest = parse(readFileSync(path.join(root, ".wiki-standard.yaml"), "utf8"));
 validate("manifest-v1.json", manifest, ".wiki-standard.yaml");
 
+const serviceIdentity = parseJsonStrict(
+  readFileSync(path.join(root, "docs/assets/service-identity.json"), "utf8"),
+  "docs/assets/service-identity.json",
+);
+validate("service-identity-v1.json", serviceIdentity, "docs/assets/service-identity.json");
+
 const conformance = runJson([
   "scripts/conformance-cli.mjs", "validate", ".", "--strict", "--json",
 ], "self conformance report");
@@ -91,10 +97,14 @@ const lifecycleCases = [
   {
     label: "generated lifecycle diff",
     args: ["scripts/conformance-cli.mjs", "diff", "fixtures/lifecycle/consumer-old", "--json"],
+    allowedStatuses: [1],
+    expectsBlocking: true,
   },
   {
     label: "generated upgrade plan",
     args: ["scripts/conformance-cli.mjs", "upgrade", "fixtures/lifecycle/consumer-old", "--dry-run", "--json"],
+    allowedStatuses: [1],
+    expectsBlocking: true,
   },
   {
     label: "generated init plan",
@@ -105,11 +115,19 @@ const lifecycleCases = [
   },
 ];
 for (const lifecycleCase of lifecycleCases) {
+  const artifact = runJson(
+    lifecycleCase.args,
+    lifecycleCase.label,
+    lifecycleCase.allowedStatuses,
+  );
   validate(
     "lifecycle-plan-v1.json",
-    runJson(lifecycleCase.args, lifecycleCase.label),
+    artifact,
     lifecycleCase.label,
   );
+  if (lifecycleCase.expectsBlocking && !(artifact?.summary?.blocking > 0)) {
+    failures.push(`${lifecycleCase.label}: revision-less fixture must retain a blocking lifecycle result`);
+  }
 }
 
 const adoptionDirectory = path.join(root, "docs", "conformance", "dogfood");
@@ -120,6 +138,30 @@ for (const name of readdirSync(adoptionDirectory).filter((entry) => entry.endsWi
   );
   validate("adoption-audit-report-v1.json", report, `docs/conformance/dogfood/${name}`);
 }
+
+const proposalDirectory = path.join(root, "standard-proposals");
+const proposalRegistry = parseJsonStrict(
+  readFileSync(path.join(proposalDirectory, "registry.json"), "utf8"),
+  "standard-proposals/registry.json",
+);
+validate("standard-proposal-registry-v1.json", proposalRegistry, "standard-proposals/registry.json");
+for (const name of readdirSync(proposalDirectory).filter((entry) => entry.endsWith(".json") && entry !== "registry.json").sort()) {
+  const proposal = parseJsonStrict(
+    readFileSync(path.join(proposalDirectory, name), "utf8"),
+    `standard-proposals/${name}`,
+  );
+  validate("standard-proposal-record-v1.json", proposal, `standard-proposals/${name}`);
+}
+const proposalFixture = parseJsonStrict(
+  readFileSync(path.join(root, "fixtures/conforming/standard-proposal-valid/record.json"), "utf8"),
+  "fixtures/conforming/standard-proposal-valid/record.json",
+);
+validate("standard-proposal-record-v1.json", proposalFixture, "fixtures/conforming/standard-proposal-valid/record.json");
+const proposalRegistryFixture = parseJsonStrict(
+  readFileSync(path.join(root, "fixtures/conforming/standard-proposal-valid/remote/registry.json"), "utf8"),
+  "fixtures/conforming/standard-proposal-valid/remote/registry.json",
+);
+validate("standard-proposal-registry-v1.json", proposalRegistryFixture, "fixtures/conforming/standard-proposal-valid/remote/registry.json");
 
 const graphPath = path.join(root, "docs", "assets", "graphify", "graph.json");
 const summaryPath = path.join(root, "docs", "assets", "graphify", "summary.json");
@@ -181,7 +223,7 @@ function validate(schemaName, value, label) {
   validated.push(label);
 }
 
-function runJson(args, label) {
+function runJson(args, label, allowedStatuses = [0]) {
   const result = spawnSync(process.execPath, args, {
     cwd: root,
     encoding: "utf8",
@@ -191,7 +233,7 @@ function runJson(args, label) {
     failures.push(`${label}: could not run generator: ${result.error.message}`);
     return undefined;
   }
-  if (result.status !== 0) {
+  if (!allowedStatuses.includes(result.status)) {
     failures.push(`${label}: generator exited ${result.status}: ${result.stderr.trim()}`);
     return undefined;
   }

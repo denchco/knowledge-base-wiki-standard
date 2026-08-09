@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": "24.19.0"
   },
   "scripts": {
     "prepare:runtime": "node scripts/sync-runtime-assets.mjs",
@@ -22,9 +22,13 @@
     "check:browser": "node scripts/check-runtime-browser-contract.mjs",
     "check:adoption-audits": "node scripts/check-adoption-audits.mjs",
     "check:canonical-content": "node scripts/check-canonical-content.mjs",
+    "check:governing-question": "node scripts/check-governing-question-repetitions.mjs",
+    "check:source-links": "node scripts/link-source-citations.mjs",
+    "response:links:check": "node scripts/development-response-links.mjs",
+    "sources:link": "node scripts/link-source-citations.mjs --write",
     "check:schema-artifacts": "node scripts/check-schema-artifacts.mjs",
     "check:provenance": "node scripts/check-provenance-mode.mjs",
-    "audit:node": "npm audit --audit-level=high",
+    "audit:node": "npm audit --audit-level=moderate",
     "audit:python": "uv run pip-audit --local",
     "conformance:inspect": "node scripts/conformance-cli.mjs inspect",
     "conformance:validate": "node scripts/conformance-cli.mjs validate",
@@ -33,11 +37,12 @@
     "conformance:upgrade-plan": "node scripts/conformance-cli.mjs upgrade --dry-run",
     "conformance:init-plan": "node scripts/conformance-cli.mjs init --dry-run",
     "conformance:full-report": "node scripts/full-profile-report.mjs",
+    "standard:proposal": "node scripts/standard-proposal-cli.mjs",
     "sync:documentation:check": "node scripts/sync-documentation-snapshot.mjs --check",
     "sync:documentation:apply": "node scripts/sync-documentation-snapshot.mjs --apply",
     "sync:documentation:test": "node --test scripts/sync-documentation-snapshot.test.mjs",
-    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/html-script-json.test.mjs scripts/sync-documentation-snapshot.test.mjs",
-    "check": "node scripts/check-standard.mjs && npm run check:canonical-content && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
+    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/check-governing-question-repetitions.test.mjs scripts/dev-service.test.mjs scripts/development-response-links.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/link-source-citations.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/standard-proposal-cli.test.mjs scripts/sync-documentation-snapshot.test.mjs",
+    "check": "node scripts/check-standard.mjs && npm run standard:proposal -- check --all && npm run check:canonical-content && npm run check:governing-question && npm run check:source-links && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
     "verify": "node scripts/verify.mjs",
     "verify:workspace": "npm run verify && npm run sync:documentation:check",
     "service:register": "node scripts/dev-service.mjs register",
@@ -45,6 +50,7 @@
     "service:start": "node scripts/dev-service.mjs start",
     "service:stop": "node scripts/dev-service.mjs stop",
     "service:status": "node scripts/dev-service.mjs status",
+    "service:preview": "node scripts/dev-service.mjs preview",
     "service:restart": "node scripts/dev-service.mjs restart",
     "service:list": "node scripts/dev-service.mjs list",
     "service:uninstall": "node scripts/dev-service.mjs uninstall",
@@ -55,14 +61,15 @@
     "serviceId": "denchco-kb-wiki-standard",
     "host": "127.0.0.1",
     "port": 8017,
-    "command": "npm run dev"
+    "command": "npm run dev",
+    "healthPath": "/assets/service-identity.json"
   },
   "devDependencies": {
     "@google/design.md": "0.4.0",
     "@playwright/test": "1.62.1",
     "3d-force-graph": "1.80.0",
     "ajv": "8.20.0",
-    "mermaid": "11.16.0",
+    "mermaid": "11.16.1",
     "vis-network": "10.1.0",
     "yaml": "2.9.0"
   }

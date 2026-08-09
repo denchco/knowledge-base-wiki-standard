@@ -7,7 +7,7 @@
   const endpoint = value => String(value?.id ?? value ?? "");
   const SEARCH_ACCENT_STYLE_ID = "denchco-wiki-search-accent";
   const SEARCH_ACCENT_CSS = `
-    /* Zensical 0.0.52 search-state adapter; structure and behaviour remain upstream-owned. */
+    /* Zensical 0.0.53 search-state adapter; structure and behaviour remain upstream-owned. */
     .k:focus-within {
       outline: 3px solid var(--focus);
       outline-offset: 2px;

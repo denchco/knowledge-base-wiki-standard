@@ -868,7 +868,12 @@ function validateManifest(data, manifestPath, projectRoot, diagnostics) {
         });
       }
       if (seenPaths.has(value)) {
-        addDiagnostic(diagnostics, "DKBWS-MANIFEST-ROLE-006", "warning", `Roles \`${seenPaths.get(value)}\` and \`${role}\` map to the same path.`, {
+        const priorRole = seenPaths.get(value);
+        const intentionalQuestionOverlap = new Set([priorRole, role]);
+        if (intentionalQuestionOverlap.size === 2
+          && intentionalQuestionOverlap.has("human_wiki")
+          && intentionalQuestionOverlap.has("governing_question")) continue;
+        addDiagnostic(diagnostics, "DKBWS-MANIFEST-ROLE-006", "warning", `Roles \`${priorRole}\` and \`${role}\` map to the same path.`, {
           file,
           field: `roles.${role}`,
         });

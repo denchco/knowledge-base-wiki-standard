@@ -19,10 +19,6 @@ function isPlainObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function portablePath(from, to) {
-  return path.relative(from, to).split(path.sep).join("/");
-}
-
 export class ProfileLoadError extends Error {
   constructor(code, message, options = {}) {
     super(message);
@@ -38,17 +34,22 @@ function fail(code, message, options) {
   throw new ProfileLoadError(code, message, options);
 }
 
-function readProfileYaml(profileId, profilePath) {
+function readProfileYaml(profileId, profilePath, relativePath, readSource) {
   let source;
   try {
-    const stat = lstatSync(profilePath);
-    if (!stat.isFile()) {
-      fail("DKBWS-PROFILE-FILE-001", `Profile \`${profileId}\` is not a regular file.`, {
-        profileId,
-        filePath: profilePath,
-      });
+    if (readSource) {
+      source = readSource(relativePath);
+      if (typeof source !== "string") throw new Error("profile source reader did not return text");
+    } else {
+      const stat = lstatSync(profilePath);
+      if (!stat.isFile()) {
+        fail("DKBWS-PROFILE-FILE-001", `Profile \`${profileId}\` is not a regular file.`, {
+          profileId,
+          filePath: profilePath,
+        });
+      }
+      source = readFileSync(profilePath, "utf8");
     }
-    source = readFileSync(profilePath, "utf8");
   } catch (error) {
     if (error instanceof ProfileLoadError) throw error;
     fail("DKBWS-PROFILE-MISSING-001", `Profile \`${profileId}\` is not present in the standard catalogue.`, {
@@ -149,6 +150,7 @@ function validateProfileShape(profileId, profilePath, data) {
 
 export function loadProfile(profileId, options = {}) {
   const standardRoot = path.resolve(options.standardRoot ?? ".");
+  const readSource = typeof options.readSource === "function" ? options.readSource : null;
   if (typeof profileId !== "string" || !PROFILE_ID.test(profileId)) {
     fail("DKBWS-PROFILE-ID-001", `Invalid profile id \`${String(profileId)}\`.`, {
       profileId,
@@ -170,8 +172,9 @@ export function loadProfile(profileId, options = {}) {
       });
     }
 
-    const profilePath = path.join(standardRoot, "profiles", `${currentId}.yaml`);
-    const parsed = readProfileYaml(currentId, profilePath);
+    const relativeProfilePath = `profiles/${currentId}.yaml`;
+    const profilePath = path.join(standardRoot, ...relativeProfilePath.split("/"));
+    const parsed = readProfileYaml(currentId, profilePath, relativeProfilePath, readSource);
     const shape = validateProfileShape(currentId, profilePath, parsed.data);
     visiting.push(currentId);
     let inherited;
@@ -196,7 +199,7 @@ export function loadProfile(profileId, options = {}) {
     }
     Object.assign(capabilities, shape.capabilities);
     const source = {
-      path: portablePath(standardRoot, profilePath),
+      path: relativeProfilePath,
       sha256: sha256(parsed.source),
     };
     sourceIndex.set(source.path, source);
@@ -245,10 +248,13 @@ export function listProfileIds(options = {}) {
 
 export function loadRequirementCatalogue(options = {}) {
   const standardRoot = path.resolve(options.standardRoot ?? ".");
-  const requirementPath = path.join(standardRoot, "docs/spec/requirements.md");
+  const relativeRequirementPath = "docs/spec/requirements.md";
+  const requirementPath = path.join(standardRoot, ...relativeRequirementPath.split("/"));
+  const readSource = typeof options.readSource === "function" ? options.readSource : null;
   let source;
   try {
-    source = readFileSync(requirementPath, "utf8");
+    source = readSource ? readSource(relativeRequirementPath) : readFileSync(requirementPath, "utf8");
+    if (typeof source !== "string") throw new Error("requirement source reader did not return text");
   } catch {
     fail("DKBWS-CATALOGUE-MISSING-001", "The canonical requirement catalogue is missing or unreadable.", {
       filePath: requirementPath,
@@ -273,7 +279,7 @@ export function loadRequirementCatalogue(options = {}) {
     });
   }
   return {
-    path: portablePath(standardRoot, requirementPath),
+    path: relativeRequirementPath,
     sha256: sha256(source),
     rows,
     ids,

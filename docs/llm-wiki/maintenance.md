@@ -13,10 +13,37 @@ status: draft
 4. Register new external evidence before changing normative claims.
 5. Add or amend stable requirements, applicability, diagnostics, and migration effects.
 6. Update schemas, profile, prompts, LLM context, fixtures, and changelog together.
-7. Run `npm run verify`.
-8. Refresh Graphify explicitly.
-9. Inspect Git and Jujutsu state.
-10. Record a validated JJ phase and prepare a reviewable Git change.
+7. For managed-preview changes, serialize the shared-register reload and live-listener probe, publish the reservation atomically, preserve other services, exact-match all twelve governed registration fields, require the installed LaunchAgent bytes and loaded job to match the generated contract, validate the exact marker, and prove the fail-closed `service:preview` canonical browser handoff. Treat live service status as maintainer-only evidence.
+8. Run `npm run verify`.
+9. Refresh Graphify explicitly.
+10. Inspect Git and Jujutsu state.
+11. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
+
+## Development response navigation
+
+- Resolve the Wiki's configured canonical URL from its manifest or registered managed-preview endpoint. Before displaying a user-facing Human or LLM Wiki destination in a development response, verify that absolute HTTP(S) route against the live service.
+- Do not substitute `file://` URLs, IDE or editor URLs, local-filesystem Markdown links, or repository-relative Markdown links for Wiki navigation. If the canonical service or route is unavailable, report that state rather than falling back to a file link.
+- Use a plain repository path only to identify an implementation artifact that has no Wiki route, and never present that path as Wiki navigation.
+- The checker covers Markdown destinations, entity-decoded HTML `a`/`area` links, and plain GFM-autolinked HTTP(S) text while excluding masked code/comments and images from navigation.
+- When a draft response is captured, run `npm run response:links:check -- --base-url <canonical-url>` and add `--managed-live` for a managed local Wiki. That mode requires exact service status, canonical URL equality, and HTTP 200 for every displayed route. It cannot intercept a response the host never exposes, so `STD-VAL-007` remains in force.
+
+## Reader source links
+
+- Add a stable anchor to every mapped source-register row. Link each visible source identity independently to its exact internal row; link every list member and only the displayed endpoints of a compact range.
+- Use a registered primary URL when prose directly links a specifically named official authority, guidance, or publication. Do not turn generic institution names into decorative authority links.
+- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, lost visible brackets, and broken destination journeys.
+
+## Canonical governing question
+
+- When one canonical governing question is declared, map its authoritative source and maintain a finite `reader_sources` set in the manifest capability contract.
+- Run the exact-text repetition lint after editing any bounded reader source. Every verbatim repetition uses the same governed callout; paraphrases, unrelated quotations, and historical/source records outside the bounded set remain ordinary content.
+- Run the built-output browser contract across every discovered repetition route at desktop and mobile widths. A subject-empty or question-free Wiki records `DKBWS-HUMAN-004` as not applicable and does not manufacture a callout.
+
+## Consumer-derived proposals
+
+Use the tracked [Standard proposal workflow](standard-proposals.md) for a user-authored consumer improvement that may be reusable. Finish and verify the project-owned implementation first. Preserve its full Git commit, optional JJ identity, pinned Standard revision, bounded evidence, fallback, fixture and migration effects in the canonical proposal record; do not make an ignored Markdown draft authoritative.
+
+Validate direct record states offline as well as command transitions: outcome metadata, prerequisites, exact issue identity, accepted requirements, release state, and adoption state must agree, and workflow-v1 linkage/decision/release/adoption transitions are terminal. Prepare a disposable scrubbed payload and review its exact digest and form revision. The CLI may check and open the governed form but never submits or uploads; final submission remains with the user. Keep issue state separate from explicit maintainer classification and acceptance, keep acceptance separate from immutable release inclusion, and keep release separate from any consumer adoption or pin change. Before release inclusion, require the registry bytes at the exact full revision, strict release-to-registry ancestry, the exact public non-draft immutable release, and exact tag resolution. The one pre-registry bridge is fixed to the existing UK Digital Health `DKBWS-LINK-002` entry and is never a new-work fallback. A closed issue is not acceptance. Record each authorised transition in its own JJ phase and fail closed on missing form, label, marker, provenance, state, registry-revision, ancestry, release, or digest evidence.
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
 

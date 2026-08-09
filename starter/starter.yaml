@@ -3,15 +3,32 @@ id: "denchco-subject-empty"
 description: "Allowlisted recipe for creating an independent, subject-specific knowledge-base repository."
 standard_source: "https://github.com/denchco/knowledge-base-wiki-standard"
 documentation: "https://denchco.github.io/knowledge-base-wiki-documentation/"
-revision_policy: "required-immutable-release-tag-or-commit"
+revision_policy: "automatically-resolve-default-branch-head-to-commit"
 repository_boundary: "independent-target"
 root_copy: "forbidden"
 content_policy: "subject-specific-create-fresh"
 deployment_policy: "consumer-owned"
+bootstrap:
+  invocation: "standard-repository-url-only"
+  first_question: "research-topic-seed-or-subject-empty-local-wiki"
+  modes: ["research-topic-seed", "subject-empty-local"]
+  defaults:
+    profile: "standard-production"
+    primary_color: "#174a5b"
+    accent_color: "#0b7285"
+    target_path: "infer-independent-local-path"
+    wiki_url: "auto-reserve-conflict-free-loopback"
+    local_service: "auto-select-platform-user-service-adapter"
+    deployment: "none"
+  inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
+  conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
+  required_design_question: "state the inferred or default accent hex and ask whether to use or replace it"
+  accent_derivation: "derive and record an accessible family; verify 4.5:1 normal-text and 3:1 non-text boundary contrast against rendered backgrounds"
+  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment"]
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
-  standard_production: "Planning only until an implementation agent supplies and verifies the complete renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the pinned release."
+  standard_production: "Planning only until an implementation agent supplies and verifies the complete consumer renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the pinned release. Standard-maintainer documentation-sync commands and verify:workspace are excluded unless the consumer independently declares and implements that capability."
 
 classifications:
   reference_only:
@@ -47,50 +64,67 @@ never_copy_as_consumer_content:
   - "dogfood reports or fixtures"
   - "the standard's source register, evidence matrix, validation queue, or research log"
   - "the standard documentation repository or its Pages workflow"
+  - "the Standard-maintained standard-proposals/registry.json or any Standard decision/release authority"
 
 consumer_owned:
   - "title, topic, audience, governing question, and intended outcome"
+  - "accent colour and derived accessible colour family"
   - "canonical Wiki URL"
+  - "stable local service identity, registered endpoint, and platform user-service adapter"
   - "source and evidence corpus"
+  - "repository licence decision, rights holder, and any resulting LICENSE text"
   - "navigation and synthesis"
   - "deployment adapter, credentials, repository settings, and domain"
+  - "tracked proposal origin records, payload approvals, issue observations, and optional adoption decisions"
 
 entries:
   - target: ".wiki-standard.yaml"
     role: "manifest"
     classification: "render-template"
     template: "starter/templates/wiki-standard.yaml.tmpl"
-    requirements: ["DKBWS-CORE-002"]
+    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "AGENTS.md"
     role: "agent-contract"
     classification: "render-template"
     template: "starter/templates/AGENTS.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "CLAUDE.md"
     role: "claude-agent-contract"
     classification: "render-template"
     template: "starter/templates/CLAUDE.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002"]
     always: true
   - target: "DEPENDENCIES.md"
     role: "dependency-contract"
     classification: "render-template"
     template: "starter/templates/DEPENDENCIES.md.tmpl"
-    requirements: ["DKBWS-VERIFY-001"]
+    requirements: ["DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
     always: true
   - target: "SECURITY.md"
     role: "security-policy"
     classification: "render-template"
     template: "starter/templates/SECURITY.md.tmpl"
-    requirements: ["DKBWS-SEC-001"]
+    requirements: ["DKBWS-SEC-001", "DKBWS-UPDATE-002"]
     always: true
   - target: "SOURCE_POLICY.md"
     role: "source-policy"
     classification: "render-template"
     template: "starter/templates/SOURCE_POLICY.md.tmpl"
-    requirements: ["DKBWS-SEC-001"]
+    requirements: ["DKBWS-SEC-001", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    always: true
+  - target: "LICENSING.md"
+    role: "licensing-record"
+    classification: "render-template"
+    template: "starter/templates/LICENSING.md.tmpl"
+    requirements: ["DKBWS-SEC-001", "DKBWS-UPDATE-002"]
+    always: true
+  - target: "standard-proposals/README.md"
+    role: "consumer-proposal-boundary"
+    classification: "render-template"
+    template: "starter/templates/standard-proposals/README.md.tmpl"
+    requirements: ["DKBWS-UPDATE-002"]
     always: true
   - target: "knowledge/index.md"
     role: "okf-index"
@@ -113,42 +147,47 @@ entries:
     role: "source-register"
     classification: "render-template"
     template: "starter/templates/docs/sources.md.tmpl"
-    requirements: ["DKBWS-EVID-001"]
+    requirements: ["DKBWS-EVID-001", "DKBWS-LINK-002"]
   - target: "docs/evidence-matrix.md"
     role: "evidence-matrix"
     classification: "render-template"
     template: "starter/templates/docs/evidence-matrix.md.tmpl"
-    requirements: ["DKBWS-EVID-002"]
+    requirements: ["DKBWS-EVID-002", "DKBWS-LINK-002"]
   - target: "docs/validation-queue.md"
     role: "validation-queue"
     classification: "render-template"
     template: "starter/templates/docs/validation-queue.md.tmpl"
-    requirements: ["DKBWS-EVID-002"]
+    requirements: ["DKBWS-EVID-002", "DKBWS-LINK-002"]
   - target: "docs/log.md"
     role: "research-log"
     classification: "render-template"
     template: "starter/templates/docs/log.md.tmpl"
-    requirements: ["DKBWS-EVID-002"]
+    requirements: ["DKBWS-EVID-002", "DKBWS-LINK-002"]
   - target: "docs/index.md"
     role: "human-wiki"
     classification: "render-template"
     template: "starter/templates/docs/index.md.tmpl"
-    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002"]
+    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
   - target: "docs/llm-wiki/index.md"
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/context-map.md.tmpl"
-    requirements: ["DKBWS-LLM-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/maintenance.md"
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+  - target: "docs/llm-wiki/standard-proposals.md"
+    role: "consumer-proposal-workflow"
+    classification: "render-template"
+    template: "starter/templates/docs/llm-wiki/standard-proposals.md.tmpl"
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROV-001", "DKBWS-UPDATE-002"]
   - target: "docs/project/status.md"
     role: "project-status"
     classification: "render-template"
@@ -159,38 +198,201 @@ entries:
     role: "design-contract"
     classification: "render-template"
     template: "starter/templates/DESIGN.md.tmpl"
-    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002"]
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
   - target: "zensical.toml"
     role: "renderer-config"
     classification: "render-template"
     template: "starter/templates/zensical.toml.tmpl"
-    requirements: ["DKBWS-RENDER-001"]
+    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-003"]
   - target: "docs/assets/"
     role: "local-runtime-assets"
     classification: "adapt-from-release"
     source: "docs/assets/"
     planning_only: true
-    dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates"
-    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002"]
+    dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates; exclude the Standard's service marker because the project-owned marker is rendered separately"
+    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+  - target: "docs/assets/service-identity.json"
+    role: "managed-service-identity"
+    classification: "render-template"
+    template: "starter/templates/docs/assets/service-identity.json.tmpl"
+    requirements: ["DKBWS-RUNTIME-002"]
+    always: true
   - target: "docs/graph/index.md"
     role: "graph-entry"
-    classification: "create-subject-content"
+    classification: "render-template"
+    template: "starter/templates/docs/graph/index.md.tmpl"
     requirements: ["DKBWS-GRAPH-001"]
   - target: "docs/graph/two-dimensional.md"
     role: "graph-2d"
-    classification: "create-subject-content"
+    classification: "render-template"
+    template: "starter/templates/docs/graph/two-dimensional.md.tmpl"
     requirements: ["DKBWS-GRAPH-001"]
   - target: "docs/graph/three-dimensional.md"
     role: "graph-3d"
-    classification: "create-subject-content"
+    classification: "render-template"
+    template: "starter/templates/docs/graph/three-dimensional.md.tmpl"
     requirements: ["DKBWS-GRAPH-001"]
   - target: "package.json"
     role: "node-build-contract"
     classification: "adapt-from-release"
     source: "package.json"
     planning_only: true
-    dependency_closure: "all scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract"
+    dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+  - target: ".node-version"
+    role: "node-runtime-pin"
+    classification: "adapt-from-release"
+    source: ".node-version"
+    planning_only: true
+    dependency_closure: "the exact Node runtime selected by package.json, the npm engine-strict policy, CI, locks, and verification"
     requirements: ["DKBWS-VERIFY-001"]
+  - target: ".npmrc"
+    role: "node-engine-enforcement"
+    classification: "adapt-from-release"
+    source: ".npmrc"
+    planning_only: true
+    dependency_closure: "the exact package.json Node engine and .node-version runtime pin"
+    requirements: ["DKBWS-VERIFY-001"]
+  - target: "scripts/dev-service.mjs"
+    role: "managed-local-service"
+    classification: "adapt-from-release"
+    source: "scripts/dev-service.mjs"
+    planning_only: true
+    dependency_closure: "project-unique service identity, versioned static marker, serialized and atomically replaced user-scoped shared register, live-listener preflight, platform user-service install/load/status checks, exact canonical browser handoff, and fixture suite"
+    requirements: ["DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/dev-service.test.mjs"
+    role: "managed-local-service-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/dev-service.test.mjs"
+    planning_only: true
+    dependency_closure: "the adapted managed-service wrapper, Node test runner, temporary loopback listeners, and project service identity"
+    requirements: ["DKBWS-RUNTIME-002", "DKBWS-VERIFY-001"]
+  - target: "schema/service-identity-v1.json"
+    role: "managed-service-identity-schema"
+    classification: "adapt-from-release"
+    source: "schema/service-identity-v1.json"
+    planning_only: true
+    dependency_closure: "the static service marker and schema-validation gate"
+    requirements: ["DKBWS-RUNTIME-002", "DKBWS-VERIFY-002"]
+  - target: "scripts/jj-phase.mjs"
+    role: "development-turn-provenance"
+    classification: "adapt-from-release"
+    source: "scripts/jj-phase.mjs"
+    planning_only: true
+    dependency_closure: "the target's complete verification command, Git/Jujutsu status inspection, failed-check disclosure, clean-turn guard, and end-of-turn commit tests"
+    requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/development-response-links.mjs"
+    role: "development-response-link-check"
+    classification: "adapt-from-release"
+    source: "scripts/development-response-links.mjs"
+    planning_only: true
+    dependency_closure: "the target's configured canonical Wiki URL, captured response Markdown, managed service identity/route evidence, stable diagnostics, and positive/negative fixtures"
+    requirements: ["DKBWS-PROMPT-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/development-response-links.test.mjs"
+    role: "development-response-link-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/development-response-links.test.mjs"
+    planning_only: true
+    dependency_closure: "the adapted response-link checker plus live-origin, relative-file, absolute-file, editor-URI, wrong-origin, code-region, and implementation-path fixtures"
+    requirements: ["DKBWS-PROMPT-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/link-source-citations.mjs"
+    role: "reader-source-link-check"
+    classification: "adapt-from-release"
+    source: "scripts/link-source-citations.mjs"
+    planning_only: true
+    dependency_closure: "mapped reader evidence surfaces, source-register path and identity grammar, stable row anchors, optional idempotent rewrite, lint fixtures, visible citation styling, and built-output exact-row browser proof"
+    requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-governing-question-repetitions.mjs"
+    role: "governing-question-consistency-check"
+    classification: "adapt-from-release"
+    source: "scripts/check-governing-question-repetitions.mjs"
+    planning_only: true
+    dependency_closure: "mapped authoritative canonical-question source, bounded reader-source declaration, exact-text positive/negative/subject-empty fixtures, implementation-specific marker parsing, and built-output proof over every repetition route"
+    requirements: ["DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-governing-question-repetitions.test.mjs"
+    role: "governing-question-consistency-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-governing-question-repetitions.test.mjs"
+    planning_only: true
+    dependency_closure: "the adapted governing-question checker and conforming, nonconforming, neutral, historical-record, and subject-empty fixture corpus"
+    requirements: ["DKBWS-HUMAN-004", "DKBWS-VERIFY-001"]
+  - target: "scripts/standard-proposal-core.mjs"
+    role: "standard-proposal-core"
+    classification: "adapt-from-release"
+    source: "scripts/standard-proposal-core.mjs"
+    planning_only: true
+    dependency_closure: "the tracked proposal directory, record and registry schemas, governed form revision/labels, immutable origin checks, scrubbed payload renderer, marker search, explicit transition authorities, and test fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/standard-proposal-cli.mjs"
+    role: "standard-proposal-cli"
+    classification: "adapt-from-release"
+    source: "scripts/standard-proposal-cli.mjs"
+    planning_only: true
+    dependency_closure: "the proposal core, package wrapper, tracked records, disposable output directory, schemas, governed form, and browser-open adapter; no remote-write dependency"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/standard-proposal-cli.test.mjs"
+    role: "standard-proposal-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/standard-proposal-cli.test.mjs"
+    planning_only: true
+    dependency_closure: "the proposal core/CLI plus positive and negative provenance, state, duplicate-marker, safety, form/label, release-ledger, and adoption fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/conforming/standard-proposal-valid/"
+    role: "standard-proposal-positive-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/conforming/standard-proposal-valid/"
+    planning_only: true
+    dependency_closure: "valid tracked record, byte-bound form, and offline remote form/label/issue/registry observations"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-state/"
+    role: "standard-proposal-state-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-state/"
+    planning_only: true
+    dependency_closure: "invalid lifecycle transition fixture and proposal validator"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-safety/"
+    role: "standard-proposal-safety-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-safety/"
+    planning_only: true
+    dependency_closure: "unsafe disclosure/content fixture and proposal validator"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-duplicate/"
+    role: "standard-proposal-deduplication-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-duplicate/"
+    planning_only: true
+    dependency_closure: "duplicate identifier/marker fixtures and proposal validator"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "fixtures/nonconforming/standard-proposal-form/"
+    role: "standard-proposal-form-fixtures"
+    classification: "adapt-from-release"
+    source: "fixtures/nonconforming/standard-proposal-form/"
+    planning_only: true
+    dependency_closure: "changed/missing governed form and label fail-closed fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "standard-proposals/standard-change-form-v1.yml"
+    role: "governed-standard-proposal-form"
+    classification: "adapt-from-release"
+    source: "standard-proposals/standard-change-form-v1.yml"
+    planning_only: true
+    dependency_closure: "the proposal record's exact form version and SHA-256 binding, required enhancement/standard-change labels, fail-closed published-form comparison, and CLI fixtures"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-001"]
+  - target: "schema/standard-proposal-record-v1.json"
+    role: "standard-proposal-record-schema"
+    classification: "adapt-from-release"
+    source: "schema/standard-proposal-record-v1.json"
+    planning_only: true
+    dependency_closure: "tracked consumer proposal records and schema-artifact validation"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-002"]
+  - target: "schema/standard-proposal-registry-v1.json"
+    role: "standard-proposal-registry-schema"
+    classification: "adapt-from-release"
+    source: "schema/standard-proposal-registry-v1.json"
+    planning_only: true
+    dependency_closure: "read-only validation/comparison of the Standard-maintained registry; never instantiate registry authority in the consumer"
+    requirements: ["DKBWS-UPDATE-002", "DKBWS-VERIFY-002"]
   - target: "package-lock.json"
     role: "node-lock"
     classification: "adapt-from-release"
@@ -217,5 +419,5 @@ entries:
     classification: "adapt-from-release"
     source: ".github/workflows/verify.yml"
     planning_only: true
-    dependency_closure: "every command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow"
-    requirements: ["DKBWS-VERIFY-001"]
+    dependency_closure: "every consumer command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow; exclude Standard-maintainer documentation synchronization unless independently declared"
+    requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]

@@ -10,31 +10,30 @@ status: draft
 | Surface | State |
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
-| Evidence governance | Implemented candidate |
-| Human Zensical wiki | Governed reference runtime with strict build and local assets |
-| Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, and completion/cycle guards |
-| Manifest and stable requirements | Implemented candidate with machine schemas and stable diagnostics |
-| Dependency contract | Exact locks, installation classes, offline boundary, and adapter requalification rule implemented |
-| Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, and completion-first anti-rabbit-hole handoff implemented |
-| Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: Git and colocated Jujutsu are active, with a read-only root/version/current-change checker; `jj 0.39.0` is reference-qualified and explicit Git-only distribution mode does not claim maintainer provenance |
-| Graphify publication | Versioned shared data plus enriched 2D/3D views and local runtimes implemented |
-| Built-output browser contract | Desktop/mobile geometry, local network, Mermaid, graph, controls, console, and asset checks implemented |
-| Cross-project dogfooding | Five read-only inferred audits and comparative report implemented |
-| Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans implemented |
-| Subject-empty starter | Allowlisted planning/templates implemented; root copying and standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
+| Evidence governance | Implemented candidate with stable row anchors, individual internal citation links, registered named-authority URLs, and exact-destination lint |
+| Human Zensical wiki | Governed reference runtime with strict build, local assets, dedicated readable draft-navigation markers, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
+| Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, completion/cycle guards, and canonical live-URL response navigation |
+| Manifest and stable requirements | Implemented candidate with machine schemas, stable diagnostics, and explicit result accounting for every requirement inherited from the selected profile |
+| Dependency contract | Exact Node `24.19.0` local/CI enforcement plus reference-qualified Mermaid `11.16.1`, DOMPurify `3.4.13`, Zensical `0.0.53`, Graphify `0.9.37`, retained vis-network `10.1.0`, installation classes, offline boundary, consumer/maintainer separation, and reserved verification-artifact rules implemented |
+| Prompt/question contract | Canonical prompt plus planning-only initializer, sequential-question contract, completion-first anti-rabbit-hole handoff, and `DKBWS-PROMPT-002` live-Wiki response-link rule implemented |
+| Development-response navigation | Exact `development_response_links: live-wiki` capability, canonical Human Wiki origin, managed root/starter instructions, Markdown/entity-decoded-HTML/plain-GFM detection, and `--managed-live` exact identity plus per-route HTTP checks implemented; absolute interception of uncaptured output remains host-hook dependent and parked as `STD-VAL-007` |
+| Managed local preview | `DKBWS-RUNTIME-002` implemented with serialized atomic reservation, exact twelve-field registration, byte-identical generated/installed LaunchAgent, loaded-job and marker identity checks, fail-closed `service:preview`, and maintainer-only live status; distribution/CI reports it not checked |
+| Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, exact `jj 0.44.0` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
+| Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
+| Built-output browser contract | Independent representative routes; desktop/mobile geometry, every canonical-question repetition route, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
+| Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |
+| Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
+| Subject-empty starter | Allowlisted policy/graph/planning templates implemented with conditional reader-evidence navigation, consumer-owned licensing, and maintainer-sync exclusion; root copying, invented citations, and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
 | Public documentation boundary | Human guidance routes to the separate Pages site; this repository remains normative and local pinned schemas remain the validation input |
+| Standard-change intake | `DKBWS-UPDATE-002` implemented and prepared for `v0.1.0-rc.4` with tracked versioned records, direct-state and terminal-transition invariants, deterministic payload/form approval, exact issue linkage, exact registry-revision bytes and strict release ancestry, exact public non-draft immutable release checks, one fixed historical bridge, and separately authorised adoption; current public immutable releases do not yet contain it, the historical bridge remains release-pending, remote reconciliation is GET-only, no command performs a remote write, and the user performs final submission |
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
-| Public GitHub release | Public `denchco` repository, MIT licence, private vulnerability reporting, read-only default workflow permissions, native immutable releases, and exact-commit CI gates established; `v0.1.0-rc.3` is the current immutable prerelease |
+| Public GitHub release | Public `denchco` repository with a no-bypass pull-request/merge-commit `main` ruleset, required exact GitHub Actions `verify` check, deletion/force-push protection, full-SHA selected Actions, read-only workflow permissions, secret scanning and push protection, private vulnerability reporting, and native immutable releases; `v0.1.0-rc.3` remains the current immutable prerelease, while `v0.1.0-rc.4` is prepared and pending required pull-request/main Verify, its exact tag, and immutable release attestation |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
-The local Zensical service is registered at `http://127.0.0.1:8017/`; health requires HTTP 200.
+The local Zensical service is registered as `denchco-kb-wiki-standard` at `http://127.0.0.1:8017/`; managed health requires every governed registration field, exact LaunchAgent bytes, the loaded job, canonical URL, and `service-identity-v1` marker in addition to HTTP 200. The maintainer-only live gate supplies current evidence and the preview command refuses browser handoff on any mismatch.
 
 ## Current bounded priorities
 
-These are the three current project priorities in order. They are status, not automatic response boilerplate, and each must be removed or replaced when completed.
-
-1. **Second-consumer proof** — run the pinned lifecycle and instruction contract against a second independently maintained consumer, record its schema-valid report and owner decision, and finish when reusable defects are reconciled or explicitly parked.
-2. **Evidence-led compatibility** — add version/browser fixtures only for exact adapters or environments exposed by that consumer or an evidenced upstream change; finish when those observed combinations pass or are declared unsupported. Do not create a speculative compatibility matrix.
-3. **MCP go/no-go** — after the second-consumer pass, compare its real discovery/update-inspection tasks with the stable CLI and GitHub MCP; finish with a recorded decision, and implement a dedicated read-first MCP only if a named unmet gap remains.
+Complete protected `v0.1.0-rc.4` publication and its strictly later registry ledger; completion requires green pull-request and exact-main Verify, exact immutable-release proof, and the descendant ledger merged to `main`. Absolute interception of uncaptured responses is parked until a selected host exposes a governed pre-send hook, future compatibility work is parked until another exact adapter or environment is deliberately selected, and a dedicated Standard MCP remains a no-go because the observed discovery and update-inspection tasks are served by the local CLI, Git, and governed GitHub issue route.

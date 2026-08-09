@@ -60,6 +60,7 @@ spacing:
   md: "12px"
   lg: "16px"
   xl: "24px"
+  draftStatusIconSize: ".9rem"
 components:
   page:
     backgroundColor: "{colors.background}"
@@ -84,6 +85,8 @@ components:
     textColor: "{colors.success}"
   status-warning:
     textColor: "{colors.warning}"
+  status-draft:
+    size: "{spacing.draftStatusIconSize}"
   table-header:
     backgroundColor: "{colors.tableHeader}"
     textColor: "{colors.text}"
@@ -125,7 +128,7 @@ The shell may look identical across topics. The topic's reader model, navigation
 - `accentDark`, `accentDarker`, `accentVisited`, `accentLight`, `accentLightest`, `accentTransparent`, `accentTransparentStrong`, and `accentContrast` form one complete, replaceable accent family.
 - `conditional`, `success`, and `warning` are semantic states, not alternate brand colours.
 - `componentRadiusSmall`, `componentRadius`, and `componentRadiusLarge` bound rectangular corners at `.2rem`, `.35rem`, and `.5rem`.
-- `diagramNodeRadius` governs Mermaid boxes; `diagramEmphasisLineWidth` distinguishes an explicitly stronger authoritative relationship from ordinary technical lines; `diagramLabelMaskWidth` keeps cluster titles legible when routed lines pass behind them.
+- `diagramNodeRadius` governs Mermaid boxes; `diagramEmphasisLineWidth` distinguishes an explicitly stronger authoritative relationship from ordinary technical lines; `diagramLabelMaskWidth` is a downstream legibility fallback and never makes a line routed through text acceptable.
 - `componentBorderWidth`, `technicalFrameBorderWidth`, `sourceRowRailWidth`, and `accentRailWidth` govern every visible line. The Graphify pane rail is `1.75px`; the iframe inside it is borderless.
 - `layoutWidthControlContentRailOffset` right-aligns the Standard/Wide control with the central body/content rail.
 - `headerTitleContentRailOffset` aligns the visible desktop title with that body/content rail without embedding a raw geometry value in the selector.
@@ -140,16 +143,21 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 ## Content And Navigation
 
 - Use one governing question and answer-first routes when the topic is a decision, comparison, compliance, purchase, build, migration, or operational interpretation.
-- Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. Keep ordinary quotations neutral.
+- Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. When the Wiki declares one canonical question, use that governed component for every verbatim repetition in its bounded reader set. Keep paraphrases and unrelated quotations neutral.
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
+- Render every displayed `SRC-NNN` as an independently focusable internal link to its exact source-register row while preserving the visible `[SRC-NNN]` grammar. Lists keep separate link targets and compact ranges link their displayed endpoints. Do not suppress the native focus indication or make brackets the only accessible label.
+- When primary navigation exposes a page's `draft` status, use the registered Pen Circle edit marker with the native “Draft — research in progress” tooltip. In the Zensical reference adapter its trailing centre aligns with the stock nested-navigation chevron column; stable or deprecated states retain their own semantics and artwork.
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.
 - Avoid marketing heroes, nested cards, decorative panels, and prose that overstates evidence.
 - Tables, Mermaid diagrams, and Graphify frames use named border and radius tokens only.
-- Canonical Mermaid diagrams use semantic classes rather than raw colours: `kb-source`, `kb-evidence`, `kb-snapshot`, `kb-normative`, `kb-canonical`, `kb-product`, `kb-derived`, `kb-consumer`, and `kb-verification`. Normative/canonical nodes take the solid accent and contrast text; derived nodes take a quiet dashed boundary; short cluster titles expose phase or authority boundaries.
-- Canonical diagrams preserve accessible titles/descriptions, the complete material topology, and readable path order while fitting the content rail at desktop, tablet, and mobile widths. Contained scrolling is a downstream fallback, not a simplification target.
+- Canonical Mermaid diagrams begin with Mermaid's ordinary node treatment. Do not add diagram-level `init`, `class`, `classDef`, `style`, or `linkStyle` directives merely to restyle ordinary entry or architecture nodes; labels, order, accessible descriptions, and adjacent prose carry their authority semantics. The existing `kb-source`, `kb-evidence`, `kb-snapshot`, `kb-normative`, `kb-canonical`, `kb-product`, `kb-derived`, `kb-consumer`, and `kb-verification` grammar remains an optional compatibility mechanism when a material distinction genuinely requires visual reinforcement. It is not the default and may never be the only carrier of meaning.
+- Canonical entry and architecture diagrams use one top-to-bottom reading direction, Mermaid's native `basis` connectors, consistent rectangular node geometry, ordinary arrows, and no edge labels. Other reference diagrams use no more than five nodes and five visible relationships. The single bounded three-product fan-out may use up to seven nodes and eight visible relationships and counts as one coordinated branch group. Reference diagrams inherit the renderer's node, rank, and padding defaults. Only bounded overrides proven necessary to fit the content rail or preserve legibility may depart from those defaults, and the reason must be recorded. The reference Human, Agent, and Graph fan-out uses exactly `flowchart.nodeSpacing: 40` because the renderer's 50px default exceeds the governed mobile ceiling under Linux Chromium text metrics; no other diagram-level initialization is permitted on those canonical diagrams. Put finer distinctions in nearby prose or a separate diagram.
+- When Human, Agent, and Graph surfaces are all shown, use three separately labelled sibling boxes, each reached directly from canonical knowledge. Where verification follows, each path rejoins it. Their visual separation does not make them separate canonical corpora or evidence authorities.
+- No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
+- Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
 - The production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent.
-- Mermaid `11.16.0`, vis-network `10.1.0`, and 3d-force-graph `1.80.0` are local
+- Mermaid `11.16.1`, vis-network `10.1.0`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects
   the governed radius, text, and line tokens into Zensical's closed diagram

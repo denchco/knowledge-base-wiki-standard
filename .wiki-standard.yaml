@@ -12,13 +12,20 @@ roles:
   validation_queue: "docs/validation-queue.md"
   research_log: "docs/log.md"
   human_wiki: "docs/index.md"
+  governing_question: "docs/index.md"
   llm_wiki: "docs/llm-wiki/index.md"
   design_contract: "DESIGN.md"
   okf_bundle: "knowledge"
 capabilities:
   evidence_governance: true
   human_wiki: true
+  human_wiki_url: "http://127.0.0.1:8017/"
+  governing_question:
+    reader_sources:
+      - "docs/index.md"
+      - "docs/architecture.md"
   llm_wiki: true
+  development_response_links: "live-wiki"
   human_renderer: "zensical"
   llm_artifacts: true
   graphify: true
@@ -28,6 +35,7 @@ capabilities:
   local_service: "macos-launchd"
   deployment: false
   jujutsu: true
+  standard_change_intake: true
   public_repository: "https://github.com/denchco/knowledge-base-wiki-standard"
   public_documentation: "https://denchco.github.io/knowledge-base-wiki-documentation/"
   documentation_sync: "snapshot-v1"

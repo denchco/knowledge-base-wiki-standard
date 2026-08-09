@@ -1,0 +1,7 @@
+name: Broken proposal form
+description: The marker is deliberately absent.
+labels: [enhancement, standard-change]
+body:
+  - type: textarea
+    id: problem
+    attributes: { label: Problem }

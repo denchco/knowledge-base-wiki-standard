@@ -23,13 +23,16 @@ const REPORT_SCHEMA_PATH = path.join(ROOT, "schema/conformance-report-v1.json");
 const RECEIPT_SCHEMA_ID = "https://denchco.github.io/knowledge-base-wiki-documentation/schema/verification-receipt-v1.json";
 const CAPABILITY_REQUIREMENTS = Object.freeze({
   evidence_governance: ["DKBWS-EVID-001", "DKBWS-EVID-002"],
-  human_wiki: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002"],
+  human_wiki: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"],
   llm_wiki: ["DKBWS-LLM-001"],
-  human_renderer: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-RENDER-001"],
+  development_response_links: ["DKBWS-PROMPT-002"],
+  human_renderer: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RENDER-001"],
   graphify: ["DKBWS-GRAPH-001"],
   local_browser_runtimes: ["DKBWS-RENDER-001"],
   browser_verification: ["DKBWS-VERIFY-001", "DKBWS-VERIFY-002"],
+  local_service: ["DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002"],
   jujutsu: ["DKBWS-PROV-001"],
+  standard_change_intake: ["DKBWS-UPDATE-002"],
 });
 
 const HELP = `DenchCo full-profile conformance report builder
@@ -230,18 +233,19 @@ function provenanceResult(receipt, contributions) {
     };
   }
   const provenance = receipt.provenance;
-  const passes = provenance?.requirement === "DKBWS-PROV-001"
+  const workspacePasses = provenance?.requirement === "DKBWS-PROV-001"
     && provenance.mode === "maintainer"
     && provenance.status === "pass"
     && provenance.readOnly === true
     && provenance.git?.status === "pass"
     && provenance.jujutsu?.status === "pass";
-  if (passes) {
+  const turnPolicyPasses = contributions.some((item) => item.status === "pass");
+  if (workspacePasses && turnPolicyPasses) {
     return {
       requirement: "DKBWS-PROV-001",
       status: "pass",
-      reason: "The read-only maintainer receipt proves colocated, reference-qualified Git/Jujutsu provenance.",
-      evidence: ["provenance-receipt"],
+      reason: "The read-only maintainer receipt proves colocated, reference-qualified Git/Jujutsu provenance, and the successful instruction/helper gate proves the end-of-development-turn commit mechanism.",
+      evidence: ["provenance-receipt", ...combineEvidence(contributions)],
     };
   }
   return {
@@ -249,8 +253,10 @@ function provenanceResult(receipt, contributions) {
     status: "not-checked",
     reason: provenance?.mode === "distribution"
       ? "Distribution mode proves only the Git-distributed surface; maintainer Jujutsu provenance remains not checked."
-      : "No successful maintainer-mode Git/Jujutsu provenance receipt was supplied.",
-    evidence: provenance ? ["provenance-receipt"] : [],
+      : workspacePasses
+        ? "The maintainer workspace passed, but no successful end-of-development-turn instruction/helper gate was supplied."
+        : "No successful maintainer-mode Git/Jujutsu provenance receipt was supplied.",
+    evidence: [...(provenance ? ["provenance-receipt"] : []), ...combineEvidence(contributions)],
   };
 }
 

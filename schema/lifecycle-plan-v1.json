@@ -29,6 +29,7 @@
     "layout": { "type": "array" },
     "stages": { "type": "array" },
     "unresolvedInputs": { "type": "array", "items": { "type": "string" } },
+    "automaticResolutions": { "type": "array", "items": { "type": "string" } },
     "clarificationProtocol": { "type": "object" },
     "safety": { "type": "object" },
     "summary": { "type": "object" }
@@ -44,7 +45,7 @@
     },
     {
       "if": { "properties": { "kind": { "const": "init-plan" } } },
-      "then": { "required": ["dryRun", "applySupported", "targetState", "input", "proposedManifest", "layout", "stages", "unresolvedInputs", "clarificationProtocol", "safety"] }
+      "then": { "required": ["dryRun", "applySupported", "targetState", "input", "proposedManifest", "layout", "stages", "unresolvedInputs", "automaticResolutions", "clarificationProtocol", "safety"] }
     }
   ],
   "additionalProperties": false,

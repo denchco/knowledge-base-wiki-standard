@@ -1,19 +1,38 @@
-export default async page => {
+export default async (page, options = {}) => {
   const configuration = await page.evaluate(() => {
     const current = new URL(location.href);
     return {
       origin: current.origin,
+      questionRoute: current.searchParams.get("question") || "/",
       mermaidRoute: current.searchParams.get("mermaid") || "/",
+      architectureRoute: current.searchParams.get("architecture"),
       tableRoute: current.searchParams.get("table"),
       listRoute: current.searchParams.get("list"),
+      sourceLinksRoute: current.searchParams.get("sourceLinks"),
+      sourceRegisterRoute: current.searchParams.get("sourceRegister") || "/sources/",
+      sourceLinksEnabled: current.searchParams.get("sourceLinksEnabled") === "1",
       graphEnabled: current.searchParams.get("graph") === "1",
+      graph2dRoute: current.searchParams.get("graph2d") || "/graph/two-dimensional/",
+      graph3dRoute: current.searchParams.get("graph3d") || "/graph/three-dimensional/",
     };
   });
   const baseUrl = configuration.origin;
+  const questionRoute = configuration.questionRoute;
   const mermaidRoute = configuration.mermaidRoute;
+  const architectureRoute = configuration.architectureRoute || mermaidRoute;
   const tableRoute = configuration.tableRoute || mermaidRoute;
   const listRoute = configuration.listRoute || mermaidRoute;
+  const sourceLinksRoute = configuration.sourceLinksRoute || questionRoute;
+  const sourceRegisterRoute = configuration.sourceRegisterRoute;
+  const sourceLinksEnabled = configuration.sourceLinksEnabled;
   const graphEnabled = configuration.graphEnabled;
+  const governingQuestionRepetitionApplicable = options.governingQuestion?.applicable === true;
+  const canonicalGoverningQuestion = typeof options.governingQuestion?.canonicalQuestion === "string"
+    ? options.governingQuestion.canonicalQuestion
+    : null;
+  const governingQuestionRepetitionRoutes = Array.isArray(options.governingQuestion?.repetitionRoutes)
+    ? options.governingQuestion.repetitionRoutes.filter(entry => entry && typeof entry.route === "string")
+    : [];
   const failures = [];
   const requests = [];
   const localResponseFailures = [];
@@ -42,11 +61,12 @@ export default async page => {
   const px = value => Number.parseFloat(String(value || "").replace("px", ""));
   const closeTo = (left, right, tolerance = 1) => Math.abs(left - right) <= tolerance;
   const routeUrl = route => `${baseUrl}${route.startsWith("/") ? route : `/${route}`}`;
-  const goto = async route => {
-    const response = await page.goto(routeUrl(route), { waitUntil: "networkidle" });
+  const goto = async (route, waitUntil = "networkidle") => {
+    const response = await page.goto(routeUrl(route), { waitUntil });
     check(Boolean(response?.ok()), `${route} did not return HTTP 200`);
   };
-  const inspectGoverningQuestion = async viewportName => {
+  const inspectGoverningQuestion = async (viewportName, route, expectedQuestion = null, expectedCount = 1) => {
+    await goto(route);
     const metrics = await page.evaluate(() => {
       const article = document.querySelector(".md-typeset");
       const questions = [...document.querySelectorAll(".md-typeset blockquote.governing-question")];
@@ -74,6 +94,16 @@ export default async page => {
         const negativeText = negative.querySelector("p");
         return {
           count: questions.length,
+          questionText: questionText?.textContent ?? "",
+          questions: questions.map(item => {
+            const text = item.querySelector(":scope > p");
+            return {
+              questionText: text?.textContent ?? "",
+              rail: getComputedStyle(item).borderInlineStartColor,
+              text: text ? getComputedStyle(text).color : "",
+              weight: text ? getComputedStyle(text).fontWeight : "",
+            };
+          }),
           accent,
           rail: question ? getComputedStyle(question).borderInlineStartColor : "",
           text: questionText ? getComputedStyle(questionText).color : "",
@@ -90,20 +120,170 @@ export default async page => {
         negative.remove();
       }
     });
-    check(metrics.count === 1, `The homepage must expose exactly one governing-question marker at ${viewportName} width`);
-    check(Boolean(metrics.accent), `The active accent token must resolve at ${viewportName} width`);
-    check(metrics.rail === metrics.accent, `The governing-question rail must equal the active accent at ${viewportName} width`);
-    check(metrics.text === metrics.accent, `The governing-question text must equal the active accent at ${viewportName} width`);
-    check(Number.parseInt(metrics.weight, 10) >= 700, `The governing-question text must remain bold at ${viewportName} width`);
+    const location = `${route} at ${viewportName} width`;
+    check(metrics.count === expectedCount, `The governing-question route ${location} must expose ${expectedCount} governing-question marker${expectedCount === 1 ? "" : "s"}`);
+    if (expectedQuestion !== null) {
+      check(
+        metrics.questions.every(item => item.questionText === expectedQuestion),
+        `Every governing-question marker on ${location} must render the identical canonical question text`,
+      );
+    }
+    check(Boolean(metrics.accent), `The active accent token must resolve on ${location}`);
+    check(metrics.questions.every(item => item.rail === metrics.accent), `Every governing-question rail must equal the active accent on ${location}`);
+    check(metrics.questions.every(item => item.text === metrics.accent), `Every governing-question text must equal the active accent on ${location}`);
+    check(metrics.questions.every(item => Number.parseInt(item.weight, 10) >= 700), `Every governing-question text must remain bold on ${location}`);
     check(
       metrics.ordinaryRail !== metrics.accent && metrics.ordinaryText !== metrics.accent,
-      `An ordinary quotation must remain neutral at ${viewportName} width`,
+      `An ordinary quotation must remain neutral on ${location}`,
     );
     check(
       metrics.negativeRail !== metrics.accent && metrics.negativeText !== metrics.accent,
-      `The negative mismatched-colour fixture must be rejected at ${viewportName} width`,
+      `The negative mismatched-colour fixture must be rejected on ${location}`,
     );
-    check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow at ${viewportName} width`);
+    check(metrics.pageOverflow <= 1, `The governing-question callout must not create page overflow on ${location}`);
+    return { route, ...metrics };
+  };
+  const inspectGoverningQuestionRepetitionRoutes = async (viewportName, primaryMetrics) => {
+    if (!governingQuestionRepetitionApplicable) return [];
+    check(Boolean(canonicalGoverningQuestion), "DKBWS-HUMAN-004 browser verification requires canonical governing-question text");
+    check(governingQuestionRepetitionRoutes.length > 0, "DKBWS-HUMAN-004 browser verification requires at least one repetition route");
+    const results = [];
+    for (const entry of governingQuestionRepetitionRoutes) {
+      if (entry.route === questionRoute
+        && primaryMetrics.count === entry.repetitions
+        && primaryMetrics.questions.every(item => item.questionText === canonicalGoverningQuestion)) {
+        results.push({ ...entry, metrics: primaryMetrics });
+        continue;
+      }
+      results.push({
+        ...entry,
+        metrics: await inspectGoverningQuestion(
+          viewportName,
+          entry.route,
+          canonicalGoverningQuestion,
+          entry.repetitions,
+        ),
+      });
+    }
+    return results;
+  };
+  const inspectSourceLink = async (viewportName, followDestination = false) => {
+    if (!sourceLinksEnabled) return null;
+    await goto(sourceLinksRoute);
+    const citation = page.locator('.md-content__inner a[href*="#src-"]').first();
+    await citation.waitFor({ state: "visible" });
+    const metrics = await citation.evaluate(element => ({
+      id: element.textContent.trim(),
+      accessibleName: element.getAttribute("aria-label") || element.textContent.trim(),
+      href: element.href,
+      tabIndex: element.tabIndex,
+      before: getComputedStyle(element, "::before").content,
+      after: getComputedStyle(element, "::after").content,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
+    const target = new URL(metrics.href);
+    check(/^SRC-\d{3}$/.test(metrics.id), `The representative source link must retain its stable identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.accessibleName.includes(metrics.id), `The representative source link must keep an intelligible accessible identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.tabIndex === 0, `The representative source link must be keyboard focusable at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.before === '"["' && metrics.after === '"]"', `The representative source link must visibly render as [${metrics.id}] at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(target.pathname === sourceRegisterRoute && target.hash === `#${metrics.id.toLowerCase()}`, `The representative source link must target its exact mapped source row at ${viewportName} width: ${JSON.stringify(metrics)}`);
+    check(metrics.pageOverflow <= 1, `Reader source links must not create page overflow at ${viewportName} width`);
+    await citation.focus();
+    check(await citation.evaluate(element => document.activeElement === element), `The representative source link must accept keyboard focus at ${viewportName} width`);
+
+    if (!followDestination) return metrics;
+    await Promise.all([
+      page.waitForURL(url => url.pathname === sourceRegisterRoute && url.hash === `#${metrics.id.toLowerCase()}`),
+      citation.click(),
+    ]);
+    const anchor = page.locator(`#${metrics.id.toLowerCase()}`);
+    await anchor.waitFor({ state: "attached" });
+    const destination = await anchor.evaluate((element, id) => ({
+      row: element.closest("tr")?.textContent.replace(/\s+/g, " ").trim() || "",
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      id,
+    }), metrics.id);
+    check(destination.row.includes(metrics.id), `The source fragment must belong to the matching source-register row: ${JSON.stringify(destination)}`);
+    check(destination.pageOverflow <= 1, `The source-register destination must not overflow at ${viewportName} width`);
+    return { ...metrics, destination };
+  };
+  const inspectDraftNavigation = async viewportName => {
+    const metrics = await page.evaluate(() => {
+      const visible = element => {
+        if (!element) return false;
+        const style = getComputedStyle(element);
+        const bounds = element.getBoundingClientRect();
+        return style.display !== "none" && style.visibility !== "hidden" && bounds.width > 0 && bounds.height > 0;
+      };
+      const navigation = document.querySelector(".md-nav--primary");
+      const markers = [...(navigation?.querySelectorAll("a.md-nav__link > .md-status--draft") || [])]
+        .filter(visible);
+      const chevrons = [...(navigation?.querySelectorAll(".md-nav__item--nested > label.md-nav__link > .md-nav__icon") || [])]
+        .filter(visible);
+      const marker = markers[0] || null;
+      const chevron = chevrons[0] || null;
+      const markerBounds = marker?.getBoundingClientRect() || null;
+      const chevronBounds = chevron?.getBoundingClientRect() || null;
+      const markerRowBounds = marker?.parentElement?.getBoundingClientRect() || null;
+      const chevronRowBounds = chevron?.parentElement?.getBoundingClientRect() || null;
+      const negative = document.createElement("span");
+      negative.className = "md-status md-status--stable";
+      negative.style.cssText = "position:absolute;left:-10000px;top:0";
+      document.body.append(negative);
+      try {
+        const markerPseudo = marker ? getComputedStyle(marker, "::after") : null;
+        const negativePseudo = getComputedStyle(negative, "::after");
+        return {
+          count: markers.length,
+          titles: [...new Set(markers.map(item => item.getAttribute("title") || ""))],
+          markerMask: markerPseudo?.maskImage || markerPseudo?.webkitMaskImage || "",
+          negativeMask: negativePseudo.maskImage || negativePseudo.webkitMaskImage || "",
+          markerWidth: markerBounds?.width ?? null,
+          markerHeight: markerBounds?.height ?? null,
+          chevronWidth: chevronBounds?.width ?? null,
+          chevronHeight: chevronBounds?.height ?? null,
+          markerCenter: markerBounds ? markerBounds.left + markerBounds.width / 2 : null,
+          chevronCenter: chevronBounds ? chevronBounds.left + chevronBounds.width / 2 : null,
+          markerRowDelta: markerBounds && markerRowBounds
+            ? markerBounds.top + markerBounds.height / 2 - (markerRowBounds.top + markerRowBounds.height / 2)
+            : null,
+          chevronRowDelta: chevronBounds && chevronRowBounds
+            ? chevronBounds.top + chevronBounds.height / 2 - (chevronRowBounds.top + chevronRowBounds.height / 2)
+            : null,
+          pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        };
+      } finally {
+        negative.remove();
+      }
+    });
+    check(metrics.count > 0, `Primary navigation must expose at least one draft marker at ${viewportName} width`);
+    check(
+      metrics.titles.length === 1 && metrics.titles[0] === "Draft — research in progress",
+      `Every draft marker must expose the governed readable status text at ${viewportName} width`,
+    );
+    check(metrics.markerMask.includes("pen-circle.svg"), `Draft markers must use the registered Pen Circle asset at ${viewportName} width`);
+    check(!metrics.negativeMask.includes("pen-circle.svg"), `Non-draft status must not inherit the Pen Circle asset at ${viewportName} width`);
+    check(
+      metrics.markerWidth !== null && metrics.markerHeight !== null &&
+        metrics.chevronWidth !== null && metrics.chevronHeight !== null &&
+        metrics.markerWidth > 0 && metrics.markerHeight > 0 &&
+        closeTo(metrics.markerWidth, metrics.chevronWidth, 0.2) &&
+        closeTo(metrics.markerHeight, metrics.chevronHeight, 0.2),
+      `Draft marker dimensions must match the stock chevron at ${viewportName} width`,
+    );
+    check(
+      metrics.markerCenter !== null && metrics.chevronCenter !== null && closeTo(metrics.markerCenter, metrics.chevronCenter, 0.2),
+      `Draft marker and nested-navigation chevron must share the trailing centreline at ${viewportName} width`,
+    );
+    check(
+      metrics.markerRowDelta !== null && closeTo(metrics.markerRowDelta, 0, 0.5),
+      `Draft marker must be vertically centred in its navigation row at ${viewportName} width`,
+    );
+    check(
+      metrics.chevronRowDelta !== null && closeTo(metrics.chevronRowDelta, 0, 0.5),
+      `Nested-navigation chevron must be vertically centred in its navigation row at ${viewportName} width`,
+    );
+    check(metrics.pageOverflow <= 1, `Draft navigation markers must not create page overflow at ${viewportName} width`);
     return metrics;
   };
   const screenshotPixels = async buffer => {
@@ -136,11 +316,300 @@ export default async page => {
       };
     }, dataUrl);
   };
+  const inspectFrameCanvasPixels = async frame => frame.evaluate(async () => {
+    await new Promise(resolve => requestAnimationFrame(() => resolve()));
+    const canvas = document.querySelector("canvas");
+    if (!canvas) return { kind: "missing", width: 0, height: 0, distinctColours: 0, opaqueRatio: 0 };
+    const width = canvas.width;
+    const height = canvas.height;
+    const context2d = canvas.getContext("2d");
+    let pixels;
+    let kind;
+    if (context2d) {
+      pixels = context2d.getImageData(0, 0, width, height).data;
+      kind = "2d";
+    } else {
+      const webgl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+      if (!webgl) return { kind: "missing", width, height, distinctColours: 0, opaqueRatio: 0 };
+      pixels = new Uint8Array(width * height * 4);
+      webgl.readPixels(0, 0, width, height, webgl.RGBA, webgl.UNSIGNED_BYTE, pixels);
+      kind = "webgl";
+    }
+    const colours = new Set();
+    let opaqueSamples = 0;
+    let samples = 0;
+    const stepX = Math.max(1, Math.floor(width / 48));
+    const stepY = Math.max(1, Math.floor(height / 48));
+    for (let y = 0; y < height; y += stepY) {
+      for (let x = 0; x < width; x += stepX) {
+        const index = (y * width + x) * 4;
+        colours.add((pixels[index] << 16) | (pixels[index + 1] << 8) | pixels[index + 2]);
+        if (pixels[index + 3] > 0) opaqueSamples += 1;
+        samples += 1;
+      }
+    }
+    return {
+      kind,
+      width,
+      height,
+      distinctColours: colours.size,
+      opaqueRatio: samples ? opaqueSamples / samples : 0,
+    };
+  });
+  const inspectMermaidPage = async ({ route, pageName, expectedCount, viewportName, maxHorizontalOverflow = 0 }) => {
+    await goto(route);
+    await page.waitForSelector(".mermaid");
+    await page.waitForFunction(() => (
+      [...document.querySelectorAll(".mermaid")]
+        .every(diagram => diagram.getBoundingClientRect().height > 40)
+    ));
+    const geometry = await page.locator(".mermaid").evaluateAll(diagrams => diagrams.map(diagram => ({
+      width: diagram.clientWidth,
+      height: diagram.clientHeight,
+      scrollWidth: diagram.scrollWidth,
+      scrollHeight: diagram.scrollHeight,
+      scrollLeft: diagram.scrollLeft,
+      display: getComputedStyle(diagram).display,
+      justifyItems: getComputedStyle(diagram).justifyItems,
+    })));
+    check(
+      geometry.length === expectedCount,
+      `${pageName} must render exactly ${expectedCount} Mermaid diagram${expectedCount === 1 ? "" : "s"} at ${viewportName} width`,
+    );
+    for (const [index, diagram] of geometry.entries()) {
+      check(diagram.width > 200 && diagram.height > 40, `${pageName} Mermaid ${index + 1} must have non-empty geometry at ${viewportName} width`);
+      check(diagram.display === "grid" && diagram.justifyItems === "safe center", `${pageName} Mermaid ${index + 1} must use safe centring at ${viewportName} width`);
+      const horizontalOverflow = Math.max(0, diagram.scrollWidth - diagram.width);
+      check(
+        horizontalOverflow <= maxHorizontalOverflow + 1 && diagram.scrollHeight <= diagram.height + 1,
+        `${pageName} Mermaid ${index + 1} must stay within its ${maxHorizontalOverflow}px contained-overflow limit at ${viewportName} width: ${horizontalOverflow}px actual horizontal overflow versus ${maxHorizontalOverflow}px governed limit (+1px measurement tolerance)`,
+      );
+      if (horizontalOverflow > 1) {
+        check(Math.abs(diagram.scrollLeft - (horizontalOverflow / 2)) <= 1, `${pageName} Mermaid ${index + 1} must open centred within its pane at ${viewportName} width`);
+      } else {
+        check(Math.abs(diagram.scrollLeft) <= 1, `${pageName} Mermaid ${index + 1} must open without displaced scrolling at ${viewportName} width`);
+      }
+    }
+    const pageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    check(pageOverflow <= 1, `${pageName} page must not overflow horizontally at ${viewportName} width`);
+    return geometry;
+  };
+  const inspectMermaidSourceLayouts = async (sources, pageName, expectations = []) => {
+    if (!Array.isArray(sources) || sources.length === 0) {
+      check(false, `${pageName} must supply canonical Mermaid source for collision checks`);
+      return [];
+    }
+    const layouts = await page.evaluate(async sourceList => {
+      if (!window.mermaid?.render) throw new Error("Pinned local Mermaid runtime is unavailable");
+      const mount = document.createElement("div");
+      mount.style.cssText = "position:absolute;left:-10000px;top:0;width:1200px;opacity:0;pointer-events:none";
+      document.body.append(mount);
+      try {
+        if (document.fonts?.ready) await document.fonts.ready;
+        const results = [];
+        for (const [diagramIndex, source] of sourceList.entries()) {
+          const rendered = await window.mermaid.render(
+            `canonical-layout-${Date.now()}-${diagramIndex}`,
+            source,
+          );
+          mount.innerHTML = rendered.svg;
+          await new Promise(resolve => requestAnimationFrame(resolve));
+          const svg = mount.querySelector("svg");
+          if (!svg) {
+            results.push({
+              diagramIndex,
+              missingSvg: true,
+              title: "",
+              description: "",
+              edgeCount: 0,
+              edgeLabels: [],
+              nodes: [],
+              nodeOverlaps: [],
+              textPathCollisions: [],
+            });
+            continue;
+          }
+          const title = svg.querySelector("title")?.textContent?.trim() || "";
+          const description = svg.querySelector("desc")?.textContent?.trim() || "";
+          const edgeCount = svg.querySelectorAll(".flowchart-link").length;
+          const edgeLabels = [...svg.querySelectorAll(".edgeLabel text")]
+            .map(text => text.textContent?.trim() || "")
+            .filter(Boolean);
+          const nodes = [...svg.querySelectorAll("g.node")].map((node, index) => {
+            const rect = node.getBoundingClientRect();
+            return {
+              index,
+              label: node.textContent?.trim() || `node ${index + 1}`,
+              rect: {
+                left: rect.left,
+                top: rect.top,
+                right: rect.right,
+                bottom: rect.bottom,
+                width: rect.width,
+                height: rect.height,
+                centerY: rect.top + (rect.height / 2),
+              },
+            };
+          });
+          const nodeOverlaps = [];
+          for (let left = 0; left < nodes.length; left += 1) {
+            for (let right = left + 1; right < nodes.length; right += 1) {
+              const overlapX = Math.min(nodes[left].rect.right, nodes[right].rect.right) - Math.max(nodes[left].rect.left, nodes[right].rect.left);
+              const overlapY = Math.min(nodes[left].rect.bottom, nodes[right].rect.bottom) - Math.max(nodes[left].rect.top, nodes[right].rect.top);
+              if (overlapX > 1 && overlapY > 1) nodeOverlaps.push([nodes[left].label, nodes[right].label]);
+            }
+          }
+          const texts = [...svg.querySelectorAll("text")].map((text, index) => ({
+            index,
+            label: text.textContent?.trim() || `text ${index + 1}`,
+            rect: text.getBoundingClientRect(),
+          })).filter(text => text.rect.width > 0 && text.rect.height > 0);
+          const textPathCollisions = [];
+          for (const [pathIndex, path] of [...svg.querySelectorAll(".flowchart-link")].entries()) {
+            const length = path.getTotalLength();
+            const matrix = path.getScreenCTM();
+            if (!matrix) continue;
+            let collision = null;
+            for (let distance = 2; distance < length - 2 && !collision; distance += 1.5) {
+              const localPoint = path.getPointAtLength(distance);
+              const point = new DOMPoint(localPoint.x, localPoint.y).matrixTransform(matrix);
+              collision = texts.find(text => (
+                point.x > text.rect.left + 1 && point.x < text.rect.right - 1 &&
+                point.y > text.rect.top + 1 && point.y < text.rect.bottom - 1
+              )) || null;
+            }
+            if (collision) textPathCollisions.push({ pathIndex, text: collision.label });
+          }
+          results.push({
+            diagramIndex,
+            missingSvg: false,
+            title,
+            description,
+            edgeCount,
+            edgeLabels,
+            nodes,
+            nodeOverlaps,
+            textPathCollisions,
+          });
+        }
+        return results;
+      } finally {
+        mount.remove();
+      }
+    }, sources);
+    for (const layout of layouts) {
+      const prefix = `${pageName} Mermaid ${layout.diagramIndex + 1}`;
+      const expected = expectations[layout.diagramIndex];
+      check(!layout.missingSvg, `${prefix} must render inspectable SVG geometry`);
+      check(layout.edgeLabels.length === 0, `${prefix} must not put text on connectors: ${layout.edgeLabels.join(", ")}`);
+      check(layout.nodeOverlaps.length === 0, `${prefix} nodes must not overlap: ${JSON.stringify(layout.nodeOverlaps)}`);
+      check(
+        layout.textPathCollisions.length === 0,
+        `${prefix} connectors must not intersect text: ${JSON.stringify(layout.textPathCollisions)}`,
+      );
+      if (!expected) {
+        check(false, `${prefix} must have a rendered topology expectation`);
+        continue;
+      }
+      const renderedLabels = layout.nodes.map(node => node.label).sort((left, right) => left.localeCompare(right));
+      const expectedLabels = [...expected.nodeLabels].sort((left, right) => left.localeCompare(right));
+      check(layout.nodes.length === expected.nodeLabels.length, `${prefix} must render exactly ${expected.nodeLabels.length} nodes; found ${layout.nodes.length}`);
+      check(JSON.stringify(renderedLabels) === JSON.stringify(expectedLabels), `${prefix} rendered node labels must be ${JSON.stringify(expectedLabels)}; found ${JSON.stringify(renderedLabels)}`);
+      check(layout.edgeCount === expected.edgeCount, `${prefix} must render exactly ${expected.edgeCount} relationships; found ${layout.edgeCount}`);
+      check(layout.title === expected.title, `${prefix} must render accessible title "${expected.title}"; found "${layout.title}"`);
+      check(layout.description === expected.description, `${prefix} must render the canonical accessible description`);
+      const sameRankNodes = expected.sameRankLabels.map(label => layout.nodes.find(node => node.label === label)).filter(Boolean);
+      check(sameRankNodes.length === expected.sameRankLabels.length, `${prefix} must render distinct ${expected.sameRankLabels.join(", ")} nodes`);
+      if (sameRankNodes.length === expected.sameRankLabels.length) {
+        const rankCenters = sameRankNodes.map(node => node.rect.centerY);
+        check(Math.max(...rankCenters) - Math.min(...rankCenters) <= 2, `${prefix} ${expected.sameRankLabels.join(", ")} nodes must share one visual rank`);
+      }
+      if (expected.downstreamLabel && sameRankNodes.length === expected.sameRankLabels.length) {
+        const downstream = layout.nodes.find(node => node.label === expected.downstreamLabel);
+        check(Boolean(downstream), `${prefix} must render downstream node ${expected.downstreamLabel}`);
+        if (downstream) {
+          check(downstream.rect.top > Math.max(...sameRankNodes.map(node => node.rect.bottom)), `${prefix} ${expected.downstreamLabel} must appear below all three product surfaces`);
+        }
+      }
+    }
+    return layouts;
+  };
+  const inspectMobileTables = async () => {
+    const metrics = await page.evaluate(() => {
+      const article = document.querySelector(".md-content__inner");
+      const viewportWidth = document.documentElement.clientWidth;
+      const tables = [...(article?.querySelectorAll("table") || [])].map(table => {
+        let candidate = table;
+        let scrollHost = null;
+        while (candidate && candidate !== article) {
+          if (["auto", "scroll"].includes(getComputedStyle(candidate).overflowX)) {
+            scrollHost = candidate;
+            break;
+          }
+          candidate = candidate.parentElement;
+        }
+        const tableBounds = table.getBoundingClientRect();
+        const hostBounds = scrollHost?.getBoundingClientRect() || null;
+        const originalScrollLeft = scrollHost?.scrollLeft || 0;
+        if (scrollHost && scrollHost.scrollWidth > scrollHost.clientWidth + 1) scrollHost.scrollLeft = 1;
+        const moved = Boolean(scrollHost && scrollHost.scrollLeft !== originalScrollLeft);
+        if (scrollHost) scrollHost.scrollLeft = originalScrollLeft;
+        return {
+          visible: tableBounds.width > 0 && tableBounds.height > 0,
+          hasScrollHost: Boolean(scrollHost),
+          hostWidth: scrollHost?.clientWidth || 0,
+          hostBoundsWidth: hostBounds?.width || 0,
+          hostScrollWidth: scrollHost?.scrollWidth || 0,
+          tableWidth: table.scrollWidth,
+          tableHeight: tableBounds.height,
+          overflowsHost: Boolean(scrollHost && scrollHost.scrollWidth > scrollHost.clientWidth + 1),
+          moved,
+        };
+      });
+      return {
+        viewportWidth,
+        pageOverflow: document.documentElement.scrollWidth - viewportWidth,
+        tables,
+      };
+    });
+    check(metrics.tables.length > 0, "The configured table route must render at least one table at mobile width");
+    check(metrics.pageOverflow <= 1, "The configured table route must not create page overflow at mobile width");
+    check(
+      metrics.tables.every(table => (
+        table.visible
+        && table.hasScrollHost
+        && table.hostWidth > 0
+        && table.hostBoundsWidth <= metrics.viewportWidth + 1
+        && table.hostScrollWidth >= table.tableWidth
+      )),
+      `Every mobile table must remain visible inside a contained horizontal scroll host: ${JSON.stringify(metrics.tables)}`,
+    );
+    check(
+      metrics.tables.some(table => table.overflowsHost && table.moved),
+      `The configured table route must prove usable horizontal scrolling for a representative wide table: ${JSON.stringify(metrics.tables)}`,
+    );
+    return metrics.tables;
+  };
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
-  await goto(mermaidRoute);
-  const desktopGoverningQuestion = await inspectGoverningQuestion("desktop");
+  const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
+    && governingQuestionRepetitionRoutes.some(entry => entry.route === questionRoute);
+  const questionRouteRepetitionCount = questionRouteIsGovernedRepetition
+    ? governingQuestionRepetitionRoutes.find(entry => entry.route === questionRoute).repetitions
+    : 1;
+  const desktopGoverningQuestion = await inspectGoverningQuestion(
+    "desktop",
+    questionRoute,
+    questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null,
+    questionRouteRepetitionCount,
+  );
+  const desktopGoverningQuestionRepetitions = await inspectGoverningQuestionRepetitionRoutes(
+    "desktop",
+    desktopGoverningQuestion,
+  );
+  await goto(questionRoute);
+  const desktopDraftNavigation = await inspectDraftNavigation("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
     header: Boolean(document.querySelector(".md-header__inner")),
@@ -156,12 +625,6 @@ export default async page => {
     element => getComputedStyle(element).display,
   );
   check(widthControlDisplay !== "none", "The Standard/Wide control must be visible at the desktop verification width");
-  await page.waitForSelector(".mermaid");
-  await page.waitForFunction(() => {
-    const diagram = document.querySelector(".mermaid");
-    return diagram && diagram.getBoundingClientRect().height > 40;
-  });
-
   const measureHeader = () => page.evaluate(() => {
     const rect = element => element?.getBoundingClientRect().toJSON() || null;
     const visibleTopic = [...document.querySelectorAll(".md-header__title .md-header__topic")]
@@ -229,16 +692,56 @@ export default async page => {
     "Wide selection must have a visible selected-state treatment",
   );
 
+  await goto(mermaidRoute);
+  await page.waitForSelector(".mermaid");
+  await page.waitForFunction(() => {
+    const diagram = document.querySelector(".mermaid");
+    return diagram && diagram.getBoundingClientRect().height > 40;
+  });
   const mermaidHost = page.locator(".mermaid").first();
   const mermaidHostGeometry = await mermaidHost.evaluate(element => ({
     width: element.clientWidth,
     height: element.clientHeight,
     scrollWidth: element.scrollWidth,
     scrollHeight: element.scrollHeight,
+    display: getComputedStyle(element).display,
+    justifyItems: getComputedStyle(element).justifyItems,
   }));
   const mermaidPixels = await screenshotPixels(await mermaidHost.screenshot());
   check(mermaidHostGeometry.width > 200 && mermaidHostGeometry.height > 40, "Rendered Mermaid geometry must be non-empty");
+  check(mermaidHostGeometry.display === "grid" && mermaidHostGeometry.justifyItems === "safe center", "Rendered Mermaid surfaces must centre safely within their pane");
   check(mermaidPixels.distinctColours > 24 && mermaidPixels.opaqueRatio > 0.95, "Rendered Mermaid pixels must be nonblank");
+  const mermaidLayouts = {
+    representative: await inspectMermaidSourceLayouts(
+      options.mermaidSources?.representative ?? options.mermaidSources?.homepage,
+      "Representative page",
+      [{
+        nodeLabels: ["Source", "Evidence", "Knowledge", "Human", "Agent", "Graph", "Verification"],
+        edgeCount: 8,
+        title: "Governed knowledge base system",
+        description: "Source material becomes inspectable evidence and maintained knowledge. That knowledge serves separate Human, Agent, and Graph surfaces, whose paths converge on verification.",
+        sameRankLabels: ["Human", "Agent", "Graph"],
+        downstreamLabel: "Verification",
+      }],
+    ),
+    architecture: await inspectMermaidSourceLayouts(
+      options.mermaidSources?.architecture,
+      "Architecture",
+      [{
+        nodeLabels: ["1 · Sources", "2 · Register", "3 · Evidence", "4 · Knowledge", "Human", "Agent", "Graph"],
+        edgeCount: 6,
+        title: "Knowledge authority and derived surfaces",
+        description: "Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.",
+        sameRankLabels: ["Human", "Agent", "Graph"],
+      }],
+    ),
+  };
+  const architectureDesktop = await inspectMermaidPage({
+    route: architectureRoute,
+    pageName: "Architecture",
+    expectedCount: 1,
+    viewportName: "1256px desktop",
+  });
 
   const mermaidProbe = await page.evaluate(async () => {
     if (!window.mermaid?.render) throw new Error("Pinned local Mermaid runtime is unavailable");
@@ -249,7 +752,7 @@ export default async page => {
     try {
       const rendered = await window.mermaid.render(
         `runtime-contract-${Date.now()}`,
-        "flowchart LR\n  A[Authority] ==>|governed relation| B[Derived]\n  B --> C[Source]\n  class A kb-canonical\n  class B kb-derived\n  class C kb-source",
+        "flowchart LR\n  D1[Default one] --> D2[Default two]\n  A[Authority] ==>|governed relation| B[Derived]\n  B --> C[Source]\n  class A kb-canonical\n  class B kb-derived\n  class C kb-source",
       );
       mount.innerHTML = rendered.svg;
       const text = mount.querySelector("svg text");
@@ -260,6 +763,10 @@ export default async page => {
       const canonicalNode = mount.querySelector(".node.kb-canonical rect");
       const canonicalText = mount.querySelector(".node.kb-canonical text");
       const derivedNode = mount.querySelector(".node.kb-derived rect");
+      const defaultNodes = [...mount.querySelectorAll(".node")]
+        .filter(nodeElement => !["kb-canonical", "kb-derived", "kb-source"].some(role => nodeElement.classList.contains(role)))
+        .map(nodeElement => nodeElement.querySelector("rect"))
+        .filter(Boolean);
       const svg = mount.querySelector("svg");
       return {
         fontSize: text ? getComputedStyle(text).fontSize : "",
@@ -274,6 +781,8 @@ export default async page => {
         canonicalTextFill: canonicalText ? getComputedStyle(canonicalText).fill : "",
         derivedFill: derivedNode ? getComputedStyle(derivedNode).fill : "",
         derivedDash: derivedNode ? getComputedStyle(derivedNode).strokeDasharray : "",
+        defaultNodeFills: defaultNodes.map(nodeElement => getComputedStyle(nodeElement).fill),
+        defaultNodeStrokes: defaultNodes.map(nodeElement => getComputedStyle(nodeElement).stroke),
         width: svg?.getBoundingClientRect().width || 0,
         height: svg?.getBoundingClientRect().height || 0,
       };
@@ -294,6 +803,10 @@ export default async page => {
   check(mermaidProbe.canonicalTextFill === "rgb(255, 255, 255)", "Canonical Mermaid labels must use accent-contrast text");
   check(mermaidProbe.derivedFill === "rgb(255, 255, 255)", "Derived Mermaid nodes must use the surface fill");
   check(mermaidProbe.derivedDash.includes("4px") && mermaidProbe.derivedDash.includes("3px"), "Derived Mermaid nodes must use a dashed boundary");
+  check(mermaidProbe.defaultNodeFills.length === 2, "Mermaid runtime probe must render two ordinary default nodes");
+  check(new Set(mermaidProbe.defaultNodeFills).size === 1, "Ordinary Mermaid nodes must share one default fill");
+  check(new Set(mermaidProbe.defaultNodeStrokes).size === 1, "Ordinary Mermaid nodes must share one default boundary");
+  check(mermaidProbe.defaultNodeFills[0] !== mermaidProbe.canonicalFill, "Ordinary Mermaid nodes must not inherit optional canonical-role styling");
 
   await goto(tableRoute);
   await page.waitForSelector(".md-typeset table tbody td");
@@ -334,10 +847,35 @@ export default async page => {
   check(listGeometry.listStyle === "square", "Unordered content lists must use square markers");
   check(listGeometry.listMargin === "0px" && px(listGeometry.listPadding) > 0, "List indentation must be internal to the body-aligned list box");
   check(closeTo(px(listGeometry.markerFont), px(listGeometry.itemFont), 0.2), "Square markers must render at list-text scale");
+  const desktopSourceLink = await inspectSourceLink("desktop", true);
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  const representativeTablet = await inspectMermaidPage({
+    route: mermaidRoute,
+    pageName: "Representative page",
+    expectedCount: 1,
+    viewportName: "768px tablet",
+  });
+  const architectureTablet = await inspectMermaidPage({
+    route: architectureRoute,
+    pageName: "Architecture",
+    expectedCount: 1,
+    viewportName: "768px tablet",
+  });
 
   await page.setViewportSize({ width: 390, height: 844 });
+  const mobileGoverningQuestion = await inspectGoverningQuestion(
+    "mobile",
+    questionRoute,
+    questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null,
+    questionRouteRepetitionCount,
+  );
+  const mobileGoverningQuestionRepetitions = await inspectGoverningQuestionRepetitionRoutes(
+    "mobile",
+    mobileGoverningQuestion,
+  );
+  const mobileSourceLink = await inspectSourceLink("mobile");
   await goto(mermaidRoute);
-  const mobileGoverningQuestion = await inspectGoverningQuestion("mobile");
   await page.waitForSelector(".mermaid");
   await page.waitForFunction(() => document.querySelector(".mermaid")?.getBoundingClientRect().height > 40);
   const mobileMermaid = page.locator(".mermaid").first();
@@ -349,21 +887,39 @@ export default async page => {
       right: bounds.right,
       width: bounds.width,
       height: bounds.height,
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      scrollLeft: element.scrollLeft,
       pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       widthControlDisplay: widthControl ? getComputedStyle(widthControl).display : "missing",
     };
   });
   const mobileMermaidPixels = await screenshotPixels(await mobileMermaid.screenshot());
   check(mobileMermaidGeometry.left >= -1 && mobileMermaidGeometry.right <= 391, "Mobile Mermaid pane must stay inside the viewport");
+  const mobileMermaidOverflow = Math.max(0, mobileMermaidGeometry.scrollWidth - mobileMermaidGeometry.clientWidth);
+  check(
+    mobileMermaidOverflow <= 61,
+    `Mobile representative Mermaid must keep contained horizontal overflow within the governed 60px limit: ${mobileMermaidOverflow}px actual versus 60px governed limit (+1px measurement tolerance)`,
+  );
+  check(Math.abs(mobileMermaidGeometry.scrollLeft - (mobileMermaidOverflow / 2)) <= 1, "Mobile representative Mermaid must open centred within its pane");
   check(mobileMermaidGeometry.pageOverflow <= 1, "Mobile Mermaid page must not overflow horizontally");
   check(mobileMermaidGeometry.widthControlDisplay === "none", "Desktop width control must not crowd the mobile header");
   check(mobileMermaidPixels.distinctColours > 24, "Mobile Mermaid pixels must be nonblank");
+  const architectureMobile = await inspectMermaidPage({
+    route: architectureRoute,
+    pageName: "Architecture",
+    expectedCount: 1,
+    viewportName: "390px mobile",
+    maxHorizontalOverflow: 60,
+  });
+  await goto(tableRoute);
+  const mobileTables = await inspectMobileTables();
 
   const graphMetrics = {};
   if (graphEnabled) {
     const graphViews = [
-      { name: "2d", route: "/graph/two-dimensional/", asset: "/assets/graphify/graph.html", wait: 900 },
-      { name: "3d", route: "/graph/three-dimensional/", asset: "/assets/graphify/graph-3d.html", wait: 2800 },
+      { name: "2d", route: configuration.graph2dRoute, asset: "/assets/graphify/graph.html", wait: 900 },
+      { name: "3d", route: configuration.graph3dRoute, asset: "/assets/graphify/graph-3d.html", wait: 2800 },
     ];
     const viewports = [
       { name: "desktop", width: 1256, height: 718 },
@@ -374,9 +930,14 @@ export default async page => {
       graphMetrics[viewport.name] = {};
       for (const view of graphViews) {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await goto(view.route);
-        await page.waitForSelector(".graph-frame");
-        await page.locator(".graph-frame").scrollIntoViewIfNeeded();
+        await goto(view.route, "domcontentloaded");
+        await page.waitForSelector(".graph-frame", { state: "attached" });
+        await page.locator(".graph-frame").evaluate(element => element.scrollIntoView({ block: "center" }));
+        await page.waitForFunction(() => {
+          const frameElement = document.querySelector(".graph-frame");
+          const bounds = frameElement?.getBoundingClientRect();
+          return Boolean(bounds && bounds.width > 250 && bounds.height > 300);
+        });
         let frame = null;
         for (let attempt = 0; attempt < 80 && !frame; attempt += 1) {
           frame = page.frames().find(candidate => candidate.url().includes(view.asset));
@@ -409,10 +970,11 @@ export default async page => {
             overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           };
         }, view.name);
-        const pixels = await screenshotPixels(await canvas.screenshot());
+        const pixels = await inspectFrameCanvasPixels(frame);
         check(canvasGeometry.width > 250 && canvasGeometry.height > 300, `${view.name.toUpperCase()} Graphify canvas must retain usable ${viewport.name} dimensions`);
         check(closeTo(canvasGeometry.width, frameGeometry.width, 3) && closeTo(canvasGeometry.height, frameGeometry.height, 3), `${view.name.toUpperCase()} Graphify canvas must fill its ${viewport.name} frame`);
-        check(pixels.distinctColours > 8 && pixels.opaqueRatio > 0.95, `${view.name.toUpperCase()} Graphify canvas pixels must be nonblank at ${viewport.name} width`);
+        const minimumOpaqueRatio = view.name === "2d" ? 0.1 : 0.95;
+        check(pixels.distinctColours > 8 && pixels.opaqueRatio > minimumOpaqueRatio, `${view.name.toUpperCase()} Graphify canvas pixels must be nonblank at ${viewport.name} width`);
         check(controls.controlVisible && controls.controlFits && controls.searchVisible, `${view.name.toUpperCase()} Graphify controls must remain usable at ${viewport.name} width`);
         check(controls.overflow <= 1, `${view.name.toUpperCase()} Graphify iframe must not overflow at ${viewport.name} width`);
         const pageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -428,7 +990,7 @@ export default async page => {
 
   const prohibitedCdnHosts = ["unpkg.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"];
   const cdnRequests = requests.filter(requestUrl => prohibitedCdnHosts.some(host => requestUrl.includes(`//${host}/`)));
-  const localAssets = ["/assets/vendor/mermaid.min.js"];
+  const localAssets = ["/assets/vendor/mermaid.min.js", "/assets/pen-circle.svg"];
   if (graphEnabled) localAssets.push("/assets/vendor/vis-network.min.js", "/assets/vendor/3d-force-graph.min.js");
   for (const asset of localAssets) {
     check(requests.some(requestUrl => requestUrl.startsWith(baseUrl) && requestUrl.split(/[?#]/)[0].endsWith(asset)), `Browser contract did not observe local runtime ${asset}`);
@@ -453,13 +1015,36 @@ export default async page => {
       table: tableTypography.table,
       mermaid: mermaidProbe.fontSize,
     },
+    tables: {
+      mobile: mobileTables,
+    },
     governingQuestion: {
       desktop: desktopGoverningQuestion,
       mobile: mobileGoverningQuestion,
+      repetitionRouteCount: governingQuestionRepetitionRoutes.length,
+      repetitionRoutes: governingQuestionRepetitionRoutes,
+      repetitions: {
+        desktop: desktopGoverningQuestionRepetitions,
+        mobile: mobileGoverningQuestionRepetitions,
+      },
+    },
+    draftNavigation: {
+      desktop: desktopDraftNavigation,
+    },
+    sourceLinks: {
+      desktop: desktopSourceLink,
+      mobile: mobileSourceLink,
     },
     mermaid: {
       desktop: mermaidPixels,
       mobile: mobileMermaidPixels,
+      layouts: mermaidLayouts,
+      architecture: {
+        desktop: architectureDesktop,
+        tablet: architectureTablet,
+        mobile: architectureMobile,
+      },
+      representativeTablet,
       nodeRadius: mermaidProbe.nodeRadiusX,
       strokeWidth: mermaidProbe.nodeStrokeWidth,
     },

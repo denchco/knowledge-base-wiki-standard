@@ -21,11 +21,17 @@ Use the [Graphify workflow](graphify.md) for query-first discovery, the six requ
 
 ## Operating model
 
-- **Ingest**: register the source, preserve raw identity, update relevant concepts and evidence, add links, and record the change.
-- **Query**: start from the context map and graph, read the smallest authoritative set, expose uncertainty, and cite registered evidence.
-- **Lint**: find contradictions, stale claims, unsupported authority language, orphans, duplicate concepts, missing contextual links, broken generated surfaces, and profile drift.
-- **Promote**: a local innovation becomes standard only with applicability, fallback, verification, fixture, and migration impact.
+- **Ingest**: register the source, preserve raw identity, add its stable exact-row anchor, update relevant concepts and evidence, add links, and record the change.
+- **Query**: start from the context map and graph, read the smallest authoritative set, expose uncertainty, and cite registered evidence through individual internal source-row links.
+- **Lint**: find contradictions, stale claims, unsupported authority language, ungoverned exact repetitions of the declared canonical question, bare or misdirected source identities, unregistered named-authority URLs, orphans, duplicate concepts, missing contextual links, broken generated surfaces, and profile drift.
+- **Propose**: after a user-authored local innovation is complete and verified, preserve its immutable origin in a tracked [Standard proposal](standard-proposals.md). Validate direct states and terminal transitions offline, generate a disposable scrubbed payload, bind approval to its exact digest and governed form revision, and leave final submission with the user. Intake, explicit Standard acceptance, exact registry/release evidence, and optional consumer adoption are separate authorities and JJ phases; the one historical bridge is not available to new work.
+
+Development responses route Human or LLM Wiki destinations through the configured live canonical HTTP(S) origin under `DKBWS-PROMPT-002`. File, editor, absolute-path, and repository-relative Markdown links do not substitute for Wiki navigation; plain repository paths identify only implementation artifacts with no rendered route. Captured drafts check Markdown, HTML links, and plain GFM-autolinked URLs. Managed local drafts add `--managed-live` to require exact service identity, canonical URL equality, and HTTP 200 for every displayed route; `STD-VAL-007` remains the host boundary for uncaptured output.
+
+Persistent preview handoff uses `npm run service:preview` only after all twelve registry fields, the exact installed/loaded job, canonical URL, and marker identity pass. Live service evidence belongs to maintainer verification; distribution/CI leaves `DKBWS-RUNTIME-002` not checked.
 
 Never treat an LLM answer, rendered page, graph edge, or generated export as new evidence.
+
+In a Standard Production maintenance workspace, a file-changing development turn remains incomplete until its persistent changes are recorded in the required end-of-turn JJ commit under `DKBWS-PROV-001`.
 
 Codex reads the shared root `AGENTS.md`; Claude Code reaches the same contract through the root `CLAUDE.md` import. Use project status for zero to three current priorities and the validation queue for parked work. A completed response does not acquire a Next Steps section merely as boilerplate: apply the completion and cycle guard in `AGENTS.md` first.

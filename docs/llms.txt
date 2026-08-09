@@ -9,6 +9,7 @@ Normative repository: https://github.com/denchco/knowledge-base-wiki-standard
 
 - [Normative specification](spec/): Requirements, profiles, conformance, dependencies, security, and prompt contract.
 - [LLM Wiki](llm-wiki/): Read order, context routing, maintenance, and Graphify workflow.
+- [Standard proposals](llm-wiki/standard-proposals/): Tracked consumer provenance, scrubbed payload approval, governed intake, explicit Standard decisions, release mapping, and optional adoption.
 - [Architecture](architecture/): Authority and product boundaries.
 - [Conformance evidence](conformance/): Machine-readable reports and five-project dogfooding.
 - [Sources](sources/): Registered upstream authorities.
@@ -18,6 +19,10 @@ Normative repository: https://github.com/denchco/knowledge-base-wiki-standard
 
 Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, `docs/llm-wiki/index.md`, and `docs/project/status.md` from the repository. Claude Code imports the shared agent contract through `CLAUDE.md`. Preserve unknown OKF fields and declared deviations. Use Graphify query-first with scoped-source fallback. Ask material clarification questions sequentially as `Question 1 of N`. Finish requested scope before suggesting more work; include no more than three goal-linked, executable Next Steps and never pad the list or reopen parked work without its trigger.
 
+When a development response names or links Human or LLM Wiki content, use the configured live canonical HTTP(S) origin and verify every displayed route. Do not substitute a repository-relative, filesystem, `file:`, or editor link; use plain repository paths only for non-Wiki implementation artifacts.
+
+If the user points at the normative repository to start a wiki, follow `prompts/instantiate-wiki.md`. Accept the repository URL as the complete bootstrap invocation; first ask for a research topic seed or a subject-empty local initialization, then run the adaptive one-question-at-a-time discovery. Infer routine defaults and report the chosen accent and local setup before implementation.
+
 ## Machine surfaces
 
 - `knowledge/` is the canonical portable OKF bundle.
@@ -26,6 +31,7 @@ Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, `docs/llm-wiki/in
 - `prompts/instantiate-wiki.md` is the repeatable bootstrap prompt.
 - `starter/starter.yaml` is the subject-empty allowlist for independent consumer repositories.
 - `node scripts/conformance-cli.mjs --help` describes the read-only and planning-only CLI.
+- `node scripts/standard-proposal-cli.mjs --help` describes the local-only, fail-closed proposal workflow; it never submits an issue, publishes a release, or changes a consumer pin.
 
 ## Authority warning
 

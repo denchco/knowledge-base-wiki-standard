@@ -1,0 +1,168 @@
+name: Propose a standard change
+description: Route a user-authored consumer improvement or reusable defect into governed Standard review.
+title: "[Standard change]: "
+labels:
+  - enhancement
+  - standard-change
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for an implementation-led proposal. Filing it preserves provenance and starts classification; it does not promote the pattern, authorize a release, or replace private security reporting.
+
+        Prepare and approve the tracked proposal record first. Use the exact values and text shown by `npm run standard:proposal -- show <id>`; the recorded issue must match the approved payload.
+
+  - type: input
+    id: schema_version
+    attributes:
+      label: Proposal schema version
+      description: Use the exact version from the tracked proposal record.
+      placeholder: "1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: proposal_id
+    attributes:
+      label: Stable proposal identifier
+      description: Use the exact DKBWS-PROP identifier from the tracked proposal record.
+      placeholder: DKBWS-PROP-example-0123456789abcdef0123456789abcdef
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and observed behaviour
+      description: Describe the user or maintainer problem, including the current behaviour that prompted the change.
+      placeholder: What was unclear, unsafe, inconsistent, inaccessible, or needlessly difficult?
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Intended outcome
+      description: State the outcome the Standard should make repeatable without prescribing unnecessary implementation detail.
+      placeholder: What should a conforming implementation enable or prove?
+    validations:
+      required: true
+
+  - type: input
+    id: origin
+    attributes:
+      label: Originating consumer or implementation
+      description: Name or link the project where the pattern was implemented. Do not include private paths or restricted material.
+      placeholder: Repository URL, public artifact, or project name
+    validations:
+      required: true
+
+  - type: input
+    id: origin_revision
+    attributes:
+      label: Immutable originating revision
+      description: Supply the exact full Git-compatible commit containing the implementation evidence.
+      placeholder: Full 40- or 64-character commit identifier
+    validations:
+      required: true
+
+  - type: input
+    id: origin_jj
+    attributes:
+      label: Jujutsu change identifier (optional)
+      description: Secondary navigation only; the immutable Git-compatible commit above remains authoritative.
+      placeholder: Optional JJ change ID
+
+  - type: input
+    id: standard_revision
+    attributes:
+      label: Pinned Standard revision
+      description: Supply the exact immutable Standard revision pinned when the proposal record was created.
+      placeholder: Full 40- or 64-character commit identifier
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reuse_class
+    attributes:
+      label: Proposed reuse class
+      description: Select the strongest class currently supported by evidence; maintainers may reclassify it.
+      options:
+        - Unknown — classify during intake
+        - Experimental
+        - Project-specific
+        - Reusable
+        - Preferred
+        - Core
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_contract
+    attributes:
+      label: Affected profiles and requirements
+      description: List known profiles, requirement IDs, adapters, or schemas. “Unknown” or “new requirement” is valid at intake.
+      placeholder: DKBWS-…; Standard Production; Zensical adapter; unknown/new requirement
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies_fallback
+    attributes:
+      label: Dependencies, limitations, and simpler fallback
+      description: Record the implementation dependencies, known limits, and the least-complex acceptable alternative.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and implementation record
+      description: Link or describe the relevant code, before/after output, user decision, source authority, and third-party licence evidence. Do not upload evidence automatically.
+    validations:
+      required: true
+
+  - type: textarea
+    id: accessibility_browser
+    attributes:
+      label: Accessibility and browser evidence
+      description: State what was checked, which viewports or browsers were covered, and what remains unverified. Use “not applicable” with a reason where appropriate.
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and fixture proposal
+      description: Identify the executable check and positive/negative fixture that could prevent regression.
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration and compatibility impact
+      description: Explain who would need to change, how local deviations are preserved, and whether an existing conforming implementation could break.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety and authority
+      options:
+        - label: I have removed secrets, personal or confidential data, and vulnerability details; security reports use the private advisory route.
+          required: true
+        - label: I have authority to share the linked implementation evidence and its licensing status is cleared or not applicable.
+          required: true
+        - label: I understand that this issue proposes review and does not itself promote the pattern or authorize publication.
+          required: true
+
+  - type: textarea
+    id: proposal_marker
+    attributes:
+      label: Stable deduplication marker
+      description: Paste the exact final hidden marker shown by the proposal CLI. Do not alter or repeat it.
+      placeholder: "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-example-0123456789abcdef0123456789abcdef -->"
+    validations:
+      required: true

@@ -7,6 +7,10 @@ status: draft
 
 # Standard architecture
 
+<blockquote class="governing-question">
+<p>How should a durable knowledge base serve humans and AI agents while remaining portable, evidence-grounded, inspectable, and safely updateable?</p>
+</blockquote>
+
 ## Canonical layers
 
 1. **Raw sources** — immutable or content-addressed source material.
@@ -17,38 +21,32 @@ status: draft
 6. **LLM Wiki** — compact routing, context, maintenance, ingest, query, and lint instructions.
 7. **Discovery outputs** — `llms.txt`, indexes, search, Graphify 2D/3D, and optional lossless JSON interchange exports of the canonical OKF bundle.
 8. **Conformance** — schemas, deterministic checks, browser evidence, fixtures, and reports.
-9. **Operations** — Git, Jujutsu phases, stable local runtime, CI, release, deployment, and migration.
+9. **Operations** — Git, end-of-development-turn Jujutsu commits, stable local runtime, CI, release, deployment, and migration.
 
 Inspect these relationships through the shared [2D and 3D repository graph](graph/index.md). The graph is a generated discovery layer and never outranks the authority chain below.
 
 ## Authority
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 6, "rankSpacing": 18, "padding": 4}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 40}}}%%
 flowchart TB
   accTitle: Knowledge authority and derived surfaces
-  accDescr: Primary sources pass through registered identity and evidence records into canonical OKF knowledge. Human, LLM, and discovery surfaces derive from that canonical layer and cannot create evidence.
+  accDescr: Sources are registered, assessed as evidence, and maintained as canonical knowledge, which directly serves separate Human, Agent, and Graph surfaces that cannot create evidence.
 
-  subgraph A["Evidence authority"]
-    S["1 · Primary sources"] --> R["2 · Source register"]
-    R --> E["3 · Evidence records<br/>claims + limits + gaps"]
-    E --> C[["4 · Canonical OKF<br/>knowledge"]]
-  end
-  subgraph D["Derived — not evidence"]
-    H["Human Wiki"]
-    L["LLM Wiki"]
-    G["Graph + exports"]
-  end
+  S["1 · Sources"]
+  R["2 · Register"]
+  E["3 · Evidence"]
+  C["4 · Knowledge"]
+  H["Human"]
+  A["Agent"]
+  G["Graph"]
+  S --> R --> E --> C
   C --> H
-  C --> L
+  C --> A
   C --> G
-  class S kb-source
-  class R,E kb-evidence
-  class C kb-canonical
-  class H,L,G kb-derived
 ```
 
-Solid accent marks canonical authority. Dashed node boundaries mark derived surfaces: they assist comprehension, routing, and discovery but cannot create evidence.
+The numbered authority chain ends at canonical knowledge. Separate Human Wiki, LLM Wiki for agents, and Graphify surfaces each derive directly from that shared corpus. They are not independent corpora and cannot create evidence.
 
 ## Distribution boundary
 

@@ -82,7 +82,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware upgrade and deviation merge exists."},
     {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/ask.md", "functions/api/ask.js", "DEPLOYMENT.md"], "finding": "Cloudflare Ask is bounded by retrieval, source links, secrets and documented authority limits."}
   ],
-  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 3, "NOT_IMPLEMENTED": 5},
+  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 10},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-mkdocs.mjs"], "finding": "Canonical knowledge is Markdown and strict-built with portable local links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, roles, capabilities or deviations."},
@@ -93,8 +93,11 @@
     {"id": "DKBWS-EVID-002", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence-matrix.md", "docs/evidence-validation-queue.md"], "finding": "Claims route to confidence, limitations and open gaps."},
     {"id": "DKBWS-HUMAN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["mkdocs.yml", "scripts/check-mkdocs.mjs", "DEPLOYMENT.md"], "finding": "Strict build and a documented stable production URL exist.", "limitations": ["The separate local-runtime requirement failed its live root probe."]},
     {"id": "DKBWS-HUMAN-002", "status": "NOT_APPLICABLE", "confidence": "HIGH", "evidence_paths": [], "finding": "Scoped inspection found no governing-question callout, so the accent rail-and-text obligation does not apply."},
+    {"id": "DKBWS-HUMAN-003", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no dedicated draft marker, readable status mapping, or chevron-alignment evidence; no pass is inferred."},
+    {"id": "DKBWS-HUMAN-004", "status": "NOT_APPLICABLE", "confidence": "HIGH", "evidence_paths": [], "finding": "Scoped inspection found no governing-question declaration or callout, so verbatim-repetition governance does not apply."},
     {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/index.md", "docs/llm-wiki/maintenance.md", "AGENTS.md"], "finding": "Required operational concepts are explicit across the mapped LLM surface."},
     {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/context-map.md", "hooks/presentation_rules.py"], "finding": "Contextual and generated canonical-title links go beyond navigation.", "limitations": ["A finite canonical concept obligation set is not machine-declared."]},
+    {"id": "DKBWS-LINK-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no exact source-row navigation or registered-authority-link evidence; no pass is inferred."},
     {"id": "DKBWS-GRAPH-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "scripts/check-graphify-freshness.mjs"], "finding": "Shared enriched graph data, real 2D/3D views and freshness checks exist."},
     {"id": "DKBWS-DESIGN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "package.json"], "finding": "Lintable structured DESIGN.md and named tokens are implemented."},
     {"id": "DKBWS-RENDER-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["mkdocs.yml"], "finding": "The project is a Material compatibility implementation, not a standard-production Zensical claim."},
@@ -102,8 +105,11 @@
     {"id": "DKBWS-VERIFY-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "scripts/check-graphify-freshness.mjs"], "finding": "One check command covers declared capabilities and regenerates Graphify only in a temporary copy."},
     {"id": "DKBWS-VERIFY-002", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No schema-valid DenchCo conformance report with stable diagnostic codes is emitted."},
     {"id": "DKBWS-RUNTIME-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/project-ops/deployment.md"], "finding": "The canonical local URL returned HTTP 404, demonstrating that process/listener state is not health."},
+    {"id": "DKBWS-RUNTIME-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no shared-register ownership, live-listener preflight, exact static identity marker, composite adapter status, or canonical browser-handoff evidence; no pass is inferred."},
     {"id": "DKBWS-PROMPT-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["AGENTS.md"], "finding": "Sequential Question 1 of N clarification is explicit."},
+    {"id": "DKBWS-PROMPT-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and lacks captured-response, exact-origin, and route-health proof; no pass is inferred."},
     {"id": "DKBWS-UPDATE-001", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo standard upgrade workflow exists."},
+    {"id": "DKBWS-UPDATE-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates the tracked consumer-to-Standard proposal record, digest-bound governed intake, explicit decision/release registry, and separately authorised adoption workflow; no pass is inferred."},
     {"id": "DKBWS-RELEASE-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["DEPLOYMENT.md"], "finding": "This audit does not treat project hosting as a DenchCo public standard release."},
     {"id": "DKBWS-SEC-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["DEPLOYMENT.md", "docs/llm-wiki/maintenance.md", "docs/sources.md"], "finding": "Ask secrets and evidence boundaries exist, but complete repository personal-data, copyright/licensing and source-retention policies are not declared as one mapped contract."}
   ],

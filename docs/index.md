@@ -19,38 +19,32 @@ Use an OKF-compatible canonical Markdown knowledge layer; add explicit evidence 
 ## The system
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 6, "rankSpacing": 18, "padding": 4}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 40}}}%%
 flowchart TB
   accTitle: Governed knowledge base system
-  accDescr: Raw sources pass through evidence governance into one canonical OKF corpus. Human, LLM, and Graphify products derive from that corpus and converge on executable verification.
+  accDescr: Source material becomes inspectable evidence and maintained knowledge. That knowledge serves separate Human, Agent, and Graph surfaces, whose paths converge on verification.
 
-  subgraph K["Governed knowledge"]
-    A["Raw sources"] --> E["Evidence governance"] --> C[["Canonical OKF<br/>knowledge"]]
-  end
-  subgraph P["Derived products"]
-    H["Human Wiki"]
-    L["LLM Wiki"]
-    G["Graphify 2D + 3D"]
-  end
-  V(["Executable verification"])
+  S["Source"]
+  E["Evidence"]
+  C["Knowledge"]
+  H["Human"]
+  A["Agent"]
+  G["Graph"]
+  V["Verification"]
+  S --> E --> C
   C --> H
-  C --> L
+  C --> A
   C --> G
   H --> V
-  L --> V
+  A --> V
   G --> V
-  class A kb-source
-  class E kb-evidence
-  class C kb-canonical
-  class H,L kb-product
-  class G kb-derived
-  class V kb-verification
 ```
 
-Solid accent marks the canonical authority; the product group is coordinated but derived, and every surface converges on the same executable verification boundary.
+Read from top to bottom: source material becomes inspectable evidence, then maintained knowledge. That shared knowledge directly serves three separately presented surfaces: the Human Wiki, the LLM Wiki for agents, and Graphify. Each path then converges on verification. The boxes are views over one corpus, not independent knowledge stores. The labels, order, and this explanation carry the authority distinction without custom node styling.
 
 ## Start here
 
+- To create an independent wiki, give an AI agent only <https://github.com/denchco/knowledge-base-wiki-standard>. The repository's canonical prompt begins an adaptive seed-or-subject-empty interview and infers routine local defaults.
 - [Architecture](architecture.md) explains the complete system.
 - [Normative specification](spec/index.md) defines conformance.
 - [Requirements](spec/requirements.md) provides stable rule identifiers.
@@ -58,11 +52,13 @@ Solid accent marks the canonical authority; the product group is coordinated but
 - [Agent entry point](llm-wiki/index.md) gives Codex and other agents the minimum reliable context.
 - [Tools and sources](reference/tools-and-sources.md) records upstream authority.
 - The subject-empty `starter/starter.yaml` recipe creates independent knowledge bases without copying this standard's topic content.
+- [Propose a reusable standard change](llm-wiki/standard-proposals.md) preserves a consumer improvement in a tracked record and keeps intake, Standard acceptance, release, and optional adoption as separate authorised states.
 
 ## Governed implementation
 
 - [Dependencies](spec/dependencies.md) and [security/source boundaries](spec/security-and-sources.md) define the executable and trust perimeter.
 - [Prompt rules](spec/prompts.md), [LLM maintenance](llm-wiki/maintenance.md), and the [context map](llm-wiki/context-map.md) govern repeatable agent work.
+- Development responses navigate Wiki content through the configured live canonical HTTP(S) origin; file and editor links never substitute for rendered Wiki routes.
 - [Sources](sources.md), the [evidence matrix](evidence-matrix.md), [validation queue](validation-queue.md), and [research log](log.md) keep authority and uncertainty inspectable.
 - [Roadmap](roadmap.md), [project status](project/status.md), and [local precedents](reference/local-precedents.md) separate completed candidate work from remaining release decisions.
 - [Conformance evidence](conformance/index.md) keeps formal declarations distinct from inferred dogfood audits.

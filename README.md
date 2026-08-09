@@ -1,36 +1,131 @@
-# DenchCo Knowledge Base Wiki Standard
+<p align="center">
+  <img src="docs/assets/brand/denchco-wordmark.png" alt="DENCH | CO" width="280">
+</p>
 
-An OKF-compatible standard for evidence-governed, human- and AI-maintained wikis.
+<h1 align="center">DenchCo Knowledge Base Wiki Standard</h1>
 
-Public human documentation: <https://denchco.github.io/knowledge-base-wiki-documentation/>
+<p align="center">
+  Build a trustworthy, searchable knowledge base with an AI coding agent—even if this is your first one.
+</p>
 
-This repository is the canonical source for the specification, profiles, schemas, prompts, subject-empty starter, and reference-qualified conformance tooling. It combines:
+<p align="center">
+  <a href="https://github.com/denchco/knowledge-base-wiki-standard/actions/workflows/verify.yml"><img src="https://github.com/denchco/knowledge-base-wiki-standard/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify"></a>
+  <a href="https://github.com/denchco/knowledge-base-wiki-standard/releases"><img src="https://img.shields.io/github/v/release/denchco/knowledge-base-wiki-standard?include_prereleases&sort=semver&label=release" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/denchco/knowledge-base-wiki-standard" alt="MIT License"></a>
+  <a href="https://denchco.github.io/knowledge-base-wiki-documentation/"><img src="https://img.shields.io/badge/documentation-read-0b7285" alt="Documentation"></a>
+</p>
+
+The Standard keeps editable Markdown, source records, evidence, uncertainty, a human-facing wiki, and an agent-facing wiki working as one maintainable knowledge base.
+
+## Give this URL to an AI agent
+
+Open Codex, Claude Code, or another coding agent that can read GitHub repositories, write local files, and run commands. Start it in the folder where you want to work, then paste this repository address:
+
+```text
+https://github.com/denchco/knowledge-base-wiki-standard
+```
+
+That is the whole starting prompt. You do not need to find a prompt file, choose a release, fill in a project brief, or decide on a profile, folder, local Wiki address, or deployment service first.
+
+The agent begins by asking whether you want:
+
+- a **research topic seed**—text, a file, a folder, a web page, or another repository that gives it something to investigate; or
+- a **subject-empty local wiki**—the complete governed structure, ready for research material later.
+
+If you already gave it a seed or asked for a blank wiki, it skips that question. It reads any supplied material and inspects any existing workspace before asking what is still unresolved.
+
+## Questions you may be asked
+
+The agent asks one question at a time. The number changes as your answers resolve—or reveal—what matters.
+
+| Decision | When it is asked |
+|---|---|
+| Research seed or subject-empty start | First, unless your request already says which |
+| Project title | For a subject-empty wiki, or when a seed does not support a responsible title |
+| Accent colour | Always confirmed: the agent proposes an evidenced colour or the default `#0b7285`, then asks whether to use or replace it |
+| Audience, reader task, or intended outcome | Only when the seed does not make it clear and the answer would change the structure |
+| Research extent | Only when it is unclear whether to use just the supplied material or add authoritative external sources |
+| Sensitive or restricted material | Only when privacy, licensing, retention, or source authority cannot be resolved safely |
+| Target folder | Only when there is a collision or more than one sensible repository boundary |
+
+The agent does **not** routinely ask you for a version tag, profile, local URL, service adapter, or deployment choice.
+
+## What happens automatically
+
+- The current default branch is resolved to an exact commit and that immutable revision is recorded in your wiki.
+- `standard-production` is selected unless the evidence calls for another profile.
+- A separate local project folder and a conflict-free local Wiki address are chosen.
+- A title, audience, reader task, intended outcome, and source boundary are inferred where the material supports them.
+- An accessible colour family is derived from the confirmed accent colour and checked for contrast.
+- External publishing stays off unless you explicitly ask for it.
+- The wiki is built, checked, and handed back with its verified live local address and any known limitations; file or editor links do not substitute for Wiki navigation.
+
+## What you receive
+
+- **Plain Markdown source** that remains readable and editable without specialist software.
+- **A searchable Human Wiki** for reading, explaining, and navigating the subject.
+- **One consistent governing question** wherever its exact wording is deliberately repeated for readers.
+- **An LLM Wiki** that helps AI agents find the right context and maintain the same knowledge safely.
+- **Source and evidence records** that distinguish supported claims, uncertainty, gaps, and work still to validate, with each displayed source identity linked to its exact registered row.
+- **Diagrams and a knowledge graph** where the selected profile requires them.
+- **Repeatable checks** and a record of exactly which Standard revision was used.
+- **Live Wiki navigation in development responses**, rooted at the configured canonical address and checked against file/editor or clickable repository-path fallbacks.
+
+A subject-empty start creates the structure without inventing research claims, evidence, concepts, or a governing question.
+
+## Documentation
+
+Use the [first-wiki guide](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) for a plain-language walkthrough, or browse the full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) for examples and explanations.
+
+This repository defines and verifies the Standard. The Documentation explains how to use it.
+
+## How the Standard works
+
+The implementation combines:
 
 - the persistent, compounding wiki model from Karpathy's LLM Wiki;
 - Open Knowledge Format (OKF) v0.2 as the portable knowledge foundation;
-- separate but coordinated Human Wiki and LLM Wiki products;
-- Zensical and the DenchCo governed visual profile as the primary human renderer;
-- source, evidence, uncertainty, Graphify, design, browser, runtime, and release governance.
+- coordinated Human and LLM Wiki views over the same canonical knowledge;
+- explicit source, evidence, uncertainty, design, runtime, and release governance; and
+- Zensical, Graphify, browser checks, Git, and Jujutsu in the Standard Production profile.
 
-## Repository boundary
+Only this repository's released specification, schemas, and profile definitions are normative. A new knowledge base is created from the subject-empty [`starter/`](starter/) recipe rather than by copying this repository and its own documentation or evidence.
 
-This is the sole normative standard repository, intended for `denchco/knowledge-base-wiki-standard`. The separate public documentation site explains and demonstrates the standard but is not normative.
+<details>
+<summary><strong>Candidate status</strong></summary>
 
-Do not use this repository root as a topic Wiki or recursively copy it into one. Its `docs/`, `knowledge/`, evidence, dogfood reports, and project records are about the standard itself. Independent knowledge bases start from the subject-empty [`starter/`](starter/) recipe, create their own content, pin an immutable standard revision, and choose their own URL and deployment.
+The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, and `v0.1.0-rc.3` are published from their exact CI-green commits. `v0.1.0-rc.4` is prepared for protected publication and is not a public immutable release until its exact tag, release, and attestation are verified.
 
-Canonical schemas live in this repository's `schema/` directory. Public endpoints are mirrored at <https://denchco.github.io/knowledge-base-wiki-documentation/schema/> for discovery; validation uses the schema copy from the consumer's pinned standard checkout or release artifact and therefore has no runtime dependency on Pages.
+The npm package uses `0.1.0-candidate`. Python project metadata represents the candidate as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 
-## Status
+</details>
 
-Version `0.1.0-candidate`. The executable candidate and its first five-project dogfood cycle are complete. The public source is `denchco/knowledge-base-wiki-standard`; immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, and `v0.1.0-rc.3` are published from their exact CI-green commits. `v0.1.0-rc.3` is the current released candidate and adds governed question styling, semantic responsive Mermaid architecture, and deterministic repository/local-versus-public publication scoping without changing the manifest or OKF content model.
+<details>
+<summary><strong>Propose a reusable change</strong></summary>
 
-The npm implementation package uses the same `0.1.0-candidate` identifier. Python project metadata encodes that prerelease as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
-
-## Start
-
-Standard Production maintenance requires Git `2.41` or newer and the reference-qualified Jujutsu `0.39.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent; never reinitialize an existing workspace:
+A consumer wiki follows the [tracked Standard proposal workflow](docs/llm-wiki/standard-proposals.md) and keeps each reusable improvement in a `standard-proposals/` record. The record is the durable authority for the originating project and immutable revision, the verified local implementation, the exact reviewed public payload, and every later decision. Generated files under `output/standard-proposals/` are disposable previews only.
 
 ```sh
+npm run standard:proposal -- new <slug>
+npm run standard:proposal -- check --all
+npm run standard:proposal -- prepare <id>
+npm run standard:proposal -- show <id>
+npm run standard:proposal -- open <id>
+```
+
+`check` and `show` are read-only. `prepare` creates a local preview, and `open` performs only a fail-closed availability check before opening the governed issue form in the user's browser. The command never submits an issue or uploads attachments. The exact prepared payload needs explicit digest-bound approval, and the user remains responsible for the form's final Submit action.
+
+An issue is only intake. Acceptance is a separate Standard-maintainer decision; release publication is a separate release-authority action; and changing a consumer's Standard pin is a separate adoption decision recorded by that consumer. A closed issue proves none of those later states.
+
+</details>
+
+<details>
+<summary><strong>For Standard maintainers</strong></summary>
+
+Standard Production maintenance requires exactly Node `24.19.0`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.44.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+
+```sh
+node --version
 git --version
 jj --version
 test -d .jj || jj git init --colocate .
@@ -43,25 +138,43 @@ npm run service:register
 npm run service:start
 ```
 
-`jj --version` MUST report `jj 0.39.0` for this candidate. Portable Core remains Git-only compatible. An explicitly Git-only distribution/CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that mode verifies the Git surface and reports Jujutsu maintainer provenance as `not-checked`, never as a Standard Production maintainer pass.
+`node --version` must report `v24.19.0`, and `jj --version` must report `jj 0.44.0` for this candidate. npm installation fails closed on a different Node version. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
 
-The local wiki is reserved at <http://127.0.0.1:8017/>.
+End every file-changing development turn with the helper below before giving the final response. It runs complete verification, inspects Git and Jujutsu state, records the turn's changes in a JJ commit, discloses a verification failure in that commit while returning the failing status, and creates no empty commit for a clean turn:
 
-## Canonical entry points
+```sh
+npm run jj:phase -- -m "Development-turn summary"
+```
 
-- `docs/spec/index.md` — normative specification.
-- `.wiki-standard.yaml` — this repository's conformance declaration.
-- `knowledge/` — explicit portable OKF v0.2 knowledge bundle.
-- `DEPENDENCIES.md` — dependency classes, pins, and installation requirements.
-- `prompts/instantiate-wiki.md` — canonical repeatable bootstrap prompt.
-- `starter/starter.yaml` — allowlisted subject-empty consumer recipe.
-- `AGENTS.md` — shared Codex/Claude operating, clarification, completion, and cycle-guard contract.
-- `CLAUDE.md` — Claude Code import of the canonical `AGENTS.md` instructions.
-- `docs/llm-wiki/index.md` — compact agent-facing wiki.
-- `docs/project/status.md` — current bounded priorities, separate from parked work.
-- `docs/conformance/index.md` — dogfood reports and conformance evidence.
+The [local Standard wiki](http://127.0.0.1:8017/) is reserved as `denchco-kb-wiki-standard` on port `8017`. `service:start` serializes the user-scoped register and live-bind checks under an exclusive lock, atomically publishes the reservation, and then installs the LaunchAgent. `service:status` succeeds only when all twelve governed registration fields, the installed LaunchAgent bytes, loaded job, canonical URL, and [`service-identity.json`](docs/assets/service-identity.json) marker agree; an unrelated HTTP 200 is unhealthy. `npm run service:preview` opens only that exact URL after complete status passes and reports browser-opener failure. Live status is maintainer-only evidence; distribution/CI leaves `DKBWS-RUNTIME-002` not checked.
 
-The lifecycle CLI is read-only in this candidate:
+Before a development response presents Wiki navigation, verify the managed service identity and every displayed route, then validate the captured draft:
+
+```sh
+npm run response:links:check -- --base-url http://127.0.0.1:8017/ --managed-live
+```
+
+`DKBWS-PROMPT-002` checks Markdown destinations, entity-decoded HTML links, and plain GFM-autolinked URLs; rejects file/editor URLs, clickable local-filesystem paths, repository-relative links, and live Wiki URLs outside the configured origin; and, in managed-live mode, requires exact service identity plus HTTP 200 from every displayed route. A plain repository path may identify a non-Wiki implementation artifact, but it is not Wiki navigation. The checker makes captured violations nonconforming; absolute interception of an uncaptured response still requires a host-provided pre-send hook under `STD-VAL-007`.
+
+</details>
+
+<details>
+<summary><strong>Technical reference and lifecycle CLI</strong></summary>
+
+Canonical entry points:
+
+- [`docs/spec/index.md`](docs/spec/index.md)—normative specification.
+- [`.wiki-standard.yaml`](.wiki-standard.yaml)—this repository's conformance declaration.
+- [`prompts/instantiate-wiki.md`](prompts/instantiate-wiki.md)—canonical adaptive bootstrap behaviour.
+- [`starter/starter.yaml`](starter/starter.yaml)—allowlisted subject-empty consumer recipe.
+- [`knowledge/`](knowledge/)—portable OKF v0.2 knowledge bundle about the Standard.
+- [`AGENTS.md`](AGENTS.md) and [`CLAUDE.md`](CLAUDE.md)—shared Codex and Claude operating contract.
+- [`docs/llm-wiki/index.md`](docs/llm-wiki/index.md)—compact agent-facing wiki.
+- [`docs/project/status.md`](docs/project/status.md)—current bounded priorities and parked work.
+- [`docs/conformance/index.md`](docs/conformance/index.md)—dogfood reports and conformance evidence.
+- [`docs/llm-wiki/standard-proposals.md`](docs/llm-wiki/standard-proposals.md)—tracked proposal records, Standard decision registry, and release/adoption boundaries.
+
+The lifecycle CLI is read-only or planning-only in this candidate:
 
 ```sh
 npm run conformance:inspect -- . --json
@@ -70,32 +183,35 @@ npm run conformance:export-okf -- .
 npm run conformance:diff -- /path/to/consumer --json
 npm run conformance:upgrade-plan -- /path/to/consumer --json
 npm run conformance:init-plan -- /path/to/new-wiki --profile standard-production --json
+npm run standard:proposal -- check --all
 ```
-
-For a complete independent-target plan, also supply `--standard-revision`, `--wiki-url`, and `--deployment` (`none` is valid). The plan classifies each target path as rendered from a subject-empty template, authored from target evidence, or adapted from the pinned release.
 
 `upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files.
 
-## Documentation synchronization
+</details>
 
-The private `denchco/knowledge-base-wiki-documentation` source publishes the public help/example site. It consumes an isolated, hash-checked snapshot of this repository; its Pages build takes the pinned specification and public schemas from that snapshot while retaining documentation-owned explanations and presentation.
+<details>
+<summary><strong>Documentation synchronization</strong></summary>
 
-After a local standard change, update and verify the sibling documentation repository with:
+The Documentation build consumes an isolated, hash-checked snapshot of this repository while retaining its own explanatory content and presentation. After a local Standard change, maintainers can inspect sibling drift with:
+
+```sh
+npm run sync:documentation:check
+```
+
+Refreshing the managed snapshot is a deliberate release step:
 
 ```sh
 npm run sync:documentation:apply
-npm run sync:documentation:check
 npm run verify:workspace
 ```
 
-The apply command writes only `.denchco-standard-snapshot/` in the sibling repository and refuses modified or unmanaged snapshot files. `verify:workspace` combines the complete standard gate with the real sibling drift check. Before a release, commit and fully verify this repository, reapply the snapshot so it records the clean commit, then verify and commit the documentation repository. Documentation CI checks the snapshot against the immutable standard tag before Pages can deploy.
+The apply command writes only `.denchco-standard-snapshot/` in the sibling Documentation repository and refuses modified or unmanaged snapshot files. Pages deployment separately verifies the pinned immutable Standard tag.
 
-Although this is the canonical template source, it is deliberately not a one-click GitHub Template repository: GitHub's template operation copies the whole default branch, including the standard's own specification and evidence. Consumers instead use the allowlisted [`starter/`](starter/) recipe so a new knowledge base begins subject-empty.
+</details>
 
-## Authority
+## Security and licence
 
-Only this repository's `docs/spec/`, `schema/`, and released profile definitions are normative. The private documentation source, its public Pages artifact, generated indexes, Graphify output, examples, and fixtures demonstrate or explain the standard; they do not supersede it.
+Report vulnerabilities through the [private security advisory route](https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new), not a public issue.
 
-## Licence
-
-Copyright (c) 2026 Andrew Dench. The repository's original work is available under the [MIT License](LICENSE); third-party material retains its own terms. See `LICENSING.md` for the boundary.
+Copyright (c) 2026 Andrew Dench. Original work is available under the [MIT License](LICENSE); third-party material keeps its own terms. See [Licensing](LICENSING.md) for the DenchCo identity and third-party boundary.

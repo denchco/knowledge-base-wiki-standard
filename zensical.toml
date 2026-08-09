@@ -32,6 +32,7 @@ nav = [
     {"Agent entry point" = "llm-wiki/index.md"},
     {"Context map" = "llm-wiki/context-map.md"},
     {"Maintenance" = "llm-wiki/maintenance.md"},
+    {"Standard proposals" = "llm-wiki/standard-proposals.md"},
     {"Graphify workflow" = "llm-wiki/graphify.md"}
   ]},
   {"Repository graph" = [
@@ -49,6 +50,9 @@ nav = [
     {"Project status" = "project/status.md"}
   ]}
 ]
+
+[project.extra.status]
+draft = "Draft — research in progress"
 
 [project.markdown_extensions]
 admonition = {}

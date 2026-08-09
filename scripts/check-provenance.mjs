@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 
 const REQUIREMENT = "DKBWS-PROV-001";
 const MINIMUM_GIT_VERSION = "2.41.0";
-const QUALIFIED_JJ_VERSION = "0.39.0";
+const QUALIFIED_JJ_VERSION = "0.44.0";
 const MODES = new Set(["maintainer", "distribution"]);
 
 function usage() {
@@ -40,12 +40,17 @@ function parseArguments(argv) {
 
 function run(command, args, cwd) {
   try {
-    return execFileSync(command, args, {
+    const output = execFileSync(command, args, {
       cwd,
       encoding: "utf8",
       maxBuffer: 1024 * 1024,
       stdio: ["ignore", "pipe", "pipe"],
-    }).trim();
+    });
+    return output.endsWith("\r\n")
+      ? output.slice(0, -2)
+      : output.endsWith("\n")
+        ? output.slice(0, -1)
+        : output;
   } catch (error) {
     if (error?.code === "ENOENT") throw new Error(`Required executable is unavailable: ${command}`);
     const detail = String(error?.stderr ?? error?.message ?? "command failed").trim();
@@ -67,7 +72,8 @@ function compareVersions(left, right) {
 }
 
 function canonicalDirectory(value) {
-  return realpathSync(path.resolve(value));
+  const candidate = path.isAbsolute(value) ? value : path.resolve(value);
+  return realpathSync(candidate);
 }
 
 function assertDirectory(value, label) {
@@ -124,7 +130,7 @@ export function checkProvenance({ root = process.cwd(), mode = "maintainer" } = 
   if (jjVersion !== QUALIFIED_JJ_VERSION) {
     throw new Error(
       `Jujutsu ${QUALIFIED_JJ_VERSION} is the reference-qualified candidate version; found ${jjVersionOutput}. ` +
-      "Newer upstream versions, including 0.42.0, require deliberate requalification before a maintainer-workspace pass.",
+      "Another Jujutsu version requires deliberate requalification before a maintainer-workspace pass.",
     );
   }
 

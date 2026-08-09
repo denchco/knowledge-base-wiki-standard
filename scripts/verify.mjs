@@ -25,12 +25,19 @@ const derivedOutputs = [
   "docs/assets/vendor/",
   "docs/assets/graphify/",
   "output/verification/",
+  "output/standard-proposals/",
   "GRAPH_REPORT.md",
 ];
 const environmentRoots = new Set([".git", ".jj", ".venv", "node_modules", ".playwright-cli"]);
-const gates = ["build", "check", "check:graphify", "check:browser"];
 const startedAt = new Date().toISOString();
 const provenanceMode = process.env.DKBWS_PROVENANCE_MODE ?? "maintainer";
+const gates = [
+  "build",
+  "check",
+  "check:graphify",
+  "check:browser",
+  ...(provenanceMode === "maintainer" ? ["service:status"] : []),
+];
 const receiptDirectory = path.join(root, "output", "verification");
 const receiptPath = path.join(receiptDirectory, "receipt.json");
 const reportPath = path.join(receiptDirectory, "conformance-report.json");
@@ -116,10 +123,10 @@ if (provenanceMode === "maintainer") {
     .map((result) => result.requirement);
   const notCheckedCapabilities = selectedNotCheckedCapabilityIds(parsedReport);
   const failed = (parsedReport.requirementResults ?? []).filter((result) => result.status === "fail");
-  const expectedDistributionGap = notChecked.length === 1 && notChecked[0] === "DKBWS-PROV-001";
-  const expectedCapabilityGap = notCheckedCapabilities.length === 1 && notCheckedCapabilities[0] === "jujutsu";
+  const expectedDistributionGap = exactSet(notChecked, ["DKBWS-PROV-001", "DKBWS-RUNTIME-002"]);
+  const expectedCapabilityGap = exactSet(notCheckedCapabilities, ["jujutsu", "local_service"]);
   if (![0, 1].includes(fullReport.status) || failed.length || parsedReport.summary?.failedCapabilities !== 0 || !expectedDistributionGap || !expectedCapabilityGap) {
-    fail(`distribution report has gaps beyond explicit maintainer provenance: ${fullReport.stderr.trim() || JSON.stringify({ notChecked, notCheckedCapabilities, failed })}`);
+    fail(`distribution report has gaps beyond the explicit maintainer-only provenance and managed-service checks: ${fullReport.stderr.trim() || JSON.stringify({ notChecked, notCheckedCapabilities, failed })}`);
   }
 } else {
   fail(`unsupported DKBWS_PROVENANCE_MODE ${provenanceMode}`);
@@ -156,7 +163,17 @@ function buildReceipt(provenance) {
   const checkEvidence = [
     evidence("standard-check", "verification-script", "Canonical roles, dependency pins, prompt protocol, and portable source checks.", "scripts/check-standard.mjs"),
     evidence("canonical-content", "verification-script", "Stable sources, evidence rows, LLM workflow, contextual links, and four security subcontrols.", "scripts/check-canonical-content.mjs"),
+    evidence("governing-question-repetitions", "verification-script", "Mapped canonical question, bounded reader-source equality, neutral exclusions, and exact repetition routes.", "scripts/check-governing-question-repetitions.mjs"),
+    evidence("governing-question-fixtures", "test-suite", "Conforming, ungoverned, mismatched, historical-record, masked-region, and subject-empty fixtures.", "scripts/check-governing-question-repetitions.test.mjs"),
+    evidence("reader-source-links", "verification-script", "Stable source-row anchors, individual visible identities, registered authority URLs, and optional idempotent migration.", "scripts/link-source-citations.mjs"),
+    evidence("reader-source-link-fixtures", "test-suite", "Positive, negative, ignored-region, Unicode, fence, destination, authority, and idempotence fixtures.", "scripts/link-source-citations.test.mjs"),
     evidence("conformance-fixtures", "test-suite", "Positive, negative, lifecycle, receipt, and lossless OKF fixtures.", "scripts/conformance-cli.test.mjs"),
+    evidence("standard-proposal-core", "verification-script", "Tracked proposal validation, deterministic scrubbed rendering, form- and digest-bound approval, fail-closed marker/form/label reconciliation, direct-state invariants, and separately authorised lifecycle transitions.", "scripts/standard-proposal-core.mjs"),
+    evidence("standard-proposal-cli", "command-adapter", "Thin local command boundary for read-only checks, disposable preparation, GET-only browser open, and explicit local record transitions.", "scripts/standard-proposal-cli.mjs"),
+    evidence("standard-proposal-fixtures", "test-suite", "Positive and negative provenance, direct-edited state, safety, form/label, marker/deduplication, exact-revision registry, immutable release, adoption, and remote-write fixtures.", "scripts/standard-proposal-cli.test.mjs"),
+    evidence("standard-proposal-record-schema", "schema-validation", "Versioned tracked consumer proposal authority.", "schema/standard-proposal-record-v1.json"),
+    evidence("standard-proposal-registry", "decision-register", "Explicit Standard decision, accepted-requirement, and immutable-release ledger independent of issue state.", "standard-proposals/registry.json"),
+    evidence("standard-proposal-form", "governed-form", "Versioned issue-form bytes, required labels, and stable field contract.", "standard-proposals/standard-change-form-v1.yml"),
     evidence("schema-artifacts", "schema-validation", "Ajv Draft 2020-12 compilation and validation of real generated artifacts.", "scripts/check-schema-artifacts.mjs"),
     evidence("design-contract", "design-validation", "Lintable design tokens and governed visual-shape checks.", "DESIGN.md"),
     evidence("dependency-lock", "dependency-lock", "Exact npm dependency graph used by build and browser checks.", "package-lock.json"),
@@ -167,7 +184,14 @@ function buildReceipt(provenance) {
     evidence("evidence-matrix", "evidence-matrix", "Claims mapped to support, state, and limitations.", "docs/evidence-matrix.md"),
     evidence("llm-wiki", "agent-contract", "Read order plus ingest, query, lint, authority, and generation boundaries.", "docs/llm-wiki/index.md"),
     evidence("prompt-contract", "prompt-contract", "Sequential clarification plus completion-first, bounded, anti-rabbit-hole handoff protocol.", "prompts/instantiate-wiki.md"),
-    evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, and parked-work boundary.", "AGENTS.md"),
+    evidence("development-response-links", "verification-script", "Stable diagnostics reject Markdown, HTML, plain-GFM, file/editor and wrong-origin Wiki links; managed-live mode also requires the exact service identity and HTTP 200 for every displayed Wiki route.", "scripts/development-response-links.mjs"),
+    evidence("development-response-link-fixtures", "test-suite", "Conforming syntax and managed-live routes plus nonconforming repository-relative, HTML, plain-GFM, absolute, file, editor, wrong-origin, service-identity and route-health cases.", "scripts/development-response-links.test.mjs"),
+    evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, parked-work boundary, and end-of-development-turn JJ commit rule.", "AGENTS.md"),
+    evidence("jj-turn-helper", "test-suite", "End-of-turn helper independently runs complete verification and maintainer provenance, inspects Git/Jujutsu state, commits changed turns with every failure disclosed, and refuses empty commits.", "scripts/jj-phase.test.mjs"),
+    evidence("local-service-contract", "verification-script", "Serialized registry ownership, atomic publication, live-listener deconfliction, exact governed registration and LaunchAgent bytes, versioned marker health, and fail-closed status-gated preview handoff.", "scripts/dev-service.mjs"),
+    evidence("local-service-fixtures", "test-suite", "Concurrent locking, stale-owner safety, atomic replacement, wrong-site HTTP 200, live-listener, exact registry/plist, loopback alias, composite status, and preview-refusal fixtures.", "scripts/dev-service.test.mjs"),
+    evidence("service-identity-marker", "runtime-identity", "Static identity marker for the registered Standard service.", "docs/assets/service-identity.json"),
+    evidence("service-identity-schema", "schema-validation", "Versioned machine contract for managed local service identity markers.", "schema/service-identity-v1.json"),
   ];
   const gatesWithEvidence = [
     {
@@ -194,9 +218,14 @@ function buildReceipt(provenance) {
         result("DKBWS-EVID-002", ["canonical-content", "evidence-matrix"]),
         result("DKBWS-LLM-001", ["canonical-content", "llm-wiki"]),
         result("DKBWS-LINK-001", ["canonical-content"]),
+        result("DKBWS-HUMAN-004", ["governing-question-repetitions", "governing-question-fixtures"], "The source gate proved one mapped canonical question and rejected ungoverned exact repetitions within the bounded reader set while leaving excluded records and subject-empty fixtures neutral."),
+        result("DKBWS-LINK-002", ["reader-source-links", "reader-source-link-fixtures", "source-register"], "The source-link gate proved stable row anchors, independent exact-row links, registered named-authority URLs, ignored non-reader regions, and an optional idempotent migration."),
         result("DKBWS-DESIGN-001", ["design-contract"]),
         result("DKBWS-PROMPT-001", ["standard-check", "prompt-contract", "agent-instruction-parity"]),
+        result("DKBWS-PROMPT-002", ["standard-check", "prompt-contract", "agent-instruction-parity", "development-response-links", "development-response-link-fixtures", "local-service-contract", "local-service-fixtures"], "The exact-valued capability, canonical URL, managed instruction parity, Markdown/HTML/plain-GFM fixtures, and managed-service identity/per-route HTTP contract make non-live Wiki-link substitution detectable and nonconforming for captured responses."),
+        result("DKBWS-PROV-001", ["standard-check", "agent-instruction-parity", "jj-turn-helper"], "The shared instructions and executable helper enforce a disclosed JJ commit at every file-changing development-turn boundary."),
         result("DKBWS-UPDATE-001", ["conformance-fixtures"]),
+        result("DKBWS-UPDATE-002", ["standard-check", "standard-proposal-core", "standard-proposal-cli", "standard-proposal-fixtures", "standard-proposal-record-schema", "standard-proposal-registry", "standard-proposal-form", "schema-artifacts"], "The proposal fixtures proved tracked immutable origin, deterministic form- and digest-bound approval, direct-edit state invariants, disclosure rejection, marker deduplication and ambiguous outcomes, fail-closed form/label checks, exact-revision registry bytes, strict release-to-ledger ancestry, immutable public release evidence, explicit issue/decision/release/adoption states, and absence of automatic remote writes or pin changes."),
         result("DKBWS-VERIFY-002", ["conformance-fixtures", "schema-artifacts"]),
         {
           ...result("DKBWS-SEC-001", ["canonical-content", "security-policy", "source-policy", "licensing-decision"]),
@@ -209,6 +238,20 @@ function buildReceipt(provenance) {
         },
       ],
     },
+    ...(provenanceMode === "maintainer" ? [{
+      id: "managed-service",
+      status: "pass",
+      command: "npm run service:status",
+      exitCode: 0,
+      evidence: [
+        evidence("managed-service-status-contract", "verification-script", "Exact registry, LaunchAgent bytes, loaded job, canonical URL, and service identity status contract.", "scripts/dev-service.mjs"),
+        evidence("managed-service-preview-fixtures", "test-suite", "Status-gated exact canonical-URL handoff and component-failure fixtures.", "scripts/dev-service.test.mjs"),
+        evidence("managed-service-live-marker", "runtime-identity", "Static identity marker returned by the registered live Standard service.", "docs/assets/service-identity.json"),
+      ],
+      results: [
+        result("DKBWS-RUNTIME-002", ["managed-service-status-contract", "managed-service-preview-fixtures", "managed-service-live-marker"], "The maintainer gate proved the live registered service, exact governed registry fields, byte-identical installed LaunchAgent contract, loaded job, HTTP identity, canonical URL, and a tested fail-closed browser handoff."),
+      ],
+    }] : []),
     {
       id: "graph",
       status: "pass",
@@ -230,9 +273,13 @@ function buildReceipt(provenance) {
         evidence("browser-dependency-lock", "dependency-lock", "Playwright and browser runtimes are exactly locked.", "package-lock.json"),
       ],
       results: [
-        result("DKBWS-HUMAN-001", ["browser-contract"], "The Human Wiki returned HTTP 200 and remained usable at tested viewports."),
+        result("DKBWS-HUMAN-001", ["browser-contract"], "The Human Wiki returned HTTP 200 and remained usable at tested viewports, including contained scrolling for a representative wide mobile table."),
         result("DKBWS-HUMAN-002", ["browser-contract"], "The governing-question marker rendered its rail and text in the resolved active accent at desktop and mobile widths while an ordinary quotation remained neutral."),
-        result("DKBWS-GRAPH-001", ["browser-contract"], "The shared 2D/3D graph views rendered with usable controls."),
+        result("DKBWS-HUMAN-004", ["browser-contract"], "Every exact canonical-question repetition route rendered the same governed text and passed the desktop/mobile accent, neutral-quotation, and containment checks."),
+        result("DKBWS-HUMAN-003", ["browser-contract"], "Draft navigation markers rendered with readable status text, the dedicated Pen Circle asset, stock-chevron dimensions, shared trailing centreline, vertical row centring, and no page overflow."),
+        result("DKBWS-LINK-002", ["browser-contract"], "A representative source identity retained visible brackets and an intelligible native link, accepted keyboard focus, targeted and reached its exact mapped source-register row, and stayed contained at desktop and mobile widths."),
+        result("DKBWS-DESIGN-001", ["browser-contract"], "Ordinary entry and architecture Mermaid diagrams retained renderer-default node treatment and passed desktop, tablet, mobile, collision, and accessibility checks."),
+        result("DKBWS-GRAPH-001", ["browser-contract"], "The selected profile's required 2D/3D graph routes rendered at desktop and mobile widths with nonblank canvases and usable controls."),
         result("DKBWS-RENDER-001", ["browser-contract", "browser-dependency-lock"]),
         result("DKBWS-RUNTIME-001", ["browser-contract"], "The verification runtime served the canonical built Wiki with HTTP 200."),
       ],
@@ -293,6 +340,11 @@ function result(requirement, evidenceIds, reason = "The successful gate supplied
 
 function subcontrol(id, evidenceIds) {
   return { id, status: "pass", reason: "The canonical content gate verified the required declaration boundary.", evidence: evidenceIds };
+}
+
+function exactSet(actual, expected) {
+  return actual.length === expected.length
+    && expected.every((item) => actual.includes(item));
 }
 
 function commandJson(command, args, label) {

@@ -5,6 +5,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { chromium } from "@playwright/test";
 import runContract from "./runtime-browser-contract.playwright.js";
+import { resolveRuntimeBrowserConfiguration } from "./runtime-browser-contract-config.mjs";
 
 const root = process.cwd();
 const serverProgram = path.join(root, "scripts", "serve-built-site.mjs");
@@ -21,16 +22,14 @@ for (const file of required) {
   process.exit(1);
 }
 
-const routeFor = (candidate, fallback = "/") => (
-  fs.existsSync(path.join(root, "site", candidate, "index.html"))
-    ? (candidate ? `/${candidate}/` : "/")
-    : fallback
-);
-const mermaidRoute = routeFor("");
-const tableRoute = routeFor("spec/requirements", mermaidRoute);
-const listRoute = mermaidRoute;
-const graphEnabled = ["graph/two-dimensional", "graph/three-dimensional"]
-  .every(candidate => fs.existsSync(path.join(root, "site", candidate, "index.html")));
+let contractConfiguration;
+try {
+  contractConfiguration = resolveRuntimeBrowserConfiguration({ root });
+} catch (error) {
+  console.error(`Runtime browser contract configuration failed: ${error.message}`);
+  process.exit(1);
+}
+const { routes, sources, graph, sourceLinks, governingQuestion } = contractConfiguration;
 
 const server = spawn(process.execPath, [serverProgram], {
   cwd: root,
@@ -43,10 +42,17 @@ let failure;
 try {
   const serverUrl = await waitForServer(server);
   const initialUrl = new URL(serverUrl);
-  initialUrl.searchParams.set("mermaid", mermaidRoute);
-  initialUrl.searchParams.set("table", tableRoute);
-  initialUrl.searchParams.set("list", listRoute);
-  initialUrl.searchParams.set("graph", graphEnabled ? "1" : "0");
+  initialUrl.searchParams.set("question", routes.question);
+  initialUrl.searchParams.set("mermaid", routes.mermaid);
+  initialUrl.searchParams.set("architecture", routes.architecture);
+  initialUrl.searchParams.set("table", routes.table);
+  initialUrl.searchParams.set("list", routes.list);
+  initialUrl.searchParams.set("sourceLinks", routes.sourceLinks);
+  initialUrl.searchParams.set("sourceRegister", routes.sourceRegister);
+  initialUrl.searchParams.set("sourceLinksEnabled", sourceLinks.required ? "1" : "0");
+  initialUrl.searchParams.set("graph", graph.required ? "1" : "0");
+  initialUrl.searchParams.set("graph2d", routes.graph2d);
+  initialUrl.searchParams.set("graph3d", routes.graph3d);
 
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
@@ -62,13 +68,26 @@ try {
   if (!bootstrap.control) {
     throw new Error(`Runtime width control did not initialize: ${JSON.stringify(bootstrap)}`);
   }
-  const result = await runContract(page);
+  const result = await runContract(page, {
+    governingQuestion: {
+      applicable: governingQuestion.applicable,
+      canonicalQuestion: governingQuestion.canonicalQuestion,
+      repetitionRoutes: governingQuestion.repetitionRoutes,
+    },
+    mermaidSources: {
+      representative: mermaidFences(fs.readFileSync(path.join(root, ...sources.mermaid.split("/")), "utf8")),
+      architecture: mermaidFences(fs.readFileSync(path.join(root, ...sources.architecture.split("/")), "utf8")),
+    },
+  });
   if (result.ok !== true) throw new Error("Runtime browser contract did not report success.");
 
-  const graphSummary = graphEnabled ? ", Graphify 2D/3D desktop/mobile pixels and controls" : "";
+  const graphSummary = graph.required ? ", Graphify 2D/3D desktop/mobile pixels and controls" : "";
   console.log(
     `Runtime browser contract passed: header rails ${result.header.standardLeftDelta}px/${result.header.standardRightDelta}px, ` +
-    `Mermaid ${result.typography.mermaid} = table ${result.typography.table}, pinned local runtimes only${graphSummary}.`,
+    `${result.governingQuestion.repetitionRouteCount} governing-question repetition route${result.governingQuestion.repetitionRouteCount === 1 ? "" : "s"}, ` +
+    `Mermaid ${result.typography.mermaid} = table ${result.typography.table}, ` +
+    `${result.tables.mobile.length} mobile table scroll contract${result.tables.mobile.length === 1 ? "" : "s"}, ` +
+    `pinned local runtimes only${graphSummary}.`,
   );
 } catch (error) {
   failure = error;
@@ -121,4 +140,8 @@ function waitForServer(child) {
       reject(error);
     });
   });
+}
+
+function mermaidFences(source) {
+  return [...source.matchAll(/```mermaid\s*\n([\s\S]*?)```/g)].map(match => match[1]);
 }

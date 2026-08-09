@@ -7,23 +7,55 @@ status: draft
 
 # Tools and sources
 
+Upstream sources are authoritative only for the formats, ideas, or tools they define. The public [DenchCo Knowledge Base Wiki Standard repository](https://github.com/denchco/knowledge-base-wiki-standard) is the sole normative source for DenchCo requirements; this Wiki provides the linked explanation.
+
 | Area | Primary tool/reference |
 |---|---|
-| Persistent wiki model | Karpathy LLM Wiki |
-| Portable format | OKF v0.2 |
-| Human renderer | Zensical |
-| Visual contract | Google DESIGN.md plus DenchCo profile |
+| Persistent wiki model | [Karpathy LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) and the [DenchCo operating model](#persistent-compounding-wiki) |
+| Portable format | [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) and the [DenchCo portability boundary](#portable-okf-v02) |
+| Human renderer | [Zensical](https://zensical.org/docs/) and the [DenchCo reference implementation](#human-reference-implementation) |
+| Visual contract | [Google DESIGN.md](https://github.com/google-labs-code/design.md) plus the canonical [DenchCo design contract](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md) |
 | Codex discovery | `AGENTS.md`, `.agents/skills/`, and `llms.txt` |
 | Claude Code discovery | `CLAUDE.md` importing `AGENTS.md`, plus `.claude/skills/` |
 | Follow-up state | `docs/project/status.md` for zero to three active priorities; validation queue fields for parked work and reopen triggers |
-| Knowledge graph | Graphify, vis-network, 3d-force-graph |
-| Diagrams | Mermaid, served locally |
-| Browser proof | Playwright with pinned Chromium |
+| Development-response navigation | Configured canonical Human Wiki origin plus `npm run response:links:check -- --base-url <canonical-url> --managed-live` for Markdown, HTML, plain-GFM, exact managed-identity, and per-route HTTP checks; uncaptured pre-send interception still requires a host hook |
+| Validation runtime | Node `24.19.0`, enforced identically in the maintainer workspace, package contract, and CI |
+| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.37`, vis-network `10.1.0`, and 3d-force-graph `1.80.0` |
+| Diagrams | Mermaid `11.16.1` with DOMPurify `3.4.13`, served locally |
+| Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
 | Versioning | Git and GitHub Releases |
-| Local phases | [Jujutsu](https://github.com/jj-vcs/jj): `0.39.0` reference-qualified; `0.42.0` available but awaiting deliberate requalification |
-| Local service | Repo wrapper plus OS adapter and HTTP-200 health |
+| Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): exact `0.44.0` reference-qualified for the Standard Production maintainer workspace |
+| Standard proposal lifecycle | Tracked records, direct-state/terminal-transition validation, the [durable Standard proposal workflow](../llm-wiki/standard-proposals.md), deterministic form-bound approval, exact registry/release evidence, one fixed historical bridge, and GET-only GitHub reconciliation; the user performs final submission |
+| Local service | Repo wrapper, serialized and atomically replaced user-scoped register, exact twelve-field registration and installed/loaded job, static-marker health, maintainer-only live status, and fail-closed `service:preview` |
 | Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |
-| Future domain integration | Conditional DenchCo Wiki Standard MCP, only after a second consumer proves a named gap left by GitHub MCP and the stable CLI |
+| Future domain integration | DenchCo Wiki Standard MCP is currently no-go; reconsider only if a future consumer proves a named gap left by Git, GitHub, and the stable CLI |
+
+## Persistent, compounding Wiki
+
+[Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) supplies the upstream idea: immutable raw sources feed an agent-maintained, interlinked Markdown Wiki, guided by a schema or instruction file and improved through ingest, query, and lint. It deliberately leaves implementation details open. DenchCo adopts the persistent, compounding model and adds governed evidence, coordinated human and agent products, reproducible checks, and explicit authority boundaries. The operational version is documented in the Wiki's [LLM Wiki entry point](../llm-wiki/index.md#operating-model).
+
+## Portable OKF v0.2
+
+The upstream [Open Knowledge Format v0.2 specification](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) defines a portable directory of Markdown documents with YAML frontmatter that remains readable by people and agents without a required runtime. DenchCo maps one explicit `knowledge/` bundle to that foundation, preserves unknown extension fields, and reports its stricter evidence and profile rules separately. See the Wiki's [OKF conformance boundary](../spec/conformance.md#okf-v02-boundary).
+
+## DenchCo governance
+
+DenchCo adds the controls that turn the two foundations into a reviewable production system:
+
+- [Sources](../sources.md), the [evidence matrix](../evidence-matrix.md), the [validation queue](../validation-queue.md), and the [research log](../log.md) make authority, uncertainty, and gaps inspectable. Displayed source identities route through [exact internal source rows](../spec/requirements.md#reader-evidence-navigation) before a reader leaves the Wiki for a registered authority, and every exact reader-facing repetition of a declared [canonical governing question](../spec/requirements.md#canonical-governing-question-consistency) retains its governed presentation.
+- The [standard architecture](../architecture.md#canonical-layers) and [repository graph](../graph/index.md) connect canonical knowledge to Human, Agent, and Graph discovery surfaces without granting generated views evidence authority.
+- The [requirements catalogue](../spec/requirements.md), [profiles](../spec/profiles.md), and canonical [DenchCo design contract](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md) define the governed implementation choices. Development responses that navigate the Wiki use its verified canonical live routes; file/editor links and clickable repository paths do not substitute for Wiki navigation.
+- [Conformance](../spec/conformance.md), [dependencies](../spec/dependencies.md), and the [roadmap](../roadmap.md) explain verification, runtime, migration, and release state.
+
+These choices are defined by the [DenchCo Standard repository](https://github.com/denchco/knowledge-base-wiki-standard), not by any upstream tool.
+
+## Coordinated Human and LLM products
+
+The [Human and LLM Wiki products](../architecture.md#human-and-llm-products) are different presentations of one canonical corpus. The Human Wiki optimizes comprehension, navigation, diagrams, and evidence inspection; the [LLM Wiki](../llm-wiki/index.md) optimizes context selection, maintenance, ingest, query, and lint. Neither becomes a duplicate knowledge store or an independent authority. This coordination is a DenchCo-defined product rule rather than a requirement imposed by Karpathy or OKF.
+
+## Human reference implementation
+
+The [Standard Production profile](../spec/profiles.md#profiles) selects exactly [Zensical](https://zensical.org/docs/) `0.0.53` to render the Human Wiki with the DenchCo visual profile, repository-local diagram and graph assets, and built-output browser checks. [Google DESIGN.md](https://github.com/google-labs-code/design.md) supplies an agent-readable design-contract format; the actual colours, shapes, layout, accessibility rules, and adapter decisions are governed by the canonical [DenchCo `DESIGN.md`](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md). Exact pins and the offline/runtime boundary are recorded in [Dependencies](../spec/dependencies.md).
 
 See the root dependency contract and source register for versions and authority.

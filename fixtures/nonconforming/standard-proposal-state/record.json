@@ -1,0 +1,7 @@
+{
+  "fixture": "accepted-without-requirements",
+  "mutation": {
+    "workflow.upstream.decision": "accepted",
+    "workflow.acceptance.requirementIds": []
+  }
+}

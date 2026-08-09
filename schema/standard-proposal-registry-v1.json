@@ -1,0 +1,484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-registry-v1.json",
+  "title": "DenchCo Standard proposal acceptance and release registry v1",
+  "description": "Standard-maintained mapping from proposal identity through issue, explicit decision, requirements, and immutable release.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "registryVersion",
+    "targetRepository",
+    "entries"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-registry-v1.json"
+    },
+    "registryVersion": {
+      "const": "1.0"
+    },
+    "targetRepository": {
+      "const": "https://github.com/denchco/knowledge-base-wiki-standard"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "proposalId": {
+      "type": "string",
+      "pattern": "^DKBWS-PROP-[a-z0-9][a-z0-9-]*[a-z0-9]-[0-9a-f]{32}$"
+    },
+    "marker": {
+      "type": "string",
+      "pattern": "^<!-- dkbws-standard-proposal:v1:DKBWS-PROP-[a-z0-9][a-z0-9-]*[a-z0-9]-[0-9a-f]{32} -->$"
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "dateTime": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "nullableDateTime": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/dateTime"
+        }
+      ]
+    },
+    "nullableCommit": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/commit"
+        }
+      ]
+    },
+    "tag": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "marker",
+        "intakeMode",
+        "origin",
+        "issue",
+        "classification",
+        "decision",
+        "decisionDate",
+        "decisionRevision",
+        "decisionEvidence",
+        "acceptedRequirements",
+        "release",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/proposalId"
+        },
+        "marker": {
+          "$ref": "#/$defs/marker"
+        },
+        "intakeMode": {
+          "enum": [
+            "governed-issue",
+            "pre-registry-local-history"
+          ]
+        },
+        "origin": {
+          "type": "object",
+          "required": [
+            "project",
+            "publicUrl",
+            "implementationCommit",
+            "verificationCommit",
+            "pinnedStandardRevision"
+          ],
+          "properties": {
+            "project": {
+              "type": "string",
+              "minLength": 1
+            },
+            "publicUrl": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^https://[^\\s]+$"
+                }
+              ]
+            },
+            "implementationCommit": {
+              "$ref": "#/$defs/commit"
+            },
+            "verificationCommit": {
+              "$ref": "#/$defs/commit"
+            },
+            "pinnedStandardRevision": {
+              "$ref": "#/$defs/commit"
+            }
+          },
+          "additionalProperties": false
+        },
+        "issue": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "url",
+                "number"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "pattern": "^https://github\\.com/denchco/knowledge-base-wiki-standard/issues/[1-9][0-9]*$"
+                },
+                "number": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "classification": {
+          "enum": [
+            "pending",
+            "experimental",
+            "project-specific",
+            "reusable",
+            "preferred",
+            "core"
+          ]
+        },
+        "decision": {
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "withdrawn"
+          ]
+        },
+        "decisionDate": {
+          "$ref": "#/$defs/nullableDateTime"
+        },
+        "decisionRevision": {
+          "$ref": "#/$defs/nullableCommit"
+        },
+        "decisionEvidence": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "acceptedRequirements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^DKBWS-[A-Z]+-[0-9]{3}$"
+          }
+        },
+        "release": {
+          "type": "object",
+          "required": [
+            "status",
+            "tag",
+            "revision",
+            "recordedAt"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "included",
+                "not-applicable"
+              ]
+            },
+            "tag": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/tag"
+                }
+              ]
+            },
+            "revision": {
+              "$ref": "#/$defs/nullableCommit"
+            },
+            "recordedAt": {
+              "$ref": "#/$defs/nullableDateTime"
+            }
+          },
+          "additionalProperties": false
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "intakeMode": {
+                "const": "governed-issue"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "issue": {
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "intakeMode": {
+                "const": "pre-registry-local-history"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "const": "DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b"
+              },
+              "issue": {
+                "type": "null"
+              },
+              "origin": {
+                "properties": {
+                  "project": {
+                    "const": "UK Digital Health compliance"
+                  },
+                  "publicUrl": {
+                    "type": "null"
+                  },
+                  "implementationCommit": {
+                    "const": "3a085ebbfa66dea87d96700c7a735cf65def5ef6"
+                  },
+                  "verificationCommit": {
+                    "const": "3d9e1379ec67fd378b16c4b50c77f57c0db3c871"
+                  },
+                  "pinnedStandardRevision": {
+                    "const": "46183bc02c3d818f5aac962a4fbebc49b6ac9659"
+                  }
+                },
+                "type": "object"
+              },
+              "classification": {
+                "const": "reusable"
+              },
+              "decision": {
+                "const": "accepted"
+              },
+              "decisionRevision": {
+                "const": "6b9c686c66d2ef0e17342d666140bf4117f33a87"
+              },
+              "acceptedRequirements": {
+                "const": [
+                  "DKBWS-LINK-002"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "const": "pending"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "decisionDate": {
+                "type": "null"
+              },
+              "decisionRevision": {
+                "type": "null"
+              },
+              "decisionEvidence": {
+                "type": "null"
+              },
+              "acceptedRequirements": {
+                "maxItems": 0,
+                "type": "array"
+              },
+              "release": {
+                "properties": {
+                  "status": {
+                    "const": "pending"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "const": "accepted"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "classification": {
+                "enum": [
+                  "experimental",
+                  "project-specific",
+                  "reusable",
+                  "preferred",
+                  "core"
+                ]
+              },
+              "decisionDate": {
+                "$ref": "#/$defs/dateTime"
+              },
+              "decisionRevision": {
+                "$ref": "#/$defs/commit"
+              },
+              "decisionEvidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "acceptedRequirements": {
+                "minItems": 1,
+                "type": "array"
+              },
+              "release": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "pending",
+                      "included"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "enum": [
+                  "rejected",
+                  "withdrawn"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "decisionDate": {
+                "$ref": "#/$defs/dateTime"
+              },
+              "decisionRevision": {
+                "$ref": "#/$defs/commit"
+              },
+              "decisionEvidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "acceptedRequirements": {
+                "maxItems": 0,
+                "type": "array"
+              },
+              "release": {
+                "properties": {
+                  "status": {
+                    "const": "not-applicable"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "release": {
+                "properties": {
+                  "status": {
+                    "const": "included"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "release": {
+                "properties": {
+                  "tag": {
+                    "$ref": "#/$defs/tag"
+                  },
+                  "revision": {
+                    "$ref": "#/$defs/commit"
+                  },
+                  "recordedAt": {
+                    "$ref": "#/$defs/dateTime"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

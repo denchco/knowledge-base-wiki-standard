@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   readdirSync,
   rmSync,
   statSync,
@@ -30,6 +32,7 @@ import {
   loadRequirementCatalogue,
   ProfileLoadError,
 } from "./profile-catalogue.mjs";
+import { checkProvenance } from "./check-provenance.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = path.join(ROOT, "scripts/conformance-cli.mjs");
@@ -39,7 +42,9 @@ const NEGATIVE_OKF = path.join(ROOT, "fixtures/nonconforming/okf-v0.2");
 const GUIDANCE = path.join(ROOT, "fixtures/nonconforming/okf-guidance");
 const NEGATIVE_MANIFEST = path.join(ROOT, "fixtures/nonconforming/manifest");
 const NEGATIVE_WAIVER = path.join(ROOT, "fixtures/nonconforming/waiver");
+const INVALID_CONSUMER_RECEIPT = path.join(ROOT, "fixtures/nonconforming/verification-receipt/consumer-summary.json");
 const OLD_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-old");
+const RC3_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-rc3");
 const STARTER_PATH = path.join(ROOT, "starter/starter.yaml");
 const LIFECYCLE_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/lifecycle-plan-v1.json"), "utf8"));
 const MANIFEST_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/manifest-v1.json"), "utf8"));
@@ -151,6 +156,27 @@ function writePortableProject(root, { deviation = null, conceptBody = "# Fixture
   ].join("\n"), "utf8");
 }
 
+test("provenance preserves a filesystem-significant trailing-space repository root", () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "denchco-provenance-path-"));
+  try {
+    const repositoryRoot = path.join(fixtureRoot, "repository ");
+    const nested = path.join(repositoryRoot, "nested");
+    mkdirSync(nested, { recursive: true });
+    const initialized = spawnSync("git", ["init", "--quiet"], { cwd: repositoryRoot, encoding: "utf8" });
+    assert.equal(initialized.status, 0, initialized.stderr);
+
+    const report = checkProvenance({ root: repositoryRoot, mode: "distribution" });
+    assert.equal(report.git.repositoryRoot, realpathSync(repositoryRoot));
+    assert.match(report.git.repositoryRoot, /repository $/);
+    assert.throws(
+      () => checkProvenance({ root: nested, mode: "distribution" }),
+      /does not equal Git root/,
+    );
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+});
+
 function receiptFor(target, profile, results, options = {}) {
   return {
     $schema: RECEIPT_SCHEMA.$id,
@@ -205,7 +231,10 @@ test("canonical profiles resolve inheritance and align with the requirement cata
   assert.ok(portable.requirements.includes("DKBWS-OKF-003"));
   assert.ok(production.requirements.includes("DKBWS-OKF-003"));
   assert.ok(production.requirements.includes("DKBWS-HUMAN-002"));
+  assert.ok(production.requirements.includes("DKBWS-LINK-002"));
   assert.ok(production.requirements.includes("DKBWS-VERIFY-002"));
+  assert.ok(production.requirements.includes("DKBWS-RUNTIME-002"));
+  assert.equal(production.capabilities.local_service, "required");
   assert.deepEqual(
     production.sources.map((source) => source.path),
     [
@@ -330,6 +359,11 @@ test("standard-production requirement results come from the resolved profile cha
   assert.equal(requirements.get("DKBWS-HUMAN-002")?.status, "not-checked");
   assert.equal(requirements.get("DKBWS-VERIFY-002")?.status, "not-checked");
   assert.match(requirements.get("DKBWS-VERIFY-002")?.reason ?? "", /complete profile verification pipeline/);
+
+  const strict = run("validate", ROOT, "--date", "2026-08-03", "--json", "--strict");
+  assert.equal(strict.status, 0, strict.stderr || strict.stdout);
+  const strictReport = JSON.parse(strict.stdout);
+  assert.equal(strictReport.diagnostics.some(item => item.code === "DKBWS-MANIFEST-ROLE-006"), false);
 });
 
 test("positive fixture validates as hard OKF v0.2 and preserves extension discovery", () => {
@@ -508,6 +542,21 @@ test("Attested Computation runtime remains soft guidance and report schemas reje
   const validateReceipt = ajv.compile(RECEIPT_SCHEMA);
   const sample = receiptFor(POSITIVE, "portable-core", [] , { gates: [] });
   assert.equal(validateReceipt(sample), true, JSON.stringify(validateReceipt.errors));
+
+  const validateManifest = ajv.compile(MANIFEST_SCHEMA);
+  const liveResponseManifest = {
+    schema: "https://example.test/manifest-v1.json",
+    standard: { name: "DenchCo Knowledge Base Wiki Standard", version: "fixture", source: "local-test" },
+    profile: "human-and-agent",
+    okf_version: "0.2",
+    roles: { okf_bundle: "knowledge" },
+    capabilities: { development_response_links: "live-wiki", human_wiki_url: "docs/index.md" },
+    deviations: [],
+  };
+  assert.equal(validateManifest(liveResponseManifest), false);
+  assert.ok(validateManifest.errors.some((item) => item.instancePath === "/capabilities/human_wiki_url"));
+  liveResponseManifest.capabilities.human_wiki_url = "http://127.0.0.1:8017/";
+  assert.equal(validateManifest(liveResponseManifest), true, JSON.stringify(validateManifest.errors));
 });
 
 test("invalid DenchCo manifest is diagnosed independently from OKF", () => {
@@ -558,6 +607,9 @@ test("help and package scripts expose only lifecycle planning modes", () => {
   assert.match(help.stdout, /init \[target\] --dry-run/);
   assert.match(help.stdout, /no apply mode/i);
   assert.match(help.stdout, /--standard-revision/);
+  assert.match(help.stdout, /--seed/);
+  assert.match(help.stdout, /--blank/);
+  assert.match(help.stdout, /--accent/);
   assert.match(help.stdout, /--wiki-url/);
   assert.match(help.stdout, /--deployment/);
   const pkg = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8"));
@@ -576,9 +628,18 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(starter.root_copy, "forbidden");
   assert.equal(starter.content_policy, "subject-specific-create-fresh");
   assert.equal(starter.deployment_policy, "consumer-owned");
+  assert.equal(starter.bootstrap.invocation, "standard-repository-url-only");
+  assert.equal(starter.bootstrap.first_question, "research-topic-seed-or-subject-empty-local-wiki");
+  assert.deepEqual(starter.bootstrap.modes, ["research-topic-seed", "subject-empty-local"]);
+  assert.equal(starter.bootstrap.defaults.profile, "standard-production");
+  assert.equal(starter.bootstrap.defaults.accent_color, "#0b7285");
+  assert.equal(starter.bootstrap.defaults.wiki_url, "auto-reserve-conflict-free-loopback");
+  assert.equal(starter.bootstrap.defaults.local_service, "auto-select-platform-user-service-adapter");
+  assert.equal(starter.bootstrap.defaults.deployment, "none");
   assert.equal(starter.executable_scope.apply_supported, false);
   assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
   assert.match(starter.executable_scope.standard_production, /complete .* dependency closure/i);
+  assert.match(starter.executable_scope.standard_production, /documentation-sync commands and verify:workspace are excluded/i);
 
   const targets = starter.entries.map((entry) => entry.target);
   assert.equal(new Set(targets).size, targets.length, "starter target paths must be unique");
@@ -592,6 +653,36 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   const projectStatusEntry = starter.entries.find((entry) => entry.target === "docs/project/status.md");
   assert.equal(projectStatusEntry?.classification, "render-template");
   assert.equal(projectStatusEntry?.always, true);
+  const packageEntry = starter.entries.find((entry) => entry.target === "package.json");
+  assert.match(packageEntry?.dependency_closure ?? "", /exclude Standard-maintainer sync:documentation:\* and verify:workspace/i);
+  assert.ok(packageEntry?.requirements.includes("DKBWS-RUNTIME-002"));
+  const serviceEntry = starter.entries.find((entry) => entry.target === "scripts/dev-service.mjs");
+  assert.equal(serviceEntry?.classification, "adapt-from-release");
+  assert.ok(serviceEntry?.requirements.includes("DKBWS-RUNTIME-002"));
+  const serviceMarkerEntry = starter.entries.find((entry) => entry.target === "docs/assets/service-identity.json");
+  assert.equal(serviceMarkerEntry?.classification, "render-template");
+  assert.equal(serviceMarkerEntry?.always, true);
+  assert.ok(serviceMarkerEntry?.requirements.includes("DKBWS-RUNTIME-002"));
+  const licensingEntry = starter.entries.find((entry) => entry.target === "LICENSING.md");
+  assert.equal(licensingEntry?.classification, "render-template");
+  assert.equal(licensingEntry?.always, true);
+  const graphIndexEntry = starter.entries.find((entry) => entry.target === "docs/graph/index.md");
+  assert.equal(graphIndexEntry?.classification, "render-template");
+  const graphIndexTemplate = readFileSync(path.join(ROOT, graphIndexEntry.template), "utf8");
+  assert.match(graphIndexTemplate, /generated discovery aids and are not evidence/);
+  assert.match(graphIndexTemplate, /\[2D\]\(two-dimensional\.md\)/);
+  assert.match(graphIndexTemplate, /\[3D\]\(three-dimensional\.md\)/);
+  for (const [target, view] of [
+    ["docs/graph/two-dimensional.md", "2d"],
+    ["docs/graph/three-dimensional.md", "3d"],
+  ]) {
+    const graphEntry = starter.entries.find((entry) => entry.target === target);
+    assert.equal(graphEntry?.classification, "render-template");
+    const graphTemplate = readFileSync(path.join(ROOT, graphEntry.template), "utf8");
+    assert.match(graphTemplate, /class="graph-shell"/);
+    assert.match(graphTemplate, new RegExp(`data-graph-view="${view}"`));
+    assert.doesNotMatch(graphTemplate, /class="kb-graph"/);
+  }
 
   const forbiddenTemplateContent = /five-project|SRC-00[1-9]|candidate status|local-unpublished/i;
   for (const entry of starter.entries) {
@@ -615,7 +706,7 @@ test("lifecycle diff compares the consumer version and selected profile without 
   const before = treeHash(OLD_CONSUMER);
   const result = run("diff", OLD_CONSUMER, "--date", "2026-08-03", "--json");
   const after = treeHash(OLD_CONSUMER);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(result.status, 1, result.stderr || result.stdout);
   assert.equal(after, before);
   const diff = JSON.parse(result.stdout);
   assertLifecycleSchemaShape(diff);
@@ -623,12 +714,137 @@ test("lifecycle diff compares the consumer version and selected profile without 
   assert.equal(diff.readOnly, true);
   assert.equal(diff.writesPerformed, false);
   assert.equal(diff.summary.versionState, "candidate-newer");
-  assert.equal(diff.summary.blocking, 0);
+  assert.equal(diff.summary.revisionState, "missing");
+  assert.equal(diff.summary.blocking, 1);
+  assert.equal(diff.summary.safeToPlanUpgrade, false);
   assert.ok(diff.requirements.some((item) => item.id === "DKBWS-OKF-001"));
   assert.deepEqual(
     diff.changes.map((change) => [change.id, change.path, change.current, change.proposed]),
-    [["standard-version-update", "/standard/version", "0.0.9", "0.1.0-candidate"]],
+    [
+      ["standard-version-update", "/standard/version", "0.0.9", "0.1.0-candidate"],
+      ["standard-revision-missing", "/standard/revision", null, diff.candidate.standard.revision],
+    ],
   );
+  const headManifest = spawnSync("git", ["show", `${diff.candidate.standard.revision}:.wiki-standard.yaml`], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(headManifest.status, 0, headManifest.stderr);
+  assert.equal(diff.candidate.manifest.sha256, createHash("sha256").update(headManifest.stdout).digest("hex"));
+});
+
+test("lifecycle diff compares equal version labels by immutable revision and requirement IDs", () => {
+  const before = treeHash(RC3_CONSUMER);
+  const result = run("diff", RC3_CONSUMER, "--date", "2026-08-04", "--json");
+  const after = treeHash(RC3_CONSUMER);
+  assert.equal(result.status, 1, result.stderr || result.stdout);
+  assert.equal(after, before);
+  const diff = JSON.parse(result.stdout);
+  assertLifecycleSchemaShape(diff);
+  assert.equal(diff.summary.versionState, "same");
+  assert.equal(diff.summary.revisionState, "candidate-newer");
+  assert.equal(diff.summary.safeToPlanUpgrade, false);
+  assert.match(diff.consumer.resolvedRevision, /^[0-9a-f]{40}$/);
+  assert.ok(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-002"));
+  assert.equal(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-003"), false);
+  assert.ok(diff.changes.some((change) => change.id === "standard-revision-review" && change.blocking));
+  assert.ok(diff.changes.some((change) => (
+    change.id === "requirement-introduced-DKBWS-HUMAN-003"
+    && change.proposed === "DKBWS-HUMAN-003"
+    && change.blocking
+  )));
+  assert.equal(
+    diff.requirements.find((item) => item.id === "DKBWS-HUMAN-003")?.introducedSinceConsumerRevision,
+    true,
+  );
+});
+
+test("the current lifecycle catalogue introduces managed preview and live response links after rc.3", () => {
+  const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
+  const current = loadProfile("standard-production", {
+    standardRoot: ROOT,
+    requirementIds: catalogue.ids,
+  });
+  const readRc3Source = (relativePath) => {
+    const result = spawnSync("git", ["show", `v0.1.0-rc.3:${relativePath}`], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout;
+  };
+  const rc3Catalogue = loadRequirementCatalogue({ standardRoot: ROOT, readSource: readRc3Source });
+  const rc3 = loadProfile("standard-production", {
+    standardRoot: ROOT,
+    readSource: readRc3Source,
+    requirementIds: rc3Catalogue.ids,
+  });
+  const introduced = current.requirements.filter((requirement) => !rc3.requirements.includes(requirement));
+  assert.ok(introduced.includes("DKBWS-RUNTIME-002"));
+  assert.ok(introduced.includes("DKBWS-PROMPT-002"));
+  assert.equal(current.capabilities.development_response_links, "live-wiki");
+});
+
+test("lifecycle revision comparison distinguishes the same commit from an unresolved pin", () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "denchco-revision-diff-"));
+  try {
+    const same = path.join(fixtureRoot, "same");
+    const unresolved = path.join(fixtureRoot, "unresolved");
+    cpSync(RC3_CONSUMER, same, { recursive: true });
+    cpSync(RC3_CONSUMER, unresolved, { recursive: true });
+    const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: ROOT, encoding: "utf8" }).stdout.trim();
+
+    const sameManifest = path.join(same, ".wiki-standard.yaml");
+    writeFileSync(
+      sameManifest,
+      readFileSync(sameManifest, "utf8").replace('revision: "v0.1.0-rc.3"', `revision: "${head}"`),
+      "utf8",
+    );
+    const sameResult = run("diff", same, "--json");
+    assert.equal(sameResult.status, 0, sameResult.stderr || sameResult.stdout);
+    const sameDiff = JSON.parse(sameResult.stdout);
+    assert.equal(sameDiff.summary.revisionState, "same");
+    assert.equal(sameDiff.changes.some((change) => change.id.startsWith("standard-revision")), false);
+
+    const unresolvedManifest = path.join(unresolved, ".wiki-standard.yaml");
+    writeFileSync(
+      unresolvedManifest,
+      readFileSync(unresolvedManifest, "utf8").replace('revision: "v0.1.0-rc.3"', `revision: "${"f".repeat(40)}"`),
+      "utf8",
+    );
+    const unresolvedResult = run("diff", unresolved, "--json");
+    assert.equal(unresolvedResult.status, 1, unresolvedResult.stderr || unresolvedResult.stdout);
+    const unresolvedDiff = JSON.parse(unresolvedResult.stdout);
+    assert.equal(unresolvedDiff.summary.revisionState, "unresolved");
+    assert.ok(unresolvedDiff.changes.some((change) => change.id === "standard-revision-unresolved" && change.blocking));
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+});
+
+test("lifecycle diff never plans a version update across Standard sources", () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "denchco-source-diff-"));
+  try {
+    const consumer = path.join(fixtureRoot, "consumer");
+    cpSync(OLD_CONSUMER, consumer, { recursive: true });
+    const manifestPath = path.join(consumer, ".wiki-standard.yaml");
+    writeFileSync(
+      manifestPath,
+      readFileSync(manifestPath, "utf8").replace(
+        "https://github.com/denchco/knowledge-base-wiki-standard",
+        "https://example.invalid/different-standard",
+      ),
+      "utf8",
+    );
+    const result = run("diff", consumer, "--json");
+    assert.equal(result.status, 1, result.stderr || result.stdout);
+    const diff = JSON.parse(result.stdout);
+    assert.equal(diff.summary.revisionState, "not-compared");
+    assert.ok(diff.changes.some((change) => change.id === "standard-source-review" && change.blocking));
+    assert.equal(diff.changes.some((change) => change.id === "standard-version-update"), false);
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 });
 
 test("upgrade requires dry-run and emits a guarded review plan rather than applying", () => {
@@ -639,7 +855,7 @@ test("upgrade requires dry-run and emits a guarded review plan rather than apply
   const before = treeHash(OLD_CONSUMER);
   const result = run("upgrade", OLD_CONSUMER, "--dry-run", "--date", "2026-08-03", "--json");
   const after = treeHash(OLD_CONSUMER);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(result.status, 1, result.stderr || result.stdout);
   assert.equal(after, before);
   const plan = JSON.parse(result.stdout);
   assertLifecycleSchemaShape(plan);
@@ -651,6 +867,8 @@ test("upgrade requires dry-run and emits a guarded review plan rather than apply
   assert.deepEqual(plan.patchPlan.operations.map((operation) => operation.op), ["test", "replace"]);
   assert.ok(plan.patchPlan.preserved.includes("/deviations"));
   assert.ok(plan.patchPlan.preserved.includes("unknown OKF concept fields"));
+  assert.equal(plan.summary.blocking, 1);
+  assert.equal(plan.summary.readyForHumanReview, false);
 });
 
 test("init requires dry-run and plans an absent target without creating it", () => {
@@ -666,10 +884,14 @@ test("init requires dry-run and plans an absent target without creating it", () 
     "--dry-run",
     "--profile",
     "portable-core",
+    "--seed",
+    "A bounded research brief supplied by the user",
     "--title",
     "Planned Wiki",
     "--topic",
     "A bounded reader task for a known audience",
+    "--accent",
+    "#0b7285",
     "--standard-revision",
     "v0.1.0-rc.1",
     "--wiki-url",
@@ -688,14 +910,25 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.equal(plan.targetState.type, "absent");
   assert.equal(plan.proposedManifest.profile, "portable-core");
   assert.equal(plan.proposedManifest.standard.source, "https://github.com/denchco/knowledge-base-wiki-standard");
-  assert.equal(plan.proposedManifest.standard.revision, "v0.1.0-rc.1");
+  const resolvedRc1 = spawnSync("git", ["rev-parse", "--verify", "v0.1.0-rc.1^{commit}"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  }).stdout.trim();
+  assert.match(resolvedRc1, /^[0-9a-f]{40}$/);
+  assert.equal(plan.proposedManifest.standard.revision, resolvedRc1);
+  assert.equal(plan.input.standardRevision, resolvedRc1);
   assert.equal(plan.proposedManifest.roles.okf_bundle, "knowledge");
   assert.equal(plan.input.wikiUrl, "https://example.test/planned-wiki/");
   assert.equal(plan.input.deployment, "none");
+  assert.equal(plan.input.startingPoint, "research-topic-seed");
+  assert.equal(plan.input.accent, "#0b7285");
   assert.equal(plan.clarificationProtocol.nextQuestion, null);
+  assert.equal(plan.automaticResolutions.length, 1);
+  assert.match(plan.automaticResolutions[0], /inspect the supplied research seed/);
+  assert.equal(plan.summary.readyForRendering, false);
   assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md" && entry.classification === "render-template"));
-  assert.ok(plan.layout.some((entry) => entry.path === "CLAUDE.md" && entry.classification === "render-template"));
-  assert.ok(plan.layout.some((entry) => entry.path === "docs/project/status.md" && entry.classification === "render-template"));
+  assert.equal(plan.layout.some((entry) => entry.path === "CLAUDE.md"), false, "the rc.1 plan must use the starter pinned at rc.1");
+  assert.equal(plan.layout.some((entry) => entry.path === "docs/project/status.md"), false, "the rc.1 plan must not leak current HEAD starter entries");
   assert.equal(plan.candidate.starter.rootCopy, "forbidden");
   assert.equal(plan.candidate.starter.deploymentPolicy, "consumer-owned");
   assert.equal(plan.candidate.starter.executableScope.apply_supported, false);
@@ -717,14 +950,58 @@ test("init plan preserves and reports collisions in an existing target", () => {
   assert.ok(plan.safety.collisions.includes(".wiki-standard.yaml"));
   assert.ok(plan.safety.collisions.includes("knowledge/index.md"));
   assert.ok(plan.layout.filter((entry) => entry.collision).every((entry) => entry.action === "preserve-and-review"));
-  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 5:/);
+  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 2:/);
+  assert.match(plan.clarificationProtocol.nextQuestion, /research topic seed.*subject-empty local wiki/i);
+  assert.match(plan.input.standardRevision, /^[0-9a-f]{40}$/);
+  assert.equal(plan.proposedManifest.standard.revision, plan.input.standardRevision);
+  assert.equal(plan.input.wikiUrl, null);
+  assert.equal(plan.input.wikiUrlResolution, "implementation-auto-reserve-conflict-free-loopback");
+  assert.equal(plan.input.deployment, "none");
+  assert.equal(plan.input.proposedAccent, "#0b7285");
+  assert.equal(plan.proposedManifest.capabilities.deployment, false);
+  assert.equal(plan.candidate.starter.bootstrap.invocation, "standard-repository-url-only");
+  assert.ok(plan.layout.some((entry) => entry.path === "CLAUDE.md" && entry.classification === "render-template"));
+  assert.ok(plan.layout.some((entry) => entry.path === "docs/project/status.md" && entry.classification === "render-template"));
   assert.deepEqual(plan.unresolvedInputs, [
-    "topic, audience, governing question, and intended outcome",
-    "project title",
-    "immutable standard release tag or commit",
-    "consumer-owned canonical Wiki URL",
-    "consumer-owned deployment choice (`none` is valid)",
+    "starting point: research topic seed or subject-empty local wiki",
+    "accent colour (proposed default #0b7285 when no evidenced brand colour exists)",
   ]);
+  assert.deepEqual(plan.automaticResolutions, [
+    "Implementation must serialize shared-register and live-listener checks, atomically reserve a conflict-free loopback endpoint, publish its exact service identity marker, and record the resulting concrete Wiki URL.",
+  ]);
+});
+
+test("init discovery rejects conflicting starting modes and invalid accent input", () => {
+  const target = path.join(ROOT, "fixtures/lifecycle/not-created-by-dry-run");
+  const conflicting = run("init", target, "--dry-run", "--seed", "seed", "--blank", "--json");
+  assert.equal(conflicting.status, 2);
+  assert.match(conflicting.stderr, /either --seed or --blank, not both/);
+
+  const invalidAccent = run("init", target, "--dry-run", "--blank", "--accent", "teal", "--json");
+  assert.equal(invalidAccent.status, 2);
+  assert.match(invalidAccent.stderr, /six-digit hex colour/);
+
+  const sameRoot = run("init", ROOT, "--dry-run", "--blank", "--json");
+  assert.equal(sameRoot.status, 2);
+  assert.match(sameRoot.stderr, /independent repository path/);
+});
+
+test("subject-empty discovery asks for a title before the accent and invents no topic", () => {
+  const target = path.join(ROOT, "fixtures/lifecycle/not-created-by-dry-run");
+  const result = run("init", target, "--dry-run", "--blank", "--profile", "portable-core", "--json");
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const plan = JSON.parse(result.stdout);
+  assert.equal(plan.input.startingPoint, "subject-empty-local");
+  assert.equal(plan.input.subjectEmpty, true);
+  assert.equal(plan.input.topic, null);
+  assert.deepEqual(plan.unresolvedInputs, [
+    "project title for the subject-empty local wiki",
+    "accent colour (proposed default #0b7285 when no evidenced brand colour exists)",
+  ]);
+  assert.match(plan.clarificationProtocol.nextQuestion, /^Question 1 of 2: Confirm project title/);
+  const homepageTemplate = readFileSync(path.join(ROOT, "starter/templates/docs/index.md.tmpl"), "utf8");
+  assert.match(homepageTemplate, /GOVERNING_QUESTION_CALLOUT_OR_SUBJECT_EMPTY_NOTICE/);
+  assert.doesNotMatch(homepageTemplate, /\{\{GOVERNING_QUESTION\}\}/);
 });
 
 test("full-profile module and CLI emit a schema-valid conformant report from explicit gate evidence", () => {
@@ -795,6 +1072,17 @@ test("full-profile reporting leaves absent gates not checked and rejects unsuppo
   );
 });
 
+test("reserved verification receipt paths reject project-only consumer summaries", () => {
+  const summary = JSON.parse(readFileSync(INVALID_CONSUMER_RECEIPT, "utf8"));
+  const validate = new Ajv2020({ strict: false, allErrors: true }).compile(RECEIPT_SCHEMA);
+  assert.equal(validate(summary), false);
+  assert.ok(validate.errors.some((error) => error.keyword === "required"));
+  assert.throws(
+    () => buildFullProfileReport({ target: ROOT, receipt: summary }),
+    (error) => error instanceof ReceiptError && /does not match/.test(error.message),
+  );
+});
+
 test("distribution provenance cannot satisfy Standard Production maintainer provenance", () => {
   const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
   const profile = loadProfile("standard-production", { standardRoot: ROOT, requirementIds: catalogue.ids });
@@ -831,6 +1119,36 @@ test("distribution provenance cannot satisfy Standard Production maintainer prov
   assert.equal(report.summary.evaluationComplete, false);
 });
 
+test("maintainer provenance also requires the end-of-development-turn instruction and helper gate", () => {
+  const provenance = {
+    requirement: "DKBWS-PROV-001",
+    mode: "maintainer",
+    status: "pass",
+    readOnly: true,
+    git: { status: "pass" },
+    jujutsu: { status: "pass" },
+  };
+  const missingPolicy = buildFullProfileReport({
+    target: ROOT,
+    receipt: receiptFor(ROOT, "standard-production", [], { provenance, gates: [] }),
+  });
+  const missingResult = missingPolicy.requirementResults.find((item) => item.requirement === "DKBWS-PROV-001");
+  assert.equal(missingResult.status, "not-checked");
+  assert.match(missingResult.reason, /instruction\/helper gate/);
+
+  const completePolicy = buildFullProfileReport({
+    target: ROOT,
+    receipt: receiptFor(ROOT, "standard-production", [{
+      requirement: "DKBWS-PROV-001",
+      status: "pass",
+      evidence: ["suite"],
+    }], { provenance }),
+  });
+  const completeResult = completePolicy.requirementResults.find((item) => item.requirement === "DKBWS-PROV-001");
+  assert.equal(completeResult.status, "pass");
+  assert.match(completeResult.reason, /end-of-development-turn commit mechanism/);
+});
+
 test("full-profile conformance fails required-false and exact-value capability drift", () => {
   withTemporaryRoot((root) => {
     writePortableProject(root);
@@ -852,6 +1170,7 @@ test("full-profile conformance fails required-false and exact-value capability d
       "  graphify: true",
       "  local_browser_runtimes: true",
       "  browser_verification: true",
+      "  local_service: fixture-user-service",
       "  jujutsu: true",
       "deviations: []",
       "",
@@ -885,8 +1204,10 @@ test("full-profile conformance fails required-false and exact-value capability d
     });
     const report = buildFullProfileReport({ target: root, receipt });
     assert.equal(report.summary.profileComplete, false);
-    assert.equal(report.summary.failedCapabilities, 2);
+    assert.equal(report.summary.failedCapabilities, 4);
     assert.equal(report.capabilityStates.find((item) => item.id === "evidence_governance").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "human_renderer").verificationStatus, "fail");
+    assert.equal(report.capabilityStates.find((item) => item.id === "standard_change_intake").verificationStatus, "fail");
+    assert.equal(report.capabilityStates.find((item) => item.id === "development_response_links").verificationStatus, "fail");
   });
 });

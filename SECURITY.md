@@ -2,7 +2,7 @@
 
 ## Reporting
 
-Do not publish suspected vulnerabilities or exposed personal data in an issue. After the public repository is created, use [GitHub private vulnerability reporting](https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new). Until that route is activated during publication, contact Andrew Dench privately through an existing trusted channel.
+Do not publish suspected vulnerabilities or exposed personal data in an issue. [GitHub private vulnerability reporting](https://github.com/denchco/knowledge-base-wiki-standard/security/advisories/new) is active for this repository; use that route for security reports.
 
 ## Trust boundaries
 
@@ -22,7 +22,15 @@ Do not publish suspected vulnerabilities or exposed personal data in an issue. A
 - Dependencies are locked, audited, and upgraded through reviewed changes.
 - CI uses read-only permissions unless a job's narrowly defined purpose requires more.
 - Validators are read-only; generators write only declared derived paths; upgrades produce reviewable patches.
-- Local services bind to loopback by default and define health as HTTP 200.
+- Proposal `check`, `show`, and `sync --check` are read-only. `prepare` writes only a sanitised disposable payload below ignored `output/standard-proposals/`; `record` updates only the selected tracked proposal record; `open` performs GET-only form, label, and duplicate checks and never submits an issue.
+- Proposal tooling rejects secrets, private absolute paths, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. Suspected vulnerabilities leave the public proposal workflow and use private reporting; patches, screenshots, and evidence files are never uploaded automatically.
+- Local services bind to loopback. Persistent managed previews reserve their endpoint in the user-scoped shared register, refuse unmanaged listeners, expose only the non-secret static service identity marker, and require its exact ID in addition to HTTP 200.
+
+## Public repository controls
+
+- The `main` ruleset has no bypass actor. It requires a pull request, the GitHub Actions `verify` check from the GitHub Actions application against the latest target branch, resolved review threads, and the merge-commit method; it blocks deletion and non-fast-forward updates so accepted Standard commit identities remain reachable.
+- GitHub Actions accepts GitHub-owned actions plus the explicitly allowlisted `astral-sh/setup-uv` action, requires every action reference to use a full commit SHA, and grants the workflow token read-only default permissions without pull-request approval authority.
+- Secret scanning, push protection, non-provider patterns, validity checks, Dependabot security updates, private vulnerability reporting, and immutable releases are enabled. Each release phase reads these settings back before publication; source-controlled verification cannot treat an unobserved remote setting as evidence.
 
 ## MCP controls
 

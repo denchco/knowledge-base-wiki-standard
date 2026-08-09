@@ -5,9 +5,14 @@ extends:
 requires:
   - DKBWS-HUMAN-001
   - DKBWS-HUMAN-002
+  - DKBWS-HUMAN-003
+  - DKBWS-HUMAN-004
   - DKBWS-LLM-001
   - DKBWS-LINK-001
+  - DKBWS-LINK-002
   - DKBWS-PROMPT-001
+  - DKBWS-PROMPT-002
 capabilities:
   human_wiki: required
   llm_wiki: required
+  development_response_links: live-wiki

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-proposal-registry-v1.json",
+  "registryVersion": "1.0",
+  "targetRepository": "https://github.com/denchco/knowledge-base-wiki-standard",
+  "entries": [
+    {
+      "id": "DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b",
+      "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b -->",
+      "intakeMode": "pre-registry-local-history",
+      "origin": {
+        "project": "UK Digital Health compliance",
+        "publicUrl": null,
+        "implementationCommit": "3a085ebbfa66dea87d96700c7a735cf65def5ef6",
+        "verificationCommit": "3d9e1379ec67fd378b16c4b50c77f57c0db3c871",
+        "pinnedStandardRevision": "46183bc02c3d818f5aac962a4fbebc49b6ac9659"
+      },
+      "issue": null,
+      "classification": "reusable",
+      "decision": "accepted",
+      "decisionDate": "2026-08-05T00:00:00Z",
+      "decisionRevision": "6b9c686c66d2ef0e17342d666140bf4117f33a87",
+      "decisionEvidence": "Standard commit 6b9c686c66d2ef0e17342d666140bf4117f33a87 formalised the verified consumer outcome as DKBWS-LINK-002.",
+      "acceptedRequirements": [
+        "DKBWS-LINK-002"
+      ],
+      "release": {
+        "status": "pending",
+        "tag": null,
+        "revision": null,
+        "recordedAt": null
+      },
+      "notes": "Accepted directly from verified local consumer evidence before the tracked workflow existed. No GitHub issue is fabricated or duplicated; inclusion remains pending the required post-release ledger commit after an immutable Standard release exists."
+    }
+  ]
+}

@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-## Completed through `v0.1.0-rc.3`
+## Completed candidate scope for `v0.1.0-rc.4`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
 2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
@@ -22,8 +22,13 @@ status: draft
 11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
 12. Added the governed accent-colour question invariant, restored semantic responsive Mermaid architecture, and proved deterministic repository/local retention versus public-Pages omission of project-specific adoption guidance, then published the changes as immutable prerelease `v0.1.0-rc.3`.
 
+13. Exercised lifecycle, starter, browser, graph, security, verification, proposal, and dual-agent boundaries against the independently maintained Health IT Governance Beyond the NHS consumer; promoted reusable defects and preferred patterns while excluding its subject-specific research.
+14. Classified a verified consumer managed-preview port collision as a core runtime control, added `DKBWS-RUNTIME-002`, and implemented serialized and atomically published shared-register ownership, live-listener refusal, versioned marker identity, fail-closed status, and exact canonical browser handoff.
+15. Added `DKBWS-UPDATE-002` and the durable consumer-to-Standard proposal lifecycle: tracked schema-validated records, deterministic form-bound approval, GET-only issue reconciliation, an explicit Standard decision/release registry, the historical `DKBWS-LINK-002` bridge, and separately authorised consumer adoption.
+16. Added `DKBWS-PROMPT-002` and the live-Wiki development-response contract: exact canonical-origin capability, root/starter and Codex/Claude instruction parity, a captured-draft checker with positive/negative fixtures, explicit migration away from file-based Wiki navigation, and an honest host pre-send-hook enforcement boundary.
+17. Hardened `DKBWS-RUNTIME-002`, `DKBWS-PROMPT-002`, and `DKBWS-UPDATE-002` with exact twelve-field/job/status-gated preview evidence, HTML/plain-GFM plus managed-live response checks, direct proposal-state invariants, exact registry revision and strict release ancestry, public non-draft immutable-release proof, and a single immutable historical bridge.
+18. Qualified exact Node `24.19.0`, Mermaid `11.16.1`/DOMPurify `3.4.13`, Zensical `0.0.53`, Graphify `0.9.37`, and Jujutsu `0.44.0`; made every file-changing development turn an absolute JJ commit boundary; activated no-bypass `main` rules, exact required CI, selected full-SHA Actions, secret scanning/push protection, and immutable-release controls; and prepared the complete change set for protected publication as `v0.1.0-rc.4`.
+
 ## Next evidence gates
 
-1. Exercise lifecycle planning and the instruction contract against a second independently maintained consumer.
-2. Add compatibility fixtures only for exact versions or environments evidenced by that consumer or an upstream change.
-3. Make a dedicated read-first MCP go/no-go decision only after the second-consumer evidence identifies whether GitHub MCP plus the stable CLI leave a named gap.
+The active gate is protected `v0.1.0-rc.4` publication followed by its strictly later registry ledger. It closes only after the pull request and exact main merge commit pass required Verify, the exact tag has a public non-draft immutable attested release, and the ledger is merged from a descendant commit. Add compatibility fixtures only when a consumer or evidenced upstream change selects an exact new version/environment. Revisit pre-send interception only when a selected agent host exposes a governed hook or mandatory response artifact; captured-draft checking remains the current enforceable repository boundary. A dedicated read-first Standard MCP remains a no-go until a future consumer identifies a named discovery or update-inspection task not served by the stable CLI, Git, and governed GitHub route.

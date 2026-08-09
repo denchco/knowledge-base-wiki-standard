@@ -1,0 +1,81 @@
+name: Propose a standard change
+description: Offline deterministic proposal fixture.
+title: "[Standard change]: "
+labels:
+  - enhancement
+  - standard-change
+body:
+  - type: input
+    id: schema_version
+    attributes: { label: Proposal schema version }
+    validations: { required: true }
+  - type: input
+    id: proposal_id
+    attributes: { label: Stable proposal identifier }
+    validations: { required: true }
+  - type: textarea
+    id: problem
+    attributes: { label: Problem and observed behaviour }
+    validations: { required: true }
+  - type: textarea
+    id: outcome
+    attributes: { label: Intended outcome }
+    validations: { required: true }
+  - type: input
+    id: origin
+    attributes: { label: Originating consumer or implementation }
+    validations: { required: true }
+  - type: input
+    id: origin_revision
+    attributes: { label: Immutable originating revision }
+    validations: { required: true }
+  - type: input
+    id: origin_jj
+    attributes: { label: Jujutsu change identifier (optional) }
+  - type: input
+    id: standard_revision
+    attributes: { label: Pinned Standard revision }
+    validations: { required: true }
+  - type: dropdown
+    id: reuse_class
+    attributes:
+      label: Proposed reuse class
+      options: [Unknown — classify during intake, Experimental, Project-specific, Reusable, Preferred, Core]
+    validations: { required: true }
+  - type: textarea
+    id: affected_contract
+    attributes: { label: Affected profiles and requirements }
+    validations: { required: true }
+  - type: textarea
+    id: dependencies_fallback
+    attributes: { label: Dependencies, limitations, and simpler fallback }
+    validations: { required: true }
+  - type: textarea
+    id: evidence
+    attributes: { label: Evidence and implementation record }
+    validations: { required: true }
+  - type: textarea
+    id: accessibility_browser
+    attributes: { label: Accessibility and browser evidence }
+    validations: { required: true }
+  - type: textarea
+    id: verification
+    attributes: { label: Verification and fixture proposal }
+    validations: { required: true }
+  - type: textarea
+    id: migration
+    attributes: { label: Migration and compatibility impact }
+    validations: { required: true }
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety and authority
+      options:
+        - label: Public payload is sanitised.
+          required: true
+        - label: Evidence is licensed for disclosure.
+          required: true
+  - type: textarea
+    id: proposal_marker
+    attributes: { label: Stable deduplication marker }
+    validations: { required: true }

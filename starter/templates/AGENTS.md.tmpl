@@ -13,14 +13,44 @@
 
 - This independent repository contains only knowledge about `{{TOPIC}}` and its own operating instructions.
 - Canonical knowledge and registered evidence outrank rendered pages, generated graphs, and conversational answers.
+- When the Human Wiki displays registered source identities, keep each identity as an independent internal link to its exact mapped source-register row; direct links naming official authorities or publications use registered source URLs. Do not invent citations for subject-empty or citation-free content.
+- When the Human Wiki declares a canonical governing question, map its authoritative source and bounded reader-source set. Every verbatim repetition in that set uses the governed callout; paraphrases, unrelated quotations, and records outside the declared reader set remain neutral. Do not invent a question for a subject-empty Wiki.
 - The standard is pinned by source and immutable revision in `.wiki-standard.yaml`; public help is at <https://denchco.github.io/knowledge-base-wiki-documentation/>.
 - Do not import the standard's help pages, knowledge bundle, evidence records, dogfood reports, fixtures, or deployment workflow as this repository's content.
 - Preserve unknown OKF fields and declared local deviations.
+- For a persistent managed preview, serialize the shared-register reload, live-listener checks, and atomic reservation of the project-unique service ID and loopback endpoint under a bounded user-local lock. Never kill or overwrite another listener. Exact-match all twelve governed registration fields, the generated installed user-service definition, the loaded job, registered canonical URL, and static identity marker. Use the fail-closed `service:preview` handoff rather than an alternate test port; live service status is maintainer-only evidence and remains not checked in distribution/CI.
 - Do not publish, change deployment, expose credentials, or alter evidence status without explicit authorization.
+
+<!-- DKBWS-PROMPT-002-LIVE-URL:START -->
+## Development response navigation
+
+- In every development response, user-facing navigation to Human or LLM Wiki content MUST use live absolute HTTP(S) URLs rooted at the Wiki's configured canonical URL.
+- Resolve that origin from `capabilities.human_wiki_url` when declared, otherwise from the registered canonical managed-preview endpoint. Verify the exact service identity and every displayed route during the turn before calling a managed local URL live.
+- Treat inline/reference/autolink Markdown, HTML `a`/`area` links, and plain GFM-autolinked HTTP(S) text as response navigation. `file://` URLs, IDE or editor URLs, clickable local-filesystem paths, and repository-relative Markdown links MUST NOT substitute for Wiki navigation. If a route is unavailable, report that state rather than falling back to a file link.
+- A plain repository path MAY identify an implementation artifact with no Wiki route, but it MUST NOT be clickable or presented as Wiki navigation.
+- When the response-link checker is present, validate a captured draft with `npm run response:links:check -- --base-url <canonical-url>`. For a managed local Wiki, add `--managed-live` so the exact registered service and HTTP 200 for every displayed route are checked. This does not remove the `STD-VAL-007` host pre-send limitation for responses the host never exposes.
+<!-- DKBWS-PROMPT-002-LIVE-URL:END -->
+
+## Consumer-to-Standard proposals
+
+- A user-authored improvement remains project-owned until it is accepted into the Standard and included in an immutable release. Do not change this repository's Standard pin, conformance claims, or deviations merely because a proposal exists.
+- Finish, verify, and commit the local implementation before preparing an upstream proposal. Preserve its full Git commit, optional JJ change ID, and immutable pinned Standard revision in a tracked schema-valid record under `standard-proposals/`; do not make an ignored Markdown draft or retrospective topic-evidence record authoritative.
+- Use `npm run standard:proposal -- check <id>` for offline validation, then `prepare` and `show` to inspect the disposable scrubbed payload under `output/standard-proposals/`. Remove private paths, secrets, personal or confidential data, restricted evidence, vulnerability detail, and unlicensed material. The workflow uploads no consumer files or attachments.
+- Explicit approval binds the exact repository, title, body, labels, stable hidden marker, form revision, and payload digest. `open` must fail closed on an unavailable or changed form, missing required label, duplicate or ambiguous marker, stale approval, or unmatched payload. It may open the governed form but must never submit it; the user performs the final Submit action.
+- Validate every direct lifecycle state and refuse terminal workflow-v1 transitions even when JSON was edited outside the CLI. Record issue linkage only after an unambiguous exact marker/payload match. Issue state, explicit Standard classification/decision, immutable release inclusion, and optional consumer adoption are independent states and authorities. Before recording a release, require registry bytes at the exact full revision, strict release-to-registry ancestry, the exact public non-draft immutable tag, and tag-to-revision equality. Record each transition in its own JJ phase; a closed issue proves no acceptance, and release proves no pin change.
+- Never use `pre-registry-local-history` for consumer work. It is reserved for the one exact immutable UK Digital Health `DKBWS-LINK-002` bridge already encoded by Standard workflow v1.
 
 ## Clarification protocol
 
 Where material uncertainty remains, ask one individually numbered question at a time using `Question 1 of N`. Revise `N` as each answer changes the remaining uncertainty.
+
+<!-- DKBWS-PROV-001-TURN:START -->
+## Development-turn completion
+
+- In a Standard Production maintenance workspace, every development turn that changes persistent repository files MUST end with that turn's changes recorded in a Jujutsu commit before the agent gives its final response.
+- Run the repository's complete applicable verification and the read-only maintainer provenance check first, then inspect Git and Jujutsu state and commit the turn's changes. A failed or unrun required check MUST be reported in the commit description and final response; it does not permit an uncommitted final handoff.
+- The boundary is the end of the development turn, not a subjective judgement that work is “substantive.” If the turn changed no persistent files, do not create an empty commit.
+<!-- DKBWS-PROV-001-TURN:END -->
 
 <!-- DKBWS-PROMPT-001-HANDOFF:START -->
 ## Completion and handoff

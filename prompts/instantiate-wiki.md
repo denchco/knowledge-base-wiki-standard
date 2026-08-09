@@ -1,42 +1,63 @@
 # Instantiate a DenchCo Knowledge Base Wiki
 
-Use this prompt from an immutable released copy of the standard. Human guidance is published at <https://denchco.github.io/knowledge-base-wiki-documentation/>; normative files remain in <https://github.com/denchco/knowledge-base-wiki-standard>.
+## URL-only invocation
+
+Give an AI implementation agent only this repository URL:
 
 ```text
-Apply the DenchCo Knowledge Base Wiki Standard from
-https://github.com/denchco/knowledge-base-wiki-standard at
-[immutable release tag or commit] to [absolute independent target path].
-
-Topic and intended scope: [topic, audience, governing question or reader task,
-and the outcome the wiki must support].
-
-Selected profile: [standard-production unless explicitly overridden].
-
-Target Wiki URL: [consumer-owned canonical URL].
-
-Target deployment: [consumer-selected adapter or none].
+https://github.com/denchco/knowledge-base-wiki-standard
 ```
+
+When the user points at this repository to start or apply the standard, do not ask them to compose a bootstrap prompt or provide a version, profile, target URL, deployment adapter, or pre-written project brief. Resolve safe defaults and run the adaptive discovery below. Human guidance is published at <https://denchco.github.io/knowledge-base-wiki-documentation/>; normative files remain in the repository above.
+
+## Required first unresolved response
+
+When the user's message contains only the repository URL or otherwise does not already identify a seed or subject-empty intent, ask this first before writing files:
+
+```text
+Question 1 of 2
+What should this wiki start from: a research topic seed (paste text or provide a
+file, folder, URL, or repository), or a subject-empty local wiki?
+```
+
+If the user already supplied a seed or explicitly requested a subject-empty start, treat that as the answer and do not repeat the question. The total may grow or shrink after each answer. Ask only one question in each response and inspect any supplied seed or existing target before choosing the next question.
+
+## Adaptive discovery
+
+- **Research topic seed**: read the supplied material first. Infer the proposed title, topic, audience, governing question or reader task, intended outcome, source boundary, target directory name, and candidate accent colour. Do not ask the user to repeat information already present in the seed.
+- **Subject-empty local wiki**: create the governed structure without inventing research content, evidence, concepts, or a governing question. Ask for a project title, then use a clearly marked awaiting-seed state until research material arrives.
+- **Research extent**: when a seed does not say whether it is the complete source set, ask whether to structure only the supplied material or expand it with authoritative external sources.
+- **Sensitive or restricted material**: ask a conditional question only when privacy, licensing, retention, or source authority cannot be determined safely from the seed and target evidence.
+- **Accent colour**: derive a candidate from an evidenced brand or existing design contract when available; otherwise propose the DenchCo default `#0b7285`. State the exact hex value and ask whether to use it or replace it. Derive the accessible accent family and contrast token automatically, record the derivation in `DESIGN.md`, and verify at least 4.5:1 contrast for normal accent-coloured text and 3:1 for non-text interactive boundaries against their rendered backgrounds. Do not make the user choose every colour token.
+- **Purpose details**: ask separately for a missing audience, governing question or reader task, or intended outcome only when the seed does not support a responsible inference and the omission would change the wiki's structure.
+- **Target path**: infer an independent local path from the active workspace and project title. Ask only when more than one maintainable boundary is plausible or a collision exists.
+
+Do not ask about routine defaults. Use `standard-production`, a subject-appropriate title inferred from the seed, an automatically reserved conflict-free loopback Wiki URL, the platform-appropriate local service adapter, and no external deployment. Publication, remote repository creation, credentials, and deployment require separate explicit authority.
+
+After the last material answer, report the inferred and user-selected setup—starting mode or seed, title and purpose, audience and governing question state, research/source scope, target path, profile, accent hex, local Wiki URL, and deployment state—then implement the local wiki. The answers authorise the described local initialization; do not add a redundant confirmation question unless a destructive collision or external action remains.
 
 ## Instruction to the implementation agent
 
-1. Resolve the exact release tag or commit before acting. Do not use a moving branch, `latest`, or the public documentation site as normative input.
+1. Resolve the standard repository's current default-branch HEAD to its exact commit SHA before acting, then use that immutable commit for the complete run. Do not ask the user to choose or supply a release tag or commit. Do not retain a moving branch, `latest`, or the public documentation site as normative input.
 2. Read the pinned standard repository `AGENTS.md`, manifest, normative specification, selected profile, dependency contract, LLM Wiki entry point, `starter/starter.yaml`, and this prompt completely.
 3. Treat the standard and target as different repositories. Never recursively copy the standard root, and never install its help pages, `knowledge/` bundle, source/evidence records, dogfood reports, fixtures, project status, or documentation deployment as target content.
-4. Read the target's nearest instructions and inspect its repository, renderer, design, evidence, generated artifacts, services, and version-control state.
+4. Read the target's nearest instructions and inspect its repository, renderer, design, evidence, generated artifacts, services, and version-control state. If no target was supplied, derive an independent local path from the active workspace and inferred title, and stop for clarification only on a collision or ambiguous repository boundary.
 5. If the target has `graphify-out/graph.json`, query Graphify before broad browsing. If recall is insufficient, continue through its generated wiki/report and then scoped canonical target sources; record the fallback.
-6. Preserve existing work and stronger verified patterns. New wikis use the subject-empty starter boundary, pinned Zensical, and the DenchCo visual profile; existing wikis retain their renderer unless migration is explicitly authorized.
+6. Preserve existing work and stronger verified patterns. New wikis use the subject-empty starter boundary, pinned Zensical, and the DenchCo visual profile; existing wikis retain their renderer unless migration is explicitly authorized. A subject-empty initialization does not invent topic claims or render a governing-question callout.
 7. Render only allowlisted starter templates. Build the target's topic, sources, evidence, validation queue, synthesis, Human Wiki, LLM Wiki, concept registry, logs, navigation, and graph from its own subject matter. Resolve every placeholder before claiming readiness.
 8. Establish the OKF v0.2-compatible canonical Markdown, generated discovery, Graphify, design, conformance, runtime, and release roles required by the selected profile.
-9. If the Human Wiki displays a governing-question callout, expose the `governing-question` marker and bind both its inline-start rail and question text to the active accent colour at every supported viewport. Keep ordinary quotations neutral and prove the distinction in built-output browser checks.
-10. Install dependencies from locks. Distinguish universal, build, runtime, verification, deployment, and optional dependencies.
-11. Record the standard source and immutable revision in the target manifest. Record the target's own Wiki URL and deployment choice; do not inherit either from the standard or documentation repository.
-12. Initialize Git only at a maintainable child boundary. For Standard Production maintenance workspaces, satisfy `DKBWS-PROV-001`: retain Git-interoperable history, colocate Jujutsu at the same repository root, use the reference-qualified dependency boundary, and record validated phase history. A Portable Core or explicit distribution/CI checkout may remain Git-only but MUST NOT claim maintainer-workspace provenance.
-13. Use the target's selected local service adapter and reserve a conflict-free endpoint when persistent serving applies. Health means HTTP 200.
-14. Run the complete verification contract for every claimed capability. Do not claim unrun or source-only checks as rendered proof.
-15. Record profile, versions, capabilities, deviations, verification, and reusable contributions in the target manifest/conformance record. A waiver is valid only when it names authority, rationale, and an expiry or review state.
+9. If the Human Wiki declares a canonical governing question, map one authoritative source and a bounded reader-source set. Every verbatim reader-facing repetition in that set uses the same `governing-question` callout, whose inline-start rail and question text bind to the active accent colour at every supported viewport. Keep ordinary quotations neutral; keep paraphrases and historical/source records outside the declared reader set outside the exact-text rule. Prove exact-text source consistency and every discovered repetition route in built-output desktop/mobile browser checks. A subject-empty Wiki records the rule as not applicable and invents no question.
+10. When the Human Wiki displays registered source identities, add stable anchors to the mapped source-register rows and make every displayed identity an individual relative link to its exact row. Link every list member and only the displayed endpoints of compact ranges, preserve the declared visible citation grammar, and use registered URLs for direct links naming specific official authorities or publications. Prove a representative keyboard-focusable link, accessible identity, exact fragment, destination row, responsive rendering, and absence of overflow. Subject-empty, agent-only, and citation-free targets do not invent evidence to activate this rule.
+11. Install dependencies from locks. Distinguish universal, build, runtime, verification, deployment, and optional dependencies. Do not copy Standard-maintainer `sync:documentation:*` commands, `verify:workspace`, or their sibling-repository contract into a consumer unless it independently declares and implements that capability.
+12. Record the standard source and immutable revision in the target manifest. Automatically reserve and record the target's conflict-free loopback Wiki URL and default deployment to none; do not inherit either from the standard or documentation repository. For a persistent preview, derive a project-unique stable service ID, serialize shared local register and live-listener checks under an exclusive user-local lock, publish the complete reservation atomically, and move only the target's own configuration when a collision requires another port.
+13. Initialize Git only at a maintainable child boundary. For Standard Production maintenance workspaces, satisfy `DKBWS-PROV-001`: retain Git-interoperable history, colocate Jujutsu at the same repository root, use the reference-qualified dependency boundary, and end every file-changing development turn by committing that turn's persistent changes in Jujutsu after verification and state inspection. Disclose failed or unrun required checks in the commit and final response; do not leave the turn's changes only in the working copy, apply a subjective “substantive work” threshold, or create an empty commit for a no-change turn. A Portable Core or explicit distribution/CI checkout may remain Git-only but MUST NOT claim maintainer-workspace provenance.
+14. Use the target's selected local service adapter when persistent serving applies. Publish `/assets/service-identity.json` conforming to `service-identity-v1`, record its health path in the shared register, and install/load the platform user-service adapter. Registration must refuse another project's service ID, a registered overlapping endpoint, or an unmanaged live listener without killing, overwriting, or silently reassigning it. Managed status exact-matches `serviceId`, `projectRoot`, `host`, `port`, `healthPath`, `packagePath`, `url`, `command`, `label`, `plistPath`, `stdoutLog`, and `stderrLog`; requires the installed service definition to equal the generated job; requires that exact job loaded; and requires HTTP 200 from the matching marker. When a preview is requested, use the fail-closed `service:preview` command, which opens only the exact registered canonical URL after complete status passes and reports opener failure; an ephemeral alternate port proves only baseline rendering.
+15. Run the complete verification contract for every claimed capability. Emit a schema-valid verification-receipt-v1 artifact at `output/verification/receipt.json` and build its paired schema-valid `output/verification/conformance-report.json`; a project-only summary must use a different path. Live managed-service status is a maintainer-only gate; explicit distribution/CI leaves `DKBWS-RUNTIME-002` and `local_service` not checked. Do not claim unrun or source-only checks as rendered proof.
+16. Record profile, versions, capabilities, deviations, verification, and reusable contributions in the target manifest/conformance record. A waiver is valid only when it names authority, rationale, and an expiry or review state.
+17. For a selected profile that requires `DKBWS-UPDATE-002`, instantiate the thin consumer proposal boundary from the pinned release: the tracked `standard-proposals/` record directory and README, record/registry schemas, local-only core and CLI, package/check hooks, LLM workflow page, and positive/negative fixtures. Keep `output/standard-proposals/` generated and ignored. Do not copy the Standard-maintained registry as consumer authority, and never use its single `pre-registry-local-history` bridge for new work. The CLI validates direct lifecycle states and terminal transitions, prepares and displays the exact payload, records authorised local transitions, compares read-only upstream state, and fail-closed opens the governed form. Release observation requires registry bytes at the exact full revision, strict release-to-registry ancestry, the exact public release with `draft: false` and `immutable: true`, and exact tag resolution. It must never submit an issue, upload a file, decide acceptance, publish a release, mutate the Standard pin, or claim adoption automatically.
 
 Where a material uncertainty remains, ask one question at a time using `Question 1 of N`. Each answer informs the next question and `N` is updated as uncertainty changes. Do not ask when evidence or a safe reversible default resolves the choice.
 
-Use a completion-first handoff: complete the requested implementation before proposing further work. The handoff must state what was built, profile and versions, validation and limitations, canonical file links, and available Wiki URLs.
+Use a completion-first handoff: complete the requested implementation before proposing further work. The handoff must state what was built, profile and versions, validation, limitations, and live Wiki URLs. Every user-facing Human or LLM Wiki destination MUST be a live absolute HTTP(S) URL rooted at the target Wiki's configured canonical URL. The captured-draft check covers Markdown destinations, HTML `a`/`area` links, and plain GFM-autolinked HTTP(S) text. For a managed local Wiki, run `npm run response:links:check -- --base-url <canonical-url> --managed-live` so exact service identity, canonical URL equality, and HTTP 200 for every displayed route are verified during the turn. Do not substitute a `file://` URL, IDE or editor URL, local-filesystem Markdown link, or repository-relative Markdown link. A plain repository path MAY identify an implementation artifact with no Wiki route, but it MUST NOT be presented as Wiki navigation. The checker cannot physically intercept an uncaptured response without a host pre-send hook; preserve that `STD-VAL-007` limitation.
 
 Next Steps are recommendations, not authority to expand the implementation. Include them only when requested, required work remains incomplete or blocked, or this named instantiation workflow needs a handoff. Include no more than three. Every item must map to an unfinished requested deliverable, a failed or unrun required check, or a decision requiring user authority; name its target and completion condition. Do not add adjacent research, generic improvements, passive waits, invitations to continue, or filler to reach a count. If no item qualifies, omit the section.
