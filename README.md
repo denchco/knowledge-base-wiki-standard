@@ -94,7 +94,7 @@ Only this repository's released specification, schemas, and profile definitions 
 <details>
 <summary><strong>Candidate status</strong></summary>
 
-The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, and `v0.1.0-rc.3` are published; the repository's current default branch may contain verified unreleased improvements.
+The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, `v0.1.0-rc.3`, and `v0.1.0-rc.4` are published from their exact CI-green commits; the repository's current default branch may contain verified unreleased improvements.
 
 The npm package uses `0.1.0-candidate`. Python project metadata represents the candidate as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 

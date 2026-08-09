@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-## Completed through `v0.1.0-rc.3`
+## Completed through `v0.1.0-rc.4`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
 2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
@@ -22,13 +22,12 @@ status: draft
 11. Reconciled project status and validation records so completed publication work is no longer recommended, then published the changes as immutable prerelease `v0.1.0-rc.2`.
 12. Added the governed accent-colour question invariant, restored semantic responsive Mermaid architecture, and proved deterministic repository/local retention versus public-Pages omission of project-specific adoption guidance, then published the changes as immutable prerelease `v0.1.0-rc.3`.
 
-## Completed in the unreleased local candidate
-
 13. Exercised lifecycle, starter, browser, graph, security, verification, proposal, and dual-agent boundaries against the independently maintained Health IT Governance Beyond the NHS consumer; promoted reusable defects and preferred patterns while excluding its subject-specific research.
 14. Classified a verified consumer managed-preview port collision as a core runtime control, added `DKBWS-RUNTIME-002`, and implemented serialized and atomically published shared-register ownership, live-listener refusal, versioned marker identity, fail-closed status, and exact canonical browser handoff.
 15. Added `DKBWS-UPDATE-002` and the durable consumer-to-Standard proposal lifecycle: tracked schema-validated records, deterministic form-bound approval, GET-only issue reconciliation, an explicit Standard decision/release registry, the historical `DKBWS-LINK-002` bridge, and separately authorised consumer adoption.
 16. Added `DKBWS-PROMPT-002` and the live-Wiki development-response contract: exact canonical-origin capability, root/starter and Codex/Claude instruction parity, a captured-draft checker with positive/negative fixtures, explicit migration away from file-based Wiki navigation, and an honest host pre-send-hook enforcement boundary.
 17. Hardened `DKBWS-RUNTIME-002`, `DKBWS-PROMPT-002`, and `DKBWS-UPDATE-002` with exact twelve-field/job/status-gated preview evidence, HTML/plain-GFM plus managed-live response checks, direct proposal-state invariants, exact registry revision and strict release ancestry, public non-draft immutable-release proof, and a single immutable historical bridge.
+18. Qualified exact Node `24.19.0`, Mermaid `11.16.1`/DOMPurify `3.4.13`, Zensical `0.0.53`, Graphify `0.9.37`, and Jujutsu `0.44.0`; made every file-changing development turn an absolute JJ commit boundary; activated no-bypass `main` rules, exact required CI, selected full-SHA Actions, secret scanning/push protection, and immutable-release controls; and published the complete change set as `v0.1.0-rc.4`.
 
 ## Next evidence gates
 

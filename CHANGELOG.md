@@ -4,6 +4,8 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+## 0.1.0-rc.4 — 2026-08-09
+
 - Hardened `DKBWS-RUNTIME-002` so managed status exact-matches all twelve governed registration fields, byte-compares the installed LaunchAgent with the generated job contract, requires the exact job loaded, and uses `service:preview` for a fail-closed exact canonical-URL handoff. Live `service:status` is now maintainer-only verification evidence; distribution/CI records the persistent service requirement and capability as not checked.
 - Hardened `DKBWS-PROMPT-002` to detect entity-decoded HTML `a`/`area` links and plain GFM-autolinked URLs in addition to Markdown destinations, and added `--managed-live` checks for exact service identity, canonical URL equality, and HTTP 200 from every displayed Wiki route. The `STD-VAL-007` host pre-send limitation remains explicit.
 - Hardened `DKBWS-UPDATE-002` with direct-state and terminal-transition invariants, exact issue identity, registry bytes read at the full `registryRevision`, strict release-to-registry ancestry, exact public tag plus `draft: false`/`immutable: true` verification, and stable state/revision/ancestry/release/historical-bridge diagnostics. `pre-registry-local-history` is restricted to the one immutable UK Digital Health `DKBWS-LINK-002` bridge already encoded by workflow v1.

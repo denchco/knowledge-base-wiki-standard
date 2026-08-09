@@ -29,7 +29,7 @@
         "revision": null,
         "recordedAt": null
       },
-      "notes": "Accepted directly from verified local consumer evidence before the tracked workflow existed. No GitHub issue is fabricated or duplicated; inclusion remains pending an immutable Standard release."
+      "notes": "Accepted directly from verified local consumer evidence before the tracked workflow existed. No GitHub issue is fabricated or duplicated; inclusion remains pending the required post-release ledger commit after an immutable Standard release exists."
     }
   ]
 }
