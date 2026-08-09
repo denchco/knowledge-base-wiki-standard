@@ -35,6 +35,20 @@ const maxHealthBytes = 64 * 1024;
 const registryLockStaleMs = 30_000;
 const registryLockWaitMs = 10_000;
 const registryLockRetryMs = 50;
+const governedRegistryFields = Object.freeze([
+  "serviceId",
+  "projectRoot",
+  "host",
+  "port",
+  "healthPath",
+  "packagePath",
+  "url",
+  "command",
+  "label",
+  "plistPath",
+  "stdoutLog",
+  "stderrLog",
+]);
 
 validateConfig();
 
@@ -189,8 +203,14 @@ export function registrationOwnershipMatches(entry, expected) {
 }
 
 export function registrationMatches(entry, expected) {
-  return registrationOwnershipMatches(entry, expected)
-    && entry.healthPath === expected.healthPath;
+  return registrationFieldMismatches(entry, expected).length === 0;
+}
+
+export function registrationFieldMismatches(entry, expected) {
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) return [...governedRegistryFields];
+  return governedRegistryFields.filter((field) => !Object.hasOwn(entry, field)
+    || !Object.hasOwn(expected, field)
+    || entry[field] !== expected[field]);
 }
 
 export function findRegistryConflict(registry, expected) {
@@ -303,6 +323,13 @@ function expectedRegistration() {
     host: config.host,
     port: config.port,
     healthPath,
+    packagePath: join(root, "package.json"),
+    url,
+    command: config.command,
+    label,
+    plistPath,
+    stdoutLog: join(logDir, `${config.serviceId}.out.log`),
+    stderrLog: join(logDir, `${config.serviceId}.err.log`),
   };
 }
 
@@ -327,17 +354,7 @@ async function register() {
       }
     }
 
-    registry.services[config.serviceId] = {
-      ...expected,
-      packagePath: join(root, "package.json"),
-      url,
-      command: config.command,
-      label,
-      plistPath,
-      stdoutLog: join(logDir, `${config.serviceId}.out.log`),
-      stderrLog: join(logDir, `${config.serviceId}.err.log`),
-      updatedAt: new Date().toISOString(),
-    };
+    registry.services[config.serviceId] = { ...expected, updatedAt: new Date().toISOString() };
     writeRegistryAtomic(registry);
   });
   console.log(`Registered ${config.serviceId} at ${url}`);
@@ -363,24 +380,53 @@ function npmInvocation() {
   return { npmCli, script };
 }
 
+export function renderLaunchAgentPlist(contract) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>${xml(contract.label)}</string>
+<key>ProgramArguments</key><array><string>${xml(contract.node)}</string><string>${xml(contract.npmCli)}</string><string>run</string><string>${xml(contract.script)}</string></array>
+<key>WorkingDirectory</key><string>${xml(contract.projectRoot)}</string>
+<key>EnvironmentVariables</key><dict><key>HOST</key><string>${xml(contract.host)}</string><key>PORT</key><string>${contract.port}</string><key>PATH</key><string>${xml(contract.path)}</string></dict>
+<key>RunAtLoad</key><true/><key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+<key>StandardOutPath</key><string>${xml(contract.stdoutLog)}</string>
+<key>StandardErrorPath</key><string>${xml(contract.stderrLog)}</string>
+</dict></plist>\n`;
+}
+
+function expectedLaunchAgentPlist() {
+  const node = process.execPath;
+  const { npmCli, script } = npmInvocation();
+  return renderLaunchAgentPlist({
+    label,
+    node,
+    npmCli,
+    script,
+    projectRoot: root,
+    host: config.host,
+    port: config.port,
+    path: `${dirname(node)}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`,
+    stdoutLog: join(logDir, `${config.serviceId}.out.log`),
+    stderrLog: join(logDir, `${config.serviceId}.err.log`),
+  });
+}
+
+export function launchAgentInstallationMatches(actualPlist, expectedPlist) {
+  return typeof actualPlist === "string"
+    && typeof expectedPlist === "string"
+    && actualPlist === expectedPlist;
+}
+
+function installed() {
+  if (!existsSync(plistPath)) return false;
+  return launchAgentInstallationMatches(readFileSync(plistPath, "utf8"), expectedLaunchAgentPlist());
+}
+
 async function install() {
   await register();
   mkdirSync(dirname(plistPath), { recursive: true });
   mkdirSync(logDir, { recursive: true });
-  const node = process.execPath;
-  const { npmCli, script } = npmInvocation();
-  const plist = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>Label</key><string>${xml(label)}</string>
-<key>ProgramArguments</key><array><string>${xml(node)}</string><string>${xml(npmCli)}</string><string>run</string><string>${xml(script)}</string></array>
-<key>WorkingDirectory</key><string>${xml(root)}</string>
-<key>EnvironmentVariables</key><dict><key>HOST</key><string>${xml(config.host)}</string><key>PORT</key><string>${config.port}</string><key>PATH</key><string>${xml(`${dirname(node)}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`)}</string></dict>
-<key>RunAtLoad</key><true/><key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
-<key>StandardOutPath</key><string>${xml(join(logDir, `${config.serviceId}.out.log`))}</string>
-<key>StandardErrorPath</key><string>${xml(join(logDir, `${config.serviceId}.err.log`))}</string>
-</dict></plist>\n`;
-  writeFileSync(plistPath, plist);
+  writeFileSync(plistPath, expectedLaunchAgentPlist());
   console.log(`Installed ${plistPath}`);
 }
 
@@ -394,6 +440,44 @@ function loaded() {
 
 async function health() {
   return probeIdentity({ host: config.host, port: config.port, path: healthPath, serviceId: config.serviceId });
+}
+
+export async function inspectManagedServiceStatus() {
+  const entry = loadRegistry().services[config.serviceId];
+  const registered = registrationMatches(entry, expectedRegistration());
+  const installationMatches = installed();
+  const isLoaded = loaded();
+  const identity = await health();
+  return {
+    registered,
+    installed: installationMatches,
+    loaded: isLoaded,
+    identityHealthy: identity.ok === true,
+    identity,
+    expectedUrl: url,
+    registeredUrl: entry?.url ?? null,
+  };
+}
+
+function openCanonicalUrl(canonicalUrl) {
+  return spawnSync("open", [canonicalUrl], { encoding: "utf8" });
+}
+
+export async function handoffManagedPreview(options = {}) {
+  const statusProvider = options.statusProvider ?? inspectManagedServiceStatus;
+  const opener = options.opener ?? openCanonicalUrl;
+  const current = await statusProvider();
+  if (!serviceStatusPasses(current) || current.registeredUrl !== current.expectedUrl) {
+    const failed = ["registered", "installed", "loaded", "identityHealthy"]
+      .filter((field) => current[field] !== true);
+    if (current.registeredUrl !== current.expectedUrl) failed.push("canonicalUrl");
+    throw new Error(`Refusing preview handoff because managed service status failed: ${failed.join(", ")}.`);
+  }
+  const result = await opener(current.expectedUrl);
+  if (result === false || result?.error || (result?.status !== undefined && result.status !== 0)) {
+    throw new Error(`Browser handoff failed for the exact canonical URL ${current.expectedUrl}.`);
+  }
+  return current.expectedUrl;
 }
 
 function stop() {
@@ -427,19 +511,18 @@ async function start() {
 }
 
 async function status() {
-  const entry = loadRegistry().services[config.serviceId];
-  const registered = registrationMatches(entry, expectedRegistration());
-  const installed = existsSync(plistPath);
-  const isLoaded = loaded();
-  const current = await health();
+  const current = await inspectManagedServiceStatus();
   console.log(
-    `Registered: ${registered}\nInstalled: ${installed}\nLoaded: ${isLoaded}\n`
-    + `Health: ${current.ok ? "healthy" : current.code}\nIdentity: ${config.serviceId}\n`
+    `Registered: ${current.registered}\nInstalled: ${current.installed}\nLoaded: ${current.loaded}\n`
+    + `Health: ${current.identityHealthy ? "healthy" : current.identity.code}\nIdentity: ${config.serviceId}\n`
     + `Health URL: ${new URL(healthPath, url)}\nURL: ${url}`,
   );
-  if (!serviceStatusPasses({ registered, installed, loaded: isLoaded, identityHealthy: current.ok })) {
-    process.exitCode = 1;
-  }
+  if (!serviceStatusPasses(current) || current.registeredUrl !== current.expectedUrl) process.exitCode = 1;
+}
+
+async function preview() {
+  const canonicalUrl = await handoffManagedPreview();
+  console.log(`Opened ${canonicalUrl}`);
 }
 
 async function uninstall() {
@@ -474,9 +557,10 @@ async function main() {
   else if (command === "stop") stopOwned();
   else if (command === "restart") { stopOwned(); await start(); }
   else if (command === "status") await status();
+  else if (command === "preview") await preview();
   else if (command === "list") list();
   else if (command === "uninstall") await uninstall();
-  else throw new Error("Use register, install, start, stop, restart, status, list, or uninstall.");
+  else throw new Error("Use register, install, start, stop, restart, status, preview, list, or uninstall.");
 }
 
 const invokedDirectly = process.argv[1]

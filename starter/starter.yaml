@@ -88,7 +88,7 @@ entries:
     role: "agent-contract"
     classification: "render-template"
     template: "starter/templates/AGENTS.md.tmpl"
-    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "CLAUDE.md"
     role: "claude-agent-contract"
@@ -172,17 +172,17 @@ entries:
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/context-map.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/maintenance.md"
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/standard-proposals.md"
     role: "consumer-proposal-workflow"
     classification: "render-template"
@@ -239,6 +239,20 @@ entries:
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
     requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+  - target: ".node-version"
+    role: "node-runtime-pin"
+    classification: "adapt-from-release"
+    source: ".node-version"
+    planning_only: true
+    dependency_closure: "the exact Node runtime selected by package.json, the npm engine-strict policy, CI, locks, and verification"
+    requirements: ["DKBWS-VERIFY-001"]
+  - target: ".npmrc"
+    role: "node-engine-enforcement"
+    classification: "adapt-from-release"
+    source: ".npmrc"
+    planning_only: true
+    dependency_closure: "the exact package.json Node engine and .node-version runtime pin"
+    requirements: ["DKBWS-VERIFY-001"]
   - target: "scripts/dev-service.mjs"
     role: "managed-local-service"
     classification: "adapt-from-release"

@@ -154,6 +154,7 @@ function compactCheck(value) {
     readOnly: value.readOnly,
     writesPerformed: value.writesPerformed,
     records: value.records.map((result) => result.record.id),
+    registryChecked: value.registry !== null,
     diagnostics: value.diagnostics,
   };
 }
@@ -175,7 +176,11 @@ export async function run(argv = process.argv.slice(2)) {
   if (options.command === "check") {
     if (options.all) {
       const result = inspectAll({ root: options.root });
-      emit(compactCheck(result), options, `Proposal records ${result.status}: ${result.records.length} checked, ${result.diagnostics.length} diagnostic(s).`);
+      emit(
+        compactCheck(result),
+        options,
+        `Proposal records ${result.status}: ${result.records.length} checked, registry ${result.registry ? "checked" : "absent"}, ${result.diagnostics.length} diagnostic(s).`,
+      );
       return result.status === "valid" ? 0 : 1;
     }
     requireSelector(options);

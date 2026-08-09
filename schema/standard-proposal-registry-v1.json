@@ -266,6 +266,61 @@
         {
           "if": {
             "properties": {
+              "intakeMode": {
+                "const": "pre-registry-local-history"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "const": "DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b"
+              },
+              "issue": {
+                "type": "null"
+              },
+              "origin": {
+                "properties": {
+                  "project": {
+                    "const": "UK Digital Health compliance"
+                  },
+                  "publicUrl": {
+                    "type": "null"
+                  },
+                  "implementationCommit": {
+                    "const": "3a085ebbfa66dea87d96700c7a735cf65def5ef6"
+                  },
+                  "verificationCommit": {
+                    "const": "3d9e1379ec67fd378b16c4b50c77f57c0db3c871"
+                  },
+                  "pinnedStandardRevision": {
+                    "const": "46183bc02c3d818f5aac962a4fbebc49b6ac9659"
+                  }
+                },
+                "type": "object"
+              },
+              "classification": {
+                "const": "reusable"
+              },
+              "decision": {
+                "const": "accepted"
+              },
+              "decisionRevision": {
+                "const": "6b9c686c66d2ef0e17342d666140bf4117f33a87"
+              },
+              "acceptedRequirements": {
+                "const": [
+                  "DKBWS-LINK-002"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
               "decision": {
                 "const": "pending"
               }

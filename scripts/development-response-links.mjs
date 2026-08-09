@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { readFileSync } from "node:fs";
+import http from "node:http";
+import https from "node:https";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -39,6 +41,10 @@ function blankExceptNewlines(value) {
   return value.replace(/[^\n]/g, " ");
 }
 
+function maskHtmlComments(source) {
+  return source.replace(/<!--[\s\S]*?-->/g, (match) => blankExceptNewlines(match));
+}
+
 /**
  * Mask fenced and inline code without changing offsets. Markdown destinations in
  * code samples are examples, not clickable response links.
@@ -70,13 +76,14 @@ function unescapeMarkdownTarget(target) {
   return target.replace(/\\([\\`()<>[\]])/g, "$1");
 }
 
-function inlineDestinations(source) {
+function inlineDestinations(source, options = {}) {
   const results = [];
   for (let cursor = 0; cursor < source.length - 1; cursor += 1) {
     if (source[cursor] !== "]" || source[cursor + 1] !== "(") continue;
     const lineStart = source.lastIndexOf("\n", cursor) + 1;
     const openingBracket = source.lastIndexOf("[", cursor);
-    if (openingBracket >= lineStart && source[openingBracket - 1] === "!") continue;
+    const image = openingBracket >= lineStart && source[openingBracket - 1] === "!";
+    if (image && !options.includeImages) continue;
     let position = cursor + 2;
     while (position < source.length && /[ \t]/.test(source[position])) position += 1;
     const start = position;
@@ -85,7 +92,14 @@ function inlineDestinations(source) {
       const targetStart = position;
       while (position < source.length && source[position] !== ">" && source[position] !== "\n") position += 1;
       if (source[position] === ">") {
-        results.push({ kind: "markdown", target: source.slice(targetStart, position), offset: targetStart });
+        results.push({
+          kind: image ? "image" : "markdown",
+          target: source.slice(targetStart, position),
+          offset: targetStart,
+          endOffset: position,
+          containerStart: openingBracket,
+          containerEnd: position + 2,
+        });
         cursor = position;
       }
       continue;
@@ -113,7 +127,14 @@ function inlineDestinations(source) {
       position += 1;
     }
     if (position > start) {
-      results.push({ kind: "markdown", target: source.slice(start, position), offset: start });
+      results.push({
+        kind: image ? "image" : "markdown",
+        target: source.slice(start, position),
+        offset: start,
+        endOffset: position,
+        containerStart: openingBracket,
+        containerEnd: source[position] === ")" ? position + 1 : position,
+      });
       cursor = position;
     }
   }
@@ -129,6 +150,9 @@ function referenceDestinations(source) {
       kind: "reference",
       target,
       offset: match.index + match[0].indexOf(target),
+      endOffset: match.index + match[0].indexOf(target) + target.length,
+      containerStart: match.index,
+      containerEnd: match.index + match[0].length,
     });
   }
   return results;
@@ -138,21 +162,121 @@ function autolinkDestinations(source) {
   const results = [];
   const pattern = /<((?:https?|file|vscode|vscode-insiders|idea|cursor|subl|atom):\/\/[^>\s]+)>/gi;
   for (const match of source.matchAll(pattern)) {
-    results.push({ kind: "autolink", target: match[1], offset: match.index + 1 });
+    results.push({
+      kind: "autolink",
+      target: match[1],
+      offset: match.index + 1,
+      endOffset: match.index + 1 + match[1].length,
+      containerStart: match.index,
+      containerEnd: match.index + match[0].length,
+    });
+  }
+  return results;
+}
+
+function decodeHtmlAttribute(value) {
+  const named = new Map([
+    ["amp", "&"],
+    ["apos", "'"],
+    ["gt", ">"],
+    ["lt", "<"],
+    ["quot", "\""],
+  ]);
+  return value.replace(/&(?:#(\d+)|#x([\da-f]+)|([a-z]+));/gi, (entity, decimal, hexadecimal, name) => {
+    if (decimal) {
+      const codePoint = Number.parseInt(decimal, 10);
+      return Number.isSafeInteger(codePoint) && codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : entity;
+    }
+    if (hexadecimal) {
+      const codePoint = Number.parseInt(hexadecimal, 16);
+      return Number.isSafeInteger(codePoint) && codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : entity;
+    }
+    return named.get(name.toLowerCase()) ?? entity;
+  });
+}
+
+function htmlHrefDestinations(source) {
+  const results = [];
+  const opening = /<(?:a|area)(?=[\s/>])/gi;
+  for (const match of source.matchAll(opening)) {
+    let position = match.index + match[0].length;
+    let quote = null;
+    while (position < source.length) {
+      const character = source[position];
+      if (quote) {
+        if (character === quote) quote = null;
+      } else if (character === "\"" || character === "'") quote = character;
+      else if (character === ">") break;
+      position += 1;
+    }
+    if (source[position] !== ">") continue;
+    const tagEnd = position + 1;
+    const tag = source.slice(match.index, tagEnd);
+    const href = /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/i.exec(tag);
+    if (!href) continue;
+    const rawTarget = href[1] ?? href[2] ?? href[3];
+    if (!rawTarget) continue;
+    const targetInAttribute = href[0].indexOf(rawTarget);
+    const offset = match.index + href.index + targetInAttribute;
+    let closingMatch = null;
+    if (/^<a$/i.test(match[0])) {
+      const closing = /<\/a\s*>/gi;
+      closing.lastIndex = tagEnd;
+      closingMatch = closing.exec(source);
+    }
+    results.push({
+      kind: "html-href",
+      target: decodeHtmlAttribute(rawTarget),
+      offset,
+      endOffset: offset + rawTarget.length,
+      containerStart: match.index,
+      containerEnd: closingMatch ? closingMatch.index + closingMatch[0].length : tagEnd,
+    });
+  }
+  return results;
+}
+
+function occupiedRanges(items) {
+  return items.map((item) => ({
+    start: item.containerStart ?? item.offset,
+    end: item.containerEnd ?? item.endOffset ?? item.offset + item.target.length,
+  }));
+}
+
+function rangeContains(ranges, offset) {
+  return ranges.some((range) => offset >= range.start && offset < range.end);
+}
+
+function gfmRawUrlDestinations(source, occupied) {
+  const results = [];
+  const pattern = /\bhttps?:\/\/[^\s<>\[\]{}()"']+/gi;
+  for (const match of source.matchAll(pattern)) {
+    if (rangeContains(occupied, match.index)) continue;
+    const rawTarget = match[0].replace(/[.,;:!?]+$/, "");
+    if (!rawTarget) continue;
+    results.push({
+      kind: "gfm-autolink",
+      target: decodeHtmlAttribute(rawTarget),
+      offset: match.index,
+      endOffset: match.index + rawTarget.length,
+    });
   }
   return results;
 }
 
 export function extractClickableDestinations(source) {
-  const visible = maskCode(source);
+  const visible = maskHtmlComments(maskCode(source));
   const deduplicated = new Map();
   for (const item of [
     ...inlineDestinations(visible),
     ...referenceDestinations(visible),
     ...autolinkDestinations(visible),
+    ...htmlHrefDestinations(visible),
   ]) {
     const key = `${item.offset}\0${item.target}`;
-    if (!deduplicated.has(key)) deduplicated.set(key, { ...item, target: unescapeMarkdownTarget(item.target) });
+    if (!deduplicated.has(key)) {
+      deduplicated.set(key, { ...item, target: decodeHtmlAttribute(unescapeMarkdownTarget(item.target)) });
+    }
   }
   return [...deduplicated.values()].sort((left, right) => left.offset - right.offset || (left.target < right.target ? -1 : left.target > right.target ? 1 : 0));
 }
@@ -247,11 +371,12 @@ function classifyTarget(target, base) {
 }
 
 function rawProhibitedUris(source, occupied) {
-  const visible = maskCode(source);
   const results = [];
   const pattern = /\b(?:file|vscode|vscode-insiders|idea|cursor|subl|atom):\/\/[^\s<>()\]]+/gi;
-  for (const match of visible.matchAll(pattern)) {
-    if (!occupied.has(match.index)) results.push({ kind: "raw-uri", target: match[0], offset: match.index });
+  for (const match of source.matchAll(pattern)) {
+    if (!rangeContains(occupied, match.index)) {
+      results.push({ kind: "raw-uri", target: match[0], offset: match.index, endOffset: match.index + match[0].length });
+    }
   }
   return results;
 }
@@ -270,8 +395,15 @@ export function lintDevelopmentResponseLinks(source, options = {}) {
   }
 
   const clickable = extractClickableDestinations(source);
-  const occupied = new Set(clickable.map((item) => item.offset));
-  const targets = [...clickable, ...rawProhibitedUris(source, occupied)]
+  const visible = maskHtmlComments(maskCode(source));
+  const imageDestinations = inlineDestinations(visible, { includeImages: true })
+    .filter((item) => item.kind === "image");
+  const occupied = occupiedRanges([...clickable, ...imageDestinations]);
+  const targets = [
+    ...clickable,
+    ...gfmRawUrlDestinations(visible, occupied),
+    ...rawProhibitedUris(visible, occupied),
+  ]
     .sort((left, right) => left.offset - right.offset || (left.target < right.target ? -1 : left.target > right.target ? 1 : 0));
   const diagnostics = [];
   const wikiUrls = [];
@@ -323,8 +455,162 @@ export function lintDevelopmentResponseLinks(source, options = {}) {
   };
 }
 
+export function probeWikiRoute(target, options = {}) {
+  const timeoutMs = options.timeoutMs ?? 2500;
+  let parsed;
+  try {
+    parsed = new URL(target);
+  } catch {
+    return Promise.resolve({ ok: false, code: "invalid-url", statusCode: null, url: target });
+  }
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    return Promise.resolve({ ok: false, code: "invalid-scheme", statusCode: null, url: target });
+  }
+  parsed.hash = "";
+  const transport = parsed.protocol === "https:" ? https : http;
+  return new Promise((resolveProbe) => {
+    let settled = false;
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      resolveProbe({ ...result, url: target });
+    };
+    const request = transport.get(parsed, { timeout: timeoutMs }, (response) => {
+      response.resume();
+      response.on("end", () => finish({
+        ok: response.statusCode === 200,
+        code: response.statusCode === 200 ? "healthy" : "http-status",
+        statusCode: response.statusCode ?? null,
+      }));
+    });
+    request.on("error", () => finish({ ok: false, code: "unreachable", statusCode: null }));
+    request.on("timeout", () => {
+      request.destroy();
+      finish({ ok: false, code: "timeout", statusCode: null });
+    });
+  });
+}
+
+async function defaultManagedStatusProvider() {
+  const { inspectManagedServiceStatus } = await import("./dev-service.mjs");
+  return inspectManagedServiceStatus();
+}
+
+function managedStatusPasses(status) {
+  return status?.registered === true
+    && status?.installed === true
+    && status?.loaded === true
+    && status?.identityHealthy === true;
+}
+
+function sortedDiagnostics(diagnostics) {
+  return diagnostics.sort((left, right) => left.line - right.line
+    || left.column - right.column
+    || (left.code < right.code ? -1 : left.code > right.code ? 1 : 0));
+}
+
+export async function checkManagedLiveResponseLinks(report, options = {}) {
+  if (!normalizeBaseUrl(report.baseUrl ?? "")) {
+    return {
+      ...report,
+      live: { requested: true, status: "not-checked", service: null, routes: [] },
+    };
+  }
+
+  const statusProvider = options.statusProvider ?? defaultManagedStatusProvider;
+  const routeProbe = options.routeProbe ?? probeWikiRoute;
+  const diagnostics = [...report.diagnostics];
+  let managed;
+  try {
+    managed = await statusProvider();
+  } catch (error) {
+    diagnostics.push(diagnostic(
+      "DKBWS-RESPONSE-LINK-LIVE-IDENTITY-001",
+      `Managed Wiki service status could not be verified: ${error.message}`,
+      "Register, install, load, and identity-check the configured managed Wiki service before presenting its URLs as live.",
+      { target: report.baseUrl },
+    ));
+    return {
+      ...report,
+      status: "invalid",
+      diagnostics: sortedDiagnostics(diagnostics),
+      live: { requested: true, status: "invalid", service: null, routes: [] },
+    };
+  }
+
+  const exactCanonicalUrl = managed.expectedUrl === report.baseUrl
+    && managed.registeredUrl === report.baseUrl;
+  const servicePasses = managedStatusPasses(managed) && exactCanonicalUrl;
+  const service = {
+    registered: managed.registered === true,
+    installed: managed.installed === true,
+    loaded: managed.loaded === true,
+    identityHealthy: managed.identityHealthy === true,
+    expectedUrl: managed.expectedUrl ?? null,
+    registeredUrl: managed.registeredUrl ?? null,
+  };
+  if (!managedStatusPasses(managed)) {
+    const failed = ["registered", "installed", "loaded", "identityHealthy"]
+      .filter((field) => managed[field] !== true);
+    diagnostics.push(diagnostic(
+      "DKBWS-RESPONSE-LINK-LIVE-IDENTITY-001",
+      `Managed Wiki service status failed: ${failed.join(", ")}.`,
+      "Register, install, load, and identity-check the configured managed Wiki service before presenting its URLs as live.",
+      { target: report.baseUrl },
+    ));
+  }
+  if (!exactCanonicalUrl) {
+    diagnostics.push(diagnostic(
+      "DKBWS-RESPONSE-LINK-LIVE-BASE-001",
+      "The response base URL is not the exact registered canonical managed-service URL.",
+      "Use the exact URL returned by the passing managed service status check.",
+      { target: report.baseUrl },
+    ));
+  }
+
+  const routes = [];
+  if (servicePasses) {
+    for (const wikiUrl of report.wikiUrls) {
+      let result;
+      try {
+        result = await routeProbe(wikiUrl);
+      } catch (error) {
+        result = { ok: false, code: "probe-error", statusCode: null, error: error.message, url: wikiUrl };
+      }
+      const route = {
+        url: wikiUrl,
+        ok: result.ok === true,
+        code: result.code ?? (result.ok ? "healthy" : "probe-error"),
+        statusCode: result.statusCode ?? null,
+      };
+      routes.push(route);
+      if (!route.ok) {
+        diagnostics.push(diagnostic(
+          "DKBWS-RESPONSE-LINK-LIVE-ROUTE-001",
+          `Wiki route did not return HTTP 200 (${route.code}).`,
+          "Restore the exact rendered route or disclose that it is unavailable instead of presenting it as live.",
+          { target: wikiUrl },
+        ));
+      }
+    }
+  }
+
+  const valid = diagnostics.length === 0;
+  return {
+    ...report,
+    status: valid ? "valid" : "invalid",
+    diagnostics: sortedDiagnostics(diagnostics),
+    live: {
+      requested: true,
+      status: valid ? "valid" : "invalid",
+      service,
+      routes,
+    },
+  };
+}
+
 export function parseArguments(argv) {
-  const options = { input: null, baseUrl: null, json: false, help: false };
+  const options = { input: null, baseUrl: null, json: false, managedLive: false, help: false };
   const takeValue = (option, index) => {
     const value = argv[index + 1];
     if (value === undefined || value.startsWith("--")) throw new Error(`${option} requires a value.`);
@@ -333,6 +619,7 @@ export function parseArguments(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--json") options.json = true;
+    else if (argument === "--managed-live") options.managedLive = true;
     else if (argument === "--help" || argument === "-h") options.help = true;
     else if (argument === "--input") options.input = takeValue(argument, index++);
     else if (argument.startsWith("--input=")) {
@@ -348,7 +635,7 @@ export function parseArguments(argv) {
 }
 
 function helpText() {
-  return `Usage: node scripts/development-response-links.mjs --base-url <url> [--input <file>] [--json]
+  return `Usage: node scripts/development-response-links.mjs --base-url <url> [--input <file>] [--managed-live] [--json]
 
 Lint a development response read from stdin or --input. Wiki navigation must use
 the exact configured live HTTP(S) base URL. Plain implementation paths are allowed.
@@ -356,6 +643,7 @@ the exact configured live HTTP(S) base URL. Plain implementation paths are allow
 Options:
   --base-url <url>  Exact live Wiki base URL (required).
   --input <file>    Read response text from a UTF-8 file instead of stdin.
+  --managed-live    Require exact managed-service identity and HTTP 200 for every Wiki route.
   --json            Emit the stable machine-readable report.
   --help, -h        Show this help.
 `;
@@ -370,7 +658,7 @@ function textReport(report) {
   ].join("\n");
 }
 
-export function run(argv = process.argv.slice(2)) {
+export async function run(argv = process.argv.slice(2)) {
   let options;
   try {
     options = parseArguments(argv);
@@ -404,10 +692,11 @@ export function run(argv = process.argv.slice(2)) {
     return 2;
   }
 
-  const report = lintDevelopmentResponseLinks(source, { baseUrl: options.baseUrl, input });
+  let report = lintDevelopmentResponseLinks(source, { baseUrl: options.baseUrl, input });
+  if (options.managedLive) report = await checkManagedLiveResponseLinks(report);
   process.stdout.write(`${options.json ? JSON.stringify(report, null, 2) : textReport(report)}\n`);
   return report.status === "valid" ? 0 : 1;
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) process.exitCode = run();
+if (isMain) process.exitCode = await run();

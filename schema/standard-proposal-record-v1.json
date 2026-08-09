@@ -692,6 +692,47 @@
         "properties": {
           "workflow": {
             "properties": {
+              "local": {
+                "properties": {
+                  "implementationStatus": {
+                    "const": "complete"
+                  },
+                  "verificationStatus": {
+                    "const": "pass"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "status": {
+                    "const": "prepared"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
               "payload": {
                 "properties": {
                   "digest": {
@@ -702,6 +743,47 @@
                   },
                   "preparedAt": {
                     "$ref": "#/$defs/dateTime"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "approval": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "approved",
+                      "stale"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "status": {
+                    "const": "prepared"
                   }
                 },
                 "type": "object"
@@ -749,6 +831,98 @@
                   },
                   "approvedAt": {
                     "type": "null"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "issue": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "submission-ambiguous",
+                      "submitted-unlinked",
+                      "linked"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "status": {
+                    "const": "prepared"
+                  }
+                },
+                "type": "object"
+              },
+              "approval": {
+                "properties": {
+                  "status": {
+                    "const": "approved"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "upstream": {
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "accepted",
+                      "rejected",
+                      "withdrawn"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "workflow": {
+            "properties": {
+              "issue": {
+                "properties": {
+                  "status": {
+                    "const": "linked"
                   }
                 },
                 "type": "object"

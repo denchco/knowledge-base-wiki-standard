@@ -26,6 +26,15 @@ export const FORM_CONTRACT_PATH = "standard-proposals/standard-change-form-v1.ym
 export const GENERATED_DIRECTORY = "output/standard-proposals";
 
 const CODEPOINT_SORT = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const HISTORICAL_PRE_REGISTRY_BRIDGE = Object.freeze({
+  id: "DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b",
+  project: "UK Digital Health compliance",
+  implementationCommit: "3a085ebbfa66dea87d96700c7a735cf65def5ef6",
+  verificationCommit: "3d9e1379ec67fd378b16c4b50c77f57c0db3c871",
+  pinnedStandardRevision: "46183bc02c3d818f5aac962a4fbebc49b6ac9659",
+  decisionRevision: "6b9c686c66d2ef0e17342d666140bf4117f33a87",
+  acceptedRequirements: ["DKBWS-LINK-002"],
+});
 const REQUIRED_FORM_FIELDS = [
   "schema_version",
   "proposal_id",
@@ -300,7 +309,7 @@ function schemaDiagnostics(validator, value, file) {
   ));
 }
 
-function pendingStateDiagnostics(record, file) {
+function lifecycleStateDiagnostics(record, file) {
   const workflow = record?.workflow;
   if (!workflow || typeof workflow !== "object") return [];
   const diagnostics = [];
@@ -317,8 +326,25 @@ function pendingStateDiagnostics(record, file) {
   if (workflow.payload?.status === "unprepared") {
     requireNull(workflow.payload, ["digest", "formSha256", "preparedAt"], "Unprepared payload");
   }
+  if (workflow.payload?.status === "prepared"
+    && (workflow.local?.implementationStatus !== "complete" || workflow.local?.verificationStatus !== "pass")) {
+    diagnostics.push(diagnostic(
+      "DKBWS-PROP-STATE-TRANSITION-001",
+      "error",
+      "Prepared payload requires a complete implementation and passing local verification.",
+      { file },
+    ));
+  }
   if (workflow.approval?.status === "pending") {
     requireNull(workflow.approval, ["digest", "formSha256", "authority", "approvedAt"], "Pending approval");
+  }
+  if (["approved", "stale"].includes(workflow.approval?.status) && workflow.payload?.status !== "prepared") {
+    diagnostics.push(diagnostic(
+      "DKBWS-PROP-STATE-TRANSITION-001",
+      "error",
+      "Approved or stale approval requires a prepared payload.",
+      { file },
+    ));
   }
   if (workflow.issue?.status === "not-submitted") {
     requireNull(workflow.issue, ["url", "number", "linkedAt", "observedAt", "remotePayloadDigest"], "Not-submitted issue");
@@ -326,14 +352,91 @@ function pendingStateDiagnostics(record, file) {
       diagnostics.push(diagnostic("DKBWS-PROP-STATE-TRANSITION-001", "error", "Not-submitted issue state must remain unknown.", { file }));
     }
   }
+  if (["submission-ambiguous", "submitted-unlinked"].includes(workflow.issue?.status)) {
+    requireNull(workflow.issue, ["url", "number", "linkedAt", "remotePayloadDigest"], `${workflow.issue.status} issue`);
+    if (workflow.issue.observedState !== "unknown" || workflow.issue.observedAt === null) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-STATE-TRANSITION-001",
+        "error",
+        `${workflow.issue.status} issue must record an observation time while its remote state remains unknown.`,
+        { file },
+      ));
+    }
+  }
+  if (["submission-ambiguous", "submitted-unlinked", "linked"].includes(workflow.issue?.status)
+    && (workflow.payload?.status !== "prepared" || workflow.approval?.status !== "approved")) {
+    diagnostics.push(diagnostic(
+      "DKBWS-PROP-STATE-TRANSITION-001",
+      "error",
+      "Submission observation or issue linkage requires a prepared payload with current explicit approval.",
+      { file },
+    ));
+  }
+  if (workflow.issue?.status === "linked") {
+    const issueNumber = Number(workflow.issue.url?.match(/\/issues\/([1-9][0-9]*)$/)?.[1]);
+    if (issueNumber !== workflow.issue.number
+      || !["open", "closed"].includes(workflow.issue.observedState)
+      || workflow.issue.linkedAt !== workflow.issue.observedAt) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-STATE-TRANSITION-001",
+        "error",
+        "Linked issue identity, observed state, and linkage observation timestamp must match the exact link transition.",
+        { file },
+      ));
+    }
+  }
   if (workflow.upstream?.decision === "pending") {
     requireNull(workflow.upstream, ["decidedAt", "decisionRevision", "evidence", "rationale"], "Pending upstream decision");
     if (workflow.upstream.classification !== "pending" || (workflow.acceptance?.requirementIds?.length ?? 0) !== 0) {
       diagnostics.push(diagnostic("DKBWS-PROP-STATE-TRANSITION-001", "error", "Pending upstream decision cannot retain a classification or accepted requirements.", { file }));
     }
+  } else if (workflow.issue?.status !== "linked") {
+    diagnostics.push(diagnostic(
+      "DKBWS-PROP-STATE-TRANSITION-001",
+      "error",
+      "An upstream decision requires exact governed issue linkage; historical pre-registry intake is allowed only in the Standard registry.",
+      { file },
+    ));
+  }
+  if (workflow.upstream?.decision === "accepted") {
+    const requirementIds = workflow.acceptance?.requirementIds ?? [];
+    if (JSON.stringify(requirementIds) !== JSON.stringify([...requirementIds].sort(CODEPOINT_SORT))) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-STATE-TRANSITION-001",
+        "error",
+        "Accepted requirement IDs must retain the codepoint-sorted command transition order.",
+        { file },
+      ));
+    }
   }
   if (["pending", "not-applicable"].includes(workflow.release?.status)) {
     requireNull(workflow.release, ["tag", "revision", "recordedAt", "registryRevision"], `${workflow.release.status} release`);
+  }
+  if (workflow.release?.status === "included" && workflow.upstream?.decision !== "accepted") {
+    diagnostics.push(diagnostic("DKBWS-PROP-STATE-TRANSITION-001", "error", "Release inclusion requires an accepted upstream decision.", { file }));
+  }
+  if (workflow.adoption?.status === "adopted") {
+    if (workflow.release?.status !== "included" || workflow.adoption.toStandardRevision !== workflow.release.revision) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-STATE-TRANSITION-001",
+        "error",
+        "Adoption requires and must target the exact included release revision.",
+        { file },
+      ));
+    }
+    if (workflow.adoption.authority?.at !== workflow.adoption.adoptedAt) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-STATE-TRANSITION-001",
+        "error",
+        "Adoption authority and adoption record must share the exact command transition timestamp.",
+        { file },
+      ));
+    }
+  } else if (workflow.adoption?.status === "not-considered") {
+    requireNull(workflow.adoption, ["authority", "fromStandardRevision", "toStandardRevision", "consumerRevision", "adoptedAt"], "Not-considered adoption");
+    if ((workflow.adoption.verification?.length ?? 0) !== 0) {
+      diagnostics.push(diagnostic("DKBWS-PROP-STATE-TRANSITION-001", "error", "Not-considered adoption cannot retain verification evidence.", { file }));
+    }
   }
   return diagnostics;
 }
@@ -390,6 +493,56 @@ function isAncestor(root, commit) {
   }
 }
 
+function adoptionProvenanceDiagnostics(record, root, file) {
+  const adoption = record?.workflow?.adoption;
+  if (adoption?.status !== "adopted") return [];
+  if (!commitExists(root, adoption.consumerRevision)) {
+    return [diagnostic(
+      "DKBWS-PROP-ADOPTION-AUTHORITY-001",
+      "error",
+      "Recorded consumer adoption commit does not resolve in this repository.",
+      { file },
+    )];
+  }
+  if (!isAncestor(root, adoption.consumerRevision)) {
+    return [diagnostic(
+      "DKBWS-PROP-ADOPTION-AUTHORITY-001",
+      "error",
+      "Recorded consumer adoption commit is not an ancestor of the current consumer HEAD.",
+      { file },
+    )];
+  }
+  try {
+    const adoptedManifest = yamlMapping(git(root, ["show", `${adoption.consumerRevision}:.wiki-standard.yaml`]), `${adoption.consumerRevision}:.wiki-standard.yaml`);
+    const previousManifest = yamlMapping(git(root, ["show", `${adoption.consumerRevision}^1:.wiki-standard.yaml`]), `${adoption.consumerRevision}^1:.wiki-standard.yaml`);
+    const diagnostics = [];
+    if (adoptedManifest?.standard?.revision !== adoption.toStandardRevision) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-ADOPTION-AUTHORITY-001",
+        "error",
+        "Recorded consumer adoption commit does not pin its declared target Standard revision.",
+        { file },
+      ));
+    }
+    if (previousManifest?.standard?.revision !== adoption.fromStandardRevision) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-ADOPTION-AUTHORITY-001",
+        "error",
+        "Recorded consumer adoption commit's first parent does not pin its declared prior Standard revision.",
+        { file },
+      ));
+    }
+    return diagnostics;
+  } catch (error) {
+    return [diagnostic(
+      "DKBWS-PROP-ADOPTION-AUTHORITY-001",
+      "error",
+      `Recorded consumer adoption transition cannot be inspected: ${error.message}`,
+      { file },
+    )];
+  }
+}
+
 export function inspectRecord(record, {
   root = process.cwd(),
   file = null,
@@ -399,7 +552,7 @@ export function inspectRecord(record, {
 } = {}) {
   const relativeFile = file ? portableRelative(root, file) : null;
   const diagnostics = schemaDiagnostics(validateRecordSchema, record, relativeFile);
-  diagnostics.push(...pendingStateDiagnostics(record, relativeFile));
+  diagnostics.push(...lifecycleStateDiagnostics(record, relativeFile));
   if (diagnostics.length) return { record, diagnostics, payload: null };
 
   const expectedId = deriveProposalId({
@@ -428,6 +581,7 @@ export function inspectRecord(record, {
     } else if (!isAncestor(root, record.origin.implementationCommit)) {
       diagnostics.push(diagnostic("DKBWS-PROP-GIT-COMMIT-001", "error", "Implementation commit is not an ancestor of the current consumer HEAD.", { file: relativeFile }));
     }
+    diagnostics.push(...adoptionProvenanceDiagnostics(record, root, relativeFile));
   }
 
   const evidenceResults = record.change.verificationEvidence.map((item) => item.result);
@@ -533,11 +687,16 @@ export function inspectAll({ root = process.cwd(), formSource = null, resolvePro
     resolveProvenance,
     allRecords: entries,
   }));
-  const diagnostics = results.flatMap((result) => result.diagnostics);
+  const registry = loadRegistry(root);
+  const diagnostics = [
+    ...results.flatMap((result) => result.diagnostics),
+    ...registry.diagnostics,
+  ];
   return {
     readOnly: true,
     writesPerformed: false,
     records: results,
+    registry: registry.registry,
     diagnostics: sortDiagnostics(diagnostics),
     status: diagnostics.some((item) => item.severity === "error") ? "invalid" : "valid",
   };
@@ -561,8 +720,32 @@ export function loadRegistry(root = process.cwd()) {
   return { file, registry, diagnostics: sortDiagnostics(diagnostics) };
 }
 
+function isHistoricalPreRegistryBridge(entry) {
+  return entry?.id === HISTORICAL_PRE_REGISTRY_BRIDGE.id
+    && entry.issue === null
+    && entry.origin?.project === HISTORICAL_PRE_REGISTRY_BRIDGE.project
+    && entry.origin?.publicUrl === null
+    && entry.origin?.implementationCommit === HISTORICAL_PRE_REGISTRY_BRIDGE.implementationCommit
+    && entry.origin?.verificationCommit === HISTORICAL_PRE_REGISTRY_BRIDGE.verificationCommit
+    && entry.origin?.pinnedStandardRevision === HISTORICAL_PRE_REGISTRY_BRIDGE.pinnedStandardRevision
+    && entry.classification === "reusable"
+    && entry.decision === "accepted"
+    && entry.decisionRevision === HISTORICAL_PRE_REGISTRY_BRIDGE.decisionRevision
+    && JSON.stringify(entry.acceptedRequirements) === JSON.stringify(HISTORICAL_PRE_REGISTRY_BRIDGE.acceptedRequirements);
+}
+
 export function registryDiagnostics(registry, file = REGISTRY_PATH) {
   const diagnostics = schemaDiagnostics(validateRegistrySchema, registry, file);
+  for (const entry of Array.isArray(registry?.entries) ? registry.entries : []) {
+    if (entry?.intakeMode === "pre-registry-local-history" && !isHistoricalPreRegistryBridge(entry)) {
+      diagnostics.push(diagnostic(
+        "DKBWS-PROP-HISTORICAL-BRIDGE-001",
+        "error",
+        `${entry.id ?? "Unknown proposal"} is not the single immutable pre-registry bridge authorised by workflow v1.`,
+        { file },
+      ));
+    }
+  }
   if (diagnostics.length) return diagnostics;
   const ids = registry.entries.map((entry) => entry.id);
   const markers = registry.entries.map((entry) => entry.marker);
@@ -579,6 +762,9 @@ export function registryDiagnostics(registry, file = REGISTRY_PATH) {
     if (entry.marker !== markerFor(entry.id)) diagnostics.push(diagnostic("DKBWS-PROP-MARKER-001", "error", `Registry marker is not derived from ${entry.id}.`, { file }));
     if (JSON.stringify(entry.acceptedRequirements) !== JSON.stringify([...entry.acceptedRequirements].sort(CODEPOINT_SORT))) {
       diagnostics.push(diagnostic("DKBWS-PROP-REGISTRY-ORDER-001", "error", `${entry.id} accepted requirements must be codepoint-sorted.`, { file }));
+    }
+    if (entry.intakeMode === "governed-issue" && entry.issue === null) {
+      diagnostics.push(diagnostic("DKBWS-PROP-STATE-TRANSITION-001", "error", `${entry.id} governed intake requires an exact issue linkage.`, { file }));
     }
   }
   return diagnostics;
@@ -681,10 +867,17 @@ export function recordSubmissionObservation({ root = process.cwd(), selector, st
 
 export async function linkIssue({ root = process.cwd(), selector, issueUrl, remote, now = new Date(), formSource = null } = {}) {
   const { file, record } = findRecord(root, selector);
+  if (record.workflow.issue.status === "linked") {
+    throw new ProposalSafetyError("DKBWS-PROP-STATE-TRANSITION-001", "Issue linkage is terminal in workflow v1.");
+  }
   const rendered = renderIssuePayload(record, { formSource });
   requireCurrentApproval(record, rendered);
   const parsed = parseIssueUrl(issueUrl);
   const issue = await remote.getIssue(parsed.number);
+  const observedIdentity = parseIssueUrl(issue?.html_url ?? issueUrl);
+  if (issue?.number !== parsed.number || observedIdentity.number !== parsed.number) {
+    throw new ProposalSafetyError("DKBWS-PROP-ISSUE-LINK-001", "Remote issue identity does not match the exact requested Standard issue URL.");
+  }
   const remotePayload = issuePayload(issue, record.target.repository);
   const digest = payloadDigest(remotePayload);
   if (countOccurrences(issue.body ?? "", record.workflow.payload.marker) !== 1) {
@@ -753,30 +946,113 @@ export function recordDecision({
   return { file, record: updated };
 }
 
+async function verifiedReleaseEvidence({ remote, tag, revision, registryRevision, proposalId, requirements }) {
+  if (!remote) throw new ProposalUsageError("Release verification requires a read-only remote adapter.");
+  for (const method of ["resolveTag", "resolveRevision", "isDescendant", "getRelease", "getRegistry"]) {
+    if (typeof remote[method] !== "function") {
+      throw new ProposalSafetyError("DKBWS-PROP-REMOTE-READ-001", `Read-only remote adapter lacks required ${method} support.`);
+    }
+  }
+
+  let resolvedRegistryRevision;
+  try {
+    resolvedRegistryRevision = await remote.resolveRevision(registryRevision);
+  } catch (error) {
+    throw new ProposalSafetyError(
+      "DKBWS-PROP-REGISTRY-REVISION-001",
+      `Registry revision ${registryRevision} could not be resolved exactly (${error.message}).`,
+    );
+  }
+  if (resolvedRegistryRevision !== registryRevision) {
+    throw new ProposalSafetyError(
+      "DKBWS-PROP-REGISTRY-REVISION-001",
+      `Registry revision ${registryRevision} resolved to ${resolvedRegistryRevision ?? "no commit"}.`,
+    );
+  }
+
+  let descendsFromRelease;
+  try {
+    descendsFromRelease = await remote.isDescendant(revision, registryRevision);
+  } catch (error) {
+    throw new ProposalSafetyError(
+      "DKBWS-PROP-REGISTRY-ANCESTRY-001",
+      `Could not prove registry revision ${registryRevision} descends from release revision ${revision} (${error.message}).`,
+    );
+  }
+  if (descendsFromRelease !== true) {
+    throw new ProposalSafetyError(
+      "DKBWS-PROP-REGISTRY-ANCESTRY-001",
+      `Registry revision ${registryRevision} does not descend from release revision ${revision}.`,
+    );
+  }
+
+  let release;
+  try {
+    release = await remote.getRelease(tag);
+  } catch (error) {
+    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-IMMUTABLE-001", `Public GitHub release ${tag} is unavailable (${error.message}).`);
+  }
+  if (!release || release.tag_name !== tag) {
+    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-IMMUTABLE-001", `Public GitHub release ${tag} is missing or names a different tag.`);
+  }
+  if (release.draft !== false) {
+    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-IMMUTABLE-001", `Public GitHub release ${tag} is still a draft.`);
+  }
+  if (release.immutable !== true) {
+    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-IMMUTABLE-001", `Public GitHub release ${tag} is not marked immutable.`);
+  }
+
+  let resolvedTag;
+  try {
+    resolvedTag = await remote.resolveTag(tag);
+  } catch (error) {
+    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-001", `Release tag ${tag} could not be resolved (${error.message}).`);
+  }
+  if (resolvedTag !== revision) {
+    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-001", `Immutable tag ${tag} resolves to ${resolvedTag}, not ${revision}.`);
+  }
+
+  let registry;
+  try {
+    registry = await remote.getRegistry(registryRevision);
+  } catch (error) {
+    throw new ProposalSafetyError(
+      "DKBWS-PROP-REGISTRY-REVISION-001",
+      `Registry bytes are unavailable at exact revision ${registryRevision} (${error.message}).`,
+    );
+  }
+  const registryErrors = registry
+    ? registryDiagnostics(registry, `remote ${REGISTRY_PATH}@${registryRevision}`).filter((item) => item.severity === "error")
+    : [diagnostic("DKBWS-PROP-REGISTRY-REVISION-001", "error", `Registry bytes are unavailable at exact revision ${registryRevision}.`)];
+  if (registryErrors.length) throwDiagnostics("Release verification refused", registryErrors);
+  const entry = registry.entries.find((candidate) => candidate.id === proposalId);
+  if (!entry || entry.decision !== "accepted"
+    || JSON.stringify(entry.acceptedRequirements) !== JSON.stringify(requirements)
+    || entry.release?.status !== "included" || entry.release.tag !== tag || entry.release.revision !== revision) {
+    throw new ProposalSafetyError(
+      "DKBWS-PROP-RELEASE-001",
+      `Registry at ${registryRevision} does not map this accepted proposal and requirements to the exact immutable release.`,
+    );
+  }
+  return { registry, entry, release, resolvedTag, resolvedRegistryRevision };
+}
+
 export async function recordRelease({ root = process.cwd(), selector, tag, revision, registryRevision, remote, now = new Date() } = {}) {
   const { file, record } = findRecord(root, selector);
   if (record.workflow.upstream.decision !== "accepted") throw new ProposalSafetyError("DKBWS-PROP-RELEASE-001", "Only accepted proposals can enter a release.");
+  if (record.workflow.release.status !== "pending") throw new ProposalSafetyError("DKBWS-PROP-STATE-TRANSITION-001", "Release inclusion is terminal in workflow v1.");
   for (const [label, value] of [["release revision", revision], ["registry revision", registryRevision]]) {
     if (!/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(value ?? "")) throw new ProposalUsageError(`${label} must be a full immutable commit.`);
   }
   if (!/^v[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/.test(tag ?? "")) throw new ProposalUsageError("Release tag is invalid.");
-  if (!remote) throw new ProposalUsageError("Release recording requires a read-only remote adapter.");
-  const resolvedTag = await remote.resolveTag(tag);
-  if (resolvedTag !== revision) {
-    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-001", `Immutable tag ${tag} resolves to ${resolvedTag}, not ${revision}.`);
-  }
-  const registry = await remote.getRegistry();
-  const registryErrors = registry
-    ? registryDiagnostics(registry, `remote ${REGISTRY_PATH}`).filter((item) => item.severity === "error")
-    : [diagnostic("DKBWS-PROP-REGISTRY-MAPPING-001", "error", "Published proposal registry is unavailable.")];
-  if (registryErrors.length) throwDiagnostics("Release recording refused", registryErrors);
-  const entry = registry?.entries?.find((candidate) => candidate.id === record.id);
-  const requirements = record.workflow.acceptance.requirementIds;
-  if (!entry || entry.decision !== "accepted"
-    || JSON.stringify(entry.acceptedRequirements) !== JSON.stringify(requirements)
-    || entry.release?.status !== "included" || entry.release.tag !== tag || entry.release.revision !== revision) {
-    throw new ProposalSafetyError("DKBWS-PROP-RELEASE-001", "Published registry does not map this accepted proposal and requirements to the exact immutable release.");
-  }
+  await verifiedReleaseEvidence({
+    remote,
+    tag,
+    revision,
+    registryRevision,
+    proposalId: record.id,
+    requirements: record.workflow.acceptance.requirementIds,
+  });
   const updated = structuredClone(record);
   updated.workflow.release = { status: "included", tag, revision, recordedAt: iso(now), registryRevision };
   writeRecordIfChanged(file, updated);
@@ -788,6 +1064,9 @@ export function recordAdoption({
   consumerRevision, verification = [], now = new Date(),
 } = {}) {
   const { file, record } = findRecord(root, selector);
+  if (record.workflow.adoption.status === "adopted") {
+    throw new ProposalSafetyError("DKBWS-PROP-STATE-TRANSITION-001", "Consumer adoption is terminal in workflow v1.");
+  }
   if (record.workflow.release.status !== "included" || record.workflow.release.revision !== toStandardRevision) {
     throw new ProposalSafetyError("DKBWS-PROP-ADOPTION-AUTHORITY-001", "Adoption target must be the proposal's immutable included release revision.");
   }
@@ -910,6 +1189,10 @@ export function newProposal({ root = process.cwd(), slug, implementationRevision
 export function createFixtureRemote(fixtureDirectory) {
   const read = (name) => readFileSync(path.join(fixtureDirectory, name));
   const issues = () => strictJson(read("issues.json").toString("utf8"), `${fixtureDirectory}/issues.json`);
+  const optionalJson = (name, fallback = null) => {
+    const file = path.join(fixtureDirectory, name);
+    return existsSync(file) ? strictJson(readFileSync(file, "utf8"), file) : fallback;
+  };
   return {
     methods: [],
     async getForm() { this.methods.push("GET"); return read("standard-change.yml"); },
@@ -917,7 +1200,14 @@ export function createFixtureRemote(fixtureDirectory) {
     async searchIssues(marker) { this.methods.push("GET"); return issues().filter((issue) => (issue.body ?? "").includes(marker)); },
     async searchTitle(title) { this.methods.push("GET"); return issues().filter((issue) => issue.title === title); },
     async getIssue(number) { this.methods.push("GET"); const issue = issues().find((item) => item.number === number); if (!issue) throw new ProposalSafetyError("DKBWS-PROP-ISSUE-LINK-001", `Fixture has no issue ${number}.`); return issue; },
-    async getRegistry() { this.methods.push("GET"); const file = path.join(fixtureDirectory, "registry.json"); return existsSync(file) ? strictJson(readFileSync(file, "utf8"), file) : null; },
+    async getRegistry(revision = null) {
+      this.methods.push("GET");
+      if (revision) return optionalJson("registries.json", {})[revision] ?? null;
+      return optionalJson("registry.json");
+    },
+    async getRelease(tag) { this.methods.push("GET"); return optionalJson("releases.json", {})[tag] ?? null; },
+    async resolveRevision(revision) { this.methods.push("GET"); return optionalJson("revisions.json", {})[revision] ?? null; },
+    async isDescendant(ancestor, descendant) { this.methods.push("GET"); return optionalJson("ancestry.json", {})[`${ancestor}..${descendant}`] === true; },
     async resolveTag(tag) { this.methods.push("GET"); const file = path.join(fixtureDirectory, "tags.json"); const tags = existsSync(file) ? strictJson(readFileSync(file, "utf8"), file) : {}; if (!tags[tag]) throw new ProposalSafetyError("DKBWS-PROP-RELEASE-001", `Fixture has no tag ${tag}.`); return tags[tag]; },
   };
 }
@@ -930,8 +1220,9 @@ export function createGitHubRemote(repository = TARGET_REPOSITORY, { fetchImpl =
     if (!response.ok) throw new ProposalSafetyError("DKBWS-PROP-REMOTE-READ-001", `GET ${url} failed with HTTP ${response.status}.`);
     return response;
   };
-  const content = async (relativePath) => {
-    const response = await get(`${api}/contents/${relativePath.split("/").map(encodeURIComponent).join("/")}`);
+  const content = async (relativePath, revision = null) => {
+    const suffix = revision ? `?ref=${encodeURIComponent(revision)}` : "";
+    const response = await get(`${api}/contents/${relativePath.split("/").map(encodeURIComponent).join("/")}${suffix}`);
     const value = await response.json();
     if (value?.encoding !== "base64" || typeof value.content !== "string") throw new ProposalSafetyError("DKBWS-PROP-REMOTE-READ-001", `GitHub content response for ${relativePath} is invalid.`);
     return Buffer.from(value.content.replace(/\s/g, ""), "base64");
@@ -946,7 +1237,28 @@ export function createGitHubRemote(repository = TARGET_REPOSITORY, { fetchImpl =
     async searchIssues(marker) { return search(`\"${marker}\" in:body`); },
     async searchTitle(title) { return search(`\"${title}\" in:title`); },
     async getIssue(number) { const response = await get(`${api}/issues/${number}`); return response.json(); },
-    async getRegistry() { try { return strictJson((await content(REGISTRY_PATH)).toString("utf8"), `remote ${REGISTRY_PATH}`); } catch (error) { if (error.code === "DKBWS-PROP-REMOTE-READ-001") return null; throw error; } },
+    async getRegistry(revision = null) {
+      try {
+        return strictJson((await content(REGISTRY_PATH, revision)).toString("utf8"), `remote ${REGISTRY_PATH}${revision ? `@${revision}` : ""}`);
+      } catch (error) {
+        if (error.code === "DKBWS-PROP-REMOTE-READ-001") return null;
+        throw error;
+      }
+    },
+    async getRelease(tag) {
+      const response = await get(`${api}/releases/tags/${encodeURIComponent(tag)}`);
+      return response.json();
+    },
+    async resolveRevision(revision) {
+      const response = await get(`${api}/commits/${encodeURIComponent(revision)}`);
+      const value = await response.json();
+      return /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(value?.sha ?? "") ? value.sha : null;
+    },
+    async isDescendant(ancestor, descendant) {
+      const response = await get(`${api}/compare/${encodeURIComponent(ancestor)}...${encodeURIComponent(descendant)}`);
+      const value = await response.json();
+      return value?.status === "ahead";
+    },
     async resolveTag(tag) {
       let response = await get(`${api}/git/ref/tags/${encodeURIComponent(tag)}`);
       let object = (await response.json()).object;
@@ -1036,8 +1348,6 @@ function payloadReview(rendered) {
 export async function syncCheck({ root = process.cwd(), remote, formSource = null, resolveProvenance = true } = {}) {
   const local = inspectAll({ root, formSource, resolveProvenance });
   const diagnostics = [...local.diagnostics];
-  const registryLocal = loadRegistry(root);
-  diagnostics.push(...registryLocal.diagnostics);
   const remoteRegistry = await remote.getRegistry();
   if (remoteRegistry) diagnostics.push(...registryDiagnostics(remoteRegistry, `remote ${REGISTRY_PATH}`));
   let currentPin = null;
@@ -1073,6 +1383,20 @@ export async function syncCheck({ root = process.cwd(), remote, formSource = nul
       }
     }
     const registryEntry = remoteRegistry?.entries?.find((entry) => entry.id === record.id);
+    if (record.workflow.release.status === "included") {
+      try {
+        await verifiedReleaseEvidence({
+          remote,
+          tag: record.workflow.release.tag,
+          revision: record.workflow.release.revision,
+          registryRevision: record.workflow.release.registryRevision,
+          proposalId: record.id,
+          requirements: record.workflow.acceptance.requirementIds,
+        });
+      } catch (error) {
+        diagnostics.push(diagnostic(error.code ?? "DKBWS-PROP-RELEASE-001", "error", error.message));
+      }
+    }
     if (record.workflow.upstream.decision === "accepted") {
       if (!registryEntry) {
         diagnostics.push(diagnostic("DKBWS-PROP-REGISTRY-MAPPING-001", "error", `${record.id} is locally accepted but absent from the published registry.`));
@@ -1091,10 +1415,23 @@ export async function syncCheck({ root = process.cwd(), remote, formSource = nul
     }
     if (registryEntry?.release?.status === "included") {
       let resolved = null;
+      let release = null;
       try {
+        release = await remote.getRelease(registryEntry.release.tag);
+        if (!release || release.tag_name !== registryEntry.release.tag || release.draft !== false || release.immutable !== true) {
+          diagnostics.push(diagnostic(
+            "DKBWS-PROP-RELEASE-IMMUTABLE-001",
+            "error",
+            `${registryEntry.release.tag} does not have a matching non-draft immutable public GitHub release.`,
+          ));
+        }
         resolved = await remote.resolveTag(registryEntry.release.tag);
       } catch (error) {
-        diagnostics.push(diagnostic("DKBWS-PROP-RELEASE-001", "error", error.message));
+        diagnostics.push(diagnostic(
+          error.code ?? "DKBWS-PROP-RELEASE-IMMUTABLE-001",
+          "error",
+          `Could not verify public release ${registryEntry.release.tag}: ${error.message}`,
+        ));
       }
       if (resolved && resolved !== registryEntry.release.revision) diagnostics.push(diagnostic("DKBWS-PROP-RELEASE-001", "error", `${registryEntry.release.tag} resolves to ${resolved}, not registry revision ${registryEntry.release.revision}.`));
       if (currentPin !== registryEntry.release.revision) diagnostics.push(diagnostic("DKBWS-PROP-RELEASE-AVAILABLE-001", "info", `${record.id} is available in ${registryEntry.release.tag}; consumer pin remains unchanged at ${currentPin ?? "unresolved"}.`));

@@ -5,7 +5,7 @@ import path from "node:path";
 
 const assets = [
   {
-    label: "Mermaid 11.16.0",
+    label: "Mermaid 11.16.1",
     source: "node_modules/mermaid/dist/mermaid.min.js",
     destination: "docs/assets/vendor/mermaid.min.js",
   },

@@ -17,6 +17,8 @@ This repository implements `{{PROFILE}}` of the DenchCo Knowledge Base Wiki Stan
 
 Commit exact lock files for every selected implementation dependency. Record optional and deployment dependencies separately from portable knowledge requirements.
 
+When Node supports the selected implementation, adapt the release's exact `.node-version`, exact `package.json` engine, npm `engine-strict` policy, and exact CI version together. A minimum range such as `>=24` does not prove that a later short-lived release remains supported or qualified.
+
 For a Standard Production maintenance workspace, adapt a repository-local end-of-development-turn command from the pinned Standard release. It must run complete applicable verification, inspect Git and Jujutsu state, record every file-changing turn in a JJ commit before the final response, disclose failed or unrun required checks, and create no empty commit for a no-change turn. The boundary must not depend on whether an agent considers the work “substantive.”
 
 The complete verification command must emit the schema-valid receipt and build its paired schema-valid conformance report. A project-only verification summary may be useful, but it must use another path and must not occupy either reserved artifact path.

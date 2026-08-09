@@ -8,11 +8,13 @@ if (!message) {
 }
 
 const verify = spawnSync("npm", ["run", "verify"], { stdio: "inherit" });
-if (verify.error) {
-  console.error(`Could not run verification: ${verify.error.message}`);
-  process.exit(2);
-}
-const verifyStatus = verify.status ?? 1;
+if (verify.error) console.error(`Could not run verification: ${verify.error.message}`);
+const verifyStatus = verify.error ? 2 : (verify.status ?? 1);
+
+const provenance = spawnSync("npm", ["run", "check:provenance"], { stdio: "inherit" });
+if (provenance.error) console.error(`Could not run maintainer provenance: ${provenance.error.message}`);
+const provenanceStatus = provenance.error ? 2 : (provenance.status ?? 1);
+const phaseStatus = verifyStatus !== 0 ? verifyStatus : provenanceStatus;
 
 const gitStatus = spawnSync("git", ["status", "--short"], { stdio: "inherit" });
 if (gitStatus.error || gitStatus.status !== 0) {
@@ -28,18 +30,19 @@ if (status.error || status.status !== 0) {
 process.stdout.write(status.stdout);
 if (status.stdout.includes("The working copy has no changes")) {
   console.log("No development-turn JJ commit recorded: working copy is clean.");
-  process.exit(verifyStatus);
+  process.exit(phaseStatus);
 }
 
-const commitMessage = verifyStatus === 0
-  ? message
-  : `Verification failed (exit ${verifyStatus}): ${message}`;
+const failures = [];
+if (verifyStatus !== 0) failures.push(`verification failed (exit ${verifyStatus})`);
+if (provenanceStatus !== 0) failures.push(`maintainer provenance failed (exit ${provenanceStatus})`);
+const commitMessage = failures.length ? `${failures.join("; ")}: ${message}` : message;
 const commit = spawnSync("jj", ["commit", "-m", commitMessage], { stdio: "inherit" });
 if (commit.error || commit.status !== 0) {
   console.error(`Could not record the development-turn JJ commit${commit.error ? `: ${commit.error.message}` : "."}`);
   process.exit(commit.status ?? 2);
 }
-if (verifyStatus !== 0) {
-  console.error(`Development-turn changes were committed with failed verification status ${verifyStatus}.`);
+if (failures.length) {
+  console.error(`Development-turn changes were committed with disclosed check failures: ${failures.join("; ")}.`);
 }
-process.exit(verifyStatus);
+process.exit(phaseStatus);

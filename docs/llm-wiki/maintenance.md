@@ -13,7 +13,7 @@ status: draft
 4. Register new external evidence before changing normative claims.
 5. Add or amend stable requirements, applicability, diagnostics, and migration effects.
 6. Update schemas, profile, prompts, LLM context, fixtures, and changelog together.
-7. For managed-preview changes, serialize the shared-register reload and live-listener probe, publish the reservation atomically, preserve other services, validate the exact marker, and prove composite adapter status plus canonical browser handoff.
+7. For managed-preview changes, serialize the shared-register reload and live-listener probe, publish the reservation atomically, preserve other services, exact-match all twelve governed registration fields, require the installed LaunchAgent bytes and loaded job to match the generated contract, validate the exact marker, and prove the fail-closed `service:preview` canonical browser handoff. Treat live service status as maintainer-only evidence.
 8. Run `npm run verify`.
 9. Refresh Graphify explicitly.
 10. Inspect Git and Jujutsu state.
@@ -24,7 +24,8 @@ status: draft
 - Resolve the Wiki's configured canonical URL from its manifest or registered managed-preview endpoint. Before displaying a user-facing Human or LLM Wiki destination in a development response, verify that absolute HTTP(S) route against the live service.
 - Do not substitute `file://` URLs, IDE or editor URLs, local-filesystem Markdown links, or repository-relative Markdown links for Wiki navigation. If the canonical service or route is unavailable, report that state rather than falling back to a file link.
 - Use a plain repository path only to identify an implementation artifact that has no Wiki route, and never present that path as Wiki navigation.
-- When a draft response is captured, run `npm run response:links:check -- --base-url <canonical-url>`; pair its syntax result with the managed identity and HTTP route evidence needed to call a local URL live.
+- The checker covers Markdown destinations, entity-decoded HTML `a`/`area` links, and plain GFM-autolinked HTTP(S) text while excluding masked code/comments and images from navigation.
+- When a draft response is captured, run `npm run response:links:check -- --base-url <canonical-url>` and add `--managed-live` for a managed local Wiki. That mode requires exact service status, canonical URL equality, and HTTP 200 for every displayed route. It cannot intercept a response the host never exposes, so `STD-VAL-007` remains in force.
 
 ## Reader source links
 
@@ -42,7 +43,7 @@ status: draft
 
 Use the tracked [Standard proposal workflow](standard-proposals.md) for a user-authored consumer improvement that may be reusable. Finish and verify the project-owned implementation first. Preserve its full Git commit, optional JJ identity, pinned Standard revision, bounded evidence, fallback, fixture and migration effects in the canonical proposal record; do not make an ignored Markdown draft authoritative.
 
-Validate the record offline, prepare a disposable scrubbed payload, and review its exact digest and form revision. The CLI may check and open the governed form but never submits or uploads; final submission remains with the user. Keep issue state separate from explicit maintainer classification and acceptance, keep acceptance separate from immutable release inclusion, and keep release separate from any consumer adoption or pin change. A closed issue is not acceptance. Record each authorised transition in its own JJ phase and fail closed on missing form, label, marker, provenance, or digest evidence.
+Validate direct record states offline as well as command transitions: outcome metadata, prerequisites, exact issue identity, accepted requirements, release state, and adoption state must agree, and workflow-v1 linkage/decision/release/adoption transitions are terminal. Prepare a disposable scrubbed payload and review its exact digest and form revision. The CLI may check and open the governed form but never submits or uploads; final submission remains with the user. Keep issue state separate from explicit maintainer classification and acceptance, keep acceptance separate from immutable release inclusion, and keep release separate from any consumer adoption or pin change. Before release inclusion, require the registry bytes at the exact full revision, strict release-to-registry ancestry, the exact public non-draft immutable release, and exact tag resolution. The one pre-registry bridge is fixed to the existing UK Digital Health `DKBWS-LINK-002` entry and is never a new-work fallback. A closed issue is not acceptance. Record each authorised transition in its own JJ phase and fail closed on missing form, label, marker, provenance, state, registry-revision, ancestry, release, or digest evidence.
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
 

@@ -3,7 +3,7 @@ import path from "node:path";
 import YAML from "yaml";
 
 const required = [
-  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml",
+  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
   ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/standard-change.yml",
   ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
   ".claude/skills/denchco-kb-wiki-standard/SKILL.md",
@@ -96,6 +96,15 @@ const starterManifest = YAML.parse(readFileSync("starter/starter.yaml", "utf8"))
 const starterEntries = starterManifest?.entries ?? [];
 const starterTargets = starterEntries.map((entry) => entry?.target);
 if (new Set(starterTargets).size !== starterTargets.length) failures.push("starter target paths must be unique");
+for (const target of [".node-version", ".npmrc"]) {
+  const entry = starterEntries.find((candidate) => candidate?.target === target);
+  if (entry?.classification !== "adapt-from-release"
+    || entry?.source !== target
+    || entry?.planning_only !== true
+    || !(entry?.requirements ?? []).includes("DKBWS-VERIFY-001")) {
+    failures.push(`starter must adapt ${target} as part of the exact Node verification contract`);
+  }
+}
 if (!(humanAndAgentProfile?.requires ?? []).includes("DKBWS-PROMPT-002")
   || humanAndAgentProfile?.capabilities?.development_response_links !== "live-wiki") {
   failures.push("human-and-agent profile must require DKBWS-PROMPT-002 and exact live-wiki response links");
@@ -481,7 +490,7 @@ const exactNodePins = {
   "@playwright/test": "1.62.1",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
-  "mermaid": "11.16.0",
+  "mermaid": "11.16.1",
   "vis-network": "10.1.0",
   "yaml": "2.9.0",
 };
@@ -503,6 +512,7 @@ if (!pkg.scripts?.check?.includes("standard:proposal -- check --all")) failures.
 if (!pkg.scripts?.["conformance:test"]?.includes("standard-proposal-cli.test.mjs")) failures.push("conformance:test must include proposal lifecycle fixtures");
 if (!pkg.scripts?.["conformance:test"]?.includes("dev-service.test.mjs")) failures.push("conformance:test must include managed local service fixtures");
 if (pkg.scripts?.["response:links:check"] !== "node scripts/development-response-links.mjs") failures.push("response:links:check must use the governed DKBWS-PROMPT-002 linter");
+if (!readFileSync("scripts/development-response-links.mjs", "utf8").includes("--managed-live")) failures.push("response-link checker must expose managed identity and live-route verification");
 if (!pkg.scripts?.["conformance:test"]?.includes("development-response-links.test.mjs")) failures.push("conformance:test must include development-response-link fixtures");
 if (pkg.codexDevServer?.serviceId !== "denchco-kb-wiki-standard") failures.push("managed local service must retain its stable Standard identity");
 if (pkg.codexDevServer?.host !== "127.0.0.1" || pkg.codexDevServer?.port !== 8017) failures.push("managed local service must retain its canonical loopback endpoint");
@@ -512,7 +522,12 @@ if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.cod
   failures.push("static managed service marker must match the configured service identity");
 }
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
-if (pkg.engines?.node !== ">=24") failures.push(`Node engine must be >=24; found ${pkg.engines?.node ?? "unlisted"}`);
+const exactNodeVersion = "24.19.0";
+if (pkg.engines?.node !== exactNodeVersion) failures.push(`Node engine must be exactly ${exactNodeVersion}; found ${pkg.engines?.node ?? "unlisted"}`);
+if (readFileSync(".node-version", "utf8") !== `${exactNodeVersion}\n`) failures.push(`.node-version must contain exactly ${exactNodeVersion}`);
+if (readFileSync(".npmrc", "utf8") !== "engine-strict=true\n") failures.push(".npmrc must enforce the exact package engine");
+if (process.versions.node !== exactNodeVersion) failures.push(`verification must run on exact Node ${exactNodeVersion}; found ${process.versions.node}`);
+if (pkg.scripts?.["audit:node"] !== "npm audit --audit-level=moderate") failures.push("audit:node must fail at moderate severity");
 const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const lockRoot = packageLock.packages?.[""] ?? {};
 if (packageLock.version !== pkg.version || lockRoot.version !== pkg.version) failures.push("package-lock candidate version does not match package.json");
@@ -521,6 +536,8 @@ if (lockRoot.license !== pkg.license) failures.push("package-lock licence does n
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
+const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
+if (!versionAtLeast(domPurifyVersion, "3.4.13")) failures.push(`package-lock must resolve DOMPurify >=3.4.13; found ${domPurifyVersion ?? "unlisted"}`);
 if (packageLock.packages?.["node_modules/wrangler"]) failures.push("package-lock retains Wrangler without a selected deployment adapter");
 for (const script of ["prepare:runtime", "graph:update", "graph:publish", "check:visual-shape", "check:graphify", "check:browser", "check:canonical-content", "check:adoption-audits", "check:schema-artifacts", "check:provenance", "audit:node", "audit:python"]) {
   if (!pkg.scripts?.[script]) failures.push(`missing executable script ${script}`);
@@ -547,9 +564,13 @@ if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("chec
 if (!pkg.scripts?.check?.includes("check:provenance")) failures.push("check does not exercise the explicit provenance mode");
 if (!pkg.scripts?.check?.includes("audit:node") || !pkg.scripts?.check?.includes("audit:python")) failures.push("check does not exercise both locked dependency audits");
 if (pkg.scripts?.verify !== "node scripts/verify.mjs") failures.push("verify must use the mutation-safe orchestrator");
+if (pkg.scripts?.["service:preview"] !== "node scripts/dev-service.mjs preview") failures.push("service:preview must use the status-gated canonical handoff");
 
 const documentationSyncContract = JSON.parse(readFileSync("sync/documentation-sync-contract-v1.json", "utf8"));
 const documentationAllowlist = new Set(documentationSyncContract.allowlist ?? []);
+for (const file of [".node-version", ".npmrc"]) {
+  if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits exact Node surface ${file}`);
+}
 for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conformance", "prompts", "starter", "sync"], /./)) {
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits canonical path ${file}`);
 }
@@ -598,12 +619,12 @@ for (const file of [
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
-for (const gate of ["build", "check", "check:graphify", "check:browser"]) {
+for (const gate of ["build", "check", "check:graphify", "check:browser", "service:status"]) {
   if (!verifyOrchestrator.includes(`"${gate}"`)) failures.push(`verify orchestrator does not exercise ${gate}`);
 }
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
-for (const pin of ["zensical==0.0.52", "graphifyy==0.9.32", "pip-audit==2.10.1"])
+for (const pin of ["zensical==0.0.53", "graphifyy==0.9.37", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
@@ -613,7 +634,7 @@ for (const pin of [
   "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2",
   "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0",
   "astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0",
-  "node-version: 24",
+  "node-version: 24.19.0",
   "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",
 ]) {
@@ -636,6 +657,19 @@ if (failures.length) {
 }
 
 console.log(`Standard checks passed: ${required.length} canonical roles, stable IDs, Codex/Claude instruction parity, prompt protocol, schema dialect, and dependency pins.`);
+
+function versionAtLeast(actual, minimum) {
+  const parse = (value) => typeof value === "string" && /^\d+\.\d+\.\d+$/.test(value)
+    ? value.split(".").map(Number)
+    : null;
+  const left = parse(actual);
+  const right = parse(minimum);
+  if (!left || !right) return false;
+  for (let index = 0; index < right.length; index += 1) {
+    if (left[index] !== right[index]) return left[index] > right[index];
+  }
+  return true;
+}
 
 function managedSection(source, id) {
   const start = `<!-- ${id}:START -->`;

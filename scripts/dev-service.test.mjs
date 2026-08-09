@@ -17,17 +17,51 @@ import test from "node:test";
 import {
   canBindEndpoint,
   findRegistryConflict,
+  handoffManagedPreview,
   hostsOverlap,
+  launchAgentInstallationMatches,
   markerMatches,
   probeIdentity,
+  registrationFieldMismatches,
   registrationMatches,
   registrationOwnershipMatches,
+  renderLaunchAgentPlist,
   serviceStatusPasses,
   withRegistryLock,
   writeRegistryAtomic,
 } from "./dev-service.mjs";
 
 const schema = "https://denchco.github.io/knowledge-base-wiki-documentation/schema/service-identity-v1.json";
+
+function registryEntry(overrides = {}) {
+  return {
+    serviceId: "expected-wiki",
+    projectRoot: "/tmp/expected-wiki",
+    host: "127.0.0.1",
+    port: 8123,
+    healthPath: "/assets/service-identity.json",
+    packagePath: "/tmp/expected-wiki/package.json",
+    url: "http://127.0.0.1:8123/",
+    command: "npm run dev",
+    label: "local.codex-dev.expected-wiki",
+    plistPath: "/tmp/Library/LaunchAgents/local.codex-dev.expected-wiki.plist",
+    stdoutLog: "/tmp/logs/expected-wiki.out.log",
+    stderrLog: "/tmp/logs/expected-wiki.err.log",
+    ...overrides,
+  };
+}
+
+function passingManagedStatus(overrides = {}) {
+  return {
+    registered: true,
+    installed: true,
+    loaded: true,
+    identityHealthy: true,
+    expectedUrl: "http://127.0.0.1:8123/",
+    registeredUrl: "http://127.0.0.1:8123/",
+    ...overrides,
+  };
+}
 
 async function withServer(handler, callback) {
   const server = http.createServer(handler);
@@ -89,20 +123,49 @@ test("exclusive bind probe detects an unmanaged live listener", async () => {
   });
 });
 
-test("registry ownership requires exact project, endpoint, and health path", () => {
-  const expected = {
-    serviceId: "expected-wiki",
-    projectRoot: "/tmp/expected-wiki",
+test("registry status exact-compares every governed field while safety ownership stays narrow", () => {
+  const expected = registryEntry();
+  assert.equal(registrationMatches({ ...expected }, expected), true);
+  assert.deepEqual(registrationFieldMismatches(expected, expected), []);
+  for (const field of Object.keys(expected)) {
+    const changed = { ...expected, [field]: field === "port" ? 8124 : `${expected[field]}-changed` };
+    assert.deepEqual(registrationFieldMismatches(changed, expected), [field], field);
+    assert.equal(registrationMatches(changed, expected), false, field);
+  }
+  const missing = { ...expected };
+  delete missing.command;
+  assert.deepEqual(registrationFieldMismatches(missing, expected), ["command"]);
+  assert.equal(registrationMatches(missing, expected), false);
+  assert.equal(registrationMatches({
+    serviceId: expected.serviceId,
+    projectRoot: expected.projectRoot,
+    host: expected.host,
+    port: expected.port,
+    healthPath: expected.healthPath,
+  }, expected), false);
+  assert.equal(registrationOwnershipMatches({ ...expected, command: "npm run other" }, expected), true);
+  assert.equal(registrationOwnershipMatches({ ...expected, projectRoot: "/tmp/other-wiki" }, expected), false);
+});
+
+test("LaunchAgent installation requires the exact generated plist job contract", () => {
+  const contract = {
+    label: "local.codex-dev.expected-wiki",
+    node: "/opt/homebrew/bin/node",
+    npmCli: "/opt/homebrew/lib/node_modules/npm/bin/npm-cli.js",
+    script: "dev",
+    projectRoot: "/tmp/Wiki & Research",
     host: "127.0.0.1",
     port: 8123,
-    healthPath: "/assets/service-identity.json",
+    path: "/opt/homebrew/bin:/usr/bin:/bin",
+    stdoutLog: "/tmp/logs/wiki.out.log",
+    stderrLog: "/tmp/logs/wiki.err.log",
   };
-  assert.equal(registrationMatches({ ...expected }, expected), true);
-  assert.equal(registrationMatches({ ...expected, healthPath: undefined }, expected), false);
-  assert.equal(registrationOwnershipMatches({ ...expected, healthPath: undefined }, expected), true);
-  assert.equal(registrationMatches({ ...expected, port: 8124 }, expected), false);
-  assert.equal(registrationMatches({ ...expected, projectRoot: "/tmp/other-wiki" }, expected), false);
-  assert.equal(registrationMatches({ ...expected, healthPath: "/health" }, expected), false);
+  const plist = renderLaunchAgentPlist(contract);
+  assert.match(plist, /<key>ProgramArguments<\/key><array><string>\/opt\/homebrew\/bin\/node<\/string>/);
+  assert.match(plist, /<key>WorkingDirectory<\/key><string>\/tmp\/Wiki &amp; Research<\/string>/);
+  assert.equal(launchAgentInstallationMatches(plist, plist), true);
+  assert.equal(launchAgentInstallationMatches(plist.replace("<string>8123</string>", "<string>8124</string>"), plist), false);
+  assert.equal(launchAgentInstallationMatches("", plist), false);
 });
 
 test("registry deconfliction treats loopback aliases as one endpoint boundary", () => {
@@ -131,6 +194,47 @@ test("managed status fails unless registry, installation, load, and identity all
   for (const key of Object.keys(passing)) {
     assert.equal(serviceStatusPasses({ ...passing, [key]: false }), false, `${key} must fail status`);
   }
+});
+
+test("preview handoff opens only the exact registered canonical URL after complete status passes", async () => {
+  const opened = [];
+  const result = await handoffManagedPreview({
+    statusProvider: async () => passingManagedStatus(),
+    opener: async (canonicalUrl) => { opened.push(canonicalUrl); },
+  });
+  assert.equal(result, "http://127.0.0.1:8123/");
+  assert.deepEqual(opened, ["http://127.0.0.1:8123/"]);
+});
+
+test("preview handoff refuses every failed component and a non-exact registered URL", async () => {
+  for (const field of ["registered", "installed", "loaded", "identityHealthy"]) {
+    let opened = false;
+    await assert.rejects(
+      handoffManagedPreview({
+        statusProvider: async () => passingManagedStatus({ [field]: false }),
+        opener: async () => { opened = true; },
+      }),
+      new RegExp(field),
+    );
+    assert.equal(opened, false, field);
+  }
+  await assert.rejects(
+    handoffManagedPreview({
+      statusProvider: async () => passingManagedStatus({ registeredUrl: "http://localhost:8123/" }),
+      opener: async () => assert.fail("opener must not run"),
+    }),
+    /canonicalUrl/,
+  );
+});
+
+test("preview handoff reports opener failure instead of claiming success", async () => {
+  await assert.rejects(
+    handoffManagedPreview({
+      statusProvider: async () => passingManagedStatus(),
+      opener: async () => ({ status: 1 }),
+    }),
+    /Browser handoff failed/,
+  );
 });
 
 test("concurrent reservations are serialized by the exclusive registry lock", async (t) => {

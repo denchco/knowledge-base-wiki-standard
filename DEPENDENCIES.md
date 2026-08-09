@@ -5,10 +5,10 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Class | Required for | Dependencies |
 |---|---|---|
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
-| Standard validation | Conformance | Node.js 24 LTS+, npm, Draft 2020-12 validation through `ajv==8.20.0`, exactly pinned `yaml==2.9.0` |
-| Reference renderer | Human Wiki | Python 3.12+, `uv`, exactly pinned `zensical==0.0.52`; installed-lock audit through `pip-audit==2.10.1` |
-| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.32` |
-| Browser runtimes | Production diagrams/graphs | `mermaid==11.16.0`, `vis-network==10.1.0`, `3d-force-graph==1.80.0` |
+| Standard validation | Conformance | exactly Node.js `24.19.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
+| Reference renderer | Human Wiki | Python 3.12+, `uv`, exactly pinned `zensical==0.0.53`; installed-lock audit through `pip-audit==2.10.1` |
+| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.37` |
+| Browser runtimes | Production diagrams/graphs | `mermaid==11.16.1` with locked `dompurify>=3.4.13`, `vis-network==10.1.0`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.62.1` and its matching Chromium binary |
 | Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.44.0` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
@@ -49,7 +49,7 @@ The repeatable commands are:
 | `npm run standard:proposal -- prepare <id>` | Builds a disposable scrubbed payload preview from one valid tracked record; it performs no remote write. |
 | `npm run standard:proposal -- open <id>` | Fails closed unless the governed form, required label, immutable prepared payload, and submission marker agree, then performs only a browser open; the user submits the form. |
 | `npm run conformance:full-report -- --target . --receipt output/verification/receipt.json` | Consumes an explicit schema-valid verification receipt and emits the selected-profile report; absent gates remain `not-checked`. |
-| `npm run audit:node` | Audits the exact npm lock graph and fails high or critical known vulnerabilities. |
+| `npm run audit:node` | Audits the exact npm lock graph and fails moderate, high, or critical known vulnerabilities. |
 | `npm run audit:python` | Audits the locally installed environment reconstructed from `uv.lock`; run after `uv sync --frozen`. |
 | `npm run verify` | Snapshots every tracked and unignored canonical file, runs build/check/Graphify/browser gates, and fails any canonical mutation while permitting only declared ignored derived outputs. |
 | `npm run service:register` | Serializes shared-register and live-listener checks under an exclusive bounded lock, atomically reserves the configured service ID and loopback endpoint, and refuses conflicts without stopping another service. |
@@ -76,7 +76,7 @@ Those two output paths are reserved for their declared schemas in Standard and c
 
 Proposal records under `standard-proposals/` are canonical, tracked consumer or Standard-maintainer records. Prepared payloads under `output/standard-proposals/` are generated, ignored, and reconstructible. Local validation never needs network access; the CLI performs no issue submission, attachment upload, release publication, or consumer-pin mutation. Those actions remain with their separately named human authorities.
 
-The CI reference uses Node 24 Active LTS with `actions/checkout` pinned to `de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2), full Git history (`fetch-depth: 0`) so revision-aware lifecycle fixtures can resolve immutable historical pins, `actions/setup-node` pinned to `48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e` (v6.4.0), and `astral-sh/setup-uv` pinned to `08807647e7069bb48b6ef5acd8ec9567f424441b` (v8.1.0). CI explicitly selects provenance `distribution` mode; that receipt remains `not-checked` for Jujutsu and is not a maintainer-provenance pass.
+The CI reference uses exactly Node `24.19.0` Active LTS with `actions/checkout` pinned to `de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2), full Git history (`fetch-depth: 0`) so revision-aware lifecycle fixtures can resolve immutable historical pins, `actions/setup-node` pinned to `48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e` (v6.4.0), and `astral-sh/setup-uv` pinned to `08807647e7069bb48b6ef5acd8ec9567f424441b` (v8.1.0). CI explicitly selects provenance `distribution` mode; that receipt remains `not-checked` for Jujutsu and is not a maintainer-provenance pass. A newer major Node release is not inferred compatible merely because its version number is higher.
 
 `docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `output/standard-proposals/`, `GRAPH_REPORT.md`, and `site/` are generated and ignored. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
 
@@ -86,11 +86,11 @@ Adapters whose homepage does not contain every representative shape set local-pa
 
 ## Tested renderer compatibility
 
-The Zensical reference adapter is tested and supported at exactly `zensical==0.0.52`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
+The Zensical reference adapter is tested and supported at exactly `zensical==0.0.53`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
 
 ## Reproducibility rules
 
-- Exact production/runtime pins live in `pyproject.toml` and `package-lock.json`.
+- Exact production/runtime pins live in `.node-version`, `package.json`, `pyproject.toml`, and `package-lock.json`; `.npmrc` makes the Node engine fail closed during npm installation.
 - `uv.lock` and `package-lock.json` are committed.
 - CI installs from locks and runs the same mutation-safe verification contract, failing additions, deletions, or content changes to tracked or unignored canonical files.
 - Optional profiles must declare their additional dependencies and checks.

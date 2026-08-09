@@ -122,9 +122,10 @@ An issue is only intake. Acceptance is a separate Standard-maintainer decision; 
 <details>
 <summary><strong>For Standard maintainers</strong></summary>
 
-Standard Production maintenance requires Git `2.41` or newer and the reference-qualified Jujutsu `0.44.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+Standard Production maintenance requires exactly Node `24.19.0`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.44.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
 
 ```sh
+node --version
 git --version
 jj --version
 test -d .jj || jj git init --colocate .
@@ -137,7 +138,7 @@ npm run service:register
 npm run service:start
 ```
 
-`jj --version` must report `jj 0.44.0` for this candidate. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
+`node --version` must report `v24.19.0`, and `jj --version` must report `jj 0.44.0` for this candidate. npm installation fails closed on a different Node version. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
 
 End every file-changing development turn with the helper below before giving the final response. It runs complete verification, inspects Git and Jujutsu state, records the turn's changes in a JJ commit, discloses a verification failure in that commit while returning the failing status, and creates no empty commit for a clean turn:
 
@@ -145,15 +146,15 @@ End every file-changing development turn with the helper below before giving the
 npm run jj:phase -- -m "Development-turn summary"
 ```
 
-The [local Standard wiki](http://127.0.0.1:8017/) is reserved as `denchco-kb-wiki-standard` on port `8017`. `service:start` serializes the user-scoped register and live-bind checks under an exclusive lock, atomically publishes the reservation, and then installs the LaunchAgent. `service:status` succeeds only when the exact registration, installed and loaded adapter, and [`service-identity.json`](docs/assets/service-identity.json) marker all agree; an unrelated HTTP 200 is unhealthy.
+The [local Standard wiki](http://127.0.0.1:8017/) is reserved as `denchco-kb-wiki-standard` on port `8017`. `service:start` serializes the user-scoped register and live-bind checks under an exclusive lock, atomically publishes the reservation, and then installs the LaunchAgent. `service:status` succeeds only when all twelve governed registration fields, the installed LaunchAgent bytes, loaded job, canonical URL, and [`service-identity.json`](docs/assets/service-identity.json) marker agree; an unrelated HTTP 200 is unhealthy. `npm run service:preview` opens only that exact URL after complete status passes and reports browser-opener failure. Live status is maintainer-only evidence; distribution/CI leaves `DKBWS-RUNTIME-002` not checked.
 
 Before a development response presents Wiki navigation, verify the managed service identity and every displayed route, then validate the captured draft:
 
 ```sh
-npm run response:links:check -- --base-url http://127.0.0.1:8017/
+npm run response:links:check -- --base-url http://127.0.0.1:8017/ --managed-live
 ```
 
-`DKBWS-PROMPT-002` rejects file/editor URLs, clickable local-filesystem paths, repository-relative links, and live Wiki URLs outside the configured origin. A plain repository path may identify a non-Wiki implementation artifact, but it is not Wiki navigation. The checker makes captured violations nonconforming; absolute interception of an uncaptured response requires a host-provided pre-send hook.
+`DKBWS-PROMPT-002` checks Markdown destinations, entity-decoded HTML links, and plain GFM-autolinked URLs; rejects file/editor URLs, clickable local-filesystem paths, repository-relative links, and live Wiki URLs outside the configured origin; and, in managed-live mode, requires exact service identity plus HTTP 200 from every displayed route. A plain repository path may identify a non-Wiki implementation artifact, but it is not Wiki navigation. The checker makes captured violations nonconforming; absolute interception of an uncaptured response still requires a host-provided pre-send hook under `STD-VAL-007`.
 
 </details>
 

@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import {
   approveProposal,
   canonicalPayloadBytes,
+  createGitHubRemote,
   deriveProposalId,
   inspectAll,
   inspectRecord,
@@ -47,6 +48,7 @@ const FIXTURE_FORM = readFileSync(path.join(VALID_FIXTURE, "standard-change.yml"
 const STANDARD_FORM = readFileSync(path.join(ROOT, "standard-proposals/standard-change-form-v1.yml"), "utf8");
 const OLD_STANDARD = "2222222222222222222222222222222222222222";
 const RELEASE_REVISION = "4444444444444444444444444444444444444444";
+const REGISTRY_REVISION = "5555555555555555555555555555555555555555";
 
 function fixtureRecord() {
   return strictJson(readFileSync(path.join(VALID_FIXTURE, "record.json"), "utf8"), "valid fixture");
@@ -99,15 +101,39 @@ function prepareAndApprove(consumer) {
   });
 }
 
-function memoryRemote({ form = FIXTURE_FORM, labels = ["enhancement", "standard-change"], issues = [], registry = emptyRegistry(), tags = {} } = {}) {
+function memoryRemote({
+  form = FIXTURE_FORM,
+  labels = ["enhancement", "standard-change"],
+  issues = [],
+  registry = emptyRegistry(),
+  registries = null,
+  tags = {},
+  revisions = null,
+  ancestry = null,
+  releases = null,
+} = {}) {
+  const exactRegistries = registries ?? { [REGISTRY_REVISION]: registry };
+  const resolvedRevisions = revisions ?? { [REGISTRY_REVISION]: REGISTRY_REVISION };
+  const ancestryResults = ancestry ?? { [`${RELEASE_REVISION}..${REGISTRY_REVISION}`]: true };
+  const publishedReleases = releases ?? {
+    "v1.2.3": { tag_name: "v1.2.3", draft: false, immutable: true },
+  };
   return {
     methods: [],
+    registryRequests: [],
     async getForm() { this.methods.push("GET"); if (form instanceof Error) throw form; return Buffer.from(form); },
     async getLabels() { this.methods.push("GET"); if (labels instanceof Error) throw labels; return labels; },
     async searchIssues(marker) { this.methods.push("GET"); return issues.filter((issue) => issue.body?.includes(marker)); },
     async searchTitle(title) { this.methods.push("GET"); return issues.filter((issue) => issue.title === title); },
     async getIssue(number) { this.methods.push("GET"); return issues.find((issue) => issue.number === number); },
-    async getRegistry() { this.methods.push("GET"); return registry; },
+    async getRegistry(revision = null) {
+      this.methods.push("GET");
+      this.registryRequests.push(revision);
+      return revision ? exactRegistries[revision] ?? null : registry;
+    },
+    async getRelease(tag) { this.methods.push("GET"); return publishedReleases[tag] ?? null; },
+    async resolveRevision(revision) { this.methods.push("GET"); return resolvedRevisions[revision] ?? null; },
+    async isDescendant(ancestor, descendant) { this.methods.push("GET"); return ancestryResults[`${ancestor}..${descendant}`] === true; },
     async resolveTag(tag) { this.methods.push("GET"); if (!tags[tag]) throw new Error(`missing tag ${tag}`); return tags[tag]; },
   };
 }
@@ -121,11 +147,15 @@ function emptyRegistry(entries = []) {
   };
 }
 
-function acceptedRegistryEntry(record, { tag = "v1.2.3", revision = RELEASE_REVISION, issue = null } = {}) {
+function acceptedRegistryEntry(record, {
+  tag = "v1.2.3",
+  revision = RELEASE_REVISION,
+  issue = { url: "https://github.com/denchco/knowledge-base-wiki-standard/issues/1", number: 1 },
+} = {}) {
   return {
     id: record.id,
     marker: record.workflow.payload.marker,
-    intakeMode: issue ? "governed-issue" : "pre-registry-local-history",
+    intakeMode: "governed-issue",
     origin: {
       project: record.origin.project,
       publicUrl: record.origin.publicUrl,
@@ -202,6 +232,34 @@ test("form contract, illegal state, safety, and duplicate identity fail closed",
   state.workflow.upstream.decision = "accepted";
   assert.ok(inspectRecord(state, { formSource: FIXTURE_FORM, resolveProvenance: false }).diagnostics.some((item) => item.code === "DKBWS-PROP-SCHEMA-001"));
 
+  const directPrepared = fixtureRecord();
+  directPrepared.workflow.local.implementationStatus = "pending";
+  directPrepared.workflow.local.verificationStatus = "pending";
+  directPrepared.workflow.payload = {
+    ...directPrepared.workflow.payload,
+    status: "prepared",
+    digest: "a".repeat(64),
+    formSha256: "b".repeat(64),
+    preparedAt: "2026-08-07T12:00:00Z",
+  };
+  assert.ok(inspectRecord(directPrepared, { formSource: FIXTURE_FORM, resolveProvenance: false }).diagnostics.some(
+    (item) => item.code === "DKBWS-PROP-STATE-TRANSITION-001" && item.message.includes("complete implementation"),
+  ));
+
+  const directDecision = fixtureRecord();
+  directDecision.workflow.upstream = {
+    classification: "reusable",
+    decision: "accepted",
+    decidedAt: "2026-08-07T12:00:00Z",
+    decisionRevision: "c".repeat(40),
+    evidence: "Decision evidence",
+    rationale: "Reusable result",
+  };
+  directDecision.workflow.acceptance.requirementIds = ["DKBWS-LINK-002"];
+  assert.ok(inspectRecord(directDecision, { formSource: FIXTURE_FORM, resolveProvenance: false }).diagnostics.some(
+    (item) => item.code === "DKBWS-PROP-STATE-TRANSITION-001" && item.message.includes("governed issue linkage"),
+  ));
+
   const unsafe = fixtureRecord();
   unsafe.change.problem = "Credential token=ghp_abcdefghijklmnopqrstuvwxyz123456 at /Users/example/private";
   assert.deepEqual(new Set(scanProposalSafety(unsafe).map((item) => item.code)), new Set([
@@ -214,6 +272,59 @@ test("form contract, illegal state, safety, and duplicate identity fail closed",
   const codes = inspectRecord(duplicate, { formSource: FIXTURE_FORM, resolveProvenance: false, allRecords: records }).diagnostics.map((item) => item.code);
   assert.ok(codes.includes("DKBWS-PROP-ID-DUPLICATE-001"));
   assert.ok(codes.includes("DKBWS-PROP-MARKER-DUPLICATE-001"));
+});
+
+test("the pre-registry exception is bound to the one immutable historical bridge", () => {
+  const historicalRegistry = strictJson(readFileSync(path.join(ROOT, "standard-proposals/registry.json"), "utf8"), "historical registry");
+  assert.deepEqual(registryDiagnostics(historicalRegistry), []);
+
+  const forged = acceptedRegistryEntry(fixtureRecord());
+  forged.intakeMode = "pre-registry-local-history";
+  forged.issue = null;
+  const diagnostics = registryDiagnostics(emptyRegistry([forged]));
+  assert.ok(diagnostics.some((item) => item.code === "DKBWS-PROP-HISTORICAL-BRIDGE-001"));
+
+  const root = mkdtempSync(path.join(os.tmpdir(), "dkbws-proposal-registry-"));
+  try {
+    mkdirSync(path.join(root, "standard-proposals"), { recursive: true });
+    writeFileSync(path.join(root, "standard-proposals/registry.json"), stableJson(emptyRegistry([forged])), "utf8");
+    const inspected = inspectAll({ root, formSource: FIXTURE_FORM, resolveProvenance: false });
+    assert.equal(inspected.status, "invalid");
+    assert.ok(inspected.diagnostics.some((item) => item.code === "DKBWS-PROP-HISTORICAL-BRIDGE-001"));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("the GitHub release-proof adapter remains GET-only and reads registry bytes by exact revision", async () => {
+  const registry = emptyRegistry();
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, method: options?.method });
+    let value;
+    if (url.includes("/contents/standard-proposals/registry.json")) {
+      value = { encoding: "base64", content: Buffer.from(stableJson(registry)).toString("base64") };
+    } else if (url.includes(`/commits/${REGISTRY_REVISION}`)) {
+      value = { sha: REGISTRY_REVISION };
+    } else if (url.includes(`/compare/${RELEASE_REVISION}...${REGISTRY_REVISION}`)) {
+      value = { status: "ahead" };
+    } else if (url.includes("/releases/tags/v1.2.3")) {
+      value = { tag_name: "v1.2.3", draft: false, immutable: true };
+    } else if (url.includes("/git/ref/tags/v1.2.3")) {
+      value = { object: { type: "commit", sha: RELEASE_REVISION } };
+    } else {
+      return { ok: false, status: 404, async json() { return {}; } };
+    }
+    return { ok: true, status: 200, async json() { return value; } };
+  };
+  const remote = createGitHubRemote(undefined, { fetchImpl });
+  assert.deepEqual(await remote.getRegistry(REGISTRY_REVISION), registry);
+  assert.equal(await remote.resolveRevision(REGISTRY_REVISION), REGISTRY_REVISION);
+  assert.equal(await remote.isDescendant(RELEASE_REVISION, REGISTRY_REVISION), true);
+  assert.deepEqual(await remote.getRelease("v1.2.3"), { tag_name: "v1.2.3", draft: false, immutable: true });
+  assert.equal(await remote.resolveTag("v1.2.3"), RELEASE_REVISION);
+  assert.equal(calls.every((call) => call.method === "GET"), true);
+  assert.ok(calls.some((call) => call.url.endsWith(`/contents/standard-proposals/registry.json?ref=${REGISTRY_REVISION}`)));
 });
 
 test("prepare binds the form, approval becomes stale on payload change, and both submission observations freeze payload", () => {
@@ -424,7 +535,46 @@ test("decision, immutable release ledger, read-only sync, and authorised adoptio
     const entry = acceptedRegistryEntry(decided, { issue: { url: issue.html_url, number: issue.number } });
     const registry = emptyRegistry([entry]);
     await assert.rejects(
-      recordRelease({ root: consumer.root, selector: prepared.slug, tag: "v1.2.3", revision: RELEASE_REVISION, registryRevision: "5".repeat(40), remote: memoryRemote({ registry, tags: { "v1.2.3": "f".repeat(40) } }) }),
+      recordRelease({
+        root: consumer.root,
+        selector: prepared.slug,
+        tag: "v1.2.3",
+        revision: RELEASE_REVISION,
+        registryRevision: REGISTRY_REVISION,
+        remote: memoryRemote({ registry, tags: { "v1.2.3": RELEASE_REVISION }, revisions: { [REGISTRY_REVISION]: "6".repeat(40) } }),
+      }),
+      (error) => error.code === "DKBWS-PROP-REGISTRY-REVISION-001",
+    );
+    await assert.rejects(
+      recordRelease({
+        root: consumer.root,
+        selector: prepared.slug,
+        tag: "v1.2.3",
+        revision: RELEASE_REVISION,
+        registryRevision: REGISTRY_REVISION,
+        remote: memoryRemote({ registry, tags: { "v1.2.3": RELEASE_REVISION }, ancestry: {} }),
+      }),
+      (error) => error.code === "DKBWS-PROP-REGISTRY-ANCESTRY-001",
+    );
+    for (const releases of [
+      {},
+      { "v1.2.3": { tag_name: "v1.2.3", draft: true, immutable: true } },
+      { "v1.2.3": { tag_name: "v1.2.3", draft: false, immutable: false } },
+    ]) {
+      await assert.rejects(
+        recordRelease({
+          root: consumer.root,
+          selector: prepared.slug,
+          tag: "v1.2.3",
+          revision: RELEASE_REVISION,
+          registryRevision: REGISTRY_REVISION,
+          remote: memoryRemote({ registry, tags: { "v1.2.3": RELEASE_REVISION }, releases }),
+        }),
+        (error) => error.code === "DKBWS-PROP-RELEASE-IMMUTABLE-001",
+      );
+    }
+    await assert.rejects(
+      recordRelease({ root: consumer.root, selector: prepared.slug, tag: "v1.2.3", revision: RELEASE_REVISION, registryRevision: REGISTRY_REVISION, remote: memoryRemote({ registry, tags: { "v1.2.3": "f".repeat(40) } }) }),
       (error) => error.code === "DKBWS-PROP-RELEASE-001",
     );
     const remote = memoryRemote({ issues: [issue], registry, tags: { "v1.2.3": RELEASE_REVISION } });
@@ -433,11 +583,39 @@ test("decision, immutable release ledger, read-only sync, and authorised adoptio
       selector: prepared.slug,
       tag: "v1.2.3",
       revision: RELEASE_REVISION,
-      registryRevision: "5".repeat(40),
+      registryRevision: REGISTRY_REVISION,
       remote,
       now: new Date("2026-08-07T12:31:00Z"),
     });
     assert.equal(released.record.workflow.release.status, "included");
+    assert.deepEqual(remote.registryRequests, [REGISTRY_REVISION]);
+    await assert.rejects(
+      recordRelease({
+        root: consumer.root,
+        selector: prepared.slug,
+        tag: "v1.2.3",
+        revision: RELEASE_REVISION,
+        registryRevision: REGISTRY_REVISION,
+        remote,
+      }),
+      (error) => error.code === "DKBWS-PROP-STATE-TRANSITION-001",
+    );
+
+    const directAdoption = readRecord(consumer);
+    directAdoption.workflow.adoption = {
+      status: "adopted",
+      authority: { by: "direct-editor", at: "2026-08-07T12:32:00Z" },
+      fromStandardRevision: OLD_STANDARD,
+      toStandardRevision: RELEASE_REVISION,
+      consumerRevision: "f".repeat(40),
+      adoptedAt: "2026-08-07T12:32:00Z",
+      verification: ["Unverified direct edit"],
+    };
+    writeFileSync(consumer.file, stableJson(directAdoption), "utf8");
+    assert.ok(inspectAll({ root: consumer.root, formSource: FIXTURE_FORM }).diagnostics.some(
+      (item) => item.code === "DKBWS-PROP-ADOPTION-AUTHORITY-001" && item.message.includes("does not resolve"),
+    ));
+    writeFileSync(consumer.file, stableJson(released.record), "utf8");
 
     const before = treeHash(consumer.root);
     const syncRemote = memoryRemote({ issues: [issue], registry, tags: { "v1.2.3": RELEASE_REVISION } });
@@ -448,6 +626,21 @@ test("decision, immutable release ledger, read-only sync, and authorised adoptio
     assert.ok(first.diagnostics.some((item) => item.code === "DKBWS-PROP-RELEASE-AVAILABLE-001"));
     assert.equal(treeHash(consumer.root), before);
     assert.equal(syncRemote.methods.every((method) => method === "GET"), true);
+    assert.ok(syncRemote.registryRequests.includes(REGISTRY_REVISION));
+
+    const exactReleasedRecord = readRecord(consumer);
+    const falseRegistryRevision = structuredClone(exactReleasedRecord);
+    falseRegistryRevision.workflow.release.registryRevision = "6".repeat(40);
+    writeFileSync(consumer.file, stableJson(falseRegistryRevision), "utf8");
+    const falseRevisionSync = await syncCheck({
+      root: consumer.root,
+      remote: memoryRemote({ issues: [issue], registry, tags: { "v1.2.3": RELEASE_REVISION } }),
+      formSource: FIXTURE_FORM,
+    });
+    assert.equal(falseRevisionSync.status, "invalid");
+    assert.ok(falseRevisionSync.diagnostics.some((item) => item.code === "DKBWS-PROP-REGISTRY-REVISION-001"));
+    writeFileSync(consumer.file, stableJson(exactReleasedRecord), "utf8");
+
     const tamperedIssue = { ...issue, title: `${issue.title} altered` };
     const tamperedSync = await syncCheck({
       root: consumer.root,

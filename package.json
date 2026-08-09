@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": "24.19.0"
   },
   "scripts": {
     "prepare:runtime": "node scripts/sync-runtime-assets.mjs",
@@ -28,7 +28,7 @@
     "sources:link": "node scripts/link-source-citations.mjs --write",
     "check:schema-artifacts": "node scripts/check-schema-artifacts.mjs",
     "check:provenance": "node scripts/check-provenance-mode.mjs",
-    "audit:node": "npm audit --audit-level=high",
+    "audit:node": "npm audit --audit-level=moderate",
     "audit:python": "uv run pip-audit --local",
     "conformance:inspect": "node scripts/conformance-cli.mjs inspect",
     "conformance:validate": "node scripts/conformance-cli.mjs validate",
@@ -50,6 +50,7 @@
     "service:start": "node scripts/dev-service.mjs start",
     "service:stop": "node scripts/dev-service.mjs stop",
     "service:status": "node scripts/dev-service.mjs status",
+    "service:preview": "node scripts/dev-service.mjs preview",
     "service:restart": "node scripts/dev-service.mjs restart",
     "service:list": "node scripts/dev-service.mjs list",
     "service:uninstall": "node scripts/dev-service.mjs uninstall",
@@ -68,7 +69,7 @@
     "@playwright/test": "1.62.1",
     "3d-force-graph": "1.80.0",
     "ajv": "8.20.0",
-    "mermaid": "11.16.0",
+    "mermaid": "11.16.1",
     "vis-network": "10.1.0",
     "yaml": "2.9.0"
   }

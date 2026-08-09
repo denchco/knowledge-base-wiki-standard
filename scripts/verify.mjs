@@ -29,9 +29,15 @@ const derivedOutputs = [
   "GRAPH_REPORT.md",
 ];
 const environmentRoots = new Set([".git", ".jj", ".venv", "node_modules", ".playwright-cli"]);
-const gates = ["build", "check", "check:graphify", "check:browser"];
 const startedAt = new Date().toISOString();
 const provenanceMode = process.env.DKBWS_PROVENANCE_MODE ?? "maintainer";
+const gates = [
+  "build",
+  "check",
+  "check:graphify",
+  "check:browser",
+  ...(provenanceMode === "maintainer" ? ["service:status"] : []),
+];
 const receiptDirectory = path.join(root, "output", "verification");
 const receiptPath = path.join(receiptDirectory, "receipt.json");
 const reportPath = path.join(receiptDirectory, "conformance-report.json");
@@ -117,10 +123,10 @@ if (provenanceMode === "maintainer") {
     .map((result) => result.requirement);
   const notCheckedCapabilities = selectedNotCheckedCapabilityIds(parsedReport);
   const failed = (parsedReport.requirementResults ?? []).filter((result) => result.status === "fail");
-  const expectedDistributionGap = notChecked.length === 1 && notChecked[0] === "DKBWS-PROV-001";
-  const expectedCapabilityGap = notCheckedCapabilities.length === 1 && notCheckedCapabilities[0] === "jujutsu";
+  const expectedDistributionGap = exactSet(notChecked, ["DKBWS-PROV-001", "DKBWS-RUNTIME-002"]);
+  const expectedCapabilityGap = exactSet(notCheckedCapabilities, ["jujutsu", "local_service"]);
   if (![0, 1].includes(fullReport.status) || failed.length || parsedReport.summary?.failedCapabilities !== 0 || !expectedDistributionGap || !expectedCapabilityGap) {
-    fail(`distribution report has gaps beyond explicit maintainer provenance: ${fullReport.stderr.trim() || JSON.stringify({ notChecked, notCheckedCapabilities, failed })}`);
+    fail(`distribution report has gaps beyond the explicit maintainer-only provenance and managed-service checks: ${fullReport.stderr.trim() || JSON.stringify({ notChecked, notCheckedCapabilities, failed })}`);
   }
 } else {
   fail(`unsupported DKBWS_PROVENANCE_MODE ${provenanceMode}`);
@@ -162,9 +168,9 @@ function buildReceipt(provenance) {
     evidence("reader-source-links", "verification-script", "Stable source-row anchors, individual visible identities, registered authority URLs, and optional idempotent migration.", "scripts/link-source-citations.mjs"),
     evidence("reader-source-link-fixtures", "test-suite", "Positive, negative, ignored-region, Unicode, fence, destination, authority, and idempotence fixtures.", "scripts/link-source-citations.test.mjs"),
     evidence("conformance-fixtures", "test-suite", "Positive, negative, lifecycle, receipt, and lossless OKF fixtures.", "scripts/conformance-cli.test.mjs"),
-    evidence("standard-proposal-core", "verification-script", "Tracked proposal validation, deterministic scrubbed rendering, form- and digest-bound approval, fail-closed marker/form/label reconciliation, and separately authorised lifecycle transitions.", "scripts/standard-proposal-core.mjs"),
+    evidence("standard-proposal-core", "verification-script", "Tracked proposal validation, deterministic scrubbed rendering, form- and digest-bound approval, fail-closed marker/form/label reconciliation, direct-state invariants, and separately authorised lifecycle transitions.", "scripts/standard-proposal-core.mjs"),
     evidence("standard-proposal-cli", "command-adapter", "Thin local command boundary for read-only checks, disposable preparation, GET-only browser open, and explicit local record transitions.", "scripts/standard-proposal-cli.mjs"),
-    evidence("standard-proposal-fixtures", "test-suite", "Positive and negative provenance, state, safety, form/label, marker/deduplication, registry, release, adoption, and remote-write fixtures.", "scripts/standard-proposal-cli.test.mjs"),
+    evidence("standard-proposal-fixtures", "test-suite", "Positive and negative provenance, direct-edited state, safety, form/label, marker/deduplication, exact-revision registry, immutable release, adoption, and remote-write fixtures.", "scripts/standard-proposal-cli.test.mjs"),
     evidence("standard-proposal-record-schema", "schema-validation", "Versioned tracked consumer proposal authority.", "schema/standard-proposal-record-v1.json"),
     evidence("standard-proposal-registry", "decision-register", "Explicit Standard decision, accepted-requirement, and immutable-release ledger independent of issue state.", "standard-proposals/registry.json"),
     evidence("standard-proposal-form", "governed-form", "Versioned issue-form bytes, required labels, and stable field contract.", "standard-proposals/standard-change-form-v1.yml"),
@@ -178,12 +184,12 @@ function buildReceipt(provenance) {
     evidence("evidence-matrix", "evidence-matrix", "Claims mapped to support, state, and limitations.", "docs/evidence-matrix.md"),
     evidence("llm-wiki", "agent-contract", "Read order plus ingest, query, lint, authority, and generation boundaries.", "docs/llm-wiki/index.md"),
     evidence("prompt-contract", "prompt-contract", "Sequential clarification plus completion-first, bounded, anti-rabbit-hole handoff protocol.", "prompts/instantiate-wiki.md"),
-    evidence("development-response-links", "verification-script", "Stable diagnostics reject file/editor links and require Wiki navigation under the configured live origin.", "scripts/development-response-links.mjs"),
-    evidence("development-response-link-fixtures", "test-suite", "Conforming live routes plus nonconforming repository-relative, absolute, file, editor, and wrong-origin response links.", "scripts/development-response-links.test.mjs"),
+    evidence("development-response-links", "verification-script", "Stable diagnostics reject Markdown, HTML, plain-GFM, file/editor and wrong-origin Wiki links; managed-live mode also requires the exact service identity and HTTP 200 for every displayed Wiki route.", "scripts/development-response-links.mjs"),
+    evidence("development-response-link-fixtures", "test-suite", "Conforming syntax and managed-live routes plus nonconforming repository-relative, HTML, plain-GFM, absolute, file, editor, wrong-origin, service-identity and route-health cases.", "scripts/development-response-links.test.mjs"),
     evidence("agent-instruction-parity", "agent-contract", "Shared Codex/Claude instructions, import relay, skill parity, cycle guard, parked-work boundary, and end-of-development-turn JJ commit rule.", "AGENTS.md"),
-    evidence("jj-turn-helper", "test-suite", "End-of-turn helper verifies, inspects Git/Jujutsu state, commits changed turns including disclosed verification failures, and refuses empty commits.", "scripts/jj-phase.test.mjs"),
-    evidence("local-service-contract", "verification-script", "Serialized registry ownership, atomic publication, live-listener deconfliction, versioned marker health, and fail-closed managed status.", "scripts/dev-service.mjs"),
-    evidence("local-service-fixtures", "test-suite", "Concurrent locking, stale-owner safety, atomic replacement, wrong-site HTTP 200, live-listener, registry ownership, loopback alias, and status-composition fixtures.", "scripts/dev-service.test.mjs"),
+    evidence("jj-turn-helper", "test-suite", "End-of-turn helper independently runs complete verification and maintainer provenance, inspects Git/Jujutsu state, commits changed turns with every failure disclosed, and refuses empty commits.", "scripts/jj-phase.test.mjs"),
+    evidence("local-service-contract", "verification-script", "Serialized registry ownership, atomic publication, live-listener deconfliction, exact governed registration and LaunchAgent bytes, versioned marker health, and fail-closed status-gated preview handoff.", "scripts/dev-service.mjs"),
+    evidence("local-service-fixtures", "test-suite", "Concurrent locking, stale-owner safety, atomic replacement, wrong-site HTTP 200, live-listener, exact registry/plist, loopback alias, composite status, and preview-refusal fixtures.", "scripts/dev-service.test.mjs"),
     evidence("service-identity-marker", "runtime-identity", "Static identity marker for the registered Standard service.", "docs/assets/service-identity.json"),
     evidence("service-identity-schema", "schema-validation", "Versioned machine contract for managed local service identity markers.", "schema/service-identity-v1.json"),
   ];
@@ -216,12 +222,11 @@ function buildReceipt(provenance) {
         result("DKBWS-LINK-002", ["reader-source-links", "reader-source-link-fixtures", "source-register"], "The source-link gate proved stable row anchors, independent exact-row links, registered named-authority URLs, ignored non-reader regions, and an optional idempotent migration."),
         result("DKBWS-DESIGN-001", ["design-contract"]),
         result("DKBWS-PROMPT-001", ["standard-check", "prompt-contract", "agent-instruction-parity"]),
-        result("DKBWS-PROMPT-002", ["standard-check", "prompt-contract", "agent-instruction-parity", "development-response-links", "development-response-link-fixtures", "local-service-contract", "local-service-fixtures"], "The exact-valued capability, canonical URL, managed instruction parity, response-link fixtures, and managed-service identity/HTTP contract make file-link substitution detectable and nonconforming."),
+        result("DKBWS-PROMPT-002", ["standard-check", "prompt-contract", "agent-instruction-parity", "development-response-links", "development-response-link-fixtures", "local-service-contract", "local-service-fixtures"], "The exact-valued capability, canonical URL, managed instruction parity, Markdown/HTML/plain-GFM fixtures, and managed-service identity/per-route HTTP contract make non-live Wiki-link substitution detectable and nonconforming for captured responses."),
         result("DKBWS-PROV-001", ["standard-check", "agent-instruction-parity", "jj-turn-helper"], "The shared instructions and executable helper enforce a disclosed JJ commit at every file-changing development-turn boundary."),
         result("DKBWS-UPDATE-001", ["conformance-fixtures"]),
-        result("DKBWS-UPDATE-002", ["standard-check", "standard-proposal-core", "standard-proposal-cli", "standard-proposal-fixtures", "standard-proposal-record-schema", "standard-proposal-registry", "standard-proposal-form", "schema-artifacts"], "The proposal fixtures proved tracked immutable origin, deterministic form- and digest-bound approval, disclosure rejection, marker deduplication and ambiguous outcomes, fail-closed form/label checks, explicit issue/decision/release/adoption states, and absence of automatic remote writes or pin changes."),
+        result("DKBWS-UPDATE-002", ["standard-check", "standard-proposal-core", "standard-proposal-cli", "standard-proposal-fixtures", "standard-proposal-record-schema", "standard-proposal-registry", "standard-proposal-form", "schema-artifacts"], "The proposal fixtures proved tracked immutable origin, deterministic form- and digest-bound approval, direct-edit state invariants, disclosure rejection, marker deduplication and ambiguous outcomes, fail-closed form/label checks, exact-revision registry bytes, strict release-to-ledger ancestry, immutable public release evidence, explicit issue/decision/release/adoption states, and absence of automatic remote writes or pin changes."),
         result("DKBWS-VERIFY-002", ["conformance-fixtures", "schema-artifacts"]),
-        result("DKBWS-RUNTIME-002", ["local-service-contract", "local-service-fixtures", "service-identity-marker", "service-identity-schema"], "The managed-service fixtures serialize concurrent reservations, recover only dead stale owners, atomically replace the register, reject registered and live-listener collisions, reject a wrong service returning HTTP 200, and require registry, installation, load, and exact marker identity for status."),
         {
           ...result("DKBWS-SEC-001", ["canonical-content", "security-policy", "source-policy", "licensing-decision"]),
           subcontrols: [
@@ -233,6 +238,20 @@ function buildReceipt(provenance) {
         },
       ],
     },
+    ...(provenanceMode === "maintainer" ? [{
+      id: "managed-service",
+      status: "pass",
+      command: "npm run service:status",
+      exitCode: 0,
+      evidence: [
+        evidence("managed-service-status-contract", "verification-script", "Exact registry, LaunchAgent bytes, loaded job, canonical URL, and service identity status contract.", "scripts/dev-service.mjs"),
+        evidence("managed-service-preview-fixtures", "test-suite", "Status-gated exact canonical-URL handoff and component-failure fixtures.", "scripts/dev-service.test.mjs"),
+        evidence("managed-service-live-marker", "runtime-identity", "Static identity marker returned by the registered live Standard service.", "docs/assets/service-identity.json"),
+      ],
+      results: [
+        result("DKBWS-RUNTIME-002", ["managed-service-status-contract", "managed-service-preview-fixtures", "managed-service-live-marker"], "The maintainer gate proved the live registered service, exact governed registry fields, byte-identical installed LaunchAgent contract, loaded job, HTTP identity, canonical URL, and a tested fail-closed browser handoff."),
+      ],
+    }] : []),
     {
       id: "graph",
       status: "pass",
@@ -321,6 +340,11 @@ function result(requirement, evidenceIds, reason = "The successful gate supplied
 
 function subcontrol(id, evidenceIds) {
   return { id, status: "pass", reason: "The canonical content gate verified the required declaration boundary.", evidence: evidenceIds };
+}
+
+function exactSet(actual, expected) {
+  return actual.length === expected.length
+    && expected.every((item) => actual.includes(item));
 }
 
 function commandJson(command, args, label) {

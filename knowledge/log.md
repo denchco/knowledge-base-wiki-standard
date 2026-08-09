@@ -1,5 +1,11 @@
 # Bundle update log
 
+## 2026-08-09
+
+- **Exact managed preview**: `DKBWS-RUNTIME-002` now exact-matches twelve registration fields, the generated installed/loaded job, marker identity, and canonical URL; `service:preview` fails closed, and only maintainer verification supplies live persistent-service evidence.
+- **Rendered response-link coverage**: `DKBWS-PROMPT-002` now checks Markdown, entity-decoded HTML links, and plain GFM autolinks. Managed-local drafts use `--managed-live` for exact identity and per-route HTTP 200, while uncaptured host output retains the explicit pre-send limitation.
+- **Exact proposal state and release evidence**: `DKBWS-UPDATE-002` now validates direct states and terminal transitions, exact registry-revision bytes and strict ancestry, exact non-draft immutable public releases, and the sole immutable UK Digital Health `DKBWS-LINK-002` historical bridge.
+
 ## 2026-08-07
 
 - **Verified live response navigation**: Added `DKBWS-PROMPT-002` so development responses navigate Wiki content through the configured canonical live HTTP(S) origin, never through file/editor URLs or clickable repository paths. The captured-draft checker and shared instructions make violations nonconforming; plain paths remain only for non-Wiki implementation artifacts, while absolute interception of uncaptured responses awaits a host pre-send hook.

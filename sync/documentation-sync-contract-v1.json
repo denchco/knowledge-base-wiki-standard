@@ -11,6 +11,8 @@
     ".github/ISSUE_TEMPLATE/standard-change.yml",
     ".github/workflows/verify.yml",
     ".gitignore",
+    ".node-version",
+    ".npmrc",
     ".wiki-standard.yaml",
     "AGENTS.md",
     "CHANGELOG.md",

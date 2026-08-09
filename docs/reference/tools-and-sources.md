@@ -18,14 +18,15 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Codex discovery | `AGENTS.md`, `.agents/skills/`, and `llms.txt` |
 | Claude Code discovery | `CLAUDE.md` importing `AGENTS.md`, plus `.claude/skills/` |
 | Follow-up state | `docs/project/status.md` for zero to three active priorities; validation queue fields for parked work and reopen triggers |
-| Development-response navigation | Configured canonical Human Wiki origin, exact managed-service identity and route health, plus `npm run response:links:check -- --base-url <canonical-url>` for captured drafts; uncaptured pre-send interception requires a host hook |
-| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify), vis-network, and 3d-force-graph |
-| Diagrams | Mermaid, served locally |
+| Development-response navigation | Configured canonical Human Wiki origin plus `npm run response:links:check -- --base-url <canonical-url> --managed-live` for Markdown, HTML, plain-GFM, exact managed-identity, and per-route HTTP checks; uncaptured pre-send interception still requires a host hook |
+| Validation runtime | Node `24.19.0`, enforced identically in the maintainer workspace, package contract, and CI |
+| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.37`, vis-network `10.1.0`, and 3d-force-graph `1.80.0` |
+| Diagrams | Mermaid `11.16.1` with DOMPurify `3.4.13`, served locally |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): exact `0.44.0` reference-qualified for the Standard Production maintainer workspace |
-| Standard proposal lifecycle | Tracked records, strict schemas, the [durable Standard proposal workflow](../llm-wiki/standard-proposals.md), deterministic form-bound approval, and GET-only GitHub reconciliation; the user performs final submission |
-| Local service | Repo wrapper, serialized and atomically replaced user-scoped register, live-listener preflight, platform user-service adapter, and exact static-marker health |
+| Standard proposal lifecycle | Tracked records, direct-state/terminal-transition validation, the [durable Standard proposal workflow](../llm-wiki/standard-proposals.md), deterministic form-bound approval, exact registry/release evidence, one fixed historical bridge, and GET-only GitHub reconciliation; the user performs final submission |
+| Local service | Repo wrapper, serialized and atomically replaced user-scoped register, exact twelve-field registration and installed/loaded job, static-marker health, maintainer-only live status, and fail-closed `service:preview` |
 | Planned deployment adapter | Cloudflare Pages is the researched reference; it is not selected or installed in this local candidate |
 | Repository integration | GitHub MCP Server |
 | Future domain integration | DenchCo Wiki Standard MCP is currently no-go; reconsider only if a future consumer proves a named gap left by Git, GitHub, and the stable CLI |
@@ -55,6 +56,6 @@ The [Human and LLM Wiki products](../architecture.md#human-and-llm-products) are
 
 ## Human reference implementation
 
-The [Standard Production profile](../spec/profiles.md#profiles) selects pinned [Zensical](https://zensical.org/docs/) to render the Human Wiki with the DenchCo visual profile, repository-local diagram and graph assets, and built-output browser checks. [Google DESIGN.md](https://github.com/google-labs-code/design.md) supplies an agent-readable design-contract format; the actual colours, shapes, layout, accessibility rules, and adapter decisions are governed by the canonical [DenchCo `DESIGN.md`](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md). Exact pins and the offline/runtime boundary are recorded in [Dependencies](../spec/dependencies.md).
+The [Standard Production profile](../spec/profiles.md#profiles) selects exactly [Zensical](https://zensical.org/docs/) `0.0.53` to render the Human Wiki with the DenchCo visual profile, repository-local diagram and graph assets, and built-output browser checks. [Google DESIGN.md](https://github.com/google-labs-code/design.md) supplies an agent-readable design-contract format; the actual colours, shapes, layout, accessibility rules, and adapter decisions are governed by the canonical [DenchCo `DESIGN.md`](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md). Exact pins and the offline/runtime boundary are recorded in [Dependencies](../spec/dependencies.md).
 
 See the root dependency contract and source register for versions and authority.
