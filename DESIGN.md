@@ -157,7 +157,7 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 - No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
 - Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
 - The production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent.
-- Mermaid `11.16.1`, vis-network `10.1.0`, and 3d-force-graph `1.80.0` are local
+- Mermaid `11.17.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects
   the governed radius, text, and line tokens into Zensical's closed diagram
@@ -175,6 +175,6 @@ The DenchCo standard wiki keeps this teal family. A conforming derived wiki may 
 - Material for MkDocs is absent from this production path; an existing-project compatibility adapter may preserve it without changing the Zensical-first reference.
 - Verification covers strict build, deterministic tokens, generated artifacts,
   Graphify 2D/3D and six relationship layers, local browser runtimes, Playwright
-  `1.62.1` rendered desktop/mobile geometry, pixel checks, controls, overflow,
+  `1.63.0` rendered desktop/mobile geometry, pixel checks, controls, overflow,
   and public-CDN exclusion. Deployment and public HTTP health are separate
   release-adapter gates.

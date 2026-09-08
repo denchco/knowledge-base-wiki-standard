@@ -54,6 +54,18 @@ OKF portability and DenchCo profile conformance are related but distinct claims.
 
 Missing optional metadata, unknown concept types, unknown producer fields, broken concept links, and missing index files MUST NOT make an OKF bundle nonconformant. When provenance, trust, lifecycle, or attestation metadata is supplied, the validator reports deviations from the v0.2 conventions as warnings. DenchCo `--strict` validation promotes those warnings to a failing command without misrepresenting the underlying OKF portability result.
 
+### OKF source and timestamp migration
+
+`DKBWS-OKF-001` now resolves OKF v0.2 through the immutable specification and relocation evidence in [the source register](../sources.md#src-002), with machine-readable identity in `config/okf-source-lock.json`. The canonical and frozen specifications retrieved on 7 September 2026 have identical hashes; the old location is nevertheless explicitly superseded. An unpinned version label cannot date an earlier content change.
+
+The optional timestamp fields are `sources[].last_modified`, both bounds of shared and per-source `usage_window`, `generated.at`, every `verified.at`, and `stale_after`. DenchCo's schema and validator accept extended ISO datetimes with seconds, optional fractional seconds, and `Z` or a signed `HH:MM` offset. They reject date-only values, absent offsets, impossible calendar dates, and invalid clock or offset components. Usage windows compare instants after offset conversion. Staleness is evaluated at `00:00:00Z` on the reported `evaluationDate`; `--date YYYY-MM-DD` selects that reproducible day boundary. It is not a live freshness monitor.
+
+These remain guidance diagnostics in portability mode, as specified by upstream section 11. `--strict` fails on the warnings. Log headings and DenchCo manifest deviation dates retain their date-only contracts; unknown local fields are never guessed to be timestamps.
+
+Migration MUST preserve source precision. Where an instant and its offset are evidenced, record that datetime. Where only a date is known, retain it with a documented deviation, or move it through a reviewed edit to an explicitly local date/precision extension and omit the optional timestamp. Do not append an invented midnight or offset to real evidence. Validation, export, and upgrade planning perform no such rewrite. The synthetic conforming fixture uses defined UTC instants; separate legacy-date and local-extension fixtures prove lossless preservation and strict diagnostics. Canonical knowledge already contained valid offset datetimes and required no timestamp fabrication.
+
+The source-lock schema requires identity and retrieval fields; offline checks verify structure and register agreement. The recorded SHA-256 values were computed from the retrieved immutable raw files. An offline schema pass does not re-fetch or independently prove those remote bytes. A changed upstream digest reopens `STD-VAL-001` for comparison and review before changing the supported lock.
+
 Every DenchCo manifest MUST map `roles.okf_bundle` to one repository-relative directory. A bare OKF directory MAY be inspected without a DenchCo manifest, but the result is not a DenchCo profile claim.
 
 ## Read-only CLI
@@ -162,6 +174,8 @@ Graph-assisted inspection is query-first, not graph-only. If a scoped query has 
 - `fixtures/conforming/okf-v0.2` includes provenance, both trust forms, lifecycle, attested computation, and a nested unknown extension.
 - `fixtures/nonconforming/okf-v0.2` proves every hard structural failure class.
 - `fixtures/nonconforming/okf-guidance` proves the portable-versus-strict distinction.
+- `fixtures/nonconforming/okf-date-precision` retains historical date-only metadata; `fixtures/conforming/okf-local-date-extension` preserves day precision without claiming an instant.
+- `schema/okf-source-lock-v1.json` and `config/okf-source-lock.json` bind source location, immutable content identity, retrieval, and supersession.
 - `fixtures/nonconforming/manifest` proves manifest diagnostics independently of bundle parsing.
 - `fixtures/lifecycle/consumer-old` proves a conservative version diff, guarded upgrade plan, deviation preservation, and byte-for-byte non-mutation.
 - `fixtures/lifecycle/consumer-rc3` proves that an equal version label at an older immutable revision exposes introduced profile requirements and blocks silent repinning.

@@ -35,11 +35,15 @@ export default async (page, options = {}) => {
     : [];
   const failures = [];
   const requests = [];
+  const resourceRequests = [];
   const localResponseFailures = [];
   const pageErrors = [];
   const consoleErrors = [];
 
-  page.on("request", request => requests.push(request.url()));
+  page.on("request", request => {
+    requests.push(request.url());
+    resourceRequests.push({ url: request.url(), type: request.resourceType() });
+  });
   page.on("requestfailed", request => {
     if (request.url().startsWith(baseUrl)) {
       localResponseFailures.push(`${request.url()}: ${request.failure()?.errorText || "request failed"}`);
@@ -670,6 +674,46 @@ export default async (page, options = {}) => {
     "The width control must align to the body-content right rail in Standard mode",
   );
 
+  // Exercise upstream search through its open shadow-root UI. Result navigation
+  // must use this served build, while Markdown discovery retains canonical URLs.
+  const searchInput = page.locator('input[role="combobox"]');
+  const searchDestination = routeUrl(architectureRoute);
+  const searchResult = page.locator(`.l ol li a[href="${searchDestination}"]`).first();
+  check(await page.locator('link[rel="alternate"][type="text/markdown"]').count() === 1,
+    "Rendered pages must retain their Markdown discovery alternate");
+  const openSearch = async () => {
+    await page.locator(".md-search__button").click();
+    await searchInput.waitFor({ state: "attached" });
+    await page.waitForFunction(() => [...document.querySelectorAll("body > div")].some(host => {
+      const input = host.shadowRoot?.querySelector('input[role="combobox"]');
+      return input && input.getRootNode().activeElement === input;
+    }));
+  };
+  await openSearch();
+  await searchInput.fill("architecture");
+  await searchResult.waitFor({ state: "visible" });
+  const searchResultLabel = (await searchResult.innerText()).trim();
+  check(/architecture/i.test(searchResultLabel), "Search must return the maintained architecture page");
+  await searchInput.press("Escape");
+  await page.waitForFunction(() => [...document.querySelectorAll("body > div")].every(host => {
+    const input = host.shadowRoot?.querySelector('input[role="combobox"]');
+    if (!input) return true;
+    const panel = input.closest(".l");
+    return panel && input.getRootNode().activeElement !== input
+      && getComputedStyle(panel).opacity === "0" && getComputedStyle(panel).pointerEvents === "none";
+  }));
+  await openSearch();
+  await searchInput.fill("architecture");
+  await searchResult.waitFor({ state: "visible" });
+  await Promise.all([
+    page.waitForURL(url => url.origin === baseUrl && url.pathname === new URL(searchDestination).pathname),
+    searchResult.click(),
+  ]);
+  await page.waitForLoadState("networkidle");
+  check(/architecture/i.test(await page.locator(".md-content__inner h1").innerText()), "Search result must navigate to the architecture document");
+  const searchLifecycle = { query: "architecture", resultRoute: architectureRoute, resultLabel: searchResultLabel, reopenAndEscape: true };
+  await goto(questionRoute);
+
   await page.locator(".layout-width-toggle").click();
   await page.waitForFunction(() => document.documentElement.dataset.layoutWidth === "wide");
   const wideHeader = await measureHeader();
@@ -998,12 +1042,18 @@ export default async (page, options = {}) => {
   check(cdnRequests.length === 0, `Production browser runtime must not request public CDNs: ${cdnRequests.join(", ")}`);
   check(localResponseFailures.length === 0, `Local browser requests failed: ${localResponseFailures.join("; ")}`);
   check(pageErrors.length === 0, `Browser page errors occurred: ${pageErrors.join("; ")}`);
+  const offOriginRequests = [...new Set(resourceRequests.filter(({ url, type }) => /^https?:/u.test(url)
+    && new URL(url).origin !== baseUrl
+    && (["script", "xhr", "fetch", "websocket"].includes(type) || new URL(url).pathname.endsWith("/sitemap.xml")))
+    .map(({ url }) => url))];
+  check(offOriginRequests.length === 0, `Browser fetched code, data or sitemaps outside the served build: ${offOriginRequests.join("; ")}`);
   check(consoleErrors.length === 0, `Browser console errors occurred: ${consoleErrors.join("; ")}`);
 
   if (failures.length) throw new Error(`Runtime browser contract failed:\n- ${failures.join("\n- ")}`);
 
   return {
     ok: true,
+    search: searchLifecycle,
     header: {
       standardLeftDelta: standardHeader.topic.left - standardHeader.heading.left,
       standardRightDelta: standardHeader.control.right - standardHeader.content.right,

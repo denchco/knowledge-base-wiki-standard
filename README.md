@@ -94,7 +94,7 @@ Only this repository's released specification, schemas, and profile definitions 
 <details>
 <summary><strong>Candidate status</strong></summary>
 
-The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, `v0.1.0-rc.3`, and `v0.1.0-rc.4` are published from their exact CI-green commits; the repository's current default branch may contain verified unreleased improvements.
+The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, `v0.1.0-rc.3`, `v0.1.0-rc.4`, and `v0.1.0-rc.5` are identified by their exact CI-green release commits; the repository's current default branch may contain verified unreleased improvements.
 
 The npm package uses `0.1.0-candidate`. Python project metadata represents the candidate as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 
@@ -122,7 +122,7 @@ An issue is only intake. Acceptance is a separate Standard-maintainer decision; 
 <details>
 <summary><strong>For Standard maintainers</strong></summary>
 
-Standard Production maintenance requires exactly Node `24.19.0`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.44.0`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+Standard Production maintenance requires exactly Node `24.20.0`, npm `11.19.0`, Python `3.12.14`, uv `0.12.10`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.45.1`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
 
 ```sh
 node --version
@@ -138,7 +138,7 @@ npm run service:register
 npm run service:start
 ```
 
-`node --version` must report `v24.19.0`, and `jj --version` must report `jj 0.44.0` for this candidate. npm installation fails closed on a different Node version. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
+`node --version` must report `v24.20.0`, and `jj --version` must report `jj 0.45.1` for this candidate. npm installation fails closed on a different Node version. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
 
 End every file-changing development turn with the helper below before giving the final response. It runs complete verification, inspects Git and Jujutsu state, records the turn's changes in a JJ commit, discloses a verification failure in that commit while returning the failing status, and creates no empty commit for a clean turn:
 

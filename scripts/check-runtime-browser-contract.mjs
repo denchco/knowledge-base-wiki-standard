@@ -87,7 +87,7 @@ try {
     `${result.governingQuestion.repetitionRouteCount} governing-question repetition route${result.governingQuestion.repetitionRouteCount === 1 ? "" : "s"}, ` +
     `Mermaid ${result.typography.mermaid} = table ${result.typography.table}, ` +
     `${result.tables.mobile.length} mobile table scroll contract${result.tables.mobile.length === 1 ? "" : "s"}, ` +
-    `pinned local runtimes only${graphSummary}.`,
+    `search "${result.search.query}" reached ${result.search.resultRoute}, pinned local runtimes only${graphSummary}.`,
   );
 } catch (error) {
   failure = error;

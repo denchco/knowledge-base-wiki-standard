@@ -16,6 +16,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
+import { tmpdir } from "node:os";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
@@ -32,8 +33,20 @@ const HELP = `DenchCo standard → documentation snapshot synchronizer
 Usage:
   node scripts/sync-documentation-snapshot.mjs --check [--documentation-repo <path>] [--json]
   node scripts/sync-documentation-snapshot.mjs --apply [--documentation-repo <path>] [--json]
+  node scripts/sync-documentation-snapshot.mjs --check|--apply --development [--json]
+  node scripts/sync-documentation-snapshot.mjs --check|--apply --standard-revision <full-commit> [--json]
 
---check is wholly read-only and exits 1 when the isolated snapshot is absent or
+By default, both modes use the documentation declaration's immutable Standard
+commit and release tag. The local tag must resolve exactly to that full commit.
+A disposable clone supplies the committed bytes; the source worktree, index and
+refs are not changed. Current development HEAD is reported separately.
+
+--development explicitly selects the mutable source worktree instead.
+--standard-revision selects an exact candidate commit without asserting a release
+or changing the documentation declaration; it is mutually exclusive with
+--development.
+
+--check is read-only in both repositories and exits 1 when the isolated snapshot is absent or
 out of date. --apply is the only write mode. It writes solely below the
 contract's dedicated snapshot root, refuses locally modified or unmanaged
 snapshot files, and never replaces the documentation repository's own pages.
@@ -47,13 +60,20 @@ export class SyncSafetyError extends Error {}
 
 export function parseArguments(argv) {
   if (argv.includes("--help") || argv.includes("-h")) return { help: true };
-  const options = { mode: null, documentationRepository: null, json: false };
+  const options = { mode: null, documentationRepository: null, json: false, development: false, standardRevision: null };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--check" || argument === "--apply") {
       const mode = argument.slice(2);
       if (options.mode && options.mode !== mode) throw new SyncUsageError("--check and --apply are mutually exclusive.");
       options.mode = mode;
+    } else if (argument === "--development") {
+      options.development = true;
+    } else if (argument === "--standard-revision") {
+      const value = argv[index + 1];
+      if (!isFullCommit(value)) throw new SyncUsageError("--standard-revision requires a full lowercase Git commit hash.");
+      options.standardRevision = value;
+      index += 1;
     } else if (argument === "--json") {
       options.json = true;
     } else if (argument === "--documentation-repo") {
@@ -65,6 +85,7 @@ export function parseArguments(argv) {
       throw new SyncUsageError(`Unsupported argument: ${argument}`);
     }
   }
+  if (options.development && options.standardRevision) throw new SyncUsageError("--development and --standard-revision are mutually exclusive.");
   if (!options.mode) throw new SyncUsageError("Choose exactly one mode: --check or --apply.");
   return options;
 }
@@ -305,12 +326,22 @@ export function applyDocumentationSnapshot({ desired, documentationRoot }) {
 
 export function synchronize({
   mode,
+  source = "development",
+  standardRevision = null,
   standardRoot = STANDARD_ROOT,
   documentationRoot,
   contractRelativePath = CONTRACT_PATH,
 } = {}) {
   if (!["check", "apply"].includes(mode)) throw new SyncUsageError("Synchronization mode must be check or apply.");
+  if (!["development", "release"].includes(source)) throw new SyncUsageError("Snapshot source must be development or release.");
+  if (source === "release" || standardRevision) {
+    return synchronizePinnedSnapshot({ mode, standardRoot, documentationRoot, contractRelativePath, standardRevision });
+  }
   const desired = buildDesiredSnapshot({ standardRoot, contractRelativePath });
+  return synchronizeDesiredSnapshot({ mode, desired, documentationRoot, contractRelativePath });
+}
+
+function synchronizeDesiredSnapshot({ mode, desired, documentationRoot, contractRelativePath }) {
   const selectedDocumentationRoot = documentationRoot
     ? path.resolve(documentationRoot)
     : path.resolve(desired.standardRoot, desired.contract.defaultDocumentationRepository);
@@ -319,6 +350,7 @@ export function synchronize({
     : applyDocumentationSnapshot({ desired, documentationRoot: selectedDocumentationRoot });
   return {
     mode,
+    source: "development",
     status: report.status,
     documentationRepository: report.documentationRoot,
     standard: desired.manifest.standard,
@@ -334,6 +366,68 @@ export function synchronize({
   };
 }
 
+function isFullCommit(value) {
+  return typeof value === "string" && /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u.test(value);
+}
+
+function synchronizePinnedSnapshot({ mode, standardRoot, documentationRoot, contractRelativePath, standardRevision }) {
+  const canonicalStandardRoot = assertGitRepositoryRoot(standardRoot, "standard repository");
+  const selectedDocumentationRoot = assertGitRepositoryRoot(
+    documentationRoot ? path.resolve(documentationRoot) : path.resolve(canonicalStandardRoot, loadContract(canonicalStandardRoot, contractRelativePath).contract.defaultDocumentationRepository),
+    "documentation repository",
+  );
+  if (selectedDocumentationRoot === canonicalStandardRoot) throw new SyncSafetyError("The documentation repository must not be the standard repository itself.");
+  const development = {
+    gitCommit: git(canonicalStandardRoot, ["rev-parse", "HEAD"]),
+    treeState: git(canonicalStandardRoot, ["status", "--porcelain=v1", "--untracked-files=all"]) ? "dirty" : "clean",
+  };
+  let revision = standardRevision;
+  let releaseTag = null;
+  if (!standardRevision) {
+    const declarationPath = path.join(selectedDocumentationRoot, ".wiki-standard.yaml");
+    if (!existsSync(declarationPath)) throw new SyncSafetyError("Release comparison requires the documentation .wiki-standard.yaml declaration.");
+    const declaration = yamlMapping(readFileSync(declarationPath, "utf8"), "documentation .wiki-standard.yaml");
+    revision = declaration.standard?.revision;
+    releaseTag = declaration.capabilities?.standard_release_tag;
+    if (declaration.standard?.name !== "DenchCo Knowledge Base Wiki Standard") {
+      throw new SyncSafetyError("Documentation does not declare the expected Standard identity.");
+    }
+    if (!isFullCommit(revision)) throw new SyncSafetyError("Documentation must pin a full immutable Standard commit for release comparison.");
+    if (typeof releaseTag !== "string" || !releaseTag) throw new SyncSafetyError("Documentation must declare capabilities.standard_release_tag for release comparison.");
+    git(canonicalStandardRoot, ["check-ref-format", `refs/tags/${releaseTag}`]);
+    const taggedRevision = git(canonicalStandardRoot, ["rev-parse", "--verify", `refs/tags/${releaseTag}^{commit}`]);
+    if (taggedRevision !== revision) throw new SyncSafetyError(`Declared release tag ${releaseTag} resolves to ${taggedRevision}, not documentation pin ${revision}.`);
+  }
+  if (!isFullCommit(revision)) throw new SyncSafetyError("Exact snapshot selection requires a full immutable Standard commit.");
+  const resolvedRevision = git(canonicalStandardRoot, ["rev-parse", "--verify", `${revision}^{commit}`]);
+  if (resolvedRevision !== revision) throw new SyncSafetyError("The selected Standard revision must identify the commit itself.");
+
+  const temporaryRoot = mkdtempSync(path.join(tmpdir(), "denchco-release-snapshot-"));
+  try {
+    const checkoutRoot = path.join(temporaryRoot, "standard");
+    // A local clone with no hardlinks copies all available objects, including an
+    // explicitly selected candidate that is not yet on a public branch. Unlike
+    // git worktree add, neither checkout nor cleanup writes source Git metadata.
+    git(temporaryRoot, ["clone", "--quiet", "--no-checkout", "--no-hardlinks", "--", canonicalStandardRoot, checkoutRoot]);
+    // Snapshot raw committed bytes even when a release has text, ident,
+    // encoding, or smudge attributes. Overrides exist only in this clone.
+    mkdirSync(path.join(checkoutRoot, ".git", "info"), { recursive: true });
+    writeFileSync(path.join(checkoutRoot, ".git", "info", "attributes"), "* -text -filter -ident -working-tree-encoding\n");
+    git(checkoutRoot, ["-c", "core.hooksPath=/dev/null", "-c", "core.autocrlf=false", "checkout", "--quiet", "--detach", revision]);
+    const desired = buildDesiredSnapshot({ standardRoot: checkoutRoot, contractRelativePath });
+    if (desired.manifest.standard.gitCommit !== revision || desired.manifest.standard.treeState !== "clean") throw new SyncSafetyError("Exact snapshot checkout did not remain at the clean selected commit.");
+    const result = synchronizeDesiredSnapshot({ mode, desired, documentationRoot: selectedDocumentationRoot, contractRelativePath });
+    return {
+      ...result,
+      source: standardRevision ? "exact-revision" : "release",
+      ...(releaseTag ? { releaseTag } : {}),
+      development,
+    };
+  } finally {
+    rmSync(temporaryRoot, { recursive: true, force: true });
+  }
+}
+
 function printReport(report, json) {
   if (json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
@@ -341,7 +435,8 @@ function printReport(report, json) {
   }
   const revision = report.standard.revision;
   process.stdout.write(
-    `Documentation snapshot ${report.status.toUpperCase()} · standard ${report.standard.version} · ${revision}\n` +
+    `Documentation snapshot ${report.status.toUpperCase()} · ${report.source}${report.releaseTag ? ` ${report.releaseTag}` : ""} · standard ${report.standard.version} · ${revision}\n` +
+    (report.development ? `Development HEAD: ${report.development.gitCommit} · ${report.development.treeState} (reported separately)\n` : "") +
     `Allowlist: ${report.contract.allowlistCount} files · target: ${report.documentationRepository}\n` +
     `Changes: +${report.changes.added.length} ~${report.changes.updated.length} -${report.changes.deleted.length}` +
     `${report.changes.manifest ? " · manifest" : ""}` +
@@ -349,7 +444,7 @@ function printReport(report, json) {
   );
 }
 
-export function run(argv = process.argv.slice(2)) {
+export function run(argv = process.argv.slice(2), { standardRoot = STANDARD_ROOT } = {}) {
   const options = parseArguments(argv);
   if (options.help) {
     process.stdout.write(`${HELP}\n`);
@@ -357,6 +452,9 @@ export function run(argv = process.argv.slice(2)) {
   }
   const report = synchronize({
     mode: options.mode,
+    standardRoot,
+    source: options.development ? "development" : "release",
+    standardRevision: options.standardRevision,
     documentationRoot: options.documentationRepository,
   });
   printReport(report, options.json);
@@ -431,9 +529,17 @@ function assertGitRepositoryRoot(candidate, label) {
 }
 
 function git(cwd, args) {
+  // Git hooks and callers may export selectors for their own repository/index.
+  // They must never redirect operations in the disposable clone into the source.
+  const environment = { ...process.env, GIT_OPTIONAL_LOCKS: "0", GIT_TERMINAL_PROMPT: "0" };
+  for (const key of ["GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_PREFIX", "GIT_CONFIG_PARAMETERS", "GIT_CONFIG_COUNT"]) delete environment[key];
+  for (const key of Object.keys(environment)) {
+    if (/^GIT_CONFIG_(?:KEY|VALUE)_\d+$/u.test(key)) delete environment[key];
+  }
   try {
     const output = execFileSync("git", args, {
       cwd,
+      env: environment,
       encoding: "utf8",
       maxBuffer: 16 * 1024 * 1024,
       stdio: ["ignore", "pipe", "pipe"],

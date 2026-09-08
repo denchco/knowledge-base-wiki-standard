@@ -5,15 +5,16 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": "24.19.0"
+    "node": "24.20.0",
+    "npm": "11.19.0"
   },
   "scripts": {
     "prepare:runtime": "node scripts/sync-runtime-assets.mjs",
     "browser:install": "playwright install chromium",
     "browser:install:ci": "playwright install --with-deps chromium",
-    "dev": "npm run prepare:runtime && uv run zensical serve -f zensical.toml --dev-addr ${HOST:-127.0.0.1}:${PORT:-8017}",
+    "dev": "npm run prepare:runtime && npm run prepare:local-config && uv run zensical serve -f zensical.local.toml --dev-addr ${HOST:-127.0.0.1}:${PORT:-8017}",
     "build": "npm run graph:update && npm run build:site",
-    "build:site": "npm run prepare:runtime && uv run zensical build -f zensical.toml --strict",
+    "build:site": "npm run prepare:runtime && uv run zensical build -f zensical.toml --strict && npm run patch:renderer && npm run build:llms",
     "design:lint": "design.md lint DESIGN.md",
     "graph:publish": "node scripts/publish-graphify-assets.mjs",
     "graph:update": "npm run prepare:runtime && uv run graphify update . --force && npm run graph:publish",
@@ -41,8 +42,8 @@
     "sync:documentation:check": "node scripts/sync-documentation-snapshot.mjs --check",
     "sync:documentation:apply": "node scripts/sync-documentation-snapshot.mjs --apply",
     "sync:documentation:test": "node --test scripts/sync-documentation-snapshot.test.mjs",
-    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/check-governing-question-repetitions.test.mjs scripts/dev-service.test.mjs scripts/development-response-links.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/link-source-citations.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/standard-proposal-cli.test.mjs scripts/sync-documentation-snapshot.test.mjs",
-    "check": "node scripts/check-standard.mjs && npm run standard:proposal -- check --all && npm run check:canonical-content && npm run check:governing-question && npm run check:source-links && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
+    "conformance:test": "node --test scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/check-governing-question-repetitions.test.mjs scripts/dev-service.test.mjs scripts/development-response-links.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/link-source-citations.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/standard-proposal-cli.test.mjs scripts/sync-documentation-snapshot.test.mjs scripts/runtime-bundle.test.mjs scripts/codex-stop-hook.test.mjs scripts/publish-llms.test.mjs scripts/package-wiki-plugin.test.mjs scripts/patch-zensical-runtime.test.mjs",
+    "check": "npm run check:toolchain && node scripts/check-standard.mjs && npm run standard:proposal -- check --all && npm run check:canonical-content && npm run check:governing-question && npm run check:source-links && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run check:renderer && npm run check:runtime && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
     "verify": "node scripts/verify.mjs",
     "verify:workspace": "npm run verify && npm run sync:documentation:check",
     "service:register": "node scripts/dev-service.mjs register",
@@ -55,7 +56,14 @@
     "service:list": "node scripts/dev-service.mjs list",
     "service:uninstall": "node scripts/dev-service.mjs uninstall",
     "jj:status": "jj status",
-    "jj:phase": "node scripts/jj-phase.mjs"
+    "jj:phase": "node scripts/jj-phase.mjs",
+    "check:runtime": "node scripts/sync-runtime-assets.mjs --check",
+    "plugin:package": "node scripts/package-wiki-plugin.mjs",
+    "build:llms": "node scripts/publish-llms.mjs",
+    "check:toolchain": "node scripts/check-reference-toolchain.mjs",
+    "patch:renderer": "node scripts/patch-zensical-runtime.mjs",
+    "check:renderer": "node scripts/patch-zensical-runtime.mjs --check",
+    "prepare:local-config": "node scripts/prepare-local-zensical-config.mjs"
   },
   "codexDevServer": {
     "serviceId": "denchco-kb-wiki-standard",
@@ -66,11 +74,14 @@
   },
   "devDependencies": {
     "@google/design.md": "0.4.0",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "3d-force-graph": "1.80.0",
     "ajv": "8.20.0",
-    "mermaid": "11.16.1",
-    "vis-network": "10.1.0",
+    "dompurify": "3.4.15",
+    "esbuild": "0.28.2",
+    "mermaid": "11.17.2",
+    "vis-network": "10.1.2",
     "yaml": "2.9.0"
-  }
+  },
+  "packageManager": "npm@11.19.0"
 }

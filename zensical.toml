@@ -33,7 +33,9 @@ nav = [
     {"Context map" = "llm-wiki/context-map.md"},
     {"Maintenance" = "llm-wiki/maintenance.md"},
     {"Standard proposals" = "llm-wiki/standard-proposals.md"},
-    {"Graphify workflow" = "llm-wiki/graphify.md"}
+    {"Graphify workflow" = "llm-wiki/graphify.md"},
+    {"Codex adapter" = "llm-wiki/codex-adapter.md"},
+    {"Web discovery" = "llm-wiki/web-discovery.md"}
   ]},
   {"Repository graph" = [
     {"Overview" = "graph/index.md"},

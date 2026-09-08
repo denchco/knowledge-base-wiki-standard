@@ -5,11 +5,12 @@ description = "Canonical OKF-compatible standard for evidence-governed human and
 license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
-  "graphifyy==0.9.37",
-  "zensical==0.0.53",
+  "graphifyy==0.9.55",
+  "zensical==0.0.59",
 ]
 
 [tool.uv]
+required-version = "==0.12.10"
 package = false
 
 [dependency-groups]

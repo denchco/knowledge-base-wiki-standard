@@ -14,3 +14,5 @@ docs/assets/vendor/
 .env
 .env.*
 !.env.example
+site-local/
+zensical.local.toml

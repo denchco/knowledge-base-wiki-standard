@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-v0.2-frontmatter.json",
   "title": "Open Knowledge Format v0.2 concept frontmatter",
-  "description": "A permissive schema for OKF v0.2 concept metadata. Unknown producer fields are intentionally preserved and accepted.",
+  "description": "A permissive schema for OKF v0.2 concept metadata. Aligned to the immutable upstream SPEC.md recorded in config/okf-source-lock.json. Timestamp-valued fields require explicit UTC offsets. Unknown producer fields are intentionally preserved and accepted.",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -18,7 +18,7 @@
       "type": "array",
       "items": { "$ref": "#/$defs/source" }
     },
-    "usage_window": { "$ref": "#/$defs/dateRange" },
+    "usage_window": { "$ref": "#/$defs/dateTimeRange" },
     "generated": { "$ref": "#/$defs/generated" },
     "verified": {
       "oneOf": [
@@ -31,7 +31,7 @@
       ]
     },
     "status": { "enum": ["draft", "stable", "deprecated"] },
-    "stale_after": { "$ref": "#/$defs/date" },
+    "stale_after": { "$ref": "#/$defs/dateTime" },
     "runtime": { "type": "string", "minLength": 1 },
     "parameters": {
       "type": "array",
@@ -43,13 +43,10 @@
   },
   "additionalProperties": true,
   "$defs": {
-    "date": {
-      "type": "string",
-      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-    },
     "dateTime": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$"
     },
     "actor": {
       "type": "string",
@@ -59,14 +56,14 @@
         { "pattern": "^[^\\s/]+/[^\\s/]+$" }
       ]
     },
-    "dateRange": {
+    "dateTimeRange": {
       "type": "object",
       "required": ["from", "to"],
       "properties": {
-        "from": { "$ref": "#/$defs/date" },
-        "to": { "$ref": "#/$defs/date" }
+        "from": { "$ref": "#/$defs/dateTime" },
+        "to": { "$ref": "#/$defs/dateTime" }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "source": {
       "type": "object",
@@ -77,8 +74,8 @@
         "title": { "type": "string", "minLength": 1 },
         "author": { "type": "string", "minLength": 1 },
         "usage_count": { "type": "integer", "minimum": 0 },
-        "last_modified": { "$ref": "#/$defs/date" },
-        "usage_window": { "$ref": "#/$defs/dateRange" }
+        "last_modified": { "$ref": "#/$defs/dateTime" },
+        "usage_window": { "$ref": "#/$defs/dateTimeRange" }
       },
       "additionalProperties": true
     },

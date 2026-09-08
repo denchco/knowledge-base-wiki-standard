@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 
 import Ajv2020 from "ajv/dist/2020.js";
+import { isDateTime } from "./okf-core.mjs";
 import { parse, parseDocument } from "yaml";
 
 const root = process.cwd();
@@ -25,10 +26,7 @@ const ajv = new Ajv2020({
 
 ajv.addFormat("date-time", {
   type: "string",
-  validate(value) {
-    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value)
-      && !Number.isNaN(Date.parse(value));
-  },
+  validate: isDateTime,
 });
 ajv.addFormat("uri", {
   type: "string",
@@ -65,6 +63,10 @@ for (const [name, schema] of schemas) {
 
 const manifest = parse(readFileSync(path.join(root, ".wiki-standard.yaml"), "utf8"));
 validate("manifest-v1.json", manifest, ".wiki-standard.yaml");
+
+validate("okf-source-lock-v1.json", parseJsonStrict(
+  readFileSync(path.join(root, "config/okf-source-lock.json"), "utf8"), "config/okf-source-lock.json",
+), "config/okf-source-lock.json");
 
 const serviceIdentity = parseJsonStrict(
   readFileSync(path.join(root, "docs/assets/service-identity.json"), "utf8"),

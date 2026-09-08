@@ -292,3 +292,12 @@ test("registry publication atomically replaces one complete JSON file", (t) => {
   });
   assert.deepEqual(readdirSync(directory), ["registry.json"]);
 });
+
+
+test("shared registry accepts both governed v1 envelopes and rejects conflicting declarations", async () => {
+  const { isSupportedRegistry } = await import("./dev-service.mjs");
+  assert.equal(isSupportedRegistry({ version: 1, services: {} }), true);
+  assert.equal(isSupportedRegistry({ schema: "codex-dev-servers/v1", services: {} }), true);
+  assert.equal(isSupportedRegistry({ version: 1, schema: "codex-dev-servers/v1", services: {} }), true);
+  for (const value of [null, [], {}, {version: 2}, {schema: "other/v1"}, {version: 2, schema: "codex-dev-servers/v1"}, {version: 1, schema: "codex-dev-servers/v2"}]) assert.equal(isSupportedRegistry(value), false);
+});

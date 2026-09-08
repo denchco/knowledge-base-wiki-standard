@@ -487,11 +487,13 @@ if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failu
 if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);
 const exactNodePins = {
   "@google/design.md": "0.4.0",
-  "@playwright/test": "1.62.1",
+  "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
-  "mermaid": "11.16.1",
-  "vis-network": "10.1.0",
+  "dompurify": "3.4.15",
+  "esbuild": "0.28.2",
+  "mermaid": "11.17.2",
+  "vis-network": "10.1.2",
   "yaml": "2.9.0",
 };
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
@@ -522,7 +524,9 @@ if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.cod
   failures.push("static managed service marker must match the configured service identity");
 }
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
-const exactNodeVersion = "24.19.0";
+const exactNodeVersion = "24.20.0";
+if (pkg.engines?.npm !== "11.19.0" || pkg.packageManager !== "npm@11.19.0") failures.push("npm must be explicitly pinned to 11.19.0");
+if (readFileSync(".python-version", "utf8") !== "3.12.14\n") failures.push("reference Python must be exactly 3.12.14");
 if (pkg.engines?.node !== exactNodeVersion) failures.push(`Node engine must be exactly ${exactNodeVersion}; found ${pkg.engines?.node ?? "unlisted"}`);
 if (readFileSync(".node-version", "utf8") !== `${exactNodeVersion}\n`) failures.push(`.node-version must contain exactly ${exactNodeVersion}`);
 if (readFileSync(".npmrc", "utf8") !== "engine-strict=true\n") failures.push(".npmrc must enforce the exact package engine");
@@ -537,7 +541,11 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
-if (!versionAtLeast(domPurifyVersion, "3.4.13")) failures.push(`package-lock must resolve DOMPurify >=3.4.13; found ${domPurifyVersion ?? "unlisted"}`);
+if (domPurifyVersion !== "3.4.15") failures.push(`package-lock must resolve exactly DOMPurify 3.4.15; found ${domPurifyVersion ?? "unlisted"}`);
+if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.7") failures.push("package-lock must resolve fast-uri exactly 3.1.7");
+if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
+if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
+if (!pkg.scripts?.["conformance:test"]?.includes("runtime-bundle.test.mjs")) failures.push("conformance:test must include runtime sanitizer and bundle inspection fixtures");
 if (packageLock.packages?.["node_modules/wrangler"]) failures.push("package-lock retains Wrangler without a selected deployment adapter");
 for (const script of ["prepare:runtime", "graph:update", "graph:publish", "check:visual-shape", "check:graphify", "check:browser", "check:canonical-content", "check:adoption-audits", "check:schema-artifacts", "check:provenance", "audit:node", "audit:python"]) {
   if (!pkg.scripts?.[script]) failures.push(`missing executable script ${script}`);
@@ -624,17 +632,20 @@ for (const gate of ["build", "check", "check:graphify", "check:browser", "servic
 }
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
-for (const pin of ["zensical==0.0.53", "graphifyy==0.9.37", "pip-audit==2.10.1"])
+for (const pin of ["zensical==0.0.59", "graphifyy==0.9.55", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
 
 const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
 for (const pin of [
-  "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2",
-  "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0",
-  "astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0",
-  "node-version: 24.19.0",
+  "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+  "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+  "astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1",
+  "node-version: 24.20.0",
+  "runs-on: ubuntu-24.04",
+  'version: "0.12.10"',
+  'python-version: "3.12.14"',
   "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",
 ]) {

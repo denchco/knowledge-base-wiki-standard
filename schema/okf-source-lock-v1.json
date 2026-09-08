@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-source-lock-v1.json",
+  "title": "OKF upstream source identity lock",
+  "type": "object",
+  "required": [
+    "$schema",
+    "lockVersion",
+    "okfVersion",
+    "canonical",
+    "records"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-source-lock-v1.json"
+    },
+    "lockVersion": {
+      "const": "1.0"
+    },
+    "okfVersion": {
+      "const": "0.2"
+    },
+    "canonical": {
+      "type": "string",
+      "minLength": 1
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": [
+        "id",
+        "sourceId",
+        "role",
+        "url",
+        "revision",
+        "immutableUrl",
+        "rawUrl",
+        "sha256",
+        "retrievedAt",
+        "supersessionStatus",
+        "supersededBy"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceId": {
+          "type": "string",
+          "pattern": "^SRC-[0-9]{3}$"
+        },
+        "role": {
+          "enum": [
+            "specification",
+            "relocation-notice"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "immutableUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "rawUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "retrievedAt": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "supersessionStatus": {
+          "enum": [
+            "current",
+            "superseded"
+          ]
+        },
+        "supersededBy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

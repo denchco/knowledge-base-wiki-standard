@@ -19,6 +19,8 @@ status: draft
 
 Use the [Graphify workflow](graphify.md) for query-first discovery, the six required enrichment layers, and repeatable 2D/3D publication.
 
+The [optional Codex adapter](codex-adapter.md) packages the shared workflow and a locally trusted Stop guardrail. [Web discovery](web-discovery.md) explains the path-scoped llms.txt and derived Markdown alternatives for reading the Wiki through HTTP.
+
 ## Operating model
 
 - **Ingest**: register the source, preserve raw identity, add its stable exact-row anchor, update relevant concepts and evidence, add links, and record the change.

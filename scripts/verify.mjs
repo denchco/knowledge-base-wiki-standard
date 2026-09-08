@@ -20,6 +20,8 @@ import { selectedNotCheckedCapabilityIds } from "./full-profile-report.mjs";
 const root = process.cwd();
 const derivedOutputs = [
   "site/",
+  "site-local/",
+  "zensical.local.toml",
   "graphify-out/",
   ".cache/",
   "docs/assets/vendor/",

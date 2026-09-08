@@ -10,7 +10,7 @@ sources:
     title: Karpathy LLM Wiki
     author: human:karpathy
   - id: okf-v0.2
-    resource: https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md
+    resource: https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/ad30107c31c06aec8a7d5636e0d1058118604e6f/SPEC.md
     title: Open Knowledge Format v0.2
     author: organisation:GoogleCloudPlatform
 generated: { by: "human:denchco-maintainer", at: "2026-08-03T11:45:00Z" }

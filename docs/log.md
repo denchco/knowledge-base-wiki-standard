@@ -100,3 +100,8 @@ status: draft
 - **Instruction decision**: Replaced unconditional exactly-three response boilerplate with completion-first, zero-to-three recommendations. Eligible items must map to unfinished requested scope, a failed or unrun check, or a decision requiring authority; optional adjacent work and filler are forbidden.
 - **Agent interoperability**: Added a root Claude `@AGENTS.md` relay, byte-identical Codex/Claude Standard skills, subject-empty starter relay and project-status template, and machine checks for import, parity, policy synchronization, and starter planning.
 - **Status reconciliation**: Removed completed repository, documentation, Pages, and `v0.1.0-rc.1` publication work from the live roadmap and validation queue; retained three bounded priorities and structured parked-work reopen conditions.
+
+
+## 2026-09-08 — rc.5 qualification
+
+Implemented the requested security/runtime repairs, canonical OKF timestamp/source alignment, exact reference toolchain, dependency update controls, optional trusted Codex Stop/plugin adapter and llms.txt v2 publication. Preserved immutable rc.4 history. Runtime inspection distinguishes inspected Mermaid inputs from opaque graph prebundles; host continuation support does not prove absolute pre-send interception. The maintained release/verification records carry the resulting qualification and exact publication identity.

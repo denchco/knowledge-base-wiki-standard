@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 
 const REQUIREMENT = "DKBWS-PROV-001";
 const MINIMUM_GIT_VERSION = "2.41.0";
-const QUALIFIED_JJ_VERSION = "0.44.0";
+const QUALIFIED_JJ_VERSION = "0.45.1";
 const MODES = new Set(["maintainer", "distribution"]);
 
 function usage() {

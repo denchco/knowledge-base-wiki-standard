@@ -11,7 +11,7 @@ status: draft
 |---|---|---|---|
 | DKBWS-CORE-001 | Canonical knowledge MUST be UTF-8 Markdown with portable links. | All | Filesystem/schema check |
 | DKBWS-CORE-002 | The repository MUST declare its standard version, profile, role paths, capabilities, and deviations. | All | Manifest check |
-| DKBWS-OKF-001 | Concept pages MUST be consumable as OKF v0.2 or declare a mapped extension. | OKF core | Frontmatter validation |
+| DKBWS-OKF-001 | Concept pages MUST be consumable as OKF v0.2 or declare a mapped extension. The supported specification MUST be identified by source URL, immutable commit, content SHA-256, retrieval date, and supersession status. Optional timestamp metadata follows the pinned offset-datetime guidance; local date precision and unknown fields MUST survive migration. | OKF core; source identity for Standard implementations | Frontmatter, source-lock schema/consistency, offset/calendar/order, and lossless migration fixtures |
 | DKBWS-OKF-002 | Unknown OKF fields MUST be preserved by standard tooling. | Tooling | Round-trip fixture |
 | DKBWS-OKF-003 | A DenchCo manifest MUST map one repository-relative canonical `okf_bundle` directory. | DenchCo claims | Manifest and filesystem check |
 | DKBWS-EVID-001 | Sources MUST have stable identities and provenance. | Evidence profile | Source-register check |

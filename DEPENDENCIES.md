@@ -5,18 +5,18 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Class | Required for | Dependencies |
 |---|---|---|
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
-| Standard validation | Conformance | exactly Node.js `24.19.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
-| Reference renderer | Human Wiki | Python 3.12+, `uv`, exactly pinned `zensical==0.0.53`; installed-lock audit through `pip-audit==2.10.1` |
-| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.37` |
-| Browser runtimes | Production diagrams/graphs | `mermaid==11.16.1` with locked `dompurify>=3.4.13`, `vis-network==10.1.0`, `3d-force-graph==1.80.0` |
-| Browser verification | Rendered conformance | `@playwright/test==1.62.1` and its matching Chromium binary |
+| Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
+| Reference renderer | Human Wiki | Python `3.12.14` and uv `0.12.10` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1` |
+| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.55` |
+| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with locked `dompurify==3.4.15`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
+| Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
 | Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
-| Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.44.0` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
+| Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
 | Deployment adapter | Not selected | No deployment CLI or credentials are required; add and qualify a locked adapter before publication to a hosting target |
 | Documentation synchronization | Standard maintainer integration | Sibling Git repository at the contract's portable default path or an explicit runtime path; uses the existing Node, Ajv, and YAML dependencies and stores no absolute path |
 | Proposal integration | Optional consumer-to-Standard handoff | Existing Node, Ajv, and YAML dependencies for local record validation and preview generation; a browser and network are used only for an explicitly requested governed-form check/open or registry comparison |
-| MCP integration | Optional | GitHub MCP Server initially; a dedicated standard MCP is a later adapter |
+| MCP integration | Optional | Separately selected read-only GitHub MCP; a dedicated Standard MCP remains deferred until evidence shows an unmet workflow |
 
 ## Repeatable reference build
 
@@ -37,7 +37,7 @@ The repeatable commands are:
 
 | Command | Contract |
 |---|---|
-| `npm run prepare:runtime` | Copies Mermaid, vis-network, and 3d-force-graph browser bundles from the pinned local packages into ignored generated assets. |
+| `npm run prepare:runtime` | Builds Mermaid’s core with exact DOMPurify `3.4.15` using `esbuild==0.28.2`; copies graph bundles and emits inspected runtime metadata and a CycloneDX SBOM into ignored assets. |
 | `npm run graph:update` | Prepares local runtimes, updates Graphify, enriches six relationship layers, and publishes the shared 2D/3D dataset. |
 | `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. |
 | `npm run build` | Regenerates the graph publication and then performs the strict site build. |
@@ -76,9 +76,9 @@ Those two output paths are reserved for their declared schemas in Standard and c
 
 Proposal records under `standard-proposals/` are canonical, tracked consumer or Standard-maintainer records. Prepared payloads under `output/standard-proposals/` are generated, ignored, and reconstructible. Local validation never needs network access; the CLI performs no issue submission, attachment upload, release publication, or consumer-pin mutation. Those actions remain with their separately named human authorities.
 
-The CI reference uses exactly Node `24.19.0` Active LTS with `actions/checkout` pinned to `de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2), full Git history (`fetch-depth: 0`) so revision-aware lifecycle fixtures can resolve immutable historical pins, `actions/setup-node` pinned to `48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e` (v6.4.0), and `astral-sh/setup-uv` pinned to `08807647e7069bb48b6ef5acd8ec9567f424441b` (v8.1.0). CI explicitly selects provenance `distribution` mode; that receipt remains `not-checked` for Jujutsu and is not a maintainer-provenance pass. A newer major Node release is not inferred compatible merely because its version number is higher.
+The CI reference uses Ubuntu `24.04`, Python `3.12.14`, uv `0.12.10`, npm `11.19.0`, and exactly Node `24.20.0` Active LTS with `actions/checkout` pinned to `3d3c42e5aac5ba805825da76410c181273ba90b1` (v7.0.1), full Git history (`fetch-depth: 0`) so revision-aware lifecycle fixtures can resolve immutable historical pins, `actions/setup-node` pinned to `820762786026740c76f36085b0efc47a31fe5020` (v7.0.0), and `astral-sh/setup-uv` pinned to `20cfd1bf945f4377ade1205e4dbc17946fc9a30d` (v10.0.1). CI explicitly selects provenance `distribution` mode; that receipt remains `not-checked` for Jujutsu and is not a maintainer-provenance pass. A newer major Node release is not inferred compatible merely because its version number is higher.
 
-`docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `output/standard-proposals/`, `GRAPH_REPORT.md`, and `site/` are generated and ignored. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
+`docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `output/standard-proposals/`, `GRAPH_REPORT.md`, `site/`, `site-local/`, and `zensical.local.toml` are generated and ignored. The live Zensical service uses the generated local configuration and writes only `site-local/`, keeping its watcher separate from the postprocessed static `site/` build. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
 
 No rendered page may load Mermaid, vis-network, or 3d-force-graph from a public CDN. The browser contract resolves question, Mermaid, architecture, table, list, reader-source-link, source-register, and graph representatives independently; records requests; fails closed when a selected-profile graph route is absent; and rejects public-CDN use, failed local assets, console errors, blank diagrams/canvases, broken exact-row citation journeys, unusable controls, uncontained mobile tables, or desktop/mobile overflow.
 
@@ -86,7 +86,7 @@ Adapters whose homepage does not contain every representative shape set local-pa
 
 ## Tested renderer compatibility
 
-The Zensical reference adapter is tested and supported at exactly `zensical==0.0.53`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
+The Zensical reference adapter is tested and supported at exactly `zensical==0.0.59`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
 
 ## Reproducibility rules
 
@@ -99,4 +99,14 @@ The Zensical reference adapter is tested and supported at exactly `zensical==0.0
 
 ## Provenance compatibility note
 
-The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.44.0`. Git `2.41` is the minimum supported Git boundary because current Jujutsu Git interoperability no longer supports older Git versions. Qualification covered the read-only maintainer provenance probe, the repository's complete Standard Production verification contract, and real colocated initialization, root, Git-root, raw Git-SHA lookup, log-template, status, and commit operations. Jujutsu remains a pre-1.0 exact dependency: another version requires the same deliberate qualification and contract update rather than being inferred compatible from a range.
+The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.45.1`. Git `2.41` is the minimum supported Git boundary because current Jujutsu Git interoperability no longer supports older Git versions. Qualification covered the read-only maintainer provenance probe, the repository's complete Standard Production verification contract, and real colocated initialization, root, Git-root, raw Git-SHA lookup, log-template, status, and commit operations. Jujutsu remains a pre-1.0 exact dependency: another version requires the same deliberate qualification and contract update rather than being inferred compatible from a range.
+
+## Runtime bundle and update evidence
+
+The Mermaid core is built with exactly `esbuild==0.28.2` against direct, overridden `dompurify==3.4.15`. `fast-uri==3.1.7` is locked while Ajv remains `8.20.0`. `npm run check:runtime` reconstructs the bundle in memory and verifies embedded sanitizer identity, all observed build inputs, package/lock agreement, and output/metafile/SBOM hashes. The generated CycloneDX SBOM states that copied graph prebundles have opaque transitive coverage; npm audit alone does not inspect those embedded internals.
+
+The exact Node, npm, Python and uv reference binaries are checked by `npm run check:toolchain`; `.python-version` selects the reference interpreter and `tool.uv.required-version` rejects a different uv. Broader consumer Python minimums remain distinct from this tested reference. Ubuntu `24.04` selects the runner OS release, not an immutable VM image; hosted runner image updates and live vulnerability databases are outside bit-for-bit environment reproducibility.
+
+Weekly scheduled audits check the installed locks and generated runtime evidence. Dependabot opens reviewable pull requests for npm, uv and Actions; it has no merge or publication authority. Dependency Review rejects moderate-or-higher new vulnerabilities on Standard pull requests.
+
+Snapshot checks compare Documentation's declared release tag and full commit by default, independently of development main. `--development` explicitly compares mutable sources. `--standard-revision <full-commit>` selects exact candidate bytes without claiming release status. Only the exact published release commit is adopted as the Documentation release pin.

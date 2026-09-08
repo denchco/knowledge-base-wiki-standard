@@ -35,3 +35,8 @@ Do not publish suspected vulnerabilities or exposed personal data in an issue. [
 ## MCP controls
 
 The filesystem and released specification remain authoritative. An MCP server is an optional adapter. It must expose read-only resources and validation tools by default, separate write tools, require authorization for remote transport, restrict repository scope, log state-changing actions without sensitive values, and never silently upgrade a consumer.
+
+
+## rc.5 dependency evidence
+
+The reference renderer rebuilds Mermaid core with the explicitly locked sanitizer. Runtime inspection verifies the emitted bundle, resolved inputs and CycloneDX evidence; separate installed-package auditing is not proof of opaque prebundle internals. Weekly GitHub Actions audit the frozen dependencies, and Dependabot changes remain pull requests requiring review and verification. The public Standard additionally runs native Dependency Review. Documentation's private repository has Code Security disabled; no native Dependency Review entitlement is claimed there, and its required verification retains both installed-lock audits and runtime inspection.

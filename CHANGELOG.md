@@ -2,6 +2,17 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning for its declared conformance contract.
 
+## v0.1.0-rc.5 — 2026-09-08
+
+- Repair the audited dependency graph with fast-uri 3.1.7 while retaining Ajv 8.20.0; build Mermaid 11.17.2 core against exact DOMPurify 3.4.15 and verify browser bundle inputs, embedded version, output hashes and CycloneDX evidence (`DKBWS-SEC-001`, `DKBWS-RUNTIME-001`).
+- Align OKF timestamp guidance/schema with the immutable canonical specification: explicit-offset datetimes, real calendar validation, instant ordering, precision-preserving legacy handling and lossless extensions. Record canonical URL, commit, digest, retrieval date and supersession (`DKBWS-OKF-001`, `STD-VAL-001`). The two retrieved specification copies are identical; no unsupported date of wording change is inferred.
+- Pin the reference environment to Node 24.20.0/npm 11.19.0, Python 3.12.14, uv 0.12.10 and Ubuntu 24.04; select Zensical 0.0.59, Graphify 0.9.55, Playwright 1.63.0, vis-network 10.1.2 and Jujutsu 0.45.1. Pin upgraded Actions, add weekly security audits and PR-only Dependabot, and apply Dependency Review to Standard PRs (`DKBWS-RELEASE-001`, `DKBWS-PROV-001`).
+- Add an optional distributable Wiki Standard plugin and trusted Stop continuation guardrail; it checks captured responses with one retry and does not claim absolute interception or automatic local trust (`DKBWS-PROMPT-001`, `DKBWS-PROMPT-002`, `STD-VAL-007`). Publish llms.txt v2 discovery and Markdown alternates under each Wiki's own path (`DKBWS-LLM-001`).
+- Compare Documentation against its declared release by default; expose development comparison and exact-commit application explicitly, retain conflict refusal, and isolate temporary Git checkout state (`DKBWS-RELEASE-001`). Preserve rc.4 and adopt only the exact new immutable release commit.
+- Accept both governed v1 shared service-registry envelopes, preserving unrelated services and rejecting conflicting declarations (`DKBWS-RUNTIME-002`).
+
+Migration: reinstall the exact toolchain and frozen locks; rebuild and inspect runtime assets; run complete selected-profile verification. Preserve date-only historical evidence in local extension fields when its actual time/offset is unknown. Opt in to the Codex adapter only after host review/trust. Consumers keep independent pins until they explicitly adopt the release.
+
 ## Unreleased
 
 - Recorded the accepted historical UK Digital Health `DKBWS-LINK-002` bridge as included in exact immutable `v0.1.0-rc.4` revision `4aae4d4efbcea526f28ec8bcbfaf203dae34bc25` through a strictly later registry ledger. No issue, release authority, consumer pin, or adoption state is fabricated or combined.

@@ -10,12 +10,12 @@ sources:
     title: Orders schema
     author: process:schema-registry
     usage_count: 1200
-    last_modified: 2026-07-31
-usage_window: { from: 2026-07-01, to: 2026-07-31 }
+    last_modified: 2026-07-31T00:00:00Z
+usage_window: { from: 2026-07-01T00:00:00Z, to: 2026-07-31T00:00:00Z }
 generated: { by: process:fixture-builder, at: 2026-08-01T09:30:00Z }
 verified: { by: human:reviewer, at: 2026-08-02T10:00:00Z }
 status: stable
-stale_after: 2099-01-01
+stale_after: 2099-01-01T00:00:00Z
 x-denchco:
   evidence_state: applicable
   nested:
