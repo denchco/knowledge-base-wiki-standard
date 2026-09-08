@@ -1,0 +1,18 @@
+{
+  "name": "wiki-standard",
+  "version": "0.1.0-rc.5",
+  "description": "Apply the DenchCo Wiki Standard with an optional locally trusted response check.",
+  "author": {
+    "name": "Andrew Dench"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Wiki Standard",
+    "shortDescription": "Use Wiki Standard in Codex.",
+    "longDescription": "Repository-first Wiki guidance and an optional Codex Stop guardrail. Requires explicit project opt-in and local hook trust.",
+    "developerName": "Andrew Dench",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Help me use Wiki Standard."
+  }
+}

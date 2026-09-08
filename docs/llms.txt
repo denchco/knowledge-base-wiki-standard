@@ -1,38 +1,33 @@
 # DenchCo Knowledge Base Wiki Standard
 
-Human documentation: https://denchco.github.io/knowledge-base-wiki-documentation/
-Normative repository: https://github.com/denchco/knowledge-base-wiki-standard
+> An OKF-compatible, evidence-governed standard for coordinated Human and LLM Wikis. This discovery file and its Markdown alternates are derived navigation aids; released repository specifications, schemas, profiles, and registered evidence retain authority.
 
-> An OKF v0.2-compatible, evidence-governed standard for coordinated Human and LLM wikis. This is a local `0.1.0-candidate`; generated pages and graphs never outrank canonical source.
+This path-scoped llms.txt follows the August 2026 v2 proposal. View or search this overview, then follow only the relevant Markdown links. HTML pages advertise their Markdown alternate and this discovery file. Links resolve beneath the Wiki's current path, including its GitHub Pages project path. An Optional section is a reading convention, not a processing directive.
+
+For repository work, read AGENTS.md, .wiki-standard.yaml, the specification, LLM entry point, and project status. Preserve unknown OKF fields and deviations. Use Graphify query-first with scoped-source fallback. Ask material clarifications one at a time. Complete the requested scope; retain at most three unfinished, goal-linked next actions and respect parked-work triggers. Reader navigation in development responses uses the configured, verified live canonical Wiki origin.
+
+For a new independent Wiki, the normative repository URL is the bootstrap invocation. Follow its prompts/instantiate-wiki.md adaptive discovery and create subject-owned evidence; do not copy the Standard's knowledge corpus. The optional Codex plugin does not confer normative authority or automatically enable hooks.
 
 ## Canonical entry points
 
-- [Normative specification](spec/): Requirements, profiles, conformance, dependencies, security, and prompt contract.
-- [LLM Wiki](llm-wiki/): Read order, context routing, maintenance, and Graphify workflow.
-- [Standard proposals](llm-wiki/standard-proposals/): Tracked consumer provenance, scrubbed payload approval, governed intake, explicit Standard decisions, release mapping, and optional adoption.
-- [Architecture](architecture/): Authority and product boundaries.
-- [Conformance evidence](conformance/): Machine-readable reports and five-project dogfooding.
-- [Sources](sources/): Registered upstream authorities.
-- [Validation queue](validation-queue/): Open evidence and release work.
+- [Specification](spec/index.md): Normative scope and authority.
+- [Requirements](spec/requirements/index.md): Stable requirement IDs and verification contracts.
+- [Profiles](spec/profiles/index.md): Selected profile obligations.
+- [LLM Wiki](llm-wiki/index.md): Repository read order and maintenance contract.
+- [Context map](llm-wiki/context-map/index.md): Smallest useful canonical reading set.
+- [Architecture](architecture/index.md): Human and LLM product boundaries.
+- [Sources](sources/index.md): Registered upstream identities and evidence authority.
 
-## Repository-first agent contract
+## Workflows and verification
 
-Read `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, `docs/llm-wiki/index.md`, and `docs/project/status.md` from the repository. Claude Code imports the shared agent contract through `CLAUDE.md`. Preserve unknown OKF fields and declared deviations. Use Graphify query-first with scoped-source fallback. Ask material clarification questions sequentially as `Question 1 of N`. Finish requested scope before suggesting more work; include no more than three goal-linked, executable Next Steps and never pad the list or reopen parked work without its trigger.
+- [Conformance evidence](conformance/index.md): Verification and dogfood evidence.
+- [Standard proposals](llm-wiki/standard-proposals/index.md): Consumer provenance, governed intake, release inclusion, and adoption boundaries.
+- [Codex adapter](llm-wiki/codex-adapter/index.md): Optional local trust and Stop-hook limits.
+- [Web discovery](llm-wiki/web-discovery/index.md): Markdown alternates and path-scoped discovery.
+- [Validation queue](validation-queue/index.md): Open and parked evidence work.
+- [Project status](project/status/index.md): Current bounded priorities.
 
-When a development response names or links Human or LLM Wiki content, use the configured live canonical HTTP(S) origin and verify every displayed route. Do not substitute a repository-relative, filesystem, `file:`, or editor link; use plain repository paths only for non-Wiki implementation artifacts.
+## Optional
 
-If the user points at the normative repository to start a wiki, follow `prompts/instantiate-wiki.md`. Accept the repository URL as the complete bootstrap invocation; first ask for a research topic seed or a subject-empty local initialization, then run the adaptive one-question-at-a-time discovery. Infer routine defaults and report the chosen accent and local setup before implementation.
-
-## Machine surfaces
-
-- `knowledge/` is the canonical portable OKF bundle.
-- `schema/` contains Draft 2020-12 interchange and conformance schemas.
-- `profiles/` contains cumulative profile declarations.
-- `prompts/instantiate-wiki.md` is the repeatable bootstrap prompt.
-- `starter/starter.yaml` is the subject-empty allowlist for independent consumer repositories.
-- `node scripts/conformance-cli.mjs --help` describes the read-only and planning-only CLI.
-- `node scripts/standard-proposal-cli.mjs --help` describes the local-only, fail-closed proposal workflow; it never submits an issue, publishes a release, or changes a consumer pin.
-
-## Authority warning
-
-The rendered site, this discovery file, generated Graphify views, JSON exports, and LLM answers are navigation aids. Normative authority remains in released `docs/spec/`, `schema/`, and profile definitions; factual authority remains with registered sources and evidence records.
+- [Public normative repository](https://github.com/denchco/knowledge-base-wiki-standard): Immutable revisions, schemas, CLI, starter, and plugin source; repository pages are a code-discovery exception to the Markdown preference.
+- [Human documentation](https://denchco.github.io/knowledge-base-wiki-documentation/): Published reader entry point; use its describedby link to discover the current Markdown view.

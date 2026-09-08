@@ -84,10 +84,17 @@ export function hostsOverlap(left, right) {
   return isLoopbackHost(left) && isLoopbackHost(right);
 }
 
+export function isSupportedRegistry(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  if (value.version !== undefined && value.version !== 1) return false;
+  if (value.schema !== undefined && value.schema !== "codex-dev-servers/v1") return false;
+  return value.version === 1 || value.schema === "codex-dev-servers/v1";
+}
+
 function loadRegistry() {
   if (!existsSync(registryPath)) return { version: 1, services: {} };
   const value = JSON.parse(readFileSync(registryPath, "utf8"));
-  if (value.version !== 1 || !value.services || typeof value.services !== "object" || Array.isArray(value.services)) {
+  if (!isSupportedRegistry(value) || !value.services || typeof value.services !== "object" || Array.isArray(value.services)) {
     throw new Error(`Unsupported or malformed service registry: ${registryPath}`);
   }
   return value;

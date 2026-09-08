@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
   cpSync,
+  chmodSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -33,6 +34,7 @@ import {
   ProfileLoadError,
 } from "./profile-catalogue.mjs";
 import { checkProvenance } from "./check-provenance.mjs";
+import { inspectOkfBundle, isDateTime, losslessExport } from "./okf-core.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = path.join(ROOT, "scripts/conformance-cli.mjs");
@@ -1210,4 +1212,167 @@ test("full-profile conformance fails required-false and exact-value capability d
     assert.equal(report.capabilityStates.find((item) => item.id === "standard_change_intake").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "development_response_links").verificationStatus, "fail");
   });
+});
+
+
+test("OKF timestamps validate offsets, calendar dates, every timestamp field, and schema parity", () => {
+  const ajv = new Ajv2020({ strict: false, allErrors: true });
+  ajv.addFormat("date-time", { type: "string", validate: isDateTime });
+  const validate = ajv.compile(OKF_SCHEMA);
+  const forms = [
+    [value => ({ generated: { by: "process:fixture", at: value } }), "OKF-DATETIME-001"],
+    [value => ({ verified: { by: "human:fixture", at: value } }), "OKF-DATETIME-002"],
+    [value => ({ verified: [{ by: "process:fixture", at: value }] }), "OKF-DATETIME-002"],
+    [value => ({ sources: [{ resource: "fixture", last_modified: value }] }), "OKF-LAST-MODIFIED-001"],
+    [value => ({ usage_window: { from: value, to: value } }), "OKF-USAGE-WINDOW-001"],
+    [value => ({ sources: [{ resource: "fixture", usage_window: { from: value, to: value } }] }), "OKF-USAGE-WINDOW-001"],
+    [value => ({ stale_after: value }), "OKF-STALE-AFTER-001"],
+  ];
+  const valid = ["2026-09-07T12:30:00Z", "2026-09-07T13:30:00+01:00", "2026-09-07T07:00:00-05:30", "2024-02-29T23:59:59.123Z"];
+  const invalid = ["2026-09-07", "2026-09-07T12:30:00", "2026-02-30T12:30:00Z", "2026-02-29T12:30:00Z", "2026-09-07T24:00:00Z", "2026-09-07T12:60:00Z", "2026-09-07T12:30:60Z", "2026-09-07T12:30:00+24:00", "2026-09-07T12:30:00+01:60", 1788800000000];
+  const root = mkdtempSync(path.join(os.tmpdir(), "denchco-okf-timestamp-"));
+  try {
+    for (const [make, code] of forms) {
+      for (const value of [...valid, ...invalid]) {
+        const metadata = { type: "Reference", ...make(value) };
+        writeFileSync(path.join(root, "concept.md"), `---\n${JSON.stringify(metadata)}\n---\n# Timestamp fixture\n`);
+        const diagnostics = [];
+        const result = inspectOkfBundle(root, root, diagnostics, { evaluationDate: "2026-09-07" });
+        const accepted = valid.includes(value);
+        assert.equal(result.conformant, true, "optional metadata never changes hard portability");
+        assert.equal(!diagnostics.some(item => item.code === code), accepted, `${code}: ${value}`);
+        assert.equal(validate(metadata), accepted, JSON.stringify(validate.errors));
+      }
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("OKF usage windows and staleness compare instants rather than offset strings", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "denchco-okf-instants-"));
+  try {
+    const check = metadata => {
+      writeFileSync(path.join(root, "concept.md"), `---\n${JSON.stringify({ type: "Reference", ...metadata })}\n---\n# Fixture\n`);
+      const diagnostics = [];
+      const bundle = inspectOkfBundle(root, root, diagnostics, { evaluationDate: "2026-09-07" });
+      return { diagnostics, bundle };
+    };
+    const chronological = check({ usage_window: { from: "2026-09-07T01:00:00+02:00", to: "2026-09-07T00:30:00Z" } });
+    assert.equal(chronological.diagnostics.length, 0);
+    const reversed = check({ usage_window: { from: "2026-09-07T00:30:00Z", to: "2026-09-07T01:00:00+02:00" } });
+    assert.ok(reversed.diagnostics.some(item => item.code === "OKF-USAGE-WINDOW-002"));
+    const fractional = check({ usage_window: { from: "2026-09-07T00:00:00.0002Z", to: "2026-09-07T01:00:00.0001+01:00" } });
+    assert.ok(fractional.diagnostics.some(item => item.code === "OKF-USAGE-WINDOW-002"));
+    const equal = check({ usage_window: { from: "2026-09-07T00:00:00.1000Z", to: "2026-09-07T01:00:00.1+01:00" } });
+    assert.equal(equal.diagnostics.length, 0);
+    for (const [stale_after, count] of [["2026-09-07T01:00:00+02:00", 1], ["2026-09-06T23:30:00-01:00", 0], ["2026-09-07T01:00:00+01:00", 1], ["2026-09-07T00:00:00.0001Z", 0]]) {
+      const { diagnostics, bundle } = check({ stale_after });
+      assert.equal(bundle.counts.stale, count);
+      assert.equal(diagnostics.filter(item => item.code === "OKF-STALE-001").length, count);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("legacy dates remain lossless and explicit local date extensions pass strict guidance", () => {
+  const legacy = path.join(ROOT, "fixtures/nonconforming/okf-date-precision");
+  const before = treeHash(legacy);
+  const result = losslessExport({ target: legacy, evaluationDate: "2026-09-07" });
+  assert.equal(result.report.summary.errors, 0);
+  assert.ok(result.report.diagnostics.some(item => item.code === "OKF-LAST-MODIFIED-001"));
+  const concept = result.exportData.bundles[0].files.find(file => file.kind === "concept");
+  assert.equal(concept.frontmatter.sources[0].last_modified, "2026-07-31");
+  assert.equal(concept.frontmatter["x-local"].source_date_precision, "day");
+  assert.equal(concept.raw, readFileSync(path.join(legacy, "concept.md"), "utf8"));
+  assert.equal(treeHash(legacy), before);
+  const strict = losslessExport({ target: legacy, evaluationDate: "2026-09-07", strict: true });
+  assert.equal(strict.exportData, null);
+  const local = losslessExport({ target: path.join(ROOT, "fixtures/conforming/okf-local-date-extension"), evaluationDate: "2026-09-07", strict: true });
+  assert.equal(local.report.summary.warnings, 0);
+  assert.equal(local.exportData.bundles[0].files[0].frontmatter["x-local"].last_modified_date, "2026-07-31");
+});
+
+test("OKF source identity lock pins canonical and superseded resources consistently", () => {
+  const lock = JSON.parse(readFileSync(path.join(ROOT, "config/okf-source-lock.json"), "utf8"));
+  const schema = JSON.parse(readFileSync(path.join(ROOT, "schema/okf-source-lock-v1.json"), "utf8"));
+  const ajv = new Ajv2020({ strict: false, validateFormats: false });
+  const validate = ajv.compile(schema);
+  assert.equal(validate(lock), true, JSON.stringify(validate.errors));
+  const ids = new Set(lock.records.map(record => record.id));
+  assert.equal(ids.size, lock.records.length);
+  const canonical = lock.records.find(record => record.id === lock.canonical);
+  assert.equal(canonical.supersessionStatus, "current");
+  assert.equal(canonical.role, "specification");
+  assert.equal(canonical.supersededBy, null);
+  const register = readFileSync(path.join(ROOT, "docs/sources.md"), "utf8");
+  for (const record of lock.records) {
+    assert.ok(record.immutableUrl.includes(`/blob/${record.revision}/`));
+    assert.equal(record.url.replace("/blob/main/", `/blob/${record.revision}/`), record.immutableUrl);
+    assert.equal(record.immutableUrl.replace("https://github.com/", "https://raw.githubusercontent.com/").replace("/blob/", "/"), record.rawUrl);
+    assert.ok(register.includes(record.immutableUrl));
+    assert.ok(register.includes(record.sha256));
+    assert.ok(register.includes(record.retrievedAt));
+    if (record.supersessionStatus === "superseded") assert.equal(record.supersededBy, lock.canonical);
+    const missing = structuredClone(lock);
+    delete missing.records.find(item => item.id === record.id).sha256;
+    assert.equal(validate(missing), false, "source content digest is mandatory");
+  }
+});
+
+
+test("maintainer provenance rejects unqualified JJ versions and keeps every workspace query read-only", () => {
+  const fixture = mkdtempSync(path.join(os.tmpdir(), "denchco-jj-version-"));
+  const repository = path.join(fixture, "repository ");
+  const bin = path.join(fixture, "bin");
+  const log = path.join(fixture, "jj-commands.jsonl");
+  mkdirSync(path.join(repository, ".jj"), { recursive: true });
+  mkdirSync(bin);
+  const initialized = spawnSync("git", ["init", "--quiet"], { cwd: repository, encoding: "utf8" });
+  assert.equal(initialized.status, 0, initialized.stderr);
+  try {
+    const fakeJj = path.join(bin, "jj");
+    writeFileSync(fakeJj, [
+      "#!/usr/bin/env node",
+      "const { appendFileSync, realpathSync } = require('node:fs');",
+      "const args = process.argv.slice(2);",
+      "appendFileSync(process.env.PROVENANCE_TEST_LOG, JSON.stringify(args) + '\\n');",
+      "const root = realpathSync(process.cwd());",
+      "if (args.join(' ') === '--version') console.log(process.env.PROVENANCE_TEST_JJ_VERSION);",
+      "else if (args.join(' ') === '--ignore-working-copy root') console.log(root);",
+      "else if (args.join(' ') === '--ignore-working-copy git root') console.log(root + '/.git');",
+      "else if (args[0] === '--ignore-working-copy' && args[1] === 'log') console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk\\n' + 'a'.repeat(40));",
+      "else { console.error('Unexpected or mutating Jujutsu invocation'); process.exit(2); }",
+      "",
+    ].join("\n"));
+    chmodSync(fakeJj, 0o755);
+    const probe = version => spawnSync(process.execPath, [
+      path.join(ROOT, "scripts/check-provenance.mjs"), "--root", repository, "--mode", "maintainer", "--json",
+    ], {
+      cwd: ROOT,
+      encoding: "utf8",
+      env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, PROVENANCE_TEST_LOG: log, PROVENANCE_TEST_JJ_VERSION: version },
+    });
+    for (const version of ["jj 0.44.0", "jj 0.45.0", "jj 0.45.2", "jj 1.0.0"]) {
+      const rejected = probe(version);
+      assert.equal(rejected.status, 1, rejected.stderr);
+      assert.match(rejected.stderr, /Jujutsu 0\.45\.1 is the reference-qualified candidate version/);
+    }
+    writeFileSync(log, "");
+    const result = probe("jj 0.45.1-7c41cdeb16b6b321c64e789a966b6adf723816a5");
+    assert.equal(result.status, 0, result.stderr);
+    const report = JSON.parse(result.stdout);
+    assert.equal(report.jujutsu.referenceQualifiedVersion, "0.45.1");
+    assert.equal(report.jujutsu.workingCopySnapshotDisabled, true);
+    assert.equal(report.jujutsu.workspaceRoot, realpathSync(repository));
+    assert.deepEqual(readFileSync(log, "utf8").trim().split("\n").map(line => JSON.parse(line)), [
+      ["--version"],
+      ["--ignore-working-copy", "root"],
+      ["--ignore-working-copy", "git", "root"],
+      ["--ignore-working-copy", "log", "-r", "@", "--no-graph", "-T", 'change_id ++ "\\n" ++ commit_id ++ "\\n"'],
+    ]);
+  } finally {
+    rmSync(fixture, { recursive: true, force: true });
+  }
 });

@@ -31,4 +31,6 @@ status: draft
 
 ## Next evidence gates
 
-No gate is currently active. Immutable `v0.1.0-rc.4` and this strictly later registry ledger close the protected publication sequence without rewriting the release. Add compatibility fixtures only when a consumer or evidenced upstream change selects an exact new version/environment. Revisit pre-send interception only when a selected agent host exposes a governed hook or mandatory response artifact; captured-draft checking remains the current enforceable repository boundary. A dedicated read-first Standard MCP remains a no-go until a future consumer identifies a named discovery or update-inspection task not served by the stable CLI, Git, and governed GitHub route.
+The rc.5 qualification and publication sequence covers corrected browser sanitizer bytes, explicit-offset OKF timestamps, exact reference tools, the optional locally trusted Codex Stop continuation guardrail, and llms.txt v2 discovery. The immutable release record establishes the exact verified Standard commit; Documentation then pins and publishes that released snapshot. rc.4 remains preserved.
+
+Future compatibility fixtures require a reproduced consumer gap or evidenced upstream change. Absolute interception of uncaptured responses remains unproven; the supported Stop adapter supplies one bounded corrective continuation after local review and trust. A dedicated Standard MCP remains deferred until a consumer identifies a named task not served by the files, CLI, skill/plugin, Git, and optional read-only repository integration.

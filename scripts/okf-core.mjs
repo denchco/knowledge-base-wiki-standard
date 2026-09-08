@@ -222,9 +222,30 @@ function isDateOnly(value) {
   return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }
 
-function isDateTime(value) {
-  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T/.test(value)) return false;
-  return !Number.isNaN(Date.parse(value));
+export function isDateTime(value) {
+  if (typeof value !== "string") return false;
+  const parts = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-](\d{2}):(\d{2}))$/.exec(value);
+  return Boolean(parts && isDateOnly(parts[1])
+    && Number(parts[2]) <= 23 && Number(parts[3]) <= 59 && Number(parts[4]) <= 59
+    && (parts[5] === "Z" || (Number(parts[6]) <= 23 && Number(parts[7]) <= 59))
+    && Number.isFinite(Date.parse(value)));
+}
+
+function compareDateTimes(left, right) {
+  const milliseconds = Date.parse(left) - Date.parse(right);
+  if (milliseconds !== 0) return milliseconds;
+  // Date.parse truncates sub-millisecond precision. Preserve the remaining
+  // fractional digits when two otherwise equal instants are compared.
+  const leftFraction = /\.(\d+)/.exec(left)?.[1] ?? "";
+  const rightFraction = /\.(\d+)/.exec(right)?.[1] ?? "";
+  const precision = Math.max(leftFraction.length, rightFraction.length);
+  const a = leftFraction.padEnd(precision, "0");
+  const b = rightFraction.padEnd(precision, "0");
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+function isStaleAtDate(value, evaluationDate) {
+  return isDateTime(value) && compareDateTimes(`${evaluationDate}T00:00:00Z`, value) >= 0;
 }
 
 function validActor(value) {
@@ -236,15 +257,15 @@ function validActor(value) {
 }
 
 function validateDateRange(value, field, file, diagnostics) {
-  if (!isPlainObject(value) || !isDateOnly(String(value.from ?? "")) || !isDateOnly(String(value.to ?? ""))) {
-    addDiagnostic(diagnostics, "OKF-USAGE-WINDOW-001", "warning", `${field} should contain ISO date-only \`from\` and \`to\` fields.`, {
+  if (!isPlainObject(value) || !isDateTime(value.from) || !isDateTime(value.to)) {
+    addDiagnostic(diagnostics, "OKF-USAGE-WINDOW-001", "warning", `${field} should contain ISO 8601 datetime \`from\` and \`to\` fields with explicit UTC offsets.`, {
       file,
       field,
-      remediation: "Use `{ from: YYYY-MM-DD, to: YYYY-MM-DD }`.",
+      remediation: "Use `{ from: 2026-07-01T00:00:00Z, to: 2026-07-31T00:00:00Z }`; preserve uncertain date precision in a documented local extension.",
     });
     return;
   }
-  if (String(value.from) > String(value.to)) {
+  if (compareDateTimes(value.from, value.to) > 0) {
     addDiagnostic(diagnostics, "OKF-USAGE-WINDOW-002", "warning", `${field}.from is later than ${field}.to.`, {
       file,
       field,
@@ -309,8 +330,8 @@ function validateOptionalFamilies(frontmatter, body, file, diagnostics, evaluati
             field: `${field}.usage_count`,
           });
         }
-        if (source.last_modified !== undefined && !isDateOnly(String(source.last_modified))) {
-          addDiagnostic(diagnostics, "OKF-LAST-MODIFIED-001", "warning", `${field}.last_modified should be an ISO date (YYYY-MM-DD).`, {
+        if (source.last_modified !== undefined && !isDateTime(source.last_modified)) {
+          addDiagnostic(diagnostics, "OKF-LAST-MODIFIED-001", "warning", `${field}.last_modified should be an ISO 8601 datetime with an explicit UTC offset.`, {
             file,
             field: `${field}.last_modified`,
           });
@@ -342,8 +363,8 @@ function validateOptionalFamilies(frontmatter, body, file, diagnostics, evaluati
           field: "generated.by",
         });
       }
-      if (frontmatter.generated.at !== undefined && !isDateTime(String(frontmatter.generated.at))) {
-        addDiagnostic(diagnostics, "OKF-DATETIME-001", "warning", "`generated.at` should be an ISO 8601 datetime.", {
+      if (frontmatter.generated.at !== undefined && !isDateTime(frontmatter.generated.at)) {
+        addDiagnostic(diagnostics, "OKF-DATETIME-001", "warning", "`generated.at` should be an ISO 8601 datetime with an explicit UTC offset.", {
           file,
           field: "generated.at",
         });
@@ -371,8 +392,8 @@ function validateOptionalFamilies(frontmatter, body, file, diagnostics, evaluati
           field: `${field}.by`,
         });
       }
-      if (!isDateTime(String(event.at ?? ""))) {
-        addDiagnostic(diagnostics, "OKF-DATETIME-002", "warning", `${field}.at should be an ISO 8601 datetime.`, {
+      if (!isDateTime(event.at)) {
+        addDiagnostic(diagnostics, "OKF-DATETIME-002", "warning", `${field}.at should be an ISO 8601 datetime with an explicit UTC offset.`, {
           file,
           field: `${field}.at`,
         });
@@ -388,13 +409,13 @@ function validateOptionalFamilies(frontmatter, body, file, diagnostics, evaluati
   }
 
   if (frontmatter.stale_after !== undefined) {
-    const staleAfter = String(frontmatter.stale_after);
-    if (!isDateOnly(staleAfter)) {
-      addDiagnostic(diagnostics, "OKF-STALE-AFTER-001", "warning", "`stale_after` should be an ISO date (YYYY-MM-DD).", {
+    const staleAfter = frontmatter.stale_after;
+    if (!isDateTime(staleAfter)) {
+      addDiagnostic(diagnostics, "OKF-STALE-AFTER-001", "warning", "`stale_after` should be an ISO 8601 datetime with an explicit UTC offset.", {
         file,
         field: "stale_after",
       });
-    } else if (evaluationDate >= staleAfter) {
+    } else if (isStaleAtDate(staleAfter, evaluationDate)) {
       addDiagnostic(diagnostics, "OKF-STALE-001", "info", `Concept is stale as of ${evaluationDate}.`, {
         file,
         field: "stale_after",
@@ -704,7 +725,7 @@ export function inspectOkfBundle(bundleRoot, projectRoot, diagnostics, options =
     if (STATUS_VALUES.has(status)) statuses[status] += 1;
     else statuses.invalid += 1;
     trust[trustTier(frontmatter)] += 1;
-    if (isDateOnly(String(frontmatter.stale_after ?? "")) && evaluationDate >= String(frontmatter.stale_after)) stale += 1;
+    if (isStaleAtDate(frontmatter.stale_after, evaluationDate)) stale += 1;
   }
   const unknownFields = [...fieldNames].filter((field) => !KNOWN_OKF_FIELDS.has(field)).sort();
   const relevantErrors = diagnostics.filter((item) => item.severity === "error" && (

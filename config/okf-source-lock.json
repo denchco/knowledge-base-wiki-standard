@@ -1,0 +1,47 @@
+{
+  "$schema": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/okf-source-lock-v1.json",
+  "lockVersion": "1.0",
+  "okfVersion": "0.2",
+  "canonical": "canonical-spec",
+  "records": [
+    {
+      "id": "canonical-spec",
+      "sourceId": "SRC-002",
+      "role": "specification",
+      "url": "https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md",
+      "revision": "ad30107c31c06aec8a7d5636e0d1058118604e6f",
+      "immutableUrl": "https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/ad30107c31c06aec8a7d5636e0d1058118604e6f/SPEC.md",
+      "rawUrl": "https://raw.githubusercontent.com/GoogleCloudPlatform/open-knowledge-format/ad30107c31c06aec8a7d5636e0d1058118604e6f/SPEC.md",
+      "sha256": "26aa5da029278939f914e578107242d9607d4f2dc5fe153272b82f9ed1030101",
+      "retrievedAt": "2026-09-07",
+      "supersessionStatus": "current",
+      "supersededBy": null
+    },
+    {
+      "id": "frozen-spec",
+      "sourceId": "SRC-002",
+      "role": "specification",
+      "url": "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md",
+      "revision": "31da799a9aef176df12e91abbd119ea9385b75ec",
+      "immutableUrl": "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/31da799a9aef176df12e91abbd119ea9385b75ec/okf/SPEC.md",
+      "rawUrl": "https://raw.githubusercontent.com/GoogleCloudPlatform/knowledge-catalog/31da799a9aef176df12e91abbd119ea9385b75ec/okf/SPEC.md",
+      "sha256": "26aa5da029278939f914e578107242d9607d4f2dc5fe153272b82f9ed1030101",
+      "retrievedAt": "2026-09-07",
+      "supersessionStatus": "superseded",
+      "supersededBy": "canonical-spec"
+    },
+    {
+      "id": "relocation-notice",
+      "sourceId": "SRC-002",
+      "role": "relocation-notice",
+      "url": "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/README.md",
+      "revision": "31da799a9aef176df12e91abbd119ea9385b75ec",
+      "immutableUrl": "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/31da799a9aef176df12e91abbd119ea9385b75ec/okf/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/GoogleCloudPlatform/knowledge-catalog/31da799a9aef176df12e91abbd119ea9385b75ec/okf/README.md",
+      "sha256": "0f9d0bb1f469e2b20aa6c2f9302545fd68b291a6f1755819430cf462f819cd21",
+      "retrievedAt": "2026-09-07",
+      "supersessionStatus": "current",
+      "supersededBy": null
+    }
+  ]
+}
