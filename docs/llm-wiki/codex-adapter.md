@@ -35,6 +35,8 @@ Use `managed` for local preview. The target's `scripts/dev-service.mjs` must exp
 
 The alternative repository-local setup uses the same `Stop` definition with a fixed command pointing at `scripts/codex-stop-hook.mjs`. Choose one host registration to avoid duplicate callbacks. Copying the optional files or the Standard manifest is not consumer adoption, and activating a hook does not authorise publications or evidence changes.
 
+For managed preview, select the same Node and npm environment in the hook command that registered the service. An absolute Node path alone does not control the npm executable resolved through `PATH`. A different npm installation can make the exact LaunchAgent comparison fail even when the HTTP endpoint is healthy. Correct the command's environment and review the changed hook through the host's trust UI; keep the identity check intact.
+
 ## What the check proves
 
 The hook receives JSON on stdin and produces bounded JSON on stdout. It never executes message text, reads the transcript, writes a captured response to disk, or includes message text, URLs, or exception details in the generated continuation prompt. It locates the nearest explicit opt-in without crossing an independent repository boundary.
@@ -46,6 +48,8 @@ The handoff check detects repeated or empty Next Steps sections and more than th
 A first detected violation requests one focused correction. If `stop_hook_active` is already true, another failure produces an explicit retry-exhausted warning without asking for another continuation. Invalid input, absent message content, malformed configuration, runtime failure, or route-budget exhaustion produces a warning that validation was not established. Host process failure or timeout is also a failed check, never a pass. No result claims an absolute delivery barrier.
 
 `npm run conformance:test` exercises valid and invalid responses, unavailable routes, missing input, bounded retries, malformed JSON, adversarial message text, manifest origin selection, opt-in boundaries, and packaged execution. Live activation in an actual trusted host remains an operator qualification step; it is not implied by fixture success.
+
+The separate [Documentation host pilot](https://denchco.github.io/knowledge-base-wiki-documentation/llm-wiki/codex-adapter/#documentation-host-pilot-9-september-2026) records a repository-local trial with a valid response, one corrective continuation, and a retry-exhausted warning. Its evidence applies only to the documented host, reviewed command, adapter, toolchain, and managed service. It does not establish activation in this Standard checkout, qualify packaged-plugin execution in other hosts, or establish a pre-delivery barrier. Qualify each selected setup independently.
 
 ## Optional future adapters
 
