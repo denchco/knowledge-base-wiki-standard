@@ -1,6 +1,7 @@
 /* Optional production width override. Stock Zensical remains the default. */
 
-:root {
+:root,
+body[data-md-color-scheme] {
   --header-title-content-rail-offset: 10.5rem;
   --layout-width-control-content-rail-offset: 2rem;
   --layout-width-control-inline-start: 0.25rem;

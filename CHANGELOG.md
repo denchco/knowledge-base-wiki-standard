@@ -2,6 +2,14 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning for its declared conformance contract.
 
+## Unreleased
+
+- Add native Zensical light/dark appearance selection immediately before Wide under the existing `DKBWS-DESIGN-001` reference-adapter contract. The Standard retains its light default and teal identity; consumers choose and document their own initial palette.
+- Keep renderer, search, width controls, Mermaid and both graph views readable across named palette families. The graph bridge inherits only same-origin native state and updates graph colours without recreating its view.
+- Reflect the restored native scheme into its radio selection so keyboard entry and the visible focus ring work immediately after loading a page. Browser checks now cover the untouched initial state and both saved appearances after reload and navigation on desktop and mobile.
+- Record governed issue #7 and explicit maintainer acceptance of the reusable appearance contribution in the Standard registry, preserving verified consumer provenance and the separate release/adoption boundary.
+- Verify native keyboard interaction, control placement, saved preference, navigation/reload, both appearances, contrast and desktop/mobile containment. Migration requires both native palettes, scheme-scoped token aliases, graph assets and matching browser checks; no consumer pin, deployment or canonical knowledge changes automatically.
+
 ## v0.1.0-rc.5 — 2026-09-08
 
 - Repair the audited dependency graph with fast-uri 3.1.7 while retaining Ajv 8.20.0; build Mermaid 11.17.2 core against exact DOMPurify 3.4.15 and verify browser bundle inputs, embedded version, output hashes and CycloneDX evidence (`DKBWS-SEC-001`, `DKBWS-RUNTIME-001`).

@@ -95,10 +95,24 @@ function placeholderGraphHtml(message = "Graphify output has not been generated.
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 16px system-ui, sans-serif; color: ${text}; background: ${pageBackground}; }
     main { max-width: 46rem; padding: 2rem; }
   </style>
+  ${graphThemeAssets()}
 </head>
 <body><main><h1>Graphify unavailable</h1><p>${escapeHtml(message)}</p></main></body>
 </html>
 `;
+}
+
+function graphThemeAssets() {
+  const configuration = {
+    fallbackScheme: "default",
+    palettes: {
+      default: { background: pageBackground, surface: "#ffffff", text, muted: "#52606d", border: "#aab7c0", accent: primary, accentContrast: "#ffffff", hover: "#d9f0f3", focus: primaryDark },
+      slate: { background: "#111a1e", surface: "#18242a", text: "#e5eef1", muted: "#b5c2c9", border: "#798f9a", accent: "#66c5d1", accentContrast: "#111a1e", hover: "#16323a", focus: "#8cdbe4" },
+    },
+  };
+  return `<script id="graph-theme-config" type="application/json">${scriptSafeJson(configuration)}</script>
+<link rel="stylesheet" href="../graph-theme.css">
+<script src="../graph-theme.js"></script>`;
 }
 
 function readGraph(filePath) {
@@ -1001,7 +1015,28 @@ function syncGraphHtml(filePath, nodes, edges) {
     #legend-wrap, #stats { display: none; }
   }
 </style>`,
-    );
+    )
+    .replace("</head>", `${graphThemeAssets()}\n</head>`)
+    .replace("el.style.borderLeft = `3px solid ${n.color.background}`;", "el.dataset.graphColor = n.color.background; el.style.borderLeft = `3px solid ${window.graphTheme.color(n.color.background)}`;")
+    .replace("</body>", `<script>
+window.graphTheme.subscribe(theme => {
+  nodesDS.update(RAW_NODES.map(node => ({
+    id: node.id,
+    font: { ...node.font, color: theme.text, strokeColor: theme.background, strokeWidth: 2 },
+    color: {
+      background: window.graphTheme.color(node.color.background),
+      border: window.graphTheme.color(node.color.border ?? node.color.background),
+      highlight: { background: theme.accent, border: theme.text },
+      hover: { background: window.graphTheme.color(node.color.background), border: theme.text },
+    },
+  })));
+  edgesDS.update(RAW_EDGES.map((edge, id) => ({ id, color: { ...edge.color, color: window.graphTheme.color(edge.color?.color ?? theme.muted), highlight: theme.text, hover: theme.text } })));
+  document.querySelectorAll(".legend-dot").forEach((dot, index) => { dot.style.background = window.graphTheme.color(LEGEND[index].color); });
+  document.querySelectorAll(".search-item[data-graph-color]").forEach(item => { item.style.borderLeftColor = window.graphTheme.color(item.dataset.graphColor); });
+  document.querySelectorAll(".neighbor-link[data-nid]").forEach(item => { item.style.borderLeftColor = nodesDS.get(item.dataset.nid)?.color.background ?? theme.border; });
+  network.redraw();
+});
+</script>\n</body>`);
   fs.writeFileSync(filePath, updated);
 }
 
@@ -1133,6 +1168,7 @@ function graph3dHtml(summary) {
     #panel { width: calc(100vw - 20px); top: 10px; left: 10px; max-height: 44vh; }
   }
 </style>
+${graphThemeAssets()}
 </head>
 <body>
 <div id="graph3d"></div>
@@ -1153,6 +1189,13 @@ const metaEl = document.getElementById("meta");
 const searchEl = document.getElementById("search");
 let graph;
 let rawData;
+
+window.graphTheme.subscribe(theme => {
+  if (!graph) return;
+  graph.backgroundColor(theme.background)
+    .nodeColor(node => window.graphTheme.color(communityColor(node)))
+    .linkColor(() => theme.muted);
+});
 
 metaEl.textContent = \`\${SUMMARY.nodes} nodes | \${SUMMARY.edges} edges | \${SUMMARY.communities} communities | \${SUMMARY.sourceFiles} source files\`;
 
@@ -1234,14 +1277,14 @@ fetch("graph.json")
     graph = ForceGraph3D()(document.getElementById("graph3d"))
       .width(window.innerWidth)
       .height(window.innerHeight)
-      .backgroundColor("${sceneBackground}")
+      .backgroundColor(window.graphTheme.current.background)
       .nodeId("id")
       .linkSource("source")
       .linkTarget("target")
       .nodeLabel((node) => \`\${escapeHtml(nodeLabel(node))}<br>\${escapeHtml(node.source_file || "")}\`)
-      .nodeColor(communityColor)
+      .nodeColor(node => window.graphTheme.color(communityColor(node)))
       .nodeVal((node) => Math.max(1, Math.min(12, Number(node.degree || 1))))
-      .linkColor(() => "${linkColor}")
+      .linkColor(() => window.graphTheme.current.muted)
       .linkOpacity(0.42)
       .linkDirectionalParticles(0)
       .onNodeClick(focusNode)

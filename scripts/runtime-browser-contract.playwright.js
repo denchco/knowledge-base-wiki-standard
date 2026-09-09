@@ -69,6 +69,201 @@ export default async (page, options = {}) => {
     const response = await page.goto(routeUrl(route), { waitUntil });
     check(Boolean(response?.ok()), `${route} did not return HTTP 200`);
   };
+  // Exercise the renderer's real radio/label controller. Do not write palette
+  // storage or body attributes: that would bypass the behaviour being verified.
+  const paletteSelector = 'form[data-md-component="palette"]';
+  const selectNativeScheme = async scheme => {
+    if (await page.locator("body").getAttribute("data-md-color-scheme") === scheme) return;
+    const input = page.locator(`${paletteSelector} input[data-md-color-scheme="${scheme}"]`);
+    const id = await input.getAttribute("id");
+    check(Boolean(id), `The native palette must expose a ${scheme} radio option`);
+    if (!id) return;
+    await page.locator(`${paletteSelector} label[for="${id}"]:visible`).click();
+    await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, scheme);
+  };
+  const inspectThemeContrast = (realm, selectors, graphName = null) => realm.evaluate(({ selectors, graphName }) => {
+    const rgba = value => value.startsWith("#")
+      ? [...[1, 3, 5].map(offset => parseInt(value.slice(offset, offset + 2), 16)), 1]
+      : [...(value.match(/[\d.]+/g) ?? []).map(Number), 1].slice(0, 4);
+    const over = (front, back) => [...front.slice(0, 3).map((value, index) => value * front[3] + back[index] * (1 - front[3])), 1];
+    const luminance = color => color.slice(0, 3).map(value => {
+      const channel = value / 255;
+      return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+    }).reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+    const contrast = (first, second) => {
+      const [lighter, darker] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+      return (lighter + 0.05) / (darker + 0.05);
+    };
+    const parent = element => element.parentElement || element.getRootNode()?.host || null;
+    const lineage = element => {
+      const result = [];
+      for (let current = element; current; current = parent(current)) result.unshift(current);
+      return result;
+    };
+    const effectiveBackground = element => lineage(element).reduce((background, current) => over(rgba(getComputedStyle(current).backgroundColor), background), [255, 255, 255, 1]);
+    const roots = [document];
+    for (let index = 0; index < roots.length; index += 1) {
+      for (const element of roots[index].querySelectorAll("*")) if (element.shadowRoot) roots.push(element.shadowRoot);
+    }
+    const entries = selectors.flatMap(selector => roots.flatMap(root => [...root.querySelectorAll(selector)]).filter(element => {
+      const bounds = element.getBoundingClientRect();
+      return bounds.width > 0 && bounds.height > 0 && lineage(element).every(current => {
+        const style = getComputedStyle(current);
+        return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) > 0;
+      });
+    }).slice(0, 6).map(element => {
+      const style = getComputedStyle(element);
+      const background = effectiveBackground(element);
+      const foreground = rgba(style.color);
+      foreground[3] *= lineage(element).reduce((value, current) => value * Number(getComputedStyle(current).opacity), 1);
+      return { selector, text: element.textContent.trim().slice(0, 70), color: style.color, background, ratio: contrast(over(foreground, background), background) };
+    }));
+    const token = name => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(--${name})`;
+      document.body.append(probe);
+      const result = getComputedStyle(probe).color;
+      probe.remove();
+      return result;
+    };
+    const background = effectiveBackground(document.body);
+    const tokens = Object.fromEntries(["background", "surface", "text", "muted", "accent", "focus"].map(name => [name, token(graphName ? `graph-${name}` : name)]));
+    let graphMetrics = null;
+    if (graphName) {
+      const theme = window.graphTheme?.current;
+      const checkbox = document.querySelector("#select-all-cb");
+      const mark = checkbox ? getComputedStyle(checkbox, "::after") : null;
+      graphMetrics = {
+        theme,
+        timeOrigin: performance.timeOrigin,
+        controlBoundaries: [...document.querySelectorAll('#search, input[type="search"], .legend-cb:not(:checked)')]
+          .filter(element => element.getBoundingClientRect().width > 0 && element.getBoundingClientRect().height > 0)
+          .map(element => ({ id: element.id || element.className,
+            ratio: contrast(rgba(getComputedStyle(element).borderTopColor), effectiveBackground(parent(element))) })),
+        checkboxRatio: checkbox ? contrast(rgba(checkbox.indeterminate ? mark.backgroundColor : mark.borderBottomColor), rgba(getComputedStyle(checkbox).backgroundColor)) : null,
+        labelsMinimum: graphName === "2d" && typeof nodesDS !== "undefined"
+          ? Math.min(...nodesDS.get().filter(node => node.font?.size > 0).map(node => contrast(rgba(node.font.color), background)))
+          : null,
+        sceneMatches: graphName !== "3d" || (typeof graph !== "undefined" && rgba(graph.backgroundColor()).slice(0, 3).every((value, index) => Math.abs(value - background[index]) <= 1)),
+      };
+    }
+    return { scheme: document.body.dataset.mdColorScheme, bodyBackground: getComputedStyle(document.body).backgroundColor,
+      backgroundLuminance: luminance(background), tokens, entries, graph: graphMetrics,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+  }, { selectors, graphName });
+  const checkThemeContrast = (metrics, label) => {
+    check(metrics.entries.length > 0 && metrics.entries.every(entry => entry.ratio >= 4.5), `${label} text must retain 4.5:1 contrast: ${JSON.stringify(metrics.entries.filter(entry => entry.ratio < 4.5))}`);
+    check(metrics.overflow <= 1, `${label} must not create horizontal page overflow`);
+    check(metrics.scheme === "default" ? metrics.backgroundLuminance > 0.8 : metrics.backgroundLuminance < 0.1, `${label} must paint the selected light or dark background`);
+  };
+  const inspectRenderedMermaidContrast = async () => {
+    // Zensical renders Mermaid inside a closed shadow root. The pinned
+    // Chromium contract can inspect that actual SVG through read-only CDP;
+    // a document/open-shadow query would silently measure an empty host.
+    const client = await page.context().newCDPSession(page);
+    try {
+      await client.send("DOM.enable");
+      await client.send("CSS.enable");
+      const descendants = node => [node, ...(node.children || []).flatMap(descendants), ...(node.shadowRoots || []).flatMap(descendants)];
+      const attribute = (node, name) => {
+        const index = (node.attributes || []).indexOf(name);
+        return index < 0 ? "" : node.attributes[index + 1];
+      };
+      const hasClass = (node, name) => attribute(node, "class").split(/\s+/u).includes(name);
+      let rendered = [];
+      const deadline = Date.now() + 10000;
+      do {
+        const { root } = await client.send("DOM.getDocument", { depth: -1, pierce: true });
+        const { nodeId } = await client.send("DOM.querySelector", { nodeId: root.nodeId, selector: ".mermaid" });
+        if (nodeId) {
+          const { node } = await client.send("DOM.describeNode", { nodeId, depth: -1, pierce: true });
+          rendered = descendants(node);
+          if (rendered.some(item => item.localName === "svg") && rendered.some(item => hasClass(item, "node"))) break;
+        }
+        await page.waitForTimeout(100);
+      } while (Date.now() < deadline);
+      const style = async node => Object.fromEntries((await client.send("CSS.getComputedStyleForNode", { nodeId: node.nodeId })).computedStyle.map(entry => [entry.name, entry.value]));
+      const luminance = value => (value.match(/[\d.]+/g) || []).slice(0, 3).map(Number).map(value => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      }).reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+      const ratio = (first, second) => {
+        const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
+        return (values[0] + 0.05) / (values[1] + 0.05);
+      };
+      const background = await page.locator("body").evaluate(body => getComputedStyle(body).backgroundColor);
+      const nodes = [];
+      for (const node of rendered.filter(item => hasClass(item, "node"))) {
+        const children = descendants(node);
+        const shape = children.find(item => ["rect", "polygon"].includes(item.localName));
+        const text = children.find(item => item.localName === "text");
+        if (!shape || !text) continue;
+        const shapeStyle = await style(shape);
+        const textStyle = await style(text);
+        nodes.push({ label: descendants(text).filter(item => item.nodeType === 3).map(item => item.nodeValue).join(" "),
+          textRatio: ratio(textStyle.fill, shapeStyle.fill), boundaryRatio: ratio(shapeStyle.stroke, background) });
+      }
+      const edgeRatios = [];
+      for (const edge of rendered.filter(item => hasClass(item, "flowchart-link"))) edgeRatios.push(ratio((await style(edge)).stroke, background));
+      return { nodes, edgeRatios };
+    } finally {
+      await client.detach();
+    }
+  };
+  const inspectPaletteControl = async (scheme, viewportName) => {
+    const metrics = await page.locator(paletteSelector).evaluate(form => {
+      const visible = element => element && !element.hidden && getComputedStyle(element).display !== "none" && element.getBoundingClientRect().width > 0;
+      const inputs = [...form.querySelectorAll('input[type="radio"]')];
+      const label = [...form.querySelectorAll("label")].find(visible);
+      const width = document.querySelector(".layout-width-toggle");
+      const bounds = label?.getBoundingClientRect();
+      const widthBounds = visible(width) ? width.getBoundingClientRect() : null;
+      return {
+        options: inputs.map(input => ({ scheme: input.dataset.mdColorScheme, name: input.getAttribute("aria-label"), checked: input.checked })),
+        labelTitle: label?.title || "", labelTarget: label?.control?.dataset.mdColorScheme,
+        visible: Boolean(bounds && bounds.width > 0 && bounds.height > 0 && bounds.left >= 0 && bounds.right <= innerWidth),
+        immediatelyBeforeWide: width?.previousElementSibling === form,
+        positionBeforeWide: !widthBounds || Boolean(bounds && bounds.right <= widthBounds.left + 1 && Math.abs((bounds.top + bounds.height / 2) - (widthBounds.top + widthBounds.height / 2)) <= 2),
+      };
+    });
+    check(metrics.options.length === 2 && metrics.options.every(option => option.name), `${viewportName} palette must use two named native radio options`);
+    check(metrics.options.filter(option => option.checked).length === 1 && metrics.options.some(option => option.checked && option.scheme === scheme), `${viewportName} selected radio must reflect ${scheme}`);
+    check(metrics.visible && metrics.labelTitle && metrics.labelTarget !== scheme, `${viewportName} must expose a visible, labelled switch to the other scheme`);
+    check(metrics.immediatelyBeforeWide && metrics.positionBeforeWide, `${viewportName} palette control must sit immediately left of Wide in DOM and visual order`);
+    return metrics;
+  };
+  const inspectPaletteKeyboard = async (scheme, viewportName, stage) => {
+    const label = `${scheme}/${viewportName}/${stage}`;
+    const control = await inspectPaletteControl(scheme, label);
+    // Report a missing restored selection before any interaction can repair it.
+    if (!control.options.some(option => option.checked && option.scheme === scheme)) return { control };
+    const checkedRadio = () => page.locator(`${paletteSelector} input:checked`);
+    if (viewportName === "desktop") {
+      await page.locator(".layout-width-toggle").focus();
+      await page.keyboard.press("Shift+Tab");
+    } else {
+      await page.locator(".md-skip").focus();
+      for (let index = 0; index < 12; index += 1) {
+        await page.keyboard.press("Tab");
+        if (await checkedRadio().evaluate(input => document.activeElement === input)) break;
+      }
+    }
+    const focus = await checkedRadio().evaluate(input => {
+      const visibleLabel = [...input.form.querySelectorAll("label")].find(label => !label.hidden && getComputedStyle(label).display !== "none");
+      const style = visibleLabel && getComputedStyle(visibleLabel);
+      return { focused: document.activeElement === input, outline: style?.outlineStyle, width: style?.outlineWidth };
+    });
+    check(focus.focused, `${label} Tab must enter the selected native palette option`);
+    check(focus.focused && focus.outline !== "none" && px(focus.width) >= 2, `${label} native palette focus must be visible before switching`);
+    if (!focus.focused) return { control, focus };
+    const otherScheme = scheme === "default" ? "slate" : "default";
+    await page.keyboard.press("ArrowRight");
+    await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, otherScheme);
+    check(await checkedRadio().evaluate(input => document.activeElement === input), `${label} switching must retain native radio focus`);
+    await page.keyboard.press("ArrowLeft");
+    await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, scheme);
+    return { control, focus };
+  };
   const inspectGoverningQuestion = async (viewportName, route, expectedQuestion = null, expectedCount = 1) => {
     await goto(route);
     const metrics = await page.evaluate(() => {
@@ -597,6 +792,10 @@ export default async (page, options = {}) => {
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
+  const initialScheme = await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
+  check(await page.locator("body").getAttribute("data-md-color-scheme") === initialScheme, "A fresh browser must start in the configured initial appearance");
+  await inspectPaletteKeyboard(initialScheme, "desktop", "first load");
+  await selectNativeScheme("default");
   const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
     && governingQuestionRepetitionRoutes.some(entry => entry.route === questionRoute);
   const questionRouteRepetitionCount = questionRouteIsGovernedRepetition
@@ -682,11 +881,14 @@ export default async (page, options = {}) => {
   check(await page.locator('link[rel="alternate"][type="text/markdown"]').count() === 1,
     "Rendered pages must retain their Markdown discovery alternate");
   const openSearch = async () => {
-    await page.locator(".md-search__button").click();
+    const desktopButton = page.locator(".md-search__button");
+    if (await desktopButton.isVisible()) await desktopButton.click();
+    else await page.locator('.md-header__button[for="__search"]').click();
     await searchInput.waitFor({ state: "attached" });
     await page.waitForFunction(() => [...document.querySelectorAll("body > div")].some(host => {
       const input = host.shadowRoot?.querySelector('input[role="combobox"]');
-      return input && input.getRootNode().activeElement === input;
+      const panel = input?.closest(".l");
+      return input && input.getRootNode().activeElement === input && panel && getComputedStyle(panel).opacity === "1";
     }));
   };
   await openSearch();
@@ -1032,6 +1234,113 @@ export default async (page, options = {}) => {
     }
   }
 
+  // The original journey above remains the full light regression contract.
+  // This additional matrix verifies native palette state, persistence and
+  // inherited surfaces without duplicating the renderer or its storage format.
+  const paletteMetrics = {};
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 1000 },
+    { name: "mobile", width: 390, height: 844 },
+  ]) {
+    paletteMetrics[viewport.name] = {};
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    for (const scheme of ["default", "slate"]) {
+      const label = `${scheme}/${viewport.name}`;
+      const otherScheme = scheme === "default" ? "slate" : "default";
+      await goto(questionRoute);
+      if (viewport.name === "desktop" && await page.locator(".layout-width-toggle").getAttribute("aria-pressed") !== "true") await page.locator(".layout-width-toggle").click();
+      // Save through the visible native action, then inspect the restored state
+      // before clicking or focusing a radio can conceal a restoration defect.
+      await selectNativeScheme(scheme);
+      await page.reload({ waitUntil: "networkidle" });
+      check(await page.locator("body").getAttribute("data-md-color-scheme") === scheme, `${label} selection must survive reload`);
+      const restored = await inspectPaletteKeyboard(scheme, viewport.name, "reload");
+      await goto(architectureRoute);
+      check(await page.locator("body").getAttribute("data-md-color-scheme") === scheme, `${label} selection must survive document navigation`);
+      const navigated = await inspectPaletteKeyboard(scheme, viewport.name, "document navigation");
+      const governing = await inspectGoverningQuestion(label, questionRoute,
+        questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null, questionRouteRepetitionCount);
+      const content = await inspectThemeContrast(page, [".md-header", ".md-search__button", ".md-content__inner h1", ".md-typeset > p", ".md-typeset blockquote.governing-question p", ".md-typeset a"]);
+      checkThemeContrast(content, `${label} header and content`);
+      check(content.bodyBackground === content.tokens.background, `${label} body must paint its active background token`);
+
+      await goto(tableRoute);
+      await page.waitForSelector(".md-typeset table tbody td");
+      const table = await inspectThemeContrast(page, [".md-typeset table th", ".md-typeset table td", ".md-typeset table a"]);
+      checkThemeContrast(table, `${label} table`);
+      const mobileScroll = viewport.name === "mobile" ? await inspectMobileTables() : null;
+
+      await goto(mermaidRoute);
+      const diagram = await inspectRenderedMermaidContrast();
+      check(diagram.nodes.length > 0 && diagram.nodes.every(node => node.textRatio >= 4.5 && node.boundaryRatio >= 3), `${label} rendered Mermaid labels and node boundaries must retain contrast`);
+      check(diagram.edgeRatios.length > 0 && diagram.edgeRatios.every(ratio => ratio >= 3), `${label} rendered Mermaid relationships must retain contrast`);
+      if (options.capture) await options.capture(`palette-${scheme}-${viewport.name}`, await page.screenshot({ fullPage: true }));
+
+      await openSearch();
+      await searchInput.fill("architecture");
+      await searchResult.waitFor({ state: "visible" });
+      const search = await inspectThemeContrast(page, ['input[role="combobox"]', '.l ol li a', '.l .n li', '.l .B', '.l .x', '.l .u', '.l mark', '.l code']);
+      checkThemeContrast(search, `${label} open search`);
+      check(search.entries.some(entry => entry.selector === '.l ol li a'), `${label} search must expose readable results`);
+      await searchInput.press("Escape");
+
+      const themedGraphs = {};
+      if (graphEnabled) for (const view of [
+        { name: "2d", route: configuration.graph2dRoute, asset: "/assets/graphify/graph.html" },
+        { name: "3d", route: configuration.graph3dRoute, asset: "/assets/graphify/graph-3d.html" },
+      ]) {
+        await goto(view.route);
+        await page.locator(".graph-frame").waitFor({ state: "attached" });
+        const frame = await (await page.locator(".graph-frame").elementHandle()).contentFrame();
+        check(Boolean(frame && frame.url().includes(view.asset)), `${label} ${view.name} graph frame must load`);
+        if (!frame) continue;
+        await frame.waitForSelector("canvas");
+        await frame.waitForFunction(expected => window.graphTheme?.current?.scheme === expected && document.body.dataset.mdColorScheme === expected, scheme);
+        const originalTimeOrigin = await frame.evaluate(() => performance.timeOrigin);
+        // Switch an already-running frame in both directions. A reload would
+        // lose its state and would fail the timeOrigin identity check.
+        await selectNativeScheme(otherScheme);
+        await frame.waitForFunction(expected => window.graphTheme?.current?.scheme === expected && document.body.dataset.mdColorScheme === expected, otherScheme);
+        await selectNativeScheme(scheme);
+        await frame.waitForFunction(expected => window.graphTheme?.current?.scheme === expected && document.body.dataset.mdColorScheme === expected, scheme);
+        const selectors = view.name === "2d" ? ["#search", "#info-content .empty", "#stats", ".legend-count", ".legend-label", "#legend-controls label"]
+          : ["#panel h1", "#panel .meta", "#panel label", "#panel input", "#info .empty", "#stats", ".scene-nav-info"];
+        const graph = await inspectThemeContrast(frame, selectors, view.name);
+        checkThemeContrast(graph, `${label} ${view.name} graph`);
+        check(graph.graph.controlBoundaries.length > 0 && graph.graph.controlBoundaries.every(control => control.ratio >= 3), `${label} graph search and unchecked filter boundaries must retain 3:1 contrast`);
+        check(graph.graph?.timeOrigin === originalTimeOrigin, `${label} ${view.name} graph must update its theme without reloading`);
+        check(graph.graph?.theme?.scheme === scheme && graph.graph.sceneMatches, `${label} ${view.name} graph scene must follow the native palette`);
+        if (view.name === "2d") {
+          check(graph.graph.labelsMinimum >= 4.5 && graph.graph.checkboxRatio >= 3, `${label} 2D graph canvas labels and checkbox mark must remain readable`);
+          // The governed mobile graph intentionally omits the desktop legend.
+          // Check filtering where it is offered, and exercise the visible
+          // search/details workflow at both viewport sizes.
+          if (viewport.name === "desktop") {
+            await frame.locator(".legend-cb").first().uncheck();
+            const filtered = await inspectThemeContrast(frame, [".legend-item.dimmed .legend-label"], view.name);
+            checkThemeContrast(filtered, `${label} filtered 2D graph`);
+            check(filtered.graph.checkboxRatio >= 3, `${label} 2D graph mixed checkbox must retain contrast`);
+            check(filtered.graph.controlBoundaries.every(control => control.ratio >= 3), `${label} 2D graph unchecked filter boundaries must retain 3:1 contrast`);
+            await frame.locator(".legend-cb").first().check();
+            graph.filtered = filtered;
+          }
+          await frame.locator("#search").fill("architecture");
+          await frame.locator(".search-item").first().waitFor({ state: "visible" });
+          const results = await inspectThemeContrast(frame, [".search-item"], view.name);
+          checkThemeContrast(results, `${label} 2D graph search`);
+          await frame.locator(".search-item").first().click();
+          const selected = await inspectThemeContrast(frame, ["#info-content .field", "#info-content .field b", ".neighbor-link"], view.name);
+          checkThemeContrast(selected, `${label} 2D graph selected details`);
+          graph.search = results;
+          graph.selected = selected;
+        }
+        themedGraphs[view.name] = graph;
+      }
+      paletteMetrics[viewport.name][scheme] = { restored, navigated, persistedReload: true, persistedNavigation: true,
+        governing, content, table, mobileScroll, diagram, search, graph: themedGraphs };
+    }
+  }
+
   const prohibitedCdnHosts = ["unpkg.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"];
   const cdnRequests = requests.filter(requestUrl => prohibitedCdnHosts.some(host => requestUrl.includes(`//${host}/`)));
   const localAssets = ["/assets/vendor/mermaid.min.js", "/assets/pen-circle.svg"];
@@ -1099,6 +1408,7 @@ export default async (page, options = {}) => {
       strokeWidth: mermaidProbe.nodeStrokeWidth,
     },
     graph: graphMetrics,
+    palettes: paletteMetrics,
     localRuntimeAssets: localAssets,
     requestCount: requests.length,
   };

@@ -29,6 +29,10 @@ Use the pinned DenchCo visual adapter as the baseline, then record only delibera
 
 Record how the confirmed accent generated its light, dark, visited, transparent, and contrast tokens. Verify at least 4.5:1 contrast for normal accent-coloured text and 3:1 for non-text interactive boundaries against their rendered backgrounds.
 
+For the dual-appearance reference adapter, configure Zensical's native `default` and `slate` palettes, record the consumer's initial palette, and keep the sun/moon action immediately left of Wide. Preserve native keyboard operation and persistence, including mobile where Wide is hidden. Record a complete named colour family for each appearance; adapt scheme-scoped renderer/control aliases, Mermaid variables and the same-origin graph theme bridge together. Verify both appearances, focus and selected-state contrast, navigation/reload persistence, search, diagrams, 2D/3D graph views and contained mobile geometry. Do not introduce competing preference storage or infer a system preference without configuring that behaviour in Zensical.
+
+For Zensical 0.0.59, retain the reference adapter that reflects the resolved body scheme into the native radio's checked state. Check keyboard entry and visible focus before interacting with the restored control, on first load and after reload or navigation; do not conceal restoration faults by cycling both appearances first.
+
 Every displayed governing-question callout must expose the `governing-question` marker and use the active accent colour for both its inline-start rail and question text at every supported viewport. When the Wiki declares one canonical question, every verbatim repetition in its bounded reader set uses that governed component. Paraphrases and unrelated quotations remain neutral.
 
 When primary navigation exposes a page's `draft` status, adapt the pinned Pen Circle marker and “Draft — research in progress” tooltip with the complete renderer asset closure. Align the marker's trailing centre with the open/close chevron column in the supported desktop navigation. Other lifecycle states keep distinct semantics and artwork.

@@ -7,6 +7,30 @@
   const initialize = runtime.initialize.bind(runtime);
   const shadowTheme = `
     .node rect,
+    .node polygon {
+      fill: var(--accent-lightest) !important;
+      stroke: var(--accent) !important;
+    }
+    .edgePath path,
+    .flowchart-link,
+    .messageLine0,
+    .messageLine1 {
+      stroke: var(--accent) !important;
+    }
+    marker path,
+    .arrowheadPath {
+      fill: var(--accent) !important;
+      stroke: var(--accent) !important;
+    }
+    .nodeLabel, .edgeLabel, .label, text {
+      color: var(--text) !important;
+      fill: var(--text) !important;
+    }
+    .note {
+      fill: var(--surface) !important;
+      stroke: var(--conditional) !important;
+    }
+    .node rect,
     .node polygon,
     .node circle,
     .cluster rect {

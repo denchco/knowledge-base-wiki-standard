@@ -459,3 +459,57 @@ input.md-option:is(:focus-visible, .focus-visible) + label,
     transition-duration: .01ms !important;
   }
 }
+
+/* Both native Zensical palettes resolve the same semantic colour roles. */
+:root,
+body[data-md-color-scheme] {
+  color-scheme: light;
+  --md-default-bg-color: var(--background);
+  --md-default-fg-color: var(--text);
+  --md-default-fg-color--light: var(--muted);
+  --md-default-fg-color--lighter: var(--border);
+  --md-default-fg-color--lightest: rgba(0, 0, 0, 0.05);
+  --md-code-fg-color: var(--text);
+  --md-code-bg-color: var(--surface);
+  --md-typeset-color: var(--text);
+  --md-typeset-table-color: var(--border);
+  --md-typeset-table-color--light: var(--surface);
+}
+
+body[data-md-color-scheme="slate"] {
+  color-scheme: dark;
+  --primary: #dff6f7;
+  --accent: #66c5d1;
+  --accent-dark: #8cdbe4;
+  --accent-darker: #c3f1f5;
+  --accent-visited: #9ed1d9;
+  --accent-light: #5db0bc;
+  --accent-lightest: #16323a;
+  --accent-transparent: rgb(102 197 209 / 10%);
+  --accent-transparent-strong: rgb(102 197 209 / 16%);
+  --accent-contrast: #111a1e;
+  --background: #111a1e;
+  --surface: #18242a;
+  --text: #e5eef1;
+  --muted: #b5c2c9;
+  --border: #798f9a;
+  --focus: #8cdbe4;
+  --focus-contrast: #111a1e;
+  --conditional: #edbc74;
+  --success: #90d7aa;
+  --warning: #ffa69e;
+  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.06);
+}
+
+body { background: var(--background); color: var(--text); }
+
+/* Keep the native radio/label control available when Wide is hidden. */
+.md-header__option[data-md-component="palette"] {
+  flex: 0 0 auto;
+}
+
+@media print {
+  .md-header__option[data-md-component="palette"] {
+    display: none !important;
+  }
+}

@@ -23,6 +23,26 @@ colors:
   conditional: "#a15c00"
   success: "#007f3b"
   warning: "#d5281b"
+  darkPrimary: "#dff6f7"
+  darkAccent: "#66c5d1"
+  darkAccentDark: "#8cdbe4"
+  darkAccentDarker: "#c3f1f5"
+  darkAccentVisited: "#9ed1d9"
+  darkAccentLight: "#5db0bc"
+  darkAccentLightest: "#16323a"
+  darkAccentTransparent: "rgb(102 197 209 / 10%)"
+  darkAccentTransparentStrong: "rgb(102 197 209 / 16%)"
+  darkAccentContrast: "#111a1e"
+  darkBackground: "#111a1e"
+  darkSurface: "#18242a"
+  darkText: "#e5eef1"
+  darkMuted: "#b5c2c9"
+  darkBorder: "#798f9a"
+  darkFocus: "#8cdbe4"
+  darkFocusContrast: "#111a1e"
+  darkConditional: "#edbc74"
+  darkSuccess: "#90d7aa"
+  darkWarning: "#ffa69e"
 typography:
   body:
     fontFamily: "system-ui"
@@ -115,11 +135,69 @@ components:
   search-button:
     backgroundColor: "{colors.background}"
     textColor: "{colors.text}"
+  dark-page:
+    backgroundColor: "{colors.darkBackground}"
+    textColor: "{colors.darkText}"
+  dark-link:
+    textColor: "{colors.darkAccent}"
+  dark-link-active:
+    textColor: "{colors.darkAccentDarker}"
+  dark-link-visited:
+    textColor: "{colors.darkAccentVisited}"
+  dark-highlight-subtle:
+    backgroundColor: "{colors.darkAccentLightest}"
+  dark-interactive-rest:
+    backgroundColor: "{colors.darkAccentTransparent}"
+  dark-interactive-selected:
+    backgroundColor: "{colors.darkAccentTransparentStrong}"
+  dark-accent-on-color:
+    textColor: "{colors.darkAccentContrast}"
+  dark-status-conditional:
+    textColor: "{colors.darkConditional}"
+  dark-status-success:
+    textColor: "{colors.darkSuccess}"
+  dark-status-warning:
+    textColor: "{colors.darkWarning}"
+  dark-status-draft:
+    size: "{spacing.draftStatusIconSize}"
+  dark-table-header:
+    backgroundColor: "{colors.darkAccentLightest}"
+    textColor: "{colors.darkText}"
+  dark-navigation-active:
+    textColor: "{colors.darkAccentDark}"
+    backgroundColor: "{colors.darkAccentLightest}"
+  dark-button-primary:
+    backgroundColor: "{colors.darkAccent}"
+    textColor: "{colors.darkAccentContrast}"
+  dark-button-primary-hover:
+    backgroundColor: "{colors.darkAccentDark}"
+    textColor: "{colors.darkAccentContrast}"
+  dark-focus-ring:
+    backgroundColor: "{colors.darkAccentDark}"
+  dark-muted-text:
+    textColor: "{colors.darkMuted}"
+  dark-governing-question:
+    textColor: "{colors.darkAccent}"
+  dark-bordered-panel:
+    backgroundColor: "{colors.darkBorder}"
+  dark-diagram-boundary:
+    backgroundColor: "{colors.darkAccentLight}"
+  dark-header:
+    backgroundColor: "{colors.darkSurface}"
+    textColor: "{colors.darkText}"
+  dark-search-button:
+    backgroundColor: "{colors.darkBackground}"
+    textColor: "{colors.darkText}"
+  dark-brand:
+    textColor: "{colors.darkPrimary}"
+  dark-focus-indicator:
+    backgroundColor: "{colors.darkFocus}"
+    textColor: "{colors.darkFocusContrast}"
 ---
 
 # Design Contract
 
-This is the deterministic DenchCo reference shell consolidated from the mature Regulation 28, NHS Data Sharing, Risk Appetite, Palantir, and EPMA scaffold implementations. Zensical owns the production header, navigation, search, responsive drawers, typography, and page outline. DenchCo assets add only governed tokens, content components, Graphify presentation, and the Standard/Wide preference.
+This is the deterministic DenchCo reference shell consolidated from the mature Regulation 28, NHS Data Sharing, Risk Appetite, Palantir, and EPMA scaffold implementations. Zensical owns the production header, native appearance selection, navigation, search, responsive drawers, typography, and page outline. DenchCo assets add governed tokens, content components, Graphify presentation, and the Standard/Wide preference.
 
 The shell may look identical across topics. The topic's reader model, navigation labels, source schema, evidence records, synthesis, and generated views must be rebuilt from the new subject rather than copied from a reference corpus.
 
@@ -139,6 +217,18 @@ The shell may look identical across topics. The topic's reader model, navigation
 - Diagram text follows reduced table text sizing; ordinary body copy remains the renderer baseline.
 
 The DenchCo standard wiki keeps this teal family. A conforming derived wiki may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify so 2D and 3D interactions inherit it. Do not alter Zensical chrome structure to create a topic identity.
+
+## Appearance
+
+The reference adapter offers native Zensical light (`default`) and dark (`slate`) palettes. Light remains the initial Standard appearance; a consumer may choose another initial palette and records that choice here. The native sun/moon control sits immediately before Wide, names the action it performs, retains keyboard focus and remains visible on mobile when Wide is hidden. Zensical owns the saved preference and its navigation/reload behaviour; do not add a competing storage key or appearance controller.
+
+For Zensical 0.0.59, reflect the resolved native body scheme into the corresponding radio's checked state on initialisation and scheme changes. This repairs keyboard entry after preference restoration without dispatching events, moving focus or writing preference storage. Verify the selected radio and visible focus before the first toggle interaction, including after reload and navigation in both appearances.
+
+The unprefixed `colors` tokens define the light family; `dark`-prefixed tokens in the same supported map define the dark family. Surface, foreground, accent, visited, focus and status roles must remain legible in both appearances. Recompute renderer and width-control aliases on the scheme-bearing body, rather than inheriting colours already resolved on `:root`. Verify at least 4.5:1 for normal text and 3:1 for non-text interactive boundaries, including translucent selected states. Graph search and unchecked filters use the focus colour for an explicit interactive boundary; the quieter border colour remains decorative.
+
+Mermaid keeps its ordinary source-level node treatment and semantic roles; shared theme variables maintain label, connector and marker contrast. Both graph views inherit a same-origin parent's native scheme, or use the saved native preference and configured initial palette when opened directly. Graph appearance changes update colours in place and preserve selection and camera position. A graph colour remains a navigation aid, never new evidence.
+
+Verify both appearances at desktop and mobile widths, control order, keyboard operation, persistence after navigation and reload, search readability, diagrams, both graph views and no page overflow. Adopting this adapter is an explicit consumer change: add the two native palettes, complete named colour families, graph bridge assets and browser assertions together. It changes no source identity, knowledge content, deployment or consumer pin automatically.
 
 ## Content And Navigation
 

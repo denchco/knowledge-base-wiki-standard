@@ -1,0 +1,26 @@
+/* Shared palette surfaces for both generated graph runtimes. */
+body { background: var(--graph-background); color: var(--graph-text); }
+#sidebar, #panel, #status { background: var(--graph-surface); border-color: var(--graph-border); color: var(--graph-text); }
+#search-wrap, #search-results, #info-panel, #info, #stats { border-color: var(--graph-border); }
+#search, input[type="search"] { color: var(--graph-text); background: var(--graph-background); border-color: var(--graph-focus); }
+#search::placeholder, input[type="search"]::placeholder { color: var(--graph-muted); opacity: 1; }
+#search:focus, input[type="search"]:focus { border-color: var(--graph-focus); outline-color: var(--graph-focus); }
+#info-content, #info-content .field b, .search-item, .neighbor-link, #info { color: var(--graph-text); }
+#info-content .field[style] { color: var(--graph-muted) !important; }
+#info-content .empty, #info .empty, #info-panel h3, #legend-wrap h3, #legend-controls label,
+.legend-count, #stats, .meta, label, #status, .legend-item.dimmed { color: var(--graph-muted); opacity: 1; }
+#legend-controls label:hover { color: var(--graph-text); }
+.search-item:hover, .neighbor-link:hover, .legend-item:hover { background: var(--graph-accent-lightest); }
+.legend-cb, #select-all-cb { background: var(--graph-background); border-color: var(--graph-focus); }
+.legend-cb:checked, #select-all-cb:checked, #select-all-cb:indeterminate { background: var(--graph-accent); border-color: var(--graph-accent); }
+.legend-cb:checked::after, #select-all-cb:checked::after { border-color: var(--graph-accent-contrast); }
+#select-all-cb:indeterminate::after { background: var(--graph-accent-contrast); }
+.legend-cb:focus-visible, #select-all-cb:focus-visible { outline-color: var(--graph-focus); }
+.pill { background: var(--graph-accent-lightest); color: var(--graph-text); }
+#graph3d .scene-nav-info { color: var(--graph-muted); opacity: 1; }
+html body .vis-tooltip, #graph3d .float-tooltip-kap {
+  color: var(--graph-text);
+  background: var(--graph-surface);
+  border: 1px solid var(--graph-border);
+  box-shadow: none;
+}

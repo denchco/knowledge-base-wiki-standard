@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { parse } from "yaml";
 
 const errors = [];
 const governedThreeProductLayout = '%%{init: {"flowchart": {"nodeSpacing": 40}}}%%';
@@ -309,12 +310,58 @@ for (const source of [theme, layout, graph]) {
   if (rawBorder) errors.push(`custom CSS must use named border tokens instead of ${rawBorder[0].trim()}`);
 }
 
+checkAppearanceContract();
+
 if (errors.length) {
   console.error("DenchCo visual-shape contract failed:");
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
 console.log("DenchCo accent, shape, rail, Mermaid, graph-frame, and local-runtime contract passed.");
+
+function checkAppearanceContract() {
+  const colors = parse(design.split("---")[1]).colors;
+  const dark = Object.fromEntries(Object.entries(colors)
+    .filter(([key]) => /^dark[A-Z]/.test(key))
+    .map(([key, value]) => [key[4].toLowerCase() + key.slice(5), value]));
+  const darkBlock = selectorBlock(theme, 'body[data-md-color-scheme="slate"]');
+  for (const [key, value] of Object.entries(dark)) {
+    const css = key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+    requireIn(darkBlock, `--${css}: ${value}`, `Dark palette token ${key} must agree with DESIGN.md`);
+  }
+  for (const config of [zensical, starterZensical]) {
+    const palettes = [...config.matchAll(/\[\[project\.theme\.palette\]\]([^[]+)/g)].map(match => match[1]);
+    if (palettes.length !== 2 || !palettes[0].includes('scheme = "default"') || !palettes[1].includes('scheme = "slate"')) {
+      errors.push("The reference and starter native palettes must be light-default with one dark alternative");
+    }
+    requireIn(config, 'toggle.name = "Switch to dark mode"', "Native appearance must name its dark action");
+    requireIn(config, 'toggle.name = "Switch to light mode"', "Native appearance must name its light action");
+  }
+  requireIn(read("docs/assets/layout-width.js"), "palette ? palette.nextSibling", "Wide must follow the native appearance control");
+  requireIn(layout, "body[data-md-color-scheme]", "Width aliases must resolve in the active scheme scope");
+  for (const asset of ["docs/assets/graph-theme.js", "docs/assets/graph-theme.css"]) {
+    requireIn(read("sync/documentation-sync-contract-v1.json"), asset, "The appearance asset dependency must survive documentation synchronization");
+  }
+  requireIn(publisher, 'id="graph-theme-config"', "Graph publication must configure the shared appearance bridge");
+  const linear = value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  const luminance = hex => hex.slice(1).match(/../g).map(value => linear(parseInt(value, 16) / 255))
+    .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+  const ratio = (first, second) => {
+    const values = [luminance(first), luminance(second)].sort((left, right) => right - left);
+    return (values[0] + 0.05) / (values[1] + 0.05);
+  };
+  for (const [name, palette] of [["light", colors], ["dark", dark]]) {
+    for (const background of ["background", "surface"]) {
+      for (const foreground of ["text", "muted", "accent", "accentDark", "accentDarker", "accentVisited"]) {
+        if (!palette[foreground] || !palette[background] || ratio(palette[foreground], palette[background]) < 4.5) {
+          errors.push(`${name} ${foreground}/${background} must reach 4.5:1 text contrast`);
+        }
+      }
+      if (ratio(palette.focus ?? palette.accentDark, palette[background]) < 3) errors.push(`${name} focus boundary must reach 3:1 contrast`);
+    }
+    if (ratio(palette.accent, palette.accentContrast) < 4.5) errors.push(`${name} accent control text must reach 4.5:1 contrast`);
+  }
+}
 
 function read(file) {
   if (!fs.existsSync(file)) {

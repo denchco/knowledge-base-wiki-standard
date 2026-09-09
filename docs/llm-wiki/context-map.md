@@ -7,6 +7,8 @@ status: draft
 
 # Context map
 
+For appearance work, read `DESIGN.md` and the native Zensical palette configuration together with the width control, semantic theme tokens and graph theme bridge. Keep the appearance action immediately before Wide; verify both native palettes and saved state rather than adding a separate controller. Consumer adoption remains explicit.
+
 | Task | Required context | Add when needed |
 |---|---|---|
 | Explain the standard | Specification, requirements, profiles | Sources and evidence matrix |

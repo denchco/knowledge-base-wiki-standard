@@ -4,6 +4,39 @@
   "targetRepository": "https://github.com/denchco/knowledge-base-wiki-standard",
   "entries": [
     {
+      "id": "DKBWS-PROP-native-appearance-toggle-37c93b3f736773545cf704dee55ed22a",
+      "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-native-appearance-toggle-37c93b3f736773545cf704dee55ed22a -->",
+      "intakeMode": "governed-issue",
+      "origin": {
+        "project": "keysight-auto-wiki",
+        "publicUrl": null,
+        "implementationCommit": "5b4e1ccd41d3877dc33bb2d65de222cae93c8a36",
+        "verificationCommit": "77f8551d62bec5b43408b60bf8944b0336228ff1",
+        "pinnedStandardRevision": "3936cc463d9461b70c59c89a78655853c470338c"
+      },
+      "issue": {
+        "url": "https://github.com/denchco/knowledge-base-wiki-standard/issues/7",
+        "number": 7
+      },
+      "classification": "reusable",
+      "decision": "accepted",
+      "decisionDate": "2026-09-09T10:57:36.217Z",
+      "decisionRevision": "bfeaecc02098e2bcc75f14b09fa7f6179d783f9f",
+      "decisionEvidence": "Andrew Dench explicitly authorised submission of the approved proposal and merging Standard PR #6 after review of corrected revision bfeaecc02098e2bcc75f14b09fa7f6179d783f9f. Governed issue #7 exactly matches approved payload d5cde0908cf4167eb6d3a5fc8ab2119aa70b25704c6efab70692c9bffb7c3a02. The reviewed revision passed full local distribution verification, separate maintainer provenance and both required GitHub checks.",
+      "acceptedRequirements": [
+        "DKBWS-DESIGN-001",
+        "DKBWS-GRAPH-001",
+        "DKBWS-RENDER-001"
+      ],
+      "release": {
+        "status": "pending",
+        "tag": null,
+        "revision": null,
+        "recordedAt": null
+      },
+      "notes": "Accepted as a reusable Standard Production reference-adapter improvement: native light/dark appearance before Wide, scheme-scoped accessible colours, in-place graph themes and restored keyboard selection. Standard keeps its light default and teal identity. The original consumer coverage gap is disclosed in issue #7 and corrected upstream. The user expressly delegated final issue submission for this contribution; the general manual-submission rule remains in force. Immutable release inclusion and consumer adoption remain separate pending decisions."
+    },
+    {
       "id": "DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b",
       "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b -->",
       "intakeMode": "pre-registry-local-history",
