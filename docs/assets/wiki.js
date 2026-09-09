@@ -8,6 +8,9 @@
   const SEARCH_ACCENT_STYLE_ID = "denchco-wiki-search-accent";
   const SEARCH_ACCENT_CSS = `
     /* Zensical 0.0.59 search-state adapter; structure and behaviour remain upstream-owned. */
+    .B, .n, .E {
+      color: var(--muted);
+    }
     .k:focus-within {
       outline: 3px solid var(--focus);
       outline-offset: 2px;

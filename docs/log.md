@@ -7,6 +7,11 @@ status: draft
 
 # Research and change log
 
+## 2026-09-09
+
+- **Native appearance proposal**: Generalise a consumer light/dark appearance request into the existing `DKBWS-DESIGN-001` reference adapter. Zensical owns the palette control and saved preference; the action appears immediately before Wide and remains available on mobile. The Standard keeps its light initial appearance and teal colour family.
+- **Complete visual boundary**: Name both colour families, recompute inherited renderer/control aliases, and carry the native scheme into Mermaid and same-origin graph views. Source-level diagram structure, graph data and evidence authority are unchanged. Browser verification covers both appearances, keyboard operation, persistence, search/diagram/graph readability and responsive containment. This entry describes an implementation proposal, not accepted consumer adoption or an immutable release.
+
 ## 2026-08-09
 
 - **Workflow and hardening prerelease**: Published the accumulated consumer-derived requirements, exact supported toolchain, identity-verified managed preview, live-Wiki development-response navigation, tracked proposal intake, absolute JJ turn boundary, and remote repository protections as immutable `v0.1.0-rc.4` from exact required-Verify merge commit `4aae4d4efbcea526f28ec8bcbfaf203dae34bc25`. The accepted historical `DKBWS-LINK-002` bridge is now mapped to that release in this strictly later post-release ledger rather than fabricated inside the release commit.

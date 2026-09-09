@@ -35,6 +35,8 @@
     "docs/assets/brand/denchco-wordmark.png",
     "docs/assets/content.css",
     "docs/assets/graph.css",
+    "docs/assets/graph-theme.css",
+    "docs/assets/graph-theme.js",
     "docs/assets/layout-width.css",
     "docs/assets/layout-width.js",
     "docs/assets/mermaid-adapter.js",

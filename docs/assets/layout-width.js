@@ -59,8 +59,9 @@
         writePreference(wide);
       });
 
+      const palette = header.querySelector('[data-md-component="palette"]');
       const search = header.querySelector('[data-md-component="search"]');
-      header.insertBefore(button, search || null);
+      header.insertBefore(button, palette ? palette.nextSibling : search || null);
     }
 
     update(root.dataset.layoutWidth === "wide", button);
