@@ -232,6 +232,38 @@ export default async (page, options = {}) => {
     check(metrics.immediatelyBeforeWide && metrics.positionBeforeWide, `${viewportName} palette control must sit immediately left of Wide in DOM and visual order`);
     return metrics;
   };
+  const inspectPaletteKeyboard = async (scheme, viewportName, stage) => {
+    const label = `${scheme}/${viewportName}/${stage}`;
+    const control = await inspectPaletteControl(scheme, label);
+    // Report a missing restored selection before any interaction can repair it.
+    if (!control.options.some(option => option.checked && option.scheme === scheme)) return { control };
+    const checkedRadio = () => page.locator(`${paletteSelector} input:checked`);
+    if (viewportName === "desktop") {
+      await page.locator(".layout-width-toggle").focus();
+      await page.keyboard.press("Shift+Tab");
+    } else {
+      await page.locator(".md-skip").focus();
+      for (let index = 0; index < 12; index += 1) {
+        await page.keyboard.press("Tab");
+        if (await checkedRadio().evaluate(input => document.activeElement === input)) break;
+      }
+    }
+    const focus = await checkedRadio().evaluate(input => {
+      const visibleLabel = [...input.form.querySelectorAll("label")].find(label => !label.hidden && getComputedStyle(label).display !== "none");
+      const style = visibleLabel && getComputedStyle(visibleLabel);
+      return { focused: document.activeElement === input, outline: style?.outlineStyle, width: style?.outlineWidth };
+    });
+    check(focus.focused, `${label} Tab must enter the selected native palette option`);
+    check(focus.focused && focus.outline !== "none" && px(focus.width) >= 2, `${label} native palette focus must be visible before switching`);
+    if (!focus.focused) return { control, focus };
+    const otherScheme = scheme === "default" ? "slate" : "default";
+    await page.keyboard.press("ArrowRight");
+    await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, otherScheme);
+    check(await checkedRadio().evaluate(input => document.activeElement === input), `${label} switching must retain native radio focus`);
+    await page.keyboard.press("ArrowLeft");
+    await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, scheme);
+    return { control, focus };
+  };
   const inspectGoverningQuestion = async (viewportName, route, expectedQuestion = null, expectedCount = 1) => {
     await goto(route);
     const metrics = await page.evaluate(() => {
@@ -760,6 +792,9 @@ export default async (page, options = {}) => {
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
+  const initialScheme = await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
+  check(await page.locator("body").getAttribute("data-md-color-scheme") === initialScheme, "A fresh browser must start in the configured initial appearance");
+  await inspectPaletteKeyboard(initialScheme, "desktop", "first load");
   await selectNativeScheme("default");
   const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
     && governingQuestionRepetitionRoutes.some(entry => entry.route === questionRoute);
@@ -1214,37 +1249,15 @@ export default async (page, options = {}) => {
       const otherScheme = scheme === "default" ? "slate" : "default";
       await goto(questionRoute);
       if (viewport.name === "desktop" && await page.locator(".layout-width-toggle").getAttribute("aria-pressed") !== "true") await page.locator(".layout-width-toggle").click();
-      // The stock renderer leaves both radios unchecked before the first selection.
-      // Establish the test state using its visible action, never by writing state.
-      await selectNativeScheme(otherScheme);
+      // Save through the visible native action, then inspect the restored state
+      // before clicking or focusing a radio can conceal a restoration defect.
       await selectNativeScheme(scheme);
-      const control = await inspectPaletteControl(scheme, viewport.name);
-
-      // Native radio keyboard navigation must change the palette. On desktop,
-      // also prove the palette is the preceding keyboard stop before Wide.
-      const checkedRadio = () => page.locator(`${paletteSelector} input:checked`);
-      if (viewport.name === "desktop") {
-        await page.locator(".layout-width-toggle").focus();
-        await page.keyboard.press("Shift+Tab");
-        check(await checkedRadio().evaluate(element => document.activeElement === element), `${label} palette must precede Wide in keyboard order`);
-      } else {
-        await checkedRadio().focus();
-      }
-      await page.keyboard.press("ArrowRight");
-      await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, otherScheme);
-      const focus = await checkedRadio().evaluate(input => {
-        const visibleLabel = [...input.form.querySelectorAll("label")].find(label => !label.hidden && getComputedStyle(label).display !== "none");
-        const style = visibleLabel && getComputedStyle(visibleLabel);
-        return { focused: document.activeElement === input, outline: style?.outlineStyle, width: style?.outlineWidth };
-      });
-      check(focus.focused && focus.outline !== "none" && px(focus.width) >= 2, `${label} native palette keyboard focus must remain visibly indicated`);
-      await page.keyboard.press("ArrowLeft");
-      await page.waitForFunction(expected => document.body.dataset.mdColorScheme === expected, scheme);
-
       await page.reload({ waitUntil: "networkidle" });
       check(await page.locator("body").getAttribute("data-md-color-scheme") === scheme, `${label} selection must survive reload`);
+      const restored = await inspectPaletteKeyboard(scheme, viewport.name, "reload");
       await goto(architectureRoute);
       check(await page.locator("body").getAttribute("data-md-color-scheme") === scheme, `${label} selection must survive document navigation`);
+      const navigated = await inspectPaletteKeyboard(scheme, viewport.name, "document navigation");
       const governing = await inspectGoverningQuestion(label, questionRoute,
         questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null, questionRouteRepetitionCount);
       const content = await inspectThemeContrast(page, [".md-header", ".md-search__button", ".md-content__inner h1", ".md-typeset > p", ".md-typeset blockquote.governing-question p", ".md-typeset a"]);
@@ -1323,7 +1336,7 @@ export default async (page, options = {}) => {
         }
         themedGraphs[view.name] = graph;
       }
-      paletteMetrics[viewport.name][scheme] = { control, keyboard: focus, persistedReload: true, persistedNavigation: true,
+      paletteMetrics[viewport.name][scheme] = { restored, navigated, persistedReload: true, persistedNavigation: true,
         governing, content, table, mobileScroll, diagram, search, graph: themedGraphs };
     }
   }

@@ -6,6 +6,7 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 - Add native Zensical light/dark appearance selection immediately before Wide under the existing `DKBWS-DESIGN-001` reference-adapter contract. The Standard retains its light default and teal identity; consumers choose and document their own initial palette.
 - Keep renderer, search, width controls, Mermaid and both graph views readable across named palette families. The graph bridge inherits only same-origin native state and updates graph colours without recreating its view.
+- Reflect the restored native scheme into its radio selection so keyboard entry and the visible focus ring work immediately after loading a page. Browser checks now cover the untouched initial state and both saved appearances after reload and navigation on desktop and mobile.
 - Verify native keyboard interaction, control placement, saved preference, navigation/reload, both appearances, contrast and desktop/mobile containment. Migration requires both native palettes, scheme-scoped token aliases, graph assets and matching browser checks; no consumer pin, deployment or canonical knowledge changes automatically.
 
 ## v0.1.0-rc.5 — 2026-09-08

@@ -159,7 +159,32 @@
     if (!searchAccentFrame) ensureSearchAccent();
   }
 
+  // Zensical 0.0.59 restores the scheme but leaves its native radios unchecked.
+  // Reflect its resolved state so Tab enters the active option and its visible
+  // action receives the focus ring. Storage, events and switching stay upstream.
+  function reflectNativePalette() {
+    const scheme = document.body?.dataset.mdColorScheme;
+    const input = [...document.querySelectorAll('form[data-md-component="palette"] input[type="radio"]')]
+      .find(option => option.dataset.mdColorScheme === scheme);
+    if (input && !input.checked) input.checked = true;
+  }
+
+  const paletteObserver = new MutationObserver(reflectNativePalette);
+  let paletteBody = null;
+  function observeNativePalette() {
+    if (document.body !== paletteBody) {
+      paletteObserver.disconnect();
+      paletteBody = document.body;
+      if (paletteBody) paletteObserver.observe(paletteBody, {
+        attributes: true,
+        attributeFilter: ["data-md-color-scheme"],
+      });
+    }
+    reflectNativePalette();
+  }
+
   const boot = () => {
+    observeNativePalette();
     document.querySelectorAll("[data-graph-view]").forEach(render);
     scheduleSearchAccent();
   };
