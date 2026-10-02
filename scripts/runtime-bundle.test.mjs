@@ -32,7 +32,7 @@ function withFixture(callback) {
 test("Mermaid is rebuilt from core and includes exactly the locked sanitizer implementation", () => {
   inspect();
   const evidence = metadata();
-  assert.equal(evidence.sanitizer.version, "3.4.15");
+  assert.equal(evidence.sanitizer.version, "3.4.16");
   assert(evidence.inputs.some((item) => item.path === "node_modules/mermaid/dist/mermaid.core.mjs"));
   const sanitizer = evidence.inputs.filter((item) => item.component === "node_modules/dompurify");
   assert.deepEqual(sanitizer.map((item) => item.path), [sanitizerPath]);
@@ -47,10 +47,10 @@ test("two independent builds emit byte-identical assets and portable evidence", 
 });
 
 test("a current package label cannot hide an old sanitizer implementation", () => {
-  assert.throws(() => inspect({ source: "DOMPurify.version = '3.4.12';" }), /source embeds 3.4.12/);
-  const output = assets.get(`${vendor}/mermaid.min.js`).replace(/\.version="3\.4\.15"/u, '.version="3.4.12"');
+  assert.throws(() => inspect({ source: "DOMPurify.version = '3.4.15';" }), /source embeds 3.4.15/);
+  const output = assets.get(`${vendor}/mermaid.min.js`).replace(/\.version="3\.4\.16"/u, '.version="3.4.15"');
   assert.notEqual(output, assets.get(`${vendor}/mermaid.min.js`));
-  assert.throws(() => inspect({ output }), /one DOMPurify 3.4.15 implementation/);
+  assert.throws(() => inspect({ output }), /one DOMPurify 3.4.16 implementation/);
   assert.throws(() => inspect({ output: `${assets.get(`${vendor}/mermaid.min.js`)}\n/*! DOMPurify 3.4.0 */` }), /unqualified DOMPurify/);
 });
 
@@ -106,8 +106,8 @@ test("a drifted installed-lock contract is rejected before the build", async () 
   try {
     fs.copyFileSync(path.join(root, "package.json"), path.join(fixture, "package.json"));
     const lock = JSON.parse(fs.readFileSync(path.join(root, "package-lock.json"), "utf8"));
-    lock.packages["node_modules/dompurify"].version = "3.4.12";
+    lock.packages["node_modules/dompurify"].version = "3.4.15";
     fs.writeFileSync(path.join(fixture, "package-lock.json"), JSON.stringify(lock));
-    await assert.rejects(buildRuntimeAssets(fixture), /dompurify must be directly pinned and locked at 3.4.15/);
+    await assert.rejects(buildRuntimeAssets(fixture), /dompurify must be directly pinned and locked at 3.4.16/);
   } finally { fs.rmSync(fixture, { recursive: true, force: true }); }
 });

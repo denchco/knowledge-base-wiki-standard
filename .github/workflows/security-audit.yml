@@ -24,6 +24,7 @@ jobs:
       - run: test "$(npm --version)" = "11.19.0"
       - run: npm ci
       - run: uv sync --frozen
+      - run: npm run check:toolchain
       - run: npm run audit:node
       - run: npm run audit:python
       - run: npm run prepare:runtime && npm run check:runtime

@@ -11,7 +11,7 @@ try {
   if (args.includes("--check")) {
     const failures = compareRuntimeAssets(assets);
     if (failures.length) throw new Error(`${failures.join("\n")}\nRun npm run prepare:runtime after npm ci.`);
-    console.log("Runtime bundle and CycloneDX SBOM inspection passed; Mermaid embeds exactly DOMPurify 3.4.15.");
+    console.log("Runtime bundle and CycloneDX SBOM inspection passed; Mermaid embeds exactly DOMPurify 3.4.16.");
   } else {
     for (const [destination, output] of assets) {
       fs.mkdirSync(path.dirname(destination), { recursive: true });

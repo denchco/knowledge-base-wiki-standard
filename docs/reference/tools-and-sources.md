@@ -21,7 +21,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Development-response navigation | Configured canonical Human Wiki origin plus `npm run response:links:check -- --base-url <canonical-url> --managed-live` for Markdown, HTML, plain-GFM, exact managed-identity, and per-route HTTP checks; uncaptured pre-send interception still requires a host hook |
 | Validation runtime | Node `24.20.0`, enforced identically in the maintainer workspace, package contract, and CI |
 | Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.55`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` |
-| Diagrams | Mermaid `11.17.2` with DOMPurify `3.4.15`, served locally |
+| Diagrams | Mermaid `11.17.2` with DOMPurify `3.4.16`, served locally |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): exact `0.45.1` reference-qualified for the Standard Production maintainer workspace |

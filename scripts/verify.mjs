@@ -34,6 +34,7 @@ const environmentRoots = new Set([".git", ".jj", ".venv", "node_modules", ".play
 const startedAt = new Date().toISOString();
 const provenanceMode = process.env.DKBWS_PROVENANCE_MODE ?? "maintainer";
 const gates = [
+  "check:toolchain",
   "build",
   "check",
   "check:graphify",
@@ -196,6 +197,19 @@ function buildReceipt(provenance) {
     evidence("service-identity-schema", "schema-validation", "Versioned machine contract for managed local service identity markers.", "schema/service-identity-v1.json"),
   ];
   const gatesWithEvidence = [
+    {
+      id: "reference-toolchain",
+      status: "pass",
+      command: "npm run check:toolchain",
+      exitCode: 0,
+      evidence: [
+        evidence("reference-toolchain", "verification-script", "Exact Node, npm and uv checked before the Python version probe; all reference versions checked before build or project workload.", "scripts/check-reference-toolchain.mjs"),
+        evidence("reference-node", "runtime-pin", "Exact reference Node version.", ".node-version"),
+        evidence("reference-python", "runtime-pin", "Exact reference Python version.", ".python-version"),
+        evidence("resolver-bootstrap", "dependency-policy", "Dependency-update resolver acceptance is separate from exact reference qualification.", "pyproject.toml"),
+      ],
+      results: [result("DKBWS-VERIFY-001", ["reference-toolchain", "reference-node", "reference-python", "resolver-bootstrap"], "The exact reference-toolchain preflight passed before build; subsequent gates and canonical-input mutation evidence establish the complete verification outcome.")],
+    },
     {
       id: "build",
       status: "pass",

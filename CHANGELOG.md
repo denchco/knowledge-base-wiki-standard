@@ -4,6 +4,11 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Repair Python dependency-update compatibility under `DKBWS-SEC-001`, `DKBWS-VERIFY-001` and `DKBWS-RELEASE-001`: accept uv `>=0.12.10` for resolver bootstrap while retaining exact `0.12.10` qualification before verification, direct build/serve/graph, Python-audit entry points. Add fail-closed binary/version fixtures, command-order regression tests, preflight receipt evidence and an explicit scheduled-audit gate. Migration: carry the bootstrap floor and every exact gate together; a bot-generated lock must still pass frozen installation and complete verification with the qualified toolchain. No hosted workflow or immutable release is changed by local qualification.
+- Reconcile project status and roadmap with released `v0.1.0-rc.5` and the scoped October maintenance. Publication is authorised through reviewed pull requests; hosted Dependabot confirmation requires a fresh job against the merged configuration.
+
+- Refresh the reference security locks to DOMPurify `3.4.16`, fast-uri `3.1.8` and urllib3 `2.8.0` under `DKBWS-SEC-001`, `DKBWS-RUNTIME-001` and `DKBWS-RELEASE-001`. Rebuild and inspect the Mermaid sanitizer, reject the previous sanitizer in runtime fixtures, and retain the exact qualified toolchain. Migration: reinstall frozen locks, regenerate runtime/graph assets and run complete maintainer verification; consumer release pins remain independently governed.
+
 - Add native Zensical light/dark appearance selection immediately before Wide under the existing `DKBWS-DESIGN-001` reference-adapter contract. The Standard retains its light default and teal identity; consumers choose and document their own initial palette.
 - Keep renderer, search, width controls, Mermaid and both graph views readable across named palette families. The graph bridge inherits only same-origin native state and updates graph colours without recreating its view.
 - Reflect the restored native scheme into its radio selection so keyboard entry and the visible focus ring work immediately after loading a page. Browser checks now cover the untouched initial state and both saved appearances after reload and navigation on desktop and mobile.
