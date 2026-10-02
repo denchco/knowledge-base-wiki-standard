@@ -9,6 +9,7 @@ status: draft
 
 ## 2026-10-02
 
+- **Publication integration check**: Correct the existing order of the graph appearance assets in the snapshot allowlist. The real sibling check exposed this independently of fixture-only tests; the regression suite now validates the checked-in contract as well. The released snapshot retains its original bytes and rc.5 revision.
 - **Dependency automation repair**: Separate resolver compatibility from exact build qualification using the uv setting and immutable Dependabot implementation in [SRC-041](sources.md#src-041) and [SRC-042](sources.md#src-042). Actual uv `0.12.15` rejects the former `==0.12.10` constraint, resolves with the new floor and produces a lock consumed by exact uv `0.12.10`. Verification and all four direct Python build, serve, graph and audit entry points retain exact checks before work; version/ordering fixtures cover the boundary. Publication is authorised; hosted bot confirmation remains pending until the maintenance PR reaches main and a fresh uv update check completes.
 - **Status and roadmap reconciliation**: Read back the non-draft immutable rc.5 release and exact tag commit from [SRC-043](sources.md#src-043); the Documentation snapshot retains that exact release. Correct the roadmap to record rc.5 publication as completed. Isolate the security and updater maintenance from the separate numeric-citation proposal; protected CI, hosted updater evidence, immutable release inclusion and consumer adoption remain distinct outcomes.
 
