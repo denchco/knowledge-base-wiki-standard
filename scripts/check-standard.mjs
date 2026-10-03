@@ -490,7 +490,7 @@ const exactNodePins = {
   "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
-  "dompurify": "3.4.15",
+  "dompurify": "3.4.16",
   "esbuild": "0.28.2",
   "mermaid": "11.17.2",
   "vis-network": "10.1.2",
@@ -541,8 +541,8 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
-if (domPurifyVersion !== "3.4.15") failures.push(`package-lock must resolve exactly DOMPurify 3.4.15; found ${domPurifyVersion ?? "unlisted"}`);
-if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.7") failures.push("package-lock must resolve fast-uri exactly 3.1.7");
+if (domPurifyVersion !== "3.4.16") failures.push(`package-lock must resolve exactly DOMPurify 3.4.16; found ${domPurifyVersion ?? "unlisted"}`);
+if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.8") failures.push("package-lock must resolve fast-uri exactly 3.1.8");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
 if (!pkg.scripts?.["conformance:test"]?.includes("runtime-bundle.test.mjs")) failures.push("conformance:test must include runtime sanitizer and bundle inspection fixtures");
@@ -627,11 +627,13 @@ for (const file of [
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
-for (const gate of ["build", "check", "check:graphify", "check:browser", "service:status"]) {
+for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:browser", "service:status"]) {
   if (!verifyOrchestrator.includes(`"${gate}"`)) failures.push(`verify orchestrator does not exercise ${gate}`);
 }
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
+const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
+if (!/^required-version\s*=\s*">=0\.12\.10"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.12.10; reference qualification remains exactly 0.12.10");
 for (const pin of ["zensical==0.0.59", "graphifyy==0.9.55", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");

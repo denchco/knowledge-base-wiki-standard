@@ -20,6 +20,7 @@ import {
   SyncSafetyError,
   SyncUsageError,
   buildDesiredSnapshot,
+  loadContract,
   parseArguments,
   run,
   synchronize,
@@ -36,6 +37,10 @@ const ALLOWLIST = [
   "scripts/sync-documentation-snapshot.test.mjs",
   CONTRACT_PATH,
 ];
+
+test("the checked-in synchronization contract is valid", () => {
+  assert.doesNotThrow(() => loadContract(STANDARD_ROOT));
+});
 
 test("CLI makes read-only checking and explicit application mutually exclusive", () => {
   assert.deepEqual(parseArguments(["--check", "--json"]), {

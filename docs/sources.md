@@ -45,6 +45,12 @@ status: draft
 | SRC-034 | <span id="src-034"></span>[DOMPurify 3.4.15 release](https://github.com/cure53/DOMPurify/releases/tag/3.4.15) | Browser-executed sanitizer pin | 2026-09-08 |
 | SRC-035 | <span id="src-035"></span>[uv 0.12.10 release](https://github.com/astral-sh/uv/releases/tag/0.12.10) | Exact package-manager reference | 2026-09-08 |
 | SRC-036 | <span id="src-036"></span>[Jujutsu 0.45.1 release](https://github.com/jj-vcs/jj/releases/tag/v0.45.1) | Disposable-clone provenance qualification | 2026-09-08 |
+| SRC-038 | <span id="src-038"></span>[DOMPurify 3.4.16 release](https://github.com/cure53/DOMPurify/releases/tag/3.4.16) | Sanitizer security fixes qualified for the unreleased reference runtime | 2026-10-02 |
+| SRC-039 | <span id="src-039"></span>[fast-uri 3.1.8 release](https://github.com/fastify/fast-uri/releases/tag/v3.1.8) | Host normalization security fix in the locked validator dependency | 2026-10-02 |
+| SRC-040 | <span id="src-040"></span>[urllib3 2.8.0 release](https://github.com/urllib3/urllib3/releases/tag/2.8.0) | HTTPS proxy TLS and streaming security fixes in the locked Python environment | 2026-10-02 |
+| SRC-041 | <span id="src-041"></span>[uv required-version setting](https://docs.astral.sh/uv/reference/settings/#required-version) | PEP 440 resolver bootstrap compatibility, separate from exact reference qualification | 2026-10-02 |
+| SRC-042 | <span id="src-042"></span>[Dependabot uv lock updater](https://github.com/dependabot/dependabot-core/blob/c3365efe2baf165f6b908b7c54cb2e7380985ec0/uv/lib/dependabot/uv/file_updater/lock_file_updater.rb) | Immutable upstream implementation using its supplied uv for dependency-update resolution | 2026-10-02 |
+| SRC-043 | <span id="src-043"></span>[Standard v0.1.0-rc.5 release](https://github.com/denchco/knowledge-base-wiki-standard/releases/tag/v0.1.0-rc.5) | Public non-draft immutable release; exact tag resolved to `fa805c78dfc9fae77b394e4ce3af980767e932c8` on retrieval | 2026-10-02 |
 
 ## OKF source identities
 

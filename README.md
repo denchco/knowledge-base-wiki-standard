@@ -122,7 +122,7 @@ An issue is only intake. Acceptance is a separate Standard-maintainer decision; 
 <details>
 <summary><strong>For Standard maintainers</strong></summary>
 
-Standard Production maintenance requires exactly Node `24.20.0`, npm `11.19.0`, Python `3.12.14`, uv `0.12.10`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.45.1`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+Standard Production maintenance requires exactly Node `24.20.0`, npm `11.19.0`, Python `3.12.14`, uv `0.12.10`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.45.1`. The uv bootstrap floor permits newer dependency-update resolvers, while build, serve and verification commands still enforce this exact reference through `check:toolchain`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
 
 ```sh
 node --version

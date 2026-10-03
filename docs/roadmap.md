@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-## Completed through `v0.1.0-rc.4`
+## Completed through `v0.1.0-rc.5`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.
 2. Implemented OKF v0.2 hard validation, guidance diagnostics, positive/negative fixtures, and lossless unknown-field export.
@@ -29,8 +29,10 @@ status: draft
 17. Hardened `DKBWS-RUNTIME-002`, `DKBWS-PROMPT-002`, and `DKBWS-UPDATE-002` with exact twelve-field/job/status-gated preview evidence, HTML/plain-GFM plus managed-live response checks, direct proposal-state invariants, exact registry revision and strict release ancestry, public non-draft immutable-release proof, and a single immutable historical bridge.
 18. Qualified exact Node `24.19.0`, Mermaid `11.16.1`/DOMPurify `3.4.13`, Zensical `0.0.53`, Graphify `0.9.37`, and Jujutsu `0.44.0`; made every file-changing development turn an absolute JJ commit boundary; activated no-bypass `main` rules, exact required CI, selected full-SHA Actions, secret scanning/push protection, and immutable-release controls; and published the complete change set as `v0.1.0-rc.4`.
 
-## Next evidence gates
+19. Qualified corrected browser sanitizer bytes, explicit-offset OKF timestamps, the exact reference tools, the optional locally trusted Codex Stop continuation guardrail and llms.txt v2 discovery; published immutable `v0.1.0-rc.5` on 8 September 2026 at `fa805c78dfc9fae77b394e4ce3af980767e932c8`; and synchronized Documentation to that released snapshot. The previous rc.4 remains preserved. [SRC-043](sources.md#src-043)
 
-The rc.5 qualification and publication sequence covers corrected browser sanitizer bytes, explicit-offset OKF timestamps, exact reference tools, the optional locally trusted Codex Stop continuation guardrail, and llms.txt v2 discovery. The immutable release record establishes the exact verified Standard commit; Documentation then pins and publishes that released snapshot. rc.4 remains preserved.
+## Current publication gate
+
+The October security and dependency-updater maintenance is authorised for publication through reviewed pull requests and protected CI. A fresh hosted uv Dependabot check must then confirm resolution against the merged configuration under [STD-VAL-008](validation-queue.md). This sequence does not create a new immutable release or change consumer pins.
 
 Future compatibility fixtures require a reproduced consumer gap or evidenced upstream change. Absolute interception of uncaptured responses remains unproven; the supported Stop adapter supplies one bounded corrective continuation after local review and trust. A dedicated Standard MCP remains deferred until a consumer identifies a named task not served by the files, CLI, skill/plugin, Git, and optional read-only repository integration.

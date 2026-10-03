@@ -8,7 +8,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
 | Reference renderer | Human Wiki | Python `3.12.14` and uv `0.12.10` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1` |
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.55` |
-| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with locked `dompurify==3.4.15`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
+| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with locked `dompurify==3.4.16`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
 | Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
@@ -37,7 +37,7 @@ The repeatable commands are:
 
 | Command | Contract |
 |---|---|
-| `npm run prepare:runtime` | Builds Mermaid’s core with exact DOMPurify `3.4.15` using `esbuild==0.28.2`; copies graph bundles and emits inspected runtime metadata and a CycloneDX SBOM into ignored assets. |
+| `npm run prepare:runtime` | Builds Mermaid’s core with exact DOMPurify `3.4.16` using `esbuild==0.28.2`; copies graph bundles and emits inspected runtime metadata and a CycloneDX SBOM into ignored assets. |
 | `npm run graph:update` | Prepares local runtimes, updates Graphify, enriches six relationship layers, and publishes the shared 2D/3D dataset. |
 | `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. |
 | `npm run build` | Regenerates the graph publication and then performs the strict site build. |
@@ -103,9 +103,11 @@ The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.45
 
 ## Runtime bundle and update evidence
 
-The Mermaid core is built with exactly `esbuild==0.28.2` against direct, overridden `dompurify==3.4.15`. `fast-uri==3.1.7` is locked while Ajv remains `8.20.0`. `npm run check:runtime` reconstructs the bundle in memory and verifies embedded sanitizer identity, all observed build inputs, package/lock agreement, and output/metafile/SBOM hashes. The generated CycloneDX SBOM states that copied graph prebundles have opaque transitive coverage; npm audit alone does not inspect those embedded internals.
+The Mermaid core is built with exactly `esbuild==0.28.2` against direct, overridden `dompurify==3.4.16`. `fast-uri==3.1.8` is locked while Ajv remains `8.20.0`; the Python lock selects `urllib3==2.8.0` for its proxy TLS and streaming security fixes. `npm run check:runtime` reconstructs the bundle in memory and verifies embedded sanitizer identity, all observed build inputs, package/lock agreement, and output/metafile/SBOM hashes. The generated CycloneDX SBOM states that copied graph prebundles have opaque transitive coverage; npm audit alone does not inspect those embedded internals.
 
-The exact Node, npm, Python and uv reference binaries are checked by `npm run check:toolchain`; `.python-version` selects the reference interpreter and `tool.uv.required-version` rejects a different uv. Broader consumer Python minimums remain distinct from this tested reference. Ubuntu `24.04` selects the runner OS release, not an immutable VM image; hosted runner image updates and live vulnerability databases are outside bit-for-bit environment reproducibility.
+The exact Node, npm, Python and uv reference binaries are checked by `npm run check:toolchain`; `.python-version` selects the reference interpreter. `tool.uv.required-version` is a resolver bootstrap floor (`>=0.12.10`) so Dependabot can propose lock changes using its supplied uv. This does not qualify another runtime: verification, direct build/serve/graph commands, Python audits reject any uv other than `0.12.10` before project execution. Verification records this preflight in its receipt; scheduled security audits explicitly run the same check after frozen installation. Broader consumer Python minimums remain distinct from this tested reference. Ubuntu `24.04` selects the runner OS release, not an immutable VM image; hosted runner image updates and live vulnerability databases are outside bit-for-bit environment reproducibility.
+
+The [uv version constraint](https://docs.astral.sh/uv/reference/settings/#required-version) and the [Dependabot lock updater](https://github.com/dependabot/dependabot-core/blob/c3365efe2baf165f6b908b7c54cb2e7380985ec0/uv/lib/dependabot/uv/file_updater/lock_file_updater.rb) define this resolver boundary. On 2 October 2026, actual uv `0.12.15` rejected the former equality, accepted the floor, and generated a targeted security lock that exact uv `0.12.10` consumed. All four direct Python entry points also rejected actual uv `0.12.15` before work. Hosted Dependabot has not consumed the local correction yet.
 
 Weekly scheduled audits check the installed locks and generated runtime evidence. Dependabot opens reviewable pull requests for npm, uv and Actions; it has no merge or publication authority. Dependency Review rejects moderate-or-higher new vulnerabilities on Standard pull requests.
 

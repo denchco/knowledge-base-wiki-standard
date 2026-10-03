@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { build, version as esbuildVersion } from "esbuild";
 
-export const runtimeVersions = Object.freeze({ mermaid: "11.17.2", dompurify: "3.4.15", esbuild: "0.28.2", "vis-network": "10.1.2", "3d-force-graph": "1.80.0" });
+export const runtimeVersions = Object.freeze({ mermaid: "11.17.2", dompurify: "3.4.16", esbuild: "0.28.2", "vis-network": "10.1.2", "3d-force-graph": "1.80.0" });
 const outputDirectory = "docs/assets/vendor";
 const mermaidOutput = `${outputDirectory}/mermaid.min.js`;
 const entryPoint = "scripts/mermaid-runtime-entry.mjs";

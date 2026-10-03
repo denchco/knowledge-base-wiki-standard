@@ -7,6 +7,14 @@ status: draft
 
 # Research and change log
 
+## 2026-10-02
+
+- **Publication integration check**: Correct the existing order of the graph appearance assets in the snapshot allowlist. The real sibling check exposed this independently of fixture-only tests; the regression suite now validates the checked-in contract as well. The released snapshot retains its original bytes and rc.5 revision.
+- **Dependency automation repair**: Separate resolver compatibility from exact build qualification using the uv setting and immutable Dependabot implementation in [SRC-041](sources.md#src-041) and [SRC-042](sources.md#src-042). Actual uv `0.12.15` rejects the former `==0.12.10` constraint, resolves with the new floor and produces a lock consumed by exact uv `0.12.10`. Verification and all four direct Python build, serve, graph and audit entry points retain exact checks before work; version/ordering fixtures cover the boundary. Publication is authorised; hosted bot confirmation remains pending until the maintenance PR reaches main and a fresh uv update check completes.
+- **Status and roadmap reconciliation**: Read back the non-draft immutable rc.5 release and exact tag commit from [SRC-043](sources.md#src-043); the Documentation snapshot retains that exact release. Correct the roadmap to record rc.5 publication as completed. Isolate the security and updater maintenance from the separate numeric-citation proposal; protected CI, hosted updater evidence, immutable release inclusion and consumer adoption remain distinct outcomes.
+
+- **Security maintenance**: Update the unreleased reference locks to DOMPurify `3.4.16`, fast-uri `3.1.8` and urllib3 `2.8.0`, supported by [SRC-038](sources.md#src-038), [SRC-039](sources.md#src-039) and [SRC-040](sources.md#src-040). Runtime metadata, embedded sanitizer inspection and negative fixtures move together. The reference toolchain and immutable consumer/release pins retain their existing boundaries; vulnerability databases remain time-dependent evidence.
+
 ## 2026-09-09
 
 - **Native appearance proposal**: Generalise a consumer light/dark appearance request into the existing `DKBWS-DESIGN-001` reference adapter. Zensical owns the palette control and saved preference; the action appears immediately before Wide and remains available on mobile. The Standard keeps its light initial appearance and teal colour family.
