@@ -81,7 +81,7 @@
     "esbuild": "0.28.2",
     "mermaid": "11.17.2",
     "vis-network": "10.1.2",
-    "yaml": "2.9.0"
+    "yaml": "2.9.1"
   },
   "packageManager": "npm@11.19.0"
 }
