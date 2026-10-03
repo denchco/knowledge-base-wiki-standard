@@ -7,6 +7,11 @@ status: draft
 
 # Research and change log
 
+## 2026-10-06
+
+- **Publication evidence closure**: Read back protected PR #13, merged on 3 October at `fef1392548381276a03ca89a2ede435a3d04ec08`, and successful post-merge Verify run `37101094460` on that exact revision. Record these outcomes in status and roadmap without implying a new immutable release or consumer adoption. [SRC-044](sources.md#src-044), [SRC-045](sources.md#src-045)
+- **Hosted updater recovery**: Fresh uv Dependabot run `37103486583` completed successfully on 3 October against the same merged revision. Update job `1606376384` used uv `0.12.18`; targeted locks for `graphifyy==0.9.72` and `zensical==0.0.66` both exited zero. Close `STD-VAL-008` and park future regressions behind a reproducible fresh-job failure. Generated upgrade proposals remain subject to exact reference qualification; the separate numeric-citation proposal remains outside this publication. [SRC-046](sources.md#src-046)
+
 ## 2026-10-02
 
 - **Publication integration check**: Correct the existing order of the graph appearance assets in the snapshot allowlist. The real sibling check exposed this independently of fixture-only tests; the regression suite now validates the checked-in contract as well. The released snapshot retains its original bytes and rc.5 revision.

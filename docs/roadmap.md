@@ -31,8 +31,8 @@ status: draft
 
 19. Qualified corrected browser sanitizer bytes, explicit-offset OKF timestamps, the exact reference tools, the optional locally trusted Codex Stop continuation guardrail and llms.txt v2 discovery; published immutable `v0.1.0-rc.5` on 8 September 2026 at `fa805c78dfc9fae77b394e4ce3af980767e932c8`; and synchronized Documentation to that released snapshot. The previous rc.4 remains preserved. [SRC-043](sources.md#src-043)
 
-## Current publication gate
+## Completed October maintenance
 
-The October security and dependency-updater maintenance is authorised for publication through reviewed pull requests and protected CI. A fresh hosted uv Dependabot check must then confirm resolution against the merged configuration under [STD-VAL-008](validation-queue.md). This sequence does not create a new immutable release or change consumer pins.
+The October security and dependency-updater maintenance merged through protected PR #13 on 3 October 2026 at `fef1392548381276a03ca89a2ede435a3d04ec08`. Post-merge Verify run `37101094460` and fresh hosted uv Dependabot run `37103486583` passed on that exact revision, closing [STD-VAL-008](validation-queue.md). Hosted uv `0.12.18` successfully resolved both proposed dependency updates; the reference runtime still requires exact uv `0.12.10`. This publication created no immutable release and changed no consumer pin. [SRC-044](sources.md#src-044), [SRC-045](sources.md#src-045), [SRC-046](sources.md#src-046)
 
 Future compatibility fixtures require a reproduced consumer gap or evidenced upstream change. Absolute interception of uncaptured responses remains unproven; the supported Stop adapter supplies one bounded corrective continuation after local review and trust. A dedicated Standard MCP remains deferred until a consumer identifies a named task not served by the files, CLI, skill/plugin, Git, and optional read-only repository integration.
