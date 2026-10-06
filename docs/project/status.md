@@ -36,7 +36,9 @@ The local Zensical service is registered as `denchco-kb-wiki-standard` at `http:
 
 ## Current bounded priorities
 
-1. Publish the scoped security and dependency-updater maintenance through protected pull-request checks, then confirm a fresh hosted uv Dependabot job against the merged configuration under [STD-VAL-008](../validation-queue.md).
+No active maintenance priorities remain from the October review. The scoped security and dependency-updater maintenance merged through protected PR #13 at `fef1392548381276a03ca89a2ede435a3d04ec08` on 3 October 2026. Post-merge Verify run `37101094460` passed on that exact revision. [SRC-044](../sources.md#src-044), [SRC-045](../sources.md#src-045)
+
+Fresh hosted uv Dependabot run `37103486583` also passed on that revision using uv `0.12.18`; both targeted dependency resolutions exited successfully. This closes [STD-VAL-008](../validation-queue.md). The generated Graphify and Zensical upgrade proposals require their own qualification and are not adopted by this evidence record. [SRC-046](../sources.md#src-046)
 
 DOMPurify `3.4.16`, fast-uri `3.1.8` and urllib3 `2.8.0` are locked. Python dependency-update resolvers may use uv `>=0.12.10`, while reference verification and all four direct Python build, serve, graph and audit entry points still require exact uv `0.12.10`. Actual uv `0.12.15` reproduced the former resolver failure and verified the repaired bootstrap boundary; exact `0.12.10` consumed its generated lock. The scoped maintenance tree has its own verification receipt; evidence from the separate numeric-citation candidate is not substituted for this tree's checks. [SRC-041](../sources.md#src-041), [SRC-042](../sources.md#src-042)
 

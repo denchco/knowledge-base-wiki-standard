@@ -51,6 +51,9 @@ status: draft
 | SRC-041 | <span id="src-041"></span>[uv required-version setting](https://docs.astral.sh/uv/reference/settings/#required-version) | PEP 440 resolver bootstrap compatibility, separate from exact reference qualification | 2026-10-02 |
 | SRC-042 | <span id="src-042"></span>[Dependabot uv lock updater](https://github.com/dependabot/dependabot-core/blob/c3365efe2baf165f6b908b7c54cb2e7380985ec0/uv/lib/dependabot/uv/file_updater/lock_file_updater.rb) | Immutable upstream implementation using its supplied uv for dependency-update resolution | 2026-10-02 |
 | SRC-043 | <span id="src-043"></span>[Standard v0.1.0-rc.5 release](https://github.com/denchco/knowledge-base-wiki-standard/releases/tag/v0.1.0-rc.5) | Public non-draft immutable release; exact tag resolved to `fa805c78dfc9fae77b394e4ce3af980767e932c8` on retrieval | 2026-10-02 |
+| SRC-044 | <span id="src-044"></span>[Standard maintenance PR #13](https://github.com/denchco/knowledge-base-wiki-standard/pull/13) | Protected security/updater publication merged on 3 October 2026 at `fef1392548381276a03ca89a2ede435a3d04ec08` | 2026-10-06 |
+| SRC-045 | <span id="src-045"></span>[Standard post-merge Verify run 37101094460](https://github.com/denchco/knowledge-base-wiki-standard/actions/runs/37101094460) | Successful post-merge verification on exact maintenance revision `fef1392548381276a03ca89a2ede435a3d04ec08` | 2026-10-06 |
+| SRC-046 | <span id="src-046"></span>[Standard fresh uv Dependabot run 37103486583](https://github.com/denchco/knowledge-base-wiki-standard/actions/runs/37103486583) | Successful 3 October hosted update job `1606376384` on `fef1392548381276a03ca89a2ede435a3d04ec08`; supplied uv `0.12.18` resolved Graphify and Zensical proposals with exit status zero | 2026-10-06 |
 
 ## OKF source identities
 
