@@ -6,10 +6,22 @@
 2. `docs/spec/index.md`
 3. `docs/llm-wiki/index.md`
 4. `docs/project/status.md`
-5. `DESIGN.md` for visual changes
-6. Graphify query results when `graphify-out/graph.json` exists
+5. The manifest's `roles.authoring_policy` path, or `AUTHORING.md` when no path is mapped, before writing new original English prose
+6. `DESIGN.md` for visual changes
+7. Graphify query results when `graphify-out/graph.json` exists
 
 When the user's intent is to instantiate an independent wiki by pointing at this repository, route immediately to `prompts/instantiate-wiki.md` and its URL-only adaptive discovery. Do not require the user to construct the old field-based prompt.
+
+<!-- DKBWS-PROMPT-001-WRITING:START -->
+## Writing policy
+
+- Read the manifest's `roles.authoring_policy` path before writing new original English Wiki prose; use `AUTHORING.md` when no path is mapped. Apply the DenchCo ASD-STE100-inspired 80% house style to all such prose, including prose created for a new Wiki.
+- 80% is a pragmatic house-style aim, not a computed score or a claim of ASD-STE100 compliance. Apply the core habits by default and document material exceptions in the mapped authoring policy or `AUTHORING.md` fallback with their scope and reason.
+- Use direct sentences, one main idea at a time, consistent terms, clear conditions, short paragraphs, and ordered steps where sequence matters. Prefer active voice when the actor is known; never invent an actor to avoid passive voice.
+- Preserve quotations, code, identifiers, official names, necessary technical terms, source claims, uncertainty, normative obligations, and the exact canonical governing question. Explain unfamiliar terms where useful without changing their meaning or evidence status.
+- Follow explicit user instructions and stricter applicable local policy. Review meaning and source fidelity before style; do not remove a necessary qualification to make a sentence shorter.
+- Apply this policy prospectively. Do not bulk-rewrite existing content, change consumer pins, or claim adoption merely because this policy is available.
+<!-- DKBWS-PROMPT-001-WRITING:END -->
 
 ## Authority and safety
 

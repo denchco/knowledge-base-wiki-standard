@@ -673,6 +673,14 @@ function starterContract(revision) {
   return contract;
 }
 
+function assertPortableAuthoringPath(value) {
+  if (typeof value !== "string" || !value.trim() || value.includes("\\") || value.includes("\0")
+    || value.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(value) || /^~(?:\/|$)/.test(value)
+    || value.split("/").some((segment) => !segment || segment === "." || segment === "..")) {
+    throw new CliUsageError("Existing authoring_policy role must be a normalized repository-relative POSIX path; preserve and review the target manifest before initialization planning.");
+  }
+}
+
 function plannedLayout(profile, starter) {
   const selectedRequirements = new Set(profile.requirements);
   return starter.entries.filter((entry) => (
@@ -683,6 +691,8 @@ function plannedLayout(profile, starter) {
 
 function proposedManifest(candidate, profile, starter, options = {}) {
   const roles = selectedRoleBaseline(profile);
+  const authoringEntry = plannedLayout(profile, starter).find((entry) => entry.role === "authoring_policy");
+  if (authoringEntry) roles.authoring_policy = options.existingAuthoringPolicy ?? authoringEntry.target;
   const capabilities = Object.fromEntries(Object.entries(profile.capabilities).map(([key, value]) => [
     key,
     value === "required" ? true : value,
@@ -727,8 +737,22 @@ export function initPlan(options = {}) {
   const inventory = targetInventory(target);
   if (inventory.type === "file") throw new CliUsageError("`init --dry-run` target must be a directory path or an absent path.");
   const promptSource = gitSource(candidate.standard.revision, "prompts/instantiate-wiki.md");
-  const layout = plannedLayout(candidate.profile, starter.data).map((entry) => {
-    const relativePath = entry.target;
+  const selectedEntries = plannedLayout(candidate.profile, starter.data);
+  let existingAuthoringPolicy;
+  const targetManifestPath = path.join(target, ".wiki-standard.yaml");
+  if (selectedEntries.some((entry) => entry.role === "authoring_policy") && existsSync(targetManifestPath)) {
+    const targetManifest = parseYaml(readFileSync(targetManifestPath, "utf8"), targetManifestPath).data;
+    if (targetManifest.roles !== undefined && (!targetManifest.roles || typeof targetManifest.roles !== "object" || Array.isArray(targetManifest.roles))) {
+      throw new CliUsageError("Existing target manifest roles must be a mapping; preserve and review it before initialization planning.");
+    }
+    if (Object.hasOwn(targetManifest.roles ?? {}, "authoring_policy")) {
+      existingAuthoringPolicy = targetManifest.roles.authoring_policy;
+      assertPortableAuthoringPath(existingAuthoringPolicy);
+    }
+  }
+  const layout = selectedEntries.map((entry) => {
+    const relativePath = entry.role === "authoring_policy" ? existingAuthoringPolicy ?? entry.target : entry.target;
+    if (entry.role === "authoring_policy") assertPortableAuthoringPath(relativePath);
     const normalized = relativePath.replace(/\/$/, "");
     const collision = inventory.exists && existsSync(path.join(target, normalized));
     return {
@@ -829,7 +853,7 @@ export function initPlan(options = {}) {
         documentation: starter.data.documentation,
       },
     },
-    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision, deployment }),
+    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision, deployment, existingAuthoringPolicy }),
     layout,
     stages,
     unresolvedInputs,

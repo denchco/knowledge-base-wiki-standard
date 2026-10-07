@@ -54,6 +54,8 @@ Read from top to bottom: source material becomes inspectable evidence, then main
 - The subject-empty `starter/starter.yaml` recipe creates independent knowledge bases without copying this standard's topic content.
 - [Propose a reusable standard change](llm-wiki/standard-proposals.md) preserves a consumer improvement in a tracked record and keeps intake, Standard acceptance, release, and optional adoption as separate authorised states.
 
+The [writing policy](spec/writing-style.md) applies an ASD-STE100-inspired 80% default to future original English prose. It preserves precise technical meaning and exact source forms.
+
 ## Governed implementation
 
 - [Dependencies](spec/dependencies.md) and [security/source boundaries](spec/security-and-sources.md) define the executable and trust perimeter.

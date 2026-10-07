@@ -7,6 +7,7 @@ profile: "standard-production"
 okf_version: "0.2"
 roles:
   specification: "docs/spec/index.md"
+  authoring_policy: "AUTHORING.md"
   source_register: "docs/sources.md"
   evidence_matrix: "docs/evidence-matrix.md"
   validation_queue: "docs/validation-queue.md"

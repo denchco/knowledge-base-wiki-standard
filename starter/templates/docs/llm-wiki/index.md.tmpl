@@ -14,8 +14,9 @@ status: "draft"
 3. `knowledge/index.md`.
 4. [Context map](context-map.md).
 5. `docs/project/status.md`.
-6. `DESIGN.md` for rendered changes.
-7. [Knowledge graph](../graph/index.md) query results when Graphify is selected.
+6. The manifest's `roles.authoring_policy` path, or `AUTHORING.md` when no path is mapped, before writing new original English prose.
+7. `DESIGN.md` for rendered changes.
+8. [Knowledge graph](../graph/index.md) query results when Graphify is selected.
 
 ## Operating model
 
@@ -25,6 +26,8 @@ status: "draft"
 - **Propose**: after a user-authored reusable improvement is implemented, verified, and committed locally, preserve it in a tracked [Standard proposal](standard-proposals.md). Validate direct states and terminal transitions offline, prepare a disposable scrubbed payload, and bind approval to the exact digest and governed form revision. The user submits; intake, Standard decision, exact registry/release evidence, and optional adoption remain separate authorities. Never reuse the Standard's sole historical bridge.
 
 Never treat an LLM answer, rendered page, or graph edge as new evidence.
+
+Apply the DenchCo ASD-STE100-inspired 80% house style in the mapped authoring policy (`AUTHORING.md` when no path is mapped) to all new original English Wiki prose. 80% is a pragmatic aim, not a computed score or a claim of ASD-STE100 compliance. Review meaning and source fidelity before style, preserve protected text and necessary technical terms, and record material exceptions with their scope and reason. Follow explicit user instructions and stricter applicable local policy. Do not bulk-rewrite existing prose or change consumer pins to apply the default.
 
 In a Standard Production maintenance workspace, a file-changing development turn remains incomplete until its persistent changes are recorded in the required end-of-turn JJ commit under `DKBWS-PROV-001`.
 

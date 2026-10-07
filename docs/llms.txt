@@ -12,6 +12,7 @@ For a new independent Wiki, the normative repository URL is the bootstrap invoca
 
 - [Specification](spec/index.md): Normative scope and authority.
 - [Requirements](spec/requirements/index.md): Stable requirement IDs and verification contracts.
+- [Writing policy](spec/writing-style/index.md): Prospective ASD-STE100-inspired 80% house style, protected content and review limits.
 - [Profiles](spec/profiles/index.md): Selected profile obligations.
 - [LLM Wiki](llm-wiki/index.md): Repository read order and maintenance contract.
 - [Context map](llm-wiki/context-map/index.md): Smallest useful canonical reading set.

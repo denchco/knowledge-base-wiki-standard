@@ -11,6 +11,7 @@ import {
   readdirSync,
   rmSync,
   statSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import os from "node:os";
@@ -111,6 +112,44 @@ function withTemporaryRoot(callback) {
 
 function writeProfile(root, profileId, source) {
   writeFileSync(path.join(root, "profiles", `${profileId}.yaml`), source, "utf8");
+}
+
+function withCurrentLifecycleRelease(callback) {
+  const fixtureRoot = realpathSync(mkdtempSync(path.join(os.tmpdir(), "denchco-bootstrap-release-")));
+  const releaseRoot = path.join(fixtureRoot, "standard");
+  try {
+    mkdirSync(releaseRoot);
+    // The planner reads an immutable revision. Commit the current contract only in
+    // a temporary repository so pre-commit verification exercises the new starter.
+    for (const relativePath of [
+      ".wiki-standard.yaml", "profiles", "starter", "prompts/instantiate-wiki.md",
+      "docs/spec/requirements.md", "scripts/conformance-cli.mjs",
+      "scripts/conformance-lifecycle.mjs", "scripts/okf-core.mjs", "scripts/profile-catalogue.mjs",
+    ]) {
+      const destination = path.join(releaseRoot, relativePath);
+      mkdirSync(path.dirname(destination), { recursive: true });
+      cpSync(path.join(ROOT, relativePath), destination, { recursive: true });
+    }
+    for (const args of [
+      ["-c", "init.templateDir=", "init", "--quiet"],
+      ["add", "."],
+      ["-c", "user.name=Bootstrap fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", "commit", "--quiet", "-m", "Current bootstrap contract fixture"],
+    ]) {
+      const result = spawnSync("git", args, { cwd: releaseRoot, encoding: "utf8" });
+      assert.equal(result.status, 0, result.stderr || result.stdout);
+    }
+    symlinkSync(path.join(ROOT, "node_modules"), path.join(releaseRoot, "node_modules"), "dir");
+    return callback({
+      fixtureRoot,
+      releaseRoot,
+      runPlan: (...args) => spawnSync(process.execPath, [path.join(releaseRoot, "scripts/conformance-cli.mjs"), ...args], {
+        cwd: releaseRoot,
+        encoding: "utf8",
+      }),
+    });
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 }
 
 function writePortableProject(root, { deviation = null, conceptBody = "# Fixture concept" } = {}) {
@@ -638,6 +677,8 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(starter.bootstrap.defaults.wiki_url, "auto-reserve-conflict-free-loopback");
   assert.equal(starter.bootstrap.defaults.local_service, "auto-select-platform-user-service-adapter");
   assert.equal(starter.bootstrap.defaults.deployment, "none");
+  assert.equal(starter.bootstrap.defaults.authoring_policy, "denchco-asd-ste100-inspired-80-percent");
+  assert.ok(starter.bootstrap.no_question_defaults.includes("pragmatic authoring policy"));
   assert.equal(starter.executable_scope.apply_supported, false);
   assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
   assert.match(starter.executable_scope.standard_production, /complete .* dependency closure/i);
@@ -652,6 +693,19 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(claudeEntry?.classification, "render-template");
   assert.equal(claudeEntry?.always, true);
   assert.equal(claudeEntry?.template, "starter/templates/CLAUDE.md.tmpl");
+  const authoringEntry = starter.entries.find((entry) => entry.target === "AUTHORING.md");
+  assert.equal(authoringEntry?.classification, "render-template");
+  assert.equal(authoringEntry?.always, true);
+  assert.equal(authoringEntry?.role, "authoring_policy");
+  assert.equal(authoringEntry?.template, "starter/templates/AUTHORING.md.tmpl");
+  assert.ok(authoringEntry?.requirements.includes("DKBWS-PROMPT-001"));
+  const authoringTemplate = readFileSync(path.join(ROOT, authoringEntry.template), "utf8");
+  assert.match(authoringTemplate, /new original English Wiki prose/);
+  assert.match(authoringTemplate, /not a computed score or a claim of ASD-STE100 compliance/);
+  assert.match(authoringTemplate, /Keep quotations, code, commands, identifiers/);
+  assert.match(authoringTemplate, /Preserve the exact canonical governing question/);
+  assert.match(authoringTemplate, /do not measure compliance with this writing style/);
+  assert.match(authoringTemplate, /Avoid bulk changes to existing prose unless the user requests them/);
   const projectStatusEntry = starter.entries.find((entry) => entry.target === "docs/project/status.md");
   assert.equal(projectStatusEntry?.classification, "render-template");
   assert.equal(projectStatusEntry?.always, true);
@@ -931,6 +985,9 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.ok(plan.layout.some((entry) => entry.path === "knowledge/index.md" && entry.classification === "render-template"));
   assert.equal(plan.layout.some((entry) => entry.path === "CLAUDE.md"), false, "the rc.1 plan must use the starter pinned at rc.1");
   assert.equal(plan.layout.some((entry) => entry.path === "docs/project/status.md"), false, "the rc.1 plan must not leak current HEAD starter entries");
+  assert.equal(plan.layout.some((entry) => entry.path === "AUTHORING.md"), false, "the rc.1 plan must not acquire a later authoring policy");
+  assert.equal(plan.proposedManifest.roles.authoring_policy, undefined, "role declarations must also respect the pinned starter");
+  assert.equal(plan.candidate.starter.bootstrap?.defaults?.authoring_policy, undefined);
   assert.equal(plan.candidate.starter.rootCopy, "forbidden");
   assert.equal(plan.candidate.starter.deploymentPolicy, "consumer-owned");
   assert.equal(plan.candidate.starter.executableScope.apply_supported, false);
@@ -939,6 +996,103 @@ test("init requires dry-run and plans an absent target without creating it", () 
   assert.equal(plan.stages.some((stage) => stage.id === "provenance"), false);
   assert.equal(plan.stages.some((stage) => stage.id === "human-llm"), false);
   assert.equal(plan.stages.some((stage) => stage.id === "graph-runtime"), false);
+});
+
+test("current init plans propagate the authoring policy for every profile without a prose score", () => {
+  withCurrentLifecycleRelease(({ fixtureRoot, runPlan }) => {
+    for (const profile of listProfileIds({ standardRoot: ROOT })) {
+      const target = path.join(fixtureRoot, `new-${profile}`);
+      const result = runPlan("init", target, "--dry-run", "--profile", profile, "--blank", "--title", "Policy fixture", "--accent", "#0b7285", "--wiki-url", "https://example.test/policy/", "--json");
+      assert.equal(result.status, 0, result.stderr || result.stdout);
+      const plan = JSON.parse(result.stdout);
+      assertLifecycleSchemaShape(plan);
+      assert.equal(plan.proposedManifest.roles.authoring_policy, "AUTHORING.md", profile);
+      assert.deepEqual(plan.layout.find((entry) => entry.path === "AUTHORING.md"), {
+        path: "AUTHORING.md",
+        role: "authoring_policy",
+        requirements: ["DKBWS-PROMPT-001"],
+        classification: "render-template",
+        template: "starter/templates/AUTHORING.md.tmpl",
+        action: "propose-render",
+        collision: false,
+      }, profile);
+      assert.equal(plan.candidate.starter.bootstrap.defaults.authoring_policy, "denchco-asd-ste100-inspired-80-percent");
+      assert.equal(plan.summary.readyForRendering, true);
+      assert.equal(existsSync(target), false, "policy planning must not write a Wiki or assert prose compliance");
+      assert.equal(plan.proposedManifest.capabilities.authoring_style, undefined, "the bootstrap default is not a linguistic conformance capability");
+    }
+  });
+});
+
+test("current init plans preserve an existing custom authoring policy byte for byte", () => {
+  withCurrentLifecycleRelease(({ fixtureRoot, runPlan }) => {
+    const target = path.join(fixtureRoot, "existing-wiki");
+    mkdirSync(target);
+    const customPolicy = "# Local authoring policy\n\nPreserve approved wording: ‘SomeAPI_v2 SHALL retain exact identifiers.’\n\n```sh\nprintf '%s' Keep_Exact\n```\n";
+    writeFileSync(path.join(target, "AUTHORING.md"), customPolicy, "utf8");
+    const before = treeHash(target);
+    const result = runPlan("init", target, "--dry-run", "--profile", "portable-core", "--blank", "--title", "Existing policy fixture", "--accent", "#0b7285", "--json");
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+    const plan = JSON.parse(result.stdout);
+    assert.ok(plan.safety.collisions.includes("AUTHORING.md"));
+    assert.equal(plan.layout.find((entry) => entry.path === "AUTHORING.md")?.action, "preserve-and-review");
+    assert.equal(treeHash(target), before);
+    assert.equal(readFileSync(path.join(target, "AUTHORING.md"), "utf8"), customPolicy);
+  });
+});
+
+test("current init plans retain an existing authoring policy role at a custom path", () => {
+  withCurrentLifecycleRelease(({ fixtureRoot, runPlan }) => {
+    const target = path.join(fixtureRoot, "custom-policy-wiki");
+    cpSync(POSITIVE, target, { recursive: true });
+    mkdirSync(path.join(target, "policies"));
+    writeFileSync(path.join(target, "policies/STYLE.md"), "# Existing policy\n\nKeep local language and approved source wording.\n", "utf8");
+    const manifestPath = path.join(target, ".wiki-standard.yaml");
+    writeFileSync(manifestPath, readFileSync(manifestPath, "utf8").replace("roles:\n", 'roles:\n  authoring_policy: "policies/STYLE.md"\n'), "utf8");
+    const before = treeHash(target);
+    const result = runPlan("init", target, "--dry-run", "--profile", "portable-core", "--blank", "--title", "Custom policy fixture", "--accent", "#0b7285", "--json");
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+    const plan = JSON.parse(result.stdout);
+    assert.equal(plan.proposedManifest.roles.authoring_policy, "policies/STYLE.md");
+    assert.equal(plan.layout.find((entry) => entry.role === "authoring_policy")?.path, "policies/STYLE.md");
+    assert.equal(plan.layout.find((entry) => entry.role === "authoring_policy")?.action, "preserve-and-review");
+    assert.equal(plan.layout.some((entry) => entry.path === "AUTHORING.md"), false);
+    assert.equal(treeHash(target), before);
+    assert.equal(existsSync(path.join(target, "AUTHORING.md")), false);
+  });
+});
+
+test("current init plans reject malformed roles and nonportable authoring policy paths without writing", () => {
+  withCurrentLifecycleRelease(({ fixtureRoot, runPlan }) => {
+    const cases = [
+      ["scalar-roles", "invalid", /roles must be a mapping/],
+      ["array-roles", [], /roles must be a mapping/],
+      ["null-roles", null, /roles must be a mapping/],
+      ...[
+        ["absolute", "/outside.md"],
+        ["traversal", "../outside.md"],
+        ["nested-traversal", "policies/../outside.md"],
+        ["windows", "C:\\policies\\STYLE.md"],
+        ["uri", "https://example.test/STYLE.md"],
+        ["empty", ""],
+        ["null", null],
+        ["empty-segment", "policies//STYLE.md"],
+        ["dot-segment", "./STYLE.md"],
+        ["nul", "policies/STYLE\u0000.md"],
+      ].map(([name, authoringPath]) => [name, { authoring_policy: authoringPath }, /authoring_policy.*(?:portable|relative|path)/]),
+    ];
+    for (const [name, roles, message] of cases) {
+      const target = path.join(fixtureRoot, name);
+      mkdirSync(target);
+      writeFileSync(path.join(target, ".wiki-standard.yaml"), `${JSON.stringify({ roles })}\n`, "utf8");
+      const before = treeHash(target);
+      const result = runPlan("init", target, "--dry-run", "--profile", "portable-core", "--blank", "--json");
+      assert.equal(result.status, 2, `${name}: ${result.stderr || result.stdout}`);
+      assert.match(result.stderr, message, name);
+      assert.equal(result.stdout, "", `${name}: an invalid role must not produce a usable plan`);
+      assert.equal(treeHash(target), before, `${name}: rejected planning must preserve the target`);
+    }
+  });
 });
 
 test("init plan preserves and reports collisions in an existing target", () => {

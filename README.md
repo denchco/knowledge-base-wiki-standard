@@ -17,6 +17,8 @@
 
 The Standard keeps editable Markdown, source records, evidence, uncertainty, a human-facing wiki, and an agent-facing wiki working as one maintainable knowledge base.
 
+New Wiki setups use an [ASD-STE100-inspired 80% writing default](docs/spec/writing-style.md) for future original English prose. The percentage is a pragmatic preference. The policy preserves technical meaning, source text and local requirements; it does not claim official STE compliance.
+
 ## Give this URL to an AI agent
 
 Open Codex, Claude Code, or another coding agent that can read GitHub repositories, write local files, and run commands. Start it in the folder where you want to work, then paste this repository address:

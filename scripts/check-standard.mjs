@@ -3,16 +3,16 @@ import path from "node:path";
 import YAML from "yaml";
 
 const required = [
-  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
+  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "AUTHORING.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
   ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/standard-change.yml",
   ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
   ".claude/skills/denchco-kb-wiki-standard/SKILL.md",
   "GOVERNANCE.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "CHANGELOG.md",
-  "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md",
+  "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md", "docs/spec/writing-style.md",
   "docs/sources.md", "docs/evidence-matrix.md", "docs/validation-queue.md",
   "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "docs/llm-wiki/standard-proposals.md", "prompts/instantiate-wiki.md",
   "starter/README.md", "starter/starter.yaml", "starter/templates/wiki-standard.yaml.tmpl",
-  "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl",
+  "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl", "starter/templates/AUTHORING.md.tmpl",
   "starter/templates/LICENSING.md.tmpl",
   "starter/templates/docs/graph/index.md.tmpl",
   "starter/templates/docs/graph/two-dimensional.md.tmpl",
@@ -96,6 +96,17 @@ const starterManifest = YAML.parse(readFileSync("starter/starter.yaml", "utf8"))
 const starterEntries = starterManifest?.entries ?? [];
 const starterTargets = starterEntries.map((entry) => entry?.target);
 if (new Set(starterTargets).size !== starterTargets.length) failures.push("starter target paths must be unique");
+const authoringEntry = starterEntries.find((entry) => entry?.target === "AUTHORING.md");
+if (authoringEntry?.classification !== "render-template"
+  || authoringEntry?.template !== "starter/templates/AUTHORING.md.tmpl"
+  || authoringEntry?.role !== "authoring_policy"
+  || authoringEntry?.always !== true
+  || !(authoringEntry?.requirements ?? []).includes("DKBWS-PROMPT-001")) {
+  failures.push("starter must always render the DKBWS-PROMPT-001 authoring policy for new Wikis");
+}
+if (starterManifest?.bootstrap?.defaults?.authoring_policy !== "denchco-asd-ste100-inspired-80-percent") {
+  failures.push("starter must select the pragmatic authoring policy as an automatic bootstrap default");
+}
 for (const target of [".node-version", ".npmrc"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
   if (entry?.classification !== "adapt-from-release"
@@ -193,6 +204,10 @@ for (const target of [".wiki-standard.yaml", "AGENTS.md", "CLAUDE.md", "docs/llm
   }
 }
 const starterWikiManifest = readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8");
+if (standardManifest?.roles?.authoring_policy !== "AUTHORING.md"
+  || !/^  authoring_policy: "AUTHORING\.md"$/m.test(starterWikiManifest)) {
+  failures.push("Standard and starter manifests must map the authoring policy to AUTHORING.md");
+}
 if (!starterWikiManifest.includes("standard_change_intake: true")) failures.push("starter manifest must select the DKBWS-UPDATE-002 proposal capability");
 if (!starterWikiManifest.includes('development_response_links: "live-wiki"') || !starterWikiManifest.includes('human_wiki_url: "{{WIKI_URL}}"')) {
   failures.push("starter manifest must select DKBWS-PROMPT-002 with a rendered canonical Wiki URL");
@@ -376,6 +391,40 @@ if (!agentsHandoff) failures.push("AGENTS.md lacks the managed completion and ha
 if (!starterHandoff) failures.push("starter AGENTS.md template lacks the managed completion and handoff policy");
 if (agentsHandoff && starterHandoff && agentsHandoff !== starterHandoff) {
   failures.push("root and starter completion/handoff policies have drifted");
+}
+
+// These guards prove policy propagation and its scope, never prose quality or an STE score.
+const agentsWriting = managedSection(agents, "DKBWS-PROMPT-001-WRITING");
+const starterWriting = managedSection(starterAgents, "DKBWS-PROMPT-001-WRITING");
+if (!agentsWriting) failures.push("AGENTS.md lacks the managed writing policy");
+if (!starterWriting) failures.push("starter AGENTS.md template lacks the managed writing policy");
+if (agentsWriting && starterWriting && agentsWriting !== starterWriting) {
+  failures.push("root and starter writing policies have drifted");
+}
+for (const phrase of [
+  "AUTHORING.md",
+  "new original English Wiki prose",
+  "80% is a pragmatic house-style aim, not a computed score or a claim of ASD-STE100 compliance",
+  "Preserve quotations, code, identifiers",
+  "source claims, uncertainty, normative obligations",
+  "exact canonical governing question",
+  "Follow explicit user instructions and stricter applicable local policy",
+  "Review meaning and source fidelity before style",
+  "Apply this policy prospectively",
+  "Do not bulk-rewrite existing content, change consumer pins, or claim adoption",
+]) {
+  if (!agentsWriting?.includes(phrase)) failures.push(`writing policy lacks: ${phrase}`);
+}
+for (const [name, source] of [
+  ["Standard authoring policy", existsSync("AUTHORING.md") ? readFileSync("AUTHORING.md", "utf8") : ""],
+  ["starter authoring policy", readFileSync("starter/templates/AUTHORING.md.tmpl", "utf8")],
+]) {
+  for (const phrase of ["new original English Wiki prose", "not a computed score", "claim of ASD-STE100 compliance"]) {
+    if (!source.includes(phrase)) failures.push(`${name} lacks writing scope or proof boundary: ${phrase}`);
+  }
+}
+for (const [name, source] of [["Standard skill", codexSkill], ["canonical prompt", prompt], ["Standard maintenance", maintenance], ["starter maintenance", starterMaintenance]]) {
+  if (!source.includes("AUTHORING.md")) failures.push(`${name} lacks the authoring policy handoff`);
 }
 
 const agentsLiveWikiLinks = managedSection(agents, "DKBWS-PROMPT-002-LIVE-URL");
