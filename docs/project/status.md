@@ -12,6 +12,7 @@ status: draft
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
 | Evidence governance | Implemented candidate with stable row anchors, individual internal citation links, registered named-authority URLs, and exact-destination lint |
 | Human Zensical wiki | Governed reference runtime with strict build, local assets, dedicated readable draft-navigation markers, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
+| Writing policy | ASD-STE100-inspired 80% default under `DKBWS-PROMPT-001`, carried by the mapped authoring policy, prompt, starter and shared instructions; prospective application, protected content and no computed compliance claim |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, completion/cycle guards, and canonical live-URL response navigation |
 | Manifest and stable requirements | Implemented candidate with machine schemas, stable diagnostics, and explicit result accounting for every requirement inherited from the selected profile |
 | Dependency contract | Exact Node `24.20.0` local/CI enforcement plus reference-qualified Mermaid `11.17.2`, DOMPurify `3.4.16`, Zensical `0.0.59`, Graphify `0.9.55`, retained vis-network `10.1.2`, installation classes, offline boundary, consumer/maintainer separation, and reserved verification-artifact rules implemented |

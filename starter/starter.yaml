@@ -20,11 +20,12 @@ bootstrap:
     wiki_url: "auto-reserve-conflict-free-loopback"
     local_service: "auto-select-platform-user-service-adapter"
     deployment: "none"
+    authoring_policy: "denchco-asd-ste100-inspired-80-percent"
   inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
   conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
   required_design_question: "state the inferred or default accent hex and ask whether to use or replace it"
   accent_derivation: "derive and record an accessible family; verify 4.5:1 normal-text and 3:1 non-text boundary contrast against rendered backgrounds"
-  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment"]
+  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment", "pragmatic authoring policy"]
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
@@ -82,7 +83,7 @@ entries:
     role: "manifest"
     classification: "render-template"
     template: "starter/templates/wiki-standard.yaml.tmpl"
-    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-CORE-002", "DKBWS-HUMAN-004", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
     always: true
   - target: "AGENTS.md"
     role: "agent-contract"
@@ -95,6 +96,12 @@ entries:
     classification: "render-template"
     template: "starter/templates/CLAUDE.md.tmpl"
     requirements: ["DKBWS-PROMPT-001", "DKBWS-PROMPT-002"]
+    always: true
+  - target: "AUTHORING.md"
+    role: "authoring_policy"
+    classification: "render-template"
+    template: "starter/templates/AUTHORING.md.tmpl"
+    requirements: ["DKBWS-PROMPT-001"]
     always: true
   - target: "DEPENDENCIES.md"
     role: "dependency-contract"
@@ -172,17 +179,17 @@ entries:
     role: "llm-wiki"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/index.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/context-map.md"
     role: "llm-context-map"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/context-map.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/maintenance.md"
     role: "llm-maintenance"
     classification: "render-template"
     template: "starter/templates/docs/llm-wiki/maintenance.md.tmpl"
-    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+    requirements: ["DKBWS-LLM-001", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: "docs/llm-wiki/standard-proposals.md"
     role: "consumer-proposal-workflow"
     classification: "render-template"

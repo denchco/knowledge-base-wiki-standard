@@ -19,6 +19,12 @@ status: draft
 10. Inspect Git and Jujutsu state.
 11. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
+## New prose
+
+Read the mapped `AUTHORING.md` and [writing policy](../spec/writing-style.md) before new original English Wiki prose. Use the ASD-STE100-inspired 80% default as a pragmatic preference. Review changed passages for clear actions, consistent terms and preserved meaning. Keep exact source text, identifiers, required wording and governing-question repetitions intact. Record material exceptions and unreviewed limits honestly.
+
+Static checks prove that the policy reaches new setups and shared instructions. They do not measure a writing percentage or certify ASD-STE100 compliance. Apply the policy prospectively; do not rewrite untouched history or change another consumer's pin.
+
 ## Development response navigation
 
 - Resolve the Wiki's configured canonical URL from its manifest or registered managed-preview endpoint. Before displaying a user-facing Human or LLM Wiki destination in a development response, verify that absolute HTTP(S) route against the live service.

@@ -7,6 +7,10 @@ status: draft
 
 # Research and change log
 
+## 2026-10-07
+
+- **Prospective writing default**: Researched official ASD-STE100 sources and added the [80% house writing policy](spec/writing-style.md). The current official issue is 9, dated 15 January 2025. The percentage is a local pragmatic preference; no official 80% measure was identified. `DKBWS-PROMPT-001` now carries the default into new Wiki setups and new original English prose, with protected forms and review limits. Existing content and consumer pins remain unchanged. Author review covered the new policy, its template and the changed guidance. A synthetic rewrite preserved uncertainty, an exact quotation, a command and its source identifier. This was a bounded fidelity check, not a linguistic score or corpus-wide review. [SRC-057](sources.md#src-057), [SRC-058](sources.md#src-058), [SRC-059](sources.md#src-059)
+
 ## 2026-10-06
 
 - **Publication evidence closure**: Read back protected PR #13, merged on 3 October at `fef1392548381276a03ca89a2ede435a3d04ec08`, and successful post-merge Verify run `37101094460` on that exact revision. Record these outcomes in status and roadmap without implying a new immutable release or consumer adoption. [SRC-044](sources.md#src-044), [SRC-045](sources.md#src-045)

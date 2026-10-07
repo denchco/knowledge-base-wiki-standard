@@ -17,6 +17,8 @@ status: draft
 6. `DESIGN.md` for rendered changes.
 7. Graphify query results when available.
 
+For new original English prose, read the mapped `AUTHORING.md` and [writing policy](../spec/writing-style.md). Apply the pragmatic ASD-STE100-inspired 80% default while preserving technical meaning and protected content. Review changed passages; do not claim a computed compliance score. Existing pinned consumers retain their own policy until adoption.
+
 Use the [Graphify workflow](graphify.md) for query-first discovery, the six required enrichment layers, and repeatable 2D/3D publication.
 
 The [optional Codex adapter](codex-adapter.md) packages the shared workflow and a locally trusted Stop guardrail. [Web discovery](web-discovery.md) explains the path-scoped llms.txt and derived Markdown alternatives for reading the Wiki through HTTP.

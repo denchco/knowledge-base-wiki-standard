@@ -9,6 +9,8 @@ Use the target repository's `AGENTS.md`, `.wiki-standard.yaml`, declared specifi
 
 For a new Wiki, resolve an immutable revision of `https://github.com/denchco/knowledge-base-wiki-standard` and follow its `prompts/instantiate-wiki.md` URL-only adaptive discovery. Create an independent repository and subject-owned knowledge. Preserve the user's requirements, existing evidence and stronger local rules.
 
+For new original prose, use the target's mapped authoring policy and its pinned Standard. Where that revision adopts the ASD-STE100-inspired 80% default, apply it as a pragmatic style preference. Preserve meaning, exact source forms and local requirements. Do not claim a computed or official compliance score, impose a newer policy on an older pin, or trigger a retrospective rewrite.
+
 For maintenance, use Graphify query-first when available, then the smallest canonical source set needed. Preserve unknown OKF fields and deviations. Register evidence before using it as authority. Use the pinned Standard's read-only conformance CLI and report applicable checks honestly. Never infer release publication or consumer adoption from an accepted proposal.
 
 Finish the requested scope. Ask material clarifications one at a time. Do not manufacture Next Steps; retain at most three unfinished actions tied to the user's goal, with an executable completion condition. Reopen parked work only with its declared trigger, new evidence, or explicit instruction. Use the target's verified canonical HTTP(S) Wiki origin for reader navigation.

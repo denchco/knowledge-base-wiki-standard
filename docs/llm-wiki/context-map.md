@@ -16,6 +16,7 @@ For appearance work, read `DESIGN.md` and the native Zensical palette configurat
 | Audit conformance | Manifest, requirements, conformance page | Fixtures and project deviations |
 | Change visual behaviour | `DESIGN.md`, Zensical adapter | Browser fixtures and local precedent |
 | Upgrade the standard | Current manifest, canonical source, immutable consumer/candidate revisions, migration notes | Pinned profile/catalogue diff, changelog, and changed fixtures |
+| Write new prose | Mapped `AUTHORING.md`, [writing policy](../spec/writing-style.md), reader task and source evidence | Existing glossary, exact quotations or identifiers, material style variations and stricter local rules; 80% is a pragmatic preference, not a score |
 | Research a concept | Source register, evidence matrix, relevant canonical page | Validation queue and Graphify |
 | Prepare a development response | Manifest capability, canonical Human Wiki URL, and captured response draft | Markdown/HTML/plain-GFM link forms; `--managed-live` exact service identity and route HTTP; host pre-send hook for an uncaptured response |
 | Select follow-up work | User's requested outcome and project status | Failed or unrun checks and currently unparked validation items |

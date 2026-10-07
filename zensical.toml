@@ -20,7 +20,8 @@ nav = [
     {"Conformance" = "spec/conformance.md"},
     {"Dependencies" = "spec/dependencies.md"},
     {"Security and sources" = "spec/security-and-sources.md"},
-    {"Prompts" = "spec/prompts.md"}
+    {"Prompts" = "spec/prompts.md"},
+    {"Writing style" = "spec/writing-style.md"}
   ]},
   {"Evidence" = [
     {"Sources" = "sources.md"},

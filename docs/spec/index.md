@@ -29,6 +29,7 @@ It incorporates five distinct foundations and governed choices. Each item links 
 ## Core principles
 
 - Canonical knowledge MUST remain readable without a renderer or MCP server.
+- New Wiki setups MUST carry the [ASD-STE100-inspired 80% writing policy](writing-style.md) for future original English prose. Preserve meaning and exact source forms; the percentage is a house-style preference, not a compliance score.
 - Unknown OKF extension fields MUST survive round trips.
 - Evidence authority MUST be explicit.
 - Generated outputs MUST be reproducible and visibly non-authoritative.

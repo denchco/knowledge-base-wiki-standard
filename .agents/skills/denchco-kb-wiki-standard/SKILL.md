@@ -7,6 +7,8 @@ description: Audit, instantiate, validate, or upgrade an OKF-compatible DenchCo 
 
 Read the repository `AGENTS.md`, `.wiki-standard.yaml`, `docs/spec/index.md`, selected profile, `DEPENDENCIES.md`, and `docs/llm-wiki/index.md` completely before acting. Treat `knowledge/` as the explicit OKF bundle; renderer pages and generated files are not implicit OKF concepts.
 
+For new original English Wiki prose, read the target's mapped authoring policy. When its pinned Standard contains the `DKBWS-PROMPT-001` writing default, apply the pragmatic ASD-STE100-inspired 80% style in its mapped policy (`AUTHORING.md` by default); use the pinned Standard's `docs/spec/writing-style.md` for the normative detail. Preserve technical meaning and exact protected forms; record material exceptions. The percentage is not a computed score or a claim of ASD-STE100 compliance. Older pinned consumers keep their policy until a reviewed adoption; do not rewrite existing prose or change pins merely to apply this guidance.
+
 For instantiation, read `prompts/instantiate-wiki.md`. For audits, distinguish a project-owned formal claim from a read-only inferred adoption assessment, and map required roles to actual paths rather than relying on filenames. For upgrades, compare the pinned release and requirement IDs, preserve deviations and unknown OKF fields, and produce a reviewable patch; never overwrite local changes from the latest template.
 
 Use Graphify first when the target has a graph. If query recall is insufficient, continue through its graph wiki/report and then scoped canonical sources. Run the target's declared verification and report manual, failed, and unrun checks separately.
