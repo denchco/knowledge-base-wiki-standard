@@ -35,6 +35,10 @@ status: draft
 
 The local Zensical service is registered as `denchco-kb-wiki-standard` at `http://127.0.0.1:8017/`; managed health requires every governed registration field, exact LaunchAgent bytes, the loaded job, canonical URL, and `service-identity-v1` marker in addition to HTTP 200. The maintainer-only live gate supplies current evidence and the preview command refuses browser handoff on any mismatch.
 
+## Content-cycle implementation
+
+The local Standard implementation extends `DKBWS-PROMPT-001` with development-cycle content assessment and a three-field next-step pattern. Its exact base is `31ee99b4c9c2da71e60c006d93a03f0e8ccff724`. The consumer-origin implementation is `ad966d4e43b56931ea22db804c4fde10704d043b`, tracked as `DKBWS-PROP-content-first-development-next-steps-08dfca0ab059007d75c4ed691a19f8bf`. Technical integration is complete; formal intake, acceptance, release and consumer adoption remain separate. Verification in this checkout uses the complete maintainer contract, including its own managed service and read-only provenance. The isolated candidate's distribution receipt remains separate evidence and does not prove managed service status.
+
 ## Current bounded priorities
 
 One contribution remains pending formal intake: the [Thirlwall configurable appearance review](configurable-appearance-review.md). Complete exact-payload approval, governed issue submission and linkage, then record the explicit Standard decision against the verified integration commit. Release and Thirlwall adoption remain separate decisions.

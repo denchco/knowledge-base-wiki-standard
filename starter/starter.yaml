@@ -337,6 +337,20 @@ entries:
     planning_only: true
     dependency_closure: "the target's complete verification command, Git/Jujutsu status inspection, failed-check disclosure, clean-turn guard, and end-of-turn commit tests"
     requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/development-next-steps.mjs"
+    role: "development-cycle-handoff"
+    classification: "adapt-from-release"
+    planning_only: true
+    source: "scripts/development-next-steps.mjs"
+    requirements: ["DKBWS-PROMPT-001"]
+    dependency_closure: "Adapt the captured development-cycle response checker; preserve cadence, three-field format and explicit no-update outcome without claiming automatic grounding or host interception."
+  - target: "scripts/development-next-steps.test.mjs"
+    role: "development-cycle-handoff-fixtures"
+    classification: "adapt-from-release"
+    planning_only: true
+    source: "scripts/development-next-steps.test.mjs"
+    requirements: ["DKBWS-PROMPT-001"]
+    dependency_closure: "Adapt instruction and response fixtures to the target layout, including missing cadence/fields, the replaced conditional policy and the no-update case."
   - target: "scripts/development-response-links.mjs"
     role: "development-response-link-check"
     classification: "adapt-from-release"

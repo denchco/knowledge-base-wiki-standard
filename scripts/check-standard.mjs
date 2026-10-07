@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
+import { checkHandoffInstructions } from "./development-next-steps.mjs";
 
 const required = [
   "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "AUTHORING.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
@@ -483,22 +484,11 @@ for (const [name, source] of [
     if (!source.includes(phrase)) failures.push(`${name} lacks development-turn completion phrase: ${phrase}`);
   }
 }
-for (const phrase of [
-  "Complete the requested scope before proposing further work",
-  "recommendations, not continuation authority",
-  "Include no more than three",
-  "failed or unrun required check",
-  "blocked_by",
-  "reopen_when",
-  "last_checked",
-  "If no item qualifies, omit the section and stop",
-]) {
-  if (!agentsHandoff?.includes(phrase)) failures.push(`completion/handoff policy lacks: ${phrase}`);
+for (const [name, source] of [["root handoff", agentsHandoff], ["starter handoff", starterHandoff], ["Standard skill", codexSkill], ["canonical prompt", prompt], ["Standard maintenance", maintenance], ["starter maintenance", starterMaintenance]]) {
+  for (const diagnostic of checkHandoffInstructions(source ?? "")) failures.push(`${name}: ${diagnostic}`);
 }
 if (/exactly three/i.test(prompt)) failures.push("prompt retains an unconditional exactly-three handoff quota");
-for (const phrase of ["completion-first", "no more than three", "If no item qualifies, omit the section"]) {
-  if (!prompt.includes(phrase)) failures.push(`prompt lacks anti-rabbit-hole handoff contract: ${phrase}`);
-}
+if (!prompt.includes("completion-first")) failures.push("prompt lacks completion-first handoff contract");
 for (const boundary of [
   "starter/starter.yaml",
   "current default-branch HEAD",
@@ -531,6 +521,8 @@ for (const phrase of ["Give this URL to an AI agent", "research topic seed", "su
 }
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+if (pkg.scripts?.["response:next-steps:check"] !== "node scripts/development-next-steps.mjs") failures.push("captured next-step format checker is missing");
+if (!pkg.scripts?.["conformance:test"]?.includes("scripts/development-next-steps.test.mjs")) failures.push("next-step fixtures are outside complete verification");
 const licence = readFileSync("LICENSE", "utf8");
 if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failures.push("LICENSE must identify MIT and copyright Andrew Dench");
 if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);

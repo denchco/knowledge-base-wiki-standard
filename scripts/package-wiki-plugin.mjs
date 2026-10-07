@@ -8,7 +8,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const PLUGIN_FILES = [
   ".codex-plugin/plugin.json", "hooks/hooks.json", "skills/wiki-standard/SKILL.md",
 ];
-export const SHARED_SCRIPTS = ["codex-stop-hook.mjs", "development-response-links.mjs", "development-response-handoff.mjs"];
+export const SHARED_SCRIPTS = ["codex-stop-hook.mjs", "development-response-links.mjs", "development-response-handoff.mjs", "development-next-steps.mjs"];
 
 export function packageWikiPlugin(root = ROOT, output = path.join(root, "output/plugins/wiki-standard")) {
   // Refuse unexpected files instead of accidentally distributing a stale payload.

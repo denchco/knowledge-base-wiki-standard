@@ -67,12 +67,12 @@ Update `N` as uncertainty narrows or expands. Do not ask a routine question when
 <!-- DKBWS-PROMPT-001-HANDOFF:START -->
 ## Completion and handoff
 
-- Complete the requested scope before proposing further work.
-- `Next Steps` are recommendations, not continuation authority. Include them only when the user asks for them, required work remains incomplete or blocked, or a named workflow requires a handoff.
-- Include no more than three. Every item must map to an unfinished requested deliverable, a failed or unrun required check, or a decision requiring the user's authority. It must name the target artifact or outcome, be executable in one follow-up pass, and state its completion condition.
-- Apply a cycle guard before selecting items. Do not reopen a bounded, parked, or evidence-blocked trail without new evidence, a due scheduled recheck, or explicit user instruction. Record parked work with `blocked_by`, `reopen_when`, and `last_checked` fields.
-- Do not add optional adjacent research, generic improvements, passive waiting, invitations to continue, or filler merely to reach a count. If no item qualifies, omit the section and stop.
-- Keep zero to three current project priorities in `docs/project/status.md`. Surface that list for status or roadmap work, not as automatic response boilerplate.
+- Complete the requested scope before proposing further work. At the end of every development cycle, assess and report the next steps against the Wiki's continuing subject, governing question when declared, evidence and content maturity. Do not limit that assessment to unfinished files from the last turn or treat initial coverage as permanent completion.
+- `Next Steps` are recommendations, not continuation authority. Prioritise subject content and evidence work. Address any failed or unrun required check before optional content work. Each item must fit one follow-up pass and remain within the Wiki's agreed scope.
+- Include no more than three prioritised items. Use `Proposed update:` to name the concrete target artifact or outcome, `Why it matters:` to explain its value to the Wiki's purpose, and `Done when:` to state a testable completion condition.
+- Apply a cycle guard before selecting items. Check canonical status, the validation queue and relevant handoff evidence; do not repeat completed work or a completed technical handoff. Do not reopen a bounded, parked, or evidence-blocked trail without new evidence, a due scheduled recheck, or explicit user instruction. Record parked work with `blocked_by`, `reopen_when`, and `last_checked` fields.
+- Do not add unrelated research, generic improvements, passive waiting, invitations to continue, or filler merely to reach a count. If no grounded content update or required follow-up qualifies, state: `No further grounded content update is available.` Do not invent a list.
+- Keep zero to three current project priorities in `docs/project/status.md`, with the same proposed update, value and completion condition. Remove completed priorities. Where the captured-draft checker is present, run `npm run response:next-steps:check -- --input <draft>` before sending a development-cycle response. The checker proves format, not evidence grounding or interception of uncaptured output.
 <!-- DKBWS-PROMPT-001-HANDOFF:END -->
 
 ## Change protocol
