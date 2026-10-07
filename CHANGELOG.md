@@ -4,6 +4,8 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Align the Standard Wiki's local presentation with the public Documentation Wiki under `DKBWS-DESIGN-001`: DenchCo blue `#004d80`, white light-page background, the existing wordmark and matching graph colours. Retain native appearance selection, saved reader choices and standard width. Verify the logo, title alignment, both appearances and graph views with the source and browser contracts. This is a Standard-owned presentation change; consumer starter defaults, the Documentation release pin and the pending Thirlwall intake do not change.
+
 - Propose an opt-in configurable appearance adapter under existing `DKBWS-DESIGN-001`, `DKBWS-RENDER-001` and `DKBWS-VERIFY-001`: one versioned input, deterministic OKLCH colour roles, final-sRGB contrast checks, visible exact brand surfaces, native defaults with stable palette indexes, persisted reader preferences, graph integration and real-renderer browser fixtures. Projects without configuration retain their current appearance. Migration is opt-in and requires the complete generator/runtime/test closure; this local candidate does not record acceptance, publish a release or change a consumer pin.
 
 - Extend `DKBWS-PROMPT-001` with the ASD-STE100-inspired 80% authoring default for future new Wiki setups and original English prose. Register Issue 9 research, define protected content and review limits, propagate a mapped `AUTHORING.md` through pinned templates and shared agent instructions, and add initializer/retention fixtures. Migration is prospective and reviewable; no bulk prose rewrite, consumer pin change, new dependency or automated linguistic-compliance claim.

@@ -2,7 +2,7 @@
 
 :root,
 body[data-md-color-scheme] {
-  --header-title-content-rail-offset: 10.5rem;
+  --header-title-content-rail-offset: 8.162rem;
   --layout-width-control-content-rail-offset: 2rem;
   --layout-width-control-inline-start: 0.25rem;
   --layout-width-control-radius: var(--component-radius-small);

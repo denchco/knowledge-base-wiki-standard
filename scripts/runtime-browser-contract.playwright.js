@@ -35,8 +35,8 @@ export default async (page, options = {}) => {
     : [];
   const appearance = options.appearance ?? null;
   const lightColors = appearance?.light ?? {
-    headerBackground: "#ffffff", headerText: "#1f2933", background: "#f6f8f9",
-    accent: "#0b7285", accentContrast: "#ffffff", surface: "#ffffff",
+    headerBackground: "#ffffff", headerText: "#1f2933", background: "#ffffff",
+    accent: "#004d80", accentContrast: "#ffffff", surface: "#ffffff",
   };
   const rgb = hex => `rgb(${hex.slice(1).match(/../g).map(channel => parseInt(channel, 16)).join(", ")})`;
   const failures = [];
@@ -828,11 +828,21 @@ export default async (page, options = {}) => {
     header: Boolean(document.querySelector(".md-header__inner")),
     layoutScript: [...document.scripts].some(script => script.src.includes("/assets/layout-width.js")),
     layoutStylesheet: [...document.styleSheets].some(sheet => sheet.href?.includes("/assets/layout-width.css")),
+    logo: (() => {
+      const image = document.querySelector(".md-header__button.md-logo img");
+      return image ? { src: image.currentSrc || image.src, width: image.naturalWidth, height: image.naturalHeight } : null;
+    })(),
+    favicon: document.querySelector('link[rel="icon"]')?.href || "",
     href: location.href,
   }));
   if (!desktopBootstrap.control) {
     throw new Error(`Desktop runtime did not initialize: ${JSON.stringify(desktopBootstrap)}`);
   }
+  check(desktopBootstrap.logo?.src.endsWith("/assets/brand/denchco-wordmark.png")
+    && desktopBootstrap.logo.width === 1032 && desktopBootstrap.logo.height === 350,
+  "The Standard header must load its governed DenchCo wordmark");
+  check(desktopBootstrap.favicon.endsWith("/assets/brand/denchco-wordmark.png"),
+    "The Standard favicon must use its governed DenchCo wordmark");
   await page.waitForSelector(".layout-width-toggle", { state: "attached" });
   const widthControlDisplay = await page.locator(".layout-width-toggle").evaluate(
     element => getComputedStyle(element).display,
@@ -851,6 +861,7 @@ export default async (page, options = {}) => {
     const header = document.querySelector(".md-header");
     const search = document.querySelector(".md-search__button");
     return {
+      pageBackground: getComputedStyle(document.body).backgroundColor,
       mode: document.documentElement.dataset.layoutWidth,
       topic: rect(visibleTopic),
       content: rect(content),
@@ -876,6 +887,7 @@ export default async (page, options = {}) => {
   check(standardHeader.mode === "standard", "Standard width must be active for its geometry measurement");
   check(standardHeader.controlPressed === "false", "Standard width control must expose aria-pressed=false");
   check(standardHeader.controlText === "Wide", "The desktop width control must have the visible label Wide");
+  check(standardHeader.pageBackground === rgb(lightColors.background), "The light page must render its governed background");
   check(standardHeader.headerBackground === rgb(lightColors.headerBackground), "The production header must render its configured light surface");
   check(standardHeader.headerColour === rgb(lightColors.headerText), "The production header must render its configured readable text");
   check(standardHeader.searchBackground === (appearance ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.05)"), "The closed Search control must use its configured surface");

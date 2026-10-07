@@ -3,42 +3,43 @@ version: "0.1.0-candidate"
 name: "DenchCo Knowledge Base Wiki Standard"
 description: "Deterministic DenchCo visual and interaction contract for a production Zensical evidence-linked wiki."
 colors:
-  primary: "#174a5b"
-  accent: "#0b7285"
-  accentDark: "#075866"
-  accentDarker: "#06444f"
-  accentVisited: "#096777"
-  accentLight: "#42a5b3"
-  accentLightest: "#d9f0f3"
-  accentTransparent: "rgb(11 114 133 / 10%)"
-  accentTransparentStrong: "rgb(11 114 133 / 16%)"
+  primary: "#003f69"
+  accent: "#004d80"
+  accentDark: "#003f69"
+  accentDarker: "#003452"
+  accentVisited: "#00436f"
+  accentLight: "#4d83a7"
+  accentLightest: "#d9e7f0"
+  accentTransparent: "rgb(0 77 128 / 10%)"
+  accentTransparentStrong: "rgb(0 77 128 / 16%)"
   accentContrast: "#ffffff"
-  background: "#f6f8f9"
+  background: "#ffffff"
   text: "#1f2933"
   muted: "#52606d"
   border: "#aab7c0"
   surface: "#ffffff"
-  tableHeader: "#d9f0f3"
-  link: "#0b7285"
+  logoSurface: "#ffffff"
+  tableHeader: "#d9e7f0"
+  link: "#004d80"
   conditional: "#a15c00"
   success: "#007f3b"
   warning: "#d5281b"
-  darkPrimary: "#dff6f7"
-  darkAccent: "#66c5d1"
-  darkAccentDark: "#8cdbe4"
-  darkAccentDarker: "#c3f1f5"
-  darkAccentVisited: "#9ed1d9"
-  darkAccentLight: "#5db0bc"
-  darkAccentLightest: "#16323a"
-  darkAccentTransparent: "rgb(102 197 209 / 10%)"
-  darkAccentTransparentStrong: "rgb(102 197 209 / 16%)"
+  darkPrimary: "#d0e8ff"
+  darkAccent: "#83c4ff"
+  darkAccentDark: "#abd6ff"
+  darkAccentDarker: "#d0e8ff"
+  darkAccentVisited: "#9ed0ff"
+  darkAccentLight: "#6aabe4"
+  darkAccentLightest: "#212d37"
+  darkAccentTransparent: "rgb(131 196 255 / 10%)"
+  darkAccentTransparentStrong: "rgb(131 196 255 / 16%)"
   darkAccentContrast: "#111a1e"
   darkBackground: "#111a1e"
   darkSurface: "#18242a"
   darkText: "#e5eef1"
   darkMuted: "#b5c2c9"
   darkBorder: "#798f9a"
-  darkFocus: "#8cdbe4"
+  darkFocus: "#abd6ff"
   darkFocusContrast: "#111a1e"
   darkConditional: "#edbc74"
   darkSuccess: "#90d7aa"
@@ -65,7 +66,7 @@ shape:
   diagramLabelMaskWidth: "4px"
   componentBorderWidth: "1px"
   technicalFrameBorderWidth: "1.75px"
-  headerTitleContentRailOffset: "10.5rem"
+  headerTitleContentRailOffset: "8.162rem"
   sourceRowRailWidth: ".25rem"
   accentRailWidth: ".3rem"
   layoutWidthControlContentRailOffset: "2rem"
@@ -129,6 +130,8 @@ components:
     backgroundColor: "{colors.border}"
   diagram-boundary:
     backgroundColor: "{colors.accentLight}"
+  header-logo:
+    backgroundColor: "{colors.logoSurface}"
   header:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
@@ -216,7 +219,11 @@ The shell may look identical across topics. The topic's reader model, navigation
 - Full pill radii are reserved for compact status labels.
 - Diagram text follows reduced table text sizing; ordinary body copy remains the renderer baseline.
 
-The unconfigured DenchCo Standard Wiki keeps this teal family. A consumer using the manual adapter may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify. A consumer selecting the configurable adapter uses the generated roles described below. Do not alter Zensical chrome structure to create a topic identity.
+The unconfigured DenchCo Standard Wiki uses the public Documentation Wiki's DenchCo blue family, anchored to `#004d80`, on a white page. Its existing `docs/assets/brand/denchco-wordmark.png` supplies the header logo and favicon. The header title offset accounts for the wordmark's `1032:350` aspect ratio.
+
+The header wordmark uses a fixed white backing for contrast in either appearance; its source pixels remain unchanged. The backing protects the blue artwork when a configured header uses any brand colour. This branding belongs to the Standard and Documentation Wikis. The subject-empty starter retains its own configurable identity and excludes the wordmark.
+
+A consumer using the manual adapter may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify. A consumer selecting the configurable adapter uses the generated roles described below. Do not alter Zensical chrome structure to create a topic identity.
 
 ## Appearance
 

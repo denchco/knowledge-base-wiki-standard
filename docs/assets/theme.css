@@ -3,22 +3,23 @@
 :root,
 body[data-md-color-primary],
 body[data-md-color-accent] {
-  --primary: #174a5b;
-  --accent: #0b7285;
-  --accent-dark: #075866;
-  --accent-darker: #06444f;
-  --accent-visited: #096777;
-  --accent-light: #42a5b3;
-  --accent-lightest: #d9f0f3;
-  --accent-transparent: rgb(11 114 133 / 10%);
-  --accent-transparent-strong: rgb(11 114 133 / 16%);
+  --primary: #003f69;
+  --accent: #004d80;
+  --accent-dark: #003f69;
+  --accent-darker: #003452;
+  --accent-visited: #00436f;
+  --accent-light: #4d83a7;
+  --accent-lightest: #d9e7f0;
+  --accent-transparent: rgb(0 77 128 / 10%);
+  --accent-transparent-strong: rgb(0 77 128 / 16%);
   --accent-contrast: #ffffff;
-  --background: #f6f8f9;
+  --background: #ffffff;
   --surface: #ffffff;
+  --logo-surface: #ffffff;
   --text: #1f2933;
   --muted: #52606d;
   --border: #aab7c0;
-  --focus: #075866;
+  --focus: #003f69;
   --focus-contrast: #ffffff;
   --conditional: #a15c00;
   --conditional-transparent: rgb(161 92 0 / 10%);
@@ -478,27 +479,33 @@ body[data-md-color-scheme] {
 
 body[data-md-color-scheme="slate"] {
   color-scheme: dark;
-  --primary: #dff6f7;
-  --accent: #66c5d1;
-  --accent-dark: #8cdbe4;
-  --accent-darker: #c3f1f5;
-  --accent-visited: #9ed1d9;
-  --accent-light: #5db0bc;
-  --accent-lightest: #16323a;
-  --accent-transparent: rgb(102 197 209 / 10%);
-  --accent-transparent-strong: rgb(102 197 209 / 16%);
+  --primary: #d0e8ff;
+  --accent: #83c4ff;
+  --accent-dark: #abd6ff;
+  --accent-darker: #d0e8ff;
+  --accent-visited: #9ed0ff;
+  --accent-light: #6aabe4;
+  --accent-lightest: #212d37;
+  --accent-transparent: rgb(131 196 255 / 10%);
+  --accent-transparent-strong: rgb(131 196 255 / 16%);
   --accent-contrast: #111a1e;
   --background: #111a1e;
   --surface: #18242a;
   --text: #e5eef1;
   --muted: #b5c2c9;
   --border: #798f9a;
-  --focus: #8cdbe4;
+  --focus: #abd6ff;
   --focus-contrast: #111a1e;
   --conditional: #edbc74;
   --success: #90d7aa;
   --warning: #ffa69e;
   --md-default-fg-color--lightest: rgba(255, 255, 255, 0.06);
+}
+
+/* Preserve the blue artwork on a readable backing for any header colour. */
+.md-logo img {
+  background-color: var(--logo-surface);
+  border-radius: var(--component-radius-small);
 }
 
 body { background: var(--background); color: var(--text); }

@@ -33,13 +33,18 @@ for (const token of [
   requireIn(design, token, `DESIGN.md must define ${token}`);
 }
 for (const [token, value] of [
-  ["primary", "#174a5b"],
-  ["accent", "#0b7285"],
-  ["accentDark", "#075866"],
-  ["accentLightest", "#d9f0f3"],
+  ["primary", "#003f69"],
+  ["accent", "#004d80"],
+  ["accentDark", "#003f69"],
+  ["accentLightest", "#d9e7f0"],
 ]) {
   requireIn(design, `${token}: "${value}"`, `DESIGN.md must pin DenchCo ${token} to ${value}`);
 }
+for (const field of ["logo", "favicon"]) {
+  requireIn(zensical, `${field} = "assets/brand/denchco-wordmark.png"`, `The Standard ${field} must use its governed DenchCo wordmark`);
+}
+requireIn(theme, "--background: #ffffff", "The Standard light page must match the white Documentation page");
+requireIn(selectorBlock(theme, ".md-logo img"), "background-color: var(--logo-surface)", "The wordmark must retain its readable backing in either appearance");
 requireIn(design, 'compactDataFontSize: ".64rem"', "DESIGN.md must pin reduced table text");
 requireIn(design, 'diagramTextSize: ".64rem"', "DESIGN.md must match Mermaid and reduced table text");
 requireIn(design, 'diagramEmphasisLineWidth: "3px"', "DESIGN.md must pin the Mermaid emphasis line");
@@ -102,8 +107,8 @@ if (governingQuestionMarkupIssues(mismatchedGoverningQuestionFixture).length ===
 }
 
 for (const token of [
-  "--primary: #174a5b", "--accent: #0b7285", "--accent-dark: #075866",
-  "--accent-darker:", "--accent-visited:", "--accent-light:", "--accent-lightest: #d9f0f3",
+  "--primary: #003f69", "--accent: #004d80", "--accent-dark: #003f69",
+  "--accent-darker:", "--accent-visited:", "--accent-light:", "--accent-lightest: #d9e7f0",
   "--accent-transparent:", "--accent-transparent-strong:", "--accent-contrast:",
   "--conditional:", "--success:", "--warning:", "--component-radius:",
   "--component-radius-small:", "--component-radius-large:", "--diagram-node-radius:",
@@ -263,7 +268,7 @@ for (const [source, label] of [[zensical, "zensical.toml"], [starterZensical, "s
   requireIn(source, 'draft = "Draft — research in progress"', `${label} must expose readable draft status text`);
 }
 requireIn(layout, "--layout-width-control-content-rail-offset: 2rem", "Wide control must use the body-rail offset");
-requireIn(layout, "--header-title-content-rail-offset: 10.5rem", "header title must use the body-rail offset");
+requireIn(layout, "--header-title-content-rail-offset: 8.162rem", "header title must use the body-rail offset");
 requireIn(layout, "margin-inline-start: var(--header-title-content-rail-offset)", "header title must consume its rail token");
 requireIn(layout, "margin-inline: var(--layout-width-control-inline-start) var(--layout-width-control-content-rail-offset)", "Wide control must align to the content rail");
 requireIn(layout, ".md-header__title .md-header__topic", "the visible header topic must be governed");
@@ -283,7 +288,7 @@ if (selectorBlock(theme, ".md-typeset blockquote").includes("var(--accent)")) {
 }
 requireIn(graph, "border: var(--technical-frame-border-width) solid var(--accent-light)", "Graph pane must use one 1.75px rail");
 requireIn(selectorBlock(graph, ".graph-frame"), "border: 0", "Graph iframe must not add a second border");
-requireIn(publisher, 'const primary = appearance?.light.accent ?? process.env.GRAPHIFY_PRIMARY ?? "#0b7285"', "Graph publication must use configured appearance with the existing DenchCo teal fallback");
+requireIn(publisher, 'const primary = appearance?.light.accent ?? process.env.GRAPHIFY_PRIMARY ?? "#004d80"', "Graph publication must use configured appearance with the DenchCo blue fallback");
 requireIn(publisher, "--component-border-width: 1px", "Graphify 3D controls must define a border token");
 requireIn(publisher, "--panel-radius: 8px", "Graphify 3D panels must retain a bounded radius");
 

@@ -19,19 +19,19 @@ const publicationSchemaVersion = "1.0";
 const repositoryCommit = currentRepositoryCommit();
 
 const title = process.env.GRAPHIFY_3D_TITLE ?? "DenchCo Knowledge Base Wiki Standard — 3D Map";
-const primary = appearance?.light.accent ?? process.env.GRAPHIFY_PRIMARY ?? "#0b7285";
-const primaryDark = appearance?.light.accentDark ?? process.env.GRAPHIFY_PRIMARY_DARK ?? "#075866";
+const primary = appearance?.light.accent ?? process.env.GRAPHIFY_PRIMARY ?? "#004d80";
+const primaryDark = appearance?.light.accentDark ?? process.env.GRAPHIFY_PRIMARY_DARK ?? "#003f69";
 const text = appearance?.light.text ?? process.env.GRAPHIFY_TEXT ?? "#1f2933";
-const muted = appearance?.light.muted ?? process.env.GRAPHIFY_MUTED ?? "#d9f0f3";
-const pageBackground = appearance?.light.background ?? process.env.GRAPHIFY_PAGE_BACKGROUND ?? "#f6f8f9";
+const muted = appearance?.light.muted ?? process.env.GRAPHIFY_MUTED ?? "#d9e7f0";
+const pageBackground = appearance?.light.background ?? process.env.GRAPHIFY_PAGE_BACKGROUND ?? "#ffffff";
 const sceneBackground = appearance?.dark.background ?? process.env.GRAPHIFY_SCENE_BACKGROUND ?? "#101820";
-const panelBorder = appearance ? alpha(primary, 0.24) : process.env.GRAPHIFY_PANEL_BORDER ?? "rgba(11, 114, 133, 0.24)";
-const panelDivider = appearance ? alpha(primary, 0.16) : process.env.GRAPHIFY_PANEL_DIVIDER ?? "rgba(11, 114, 133, 0.16)";
-const linkColor = appearance ? alpha(appearance.dark.accent, 0.50) : process.env.GRAPHIFY_LINK_COLOR ?? "rgba(217, 240, 243, 0.50)";
+const panelBorder = appearance ? alpha(primary, 0.24) : process.env.GRAPHIFY_PANEL_BORDER ?? "rgba(0, 77, 128, 0.24)";
+const panelDivider = appearance ? alpha(primary, 0.16) : process.env.GRAPHIFY_PANEL_DIVIDER ?? "rgba(0, 77, 128, 0.16)";
+const linkColor = appearance ? alpha(appearance.dark.accent, 0.50) : process.env.GRAPHIFY_LINK_COLOR ?? "rgba(217, 231, 240, 0.50)";
 const sourceIdPattern = process.env.GRAPHIFY_SOURCE_ID_PATTERN ?? "[A-Z][A-Z0-9]+-\\d{3}";
 const sourceIdRegex = new RegExp(`\\b${sourceIdPattern}\\b`, "g");
 const exactSourceIdRegex = new RegExp(`^${sourceIdPattern}$`);
-const palette = (process.env.GRAPHIFY_PALETTE ?? `${primary},#9b5d00,#007c78,#15803d,#5c6f7f,#b45309,#c0382b,#174a5b`)
+const palette = (process.env.GRAPHIFY_PALETTE ?? `${primary},#9b5d00,#007c78,#15803d,#5c6f7f,#b45309,#c0382b,#003f69`)
   .split(",")
   .map((entry) => entry.trim())
   .filter(Boolean);
@@ -114,8 +114,8 @@ function graphThemeAssets() {
   const configuration = {
     fallbackScheme: appearance?.config.appearance === "dark" ? "slate" : "default",
     palettes: appearance ? { default: graphPalette(appearance.light), slate: graphPalette(appearance.dark) } : {
-      default: { background: pageBackground, surface: "#ffffff", text, muted: "#52606d", border: "#aab7c0", accent: primary, accentContrast: "#ffffff", hover: "#d9f0f3", focus: primaryDark },
-      slate: { background: "#111a1e", surface: "#18242a", text: "#e5eef1", muted: "#b5c2c9", border: "#798f9a", accent: "#66c5d1", accentContrast: "#111a1e", hover: "#16323a", focus: "#8cdbe4" },
+      default: { background: pageBackground, surface: "#ffffff", text, muted: "#52606d", border: "#aab7c0", accent: primary, accentContrast: "#ffffff", hover: "#d9e7f0", focus: primaryDark },
+      slate: { background: "#111a1e", surface: "#18242a", text: "#e5eef1", muted: "#b5c2c9", border: "#798f9a", accent: "#83c4ff", accentContrast: "#111a1e", hover: "#212d37", focus: "#abd6ff" },
     },
   };
   return `<script id="graph-theme-config" type="application/json">${scriptSafeJson(configuration)}</script>

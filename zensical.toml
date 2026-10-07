@@ -70,6 +70,8 @@ class = "mermaid"
 format = "pymdownx.superfences.fence_code_format"
 
 [project.theme]
+logo = "assets/brand/denchco-wordmark.png"
+favicon = "assets/brand/denchco-wordmark.png"
 
 [[project.theme.palette]]
 scheme = "default"
