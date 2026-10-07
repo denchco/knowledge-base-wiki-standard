@@ -283,7 +283,7 @@ if (selectorBlock(theme, ".md-typeset blockquote").includes("var(--accent)")) {
 }
 requireIn(graph, "border: var(--technical-frame-border-width) solid var(--accent-light)", "Graph pane must use one 1.75px rail");
 requireIn(selectorBlock(graph, ".graph-frame"), "border: 0", "Graph iframe must not add a second border");
-requireIn(publisher, 'const primary = process.env.GRAPHIFY_PRIMARY ?? "#0b7285"', "Graph publication must default to DenchCo teal");
+requireIn(publisher, 'const primary = appearance?.light.accent ?? process.env.GRAPHIFY_PRIMARY ?? "#0b7285"', "Graph publication must use configured appearance with the existing DenchCo teal fallback");
 requireIn(publisher, "--component-border-width: 1px", "Graphify 3D controls must define a border token");
 requireIn(publisher, "--panel-radius: 8px", "Graphify 3D panels must retain a bounded radius");
 

@@ -50,7 +50,8 @@ nav = [
   {"References" = [
     {"Tools and sources" = "reference/tools-and-sources.md"},
     {"Local precedents" = "reference/local-precedents.md"},
-    {"Project status" = "project/status.md"}
+    {"Project status" = "project/status.md"},
+    {"Appearance contribution review" = "project/configurable-appearance-review.md"}
   ]}
 ]
 

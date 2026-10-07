@@ -33,6 +33,12 @@ export default async (page, options = {}) => {
   const governingQuestionRepetitionRoutes = Array.isArray(options.governingQuestion?.repetitionRoutes)
     ? options.governingQuestion.repetitionRoutes.filter(entry => entry && typeof entry.route === "string")
     : [];
+  const appearance = options.appearance ?? null;
+  const lightColors = appearance?.light ?? {
+    headerBackground: "#ffffff", headerText: "#1f2933", background: "#f6f8f9",
+    accent: "#0b7285", accentContrast: "#ffffff", surface: "#ffffff",
+  };
+  const rgb = hex => `rgb(${hex.slice(1).match(/../g).map(channel => parseInt(channel, 16)).join(", ")})`;
   const failures = [];
   const requests = [];
   const resourceRequests = [];
@@ -792,8 +798,12 @@ export default async (page, options = {}) => {
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
-  const initialScheme = await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
+  const initialScheme = appearance
+    ? (appearance.config.appearance === "dark" ? "slate" : "default")
+    : await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
   check(await page.locator("body").getAttribute("data-md-color-scheme") === initialScheme, "A fresh browser must start in the configured initial appearance");
+  const initialWidth = await page.locator("html").getAttribute("data-layout-width");
+  check(initialWidth === (appearance?.config.width ?? "standard"), "A fresh browser must start in the configured initial width");
   await inspectPaletteKeyboard(initialScheme, "desktop", "first load");
   await selectNativeScheme("default");
   const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
@@ -849,6 +859,7 @@ export default async (page, options = {}) => {
       controlText: control?.textContent.trim() || "",
       controlPressed: control?.getAttribute("aria-pressed"),
       controlBackground: control ? getComputedStyle(control).backgroundColor : "",
+      controlBoxShadow: control ? getComputedStyle(control).boxShadow : "",
       headerBackground: header ? getComputedStyle(header).backgroundColor : "",
       headerColour: header ? getComputedStyle(header).color : "",
       searchBackground: search ? getComputedStyle(search).backgroundColor : "",
@@ -856,14 +867,19 @@ export default async (page, options = {}) => {
     };
   });
 
+  // Geometry is measured in both modes regardless of the consumer's initial choice.
+  if (await page.locator("html").getAttribute("data-layout-width") === "wide") {
+    await page.locator(".layout-width-toggle").click();
+    await page.waitForFunction(() => document.documentElement.dataset.layoutWidth === "standard");
+  }
   const standardHeader = await measureHeader();
-  check(standardHeader.mode === "standard", "Standard width must be the initial desktop mode");
+  check(standardHeader.mode === "standard", "Standard width must be active for its geometry measurement");
   check(standardHeader.controlPressed === "false", "Standard width control must expose aria-pressed=false");
   check(standardHeader.controlText === "Wide", "The desktop width control must have the visible label Wide");
-  check(standardHeader.headerBackground === "rgb(255, 255, 255)", "The production header must render white");
-  check(standardHeader.headerColour === "rgb(31, 41, 51)", "The production header must render DenchCo dark content");
-  check(standardHeader.searchBackground === "rgba(0, 0, 0, 0.05)", "The closed Search control must render neutral grey");
-  check(standardHeader.searchColour === "rgb(31, 41, 51)", "The closed Search control must render DenchCo dark content");
+  check(standardHeader.headerBackground === rgb(lightColors.headerBackground), "The production header must render its configured light surface");
+  check(standardHeader.headerColour === rgb(lightColors.headerText), "The production header must render its configured readable text");
+  check(standardHeader.searchBackground === (appearance ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.05)"), "The closed Search control must use its configured surface");
+  check(standardHeader.searchColour === rgb(lightColors.headerText), "The closed Search control must render its configured readable text");
   check(
     standardHeader.topic && standardHeader.heading && closeTo(standardHeader.topic.left, standardHeader.heading.left),
     "The visible desktop title must align to the body-text left rail in Standard mode",
@@ -934,7 +950,7 @@ export default async (page, options = {}) => {
     "Wide mode must increase the central content width",
   );
   check(
-    wideHeader.controlBackground !== standardHeader.controlBackground,
+    wideHeader.controlBackground !== standardHeader.controlBackground || wideHeader.controlBoxShadow !== standardHeader.controlBoxShadow,
     "Wide selection must have a visible selected-state treatment",
   );
 
@@ -1042,12 +1058,12 @@ export default async (page, options = {}) => {
   check(mermaidProbe.edgeStrokeWidth === "1.75px", "Mermaid edges must render at 1.75px");
   check(mermaidProbe.emphasisStrokeWidth === "3px", "Emphasized Mermaid relationships must render at 3px");
   check(
-    mermaidProbe.edgeLabelFill === "rgb(246, 248, 249)" && mermaidProbe.edgeLabelFillOpacity === "1",
+    mermaidProbe.edgeLabelFill === rgb(lightColors.background) && mermaidProbe.edgeLabelFillOpacity === "1",
     "Mermaid edge labels must fully mask connecting lines with the governed diagram background",
   );
-  check(mermaidProbe.canonicalFill === "rgb(11, 114, 133)", "Canonical Mermaid nodes must use the active solid accent");
-  check(mermaidProbe.canonicalTextFill === "rgb(255, 255, 255)", "Canonical Mermaid labels must use accent-contrast text");
-  check(mermaidProbe.derivedFill === "rgb(255, 255, 255)", "Derived Mermaid nodes must use the surface fill");
+  check(mermaidProbe.canonicalFill === rgb(lightColors.accent), "Canonical Mermaid nodes must use the active solid accent");
+  check(mermaidProbe.canonicalTextFill === rgb(lightColors.accentContrast), "Canonical Mermaid labels must use accent-contrast text");
+  check(mermaidProbe.derivedFill === rgb(lightColors.surface), "Derived Mermaid nodes must use the surface fill");
   check(mermaidProbe.derivedDash.includes("4px") && mermaidProbe.derivedDash.includes("3px"), "Derived Mermaid nodes must use a dashed boundary");
   check(mermaidProbe.defaultNodeFills.length === 2, "Mermaid runtime probe must render two ordinary default nodes");
   check(new Set(mermaidProbe.defaultNodeFills).size === 1, "Ordinary Mermaid nodes must share one default fill");

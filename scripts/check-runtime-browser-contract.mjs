@@ -29,7 +29,7 @@ try {
   console.error(`Runtime browser contract configuration failed: ${error.message}`);
   process.exit(1);
 }
-const { routes, sources, graph, sourceLinks, governingQuestion } = contractConfiguration;
+const { routes, sources, graph, sourceLinks, governingQuestion, appearance } = contractConfiguration;
 
 const server = spawn(process.execPath, [serverProgram], {
   cwd: root,
@@ -69,6 +69,7 @@ try {
     throw new Error(`Runtime width control did not initialize: ${JSON.stringify(bootstrap)}`);
   }
   const result = await runContract(page, {
+    appearance,
     governingQuestion: {
       applicable: governingQuestion.applicable,
       canonicalQuestion: governingQuestion.canonicalQuestion,

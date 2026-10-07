@@ -9,6 +9,8 @@ status: draft
 
 ## 2026-10-07
 
+- **Configurable appearance technical review**: Integrate the exact Thirlwall candidate into the local Standard tree. Fix native palette reordering that reversed saved reader choices during adoption. Use stable radio indexes and native unconditional media defaults, with regression cases for prior choices and later default changes. Clarify configured brand surfaces and derived active colours in the design and starter contracts. The [review record](project/configurable-appearance-review.md) retains the original proposal and keeps approval, issue linkage, formal acceptance, release and adoption separate.
+
 - **Prospective writing default**: Researched official ASD-STE100 sources and added the [80% house writing policy](spec/writing-style.md). The current official issue is 9, dated 15 January 2025. The percentage is a local pragmatic preference; no official 80% measure was identified. `DKBWS-PROMPT-001` now carries the default into new Wiki setups and new original English prose, with protected forms and review limits. Existing content and consumer pins remain unchanged. Author review covered the new policy, its template and the changed guidance. A synthetic rewrite preserved uncertainty, an exact quotation, a command and its source identifier. This was a bounded fidelity check, not a linguistic score or corpus-wide review. [SRC-057](sources.md#src-057), [SRC-058](sources.md#src-058), [SRC-059](sources.md#src-059)
 
 ## 2026-10-06

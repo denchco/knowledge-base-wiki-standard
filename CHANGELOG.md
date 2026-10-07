@@ -4,6 +4,8 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Propose an opt-in configurable appearance adapter under existing `DKBWS-DESIGN-001`, `DKBWS-RENDER-001` and `DKBWS-VERIFY-001`: one versioned input, deterministic OKLCH colour roles, final-sRGB contrast checks, visible exact brand surfaces, native defaults with stable palette indexes, persisted reader preferences, graph integration and real-renderer browser fixtures. Projects without configuration retain their current appearance. Migration is opt-in and requires the complete generator/runtime/test closure; this local candidate does not record acceptance, publish a release or change a consumer pin.
+
 - Extend `DKBWS-PROMPT-001` with the ASD-STE100-inspired 80% authoring default for future new Wiki setups and original English prose. Register Issue 9 research, define protected content and review limits, propagate a mapped `AUTHORING.md` through pinned templates and shared agent instructions, and add initializer/retention fixtures. Migration is prospective and reviewable; no bulk prose rewrite, consumer pin change, new dependency or automated linguistic-compliance claim.
 
 - Restore codepoint ordering of the snapshot allowlist after the appearance assets were added, and validate the checked-in contract in the regression suite. The released Documentation snapshot and its pin remain unchanged.

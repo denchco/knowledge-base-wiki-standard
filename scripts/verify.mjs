@@ -22,9 +22,11 @@ const derivedOutputs = [
   "site/",
   "site-local/",
   "zensical.local.toml",
+  "zensical.appearance.toml",
   "graphify-out/",
   ".cache/",
   "docs/assets/vendor/",
+  "docs/assets/appearance/",
   "docs/assets/graphify/",
   "output/verification/",
   "output/standard-proposals/",
@@ -39,6 +41,7 @@ const gates = [
   "check",
   "check:graphify",
   "check:browser",
+  "check:appearance-browser",
   ...(provenanceMode === "maintainer" ? ["service:status"] : []),
 ];
 const receiptDirectory = path.join(root, "output", "verification");
@@ -300,6 +303,22 @@ function buildReceipt(provenance) {
         result("DKBWS-GRAPH-001", ["browser-contract"], "The selected profile's required 2D/3D graph routes rendered at desktop and mobile widths with nonblank canvases and usable controls."),
         result("DKBWS-RENDER-001", ["browser-contract", "browser-dependency-lock"]),
         result("DKBWS-RUNTIME-001", ["browser-contract"], "The verification runtime served the canonical built Wiki with HTTP 200."),
+      ],
+    },
+    {
+      id: "appearance-browser",
+      status: "pass",
+      command: "npm run check:appearance-browser",
+      exitCode: 0,
+      evidence: [
+        evidence("appearance-core-fixtures", "test-suite", "Deterministic role derivation, rounded sRGB contrast, strict input validation and native configuration preservation.", "scripts/wiki-appearance.test.mjs"),
+        evidence("appearance-generation-fixtures", "test-suite", "Absent-config passthrough, deterministic generation, invalid-input safety and shared graph roles.", "scripts/prepare-wiki-appearance.test.mjs"),
+        evidence("appearance-browser-fixtures", "browser-test", "Real native palette, width, exact accent, contrast, persistence across adoption and default changes, storage failure and narrow-screen cases.", "scripts/check-wiki-appearance-browser.mjs"),
+        evidence("appearance-browser-result", "browser-test", "Current generated fixture results.", "output/verification/appearance/contract.json"),
+      ],
+      results: [
+        result("DKBWS-DESIGN-001", ["appearance-core-fixtures", "appearance-generation-fixtures", "appearance-browser-fixtures", "appearance-browser-result"], "The optional adapter derives readable roles while retaining exact brand surfaces; real browser fixtures prove contrasting themes, saved preferences and configured defaults."),
+        result("DKBWS-RENDER-001", ["appearance-browser-fixtures", "appearance-browser-result"], "Configured and unconfigured fixtures use the pinned native renderer and existing palette persistence."),
       ],
     },
     {

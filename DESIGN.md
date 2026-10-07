@@ -216,7 +216,7 @@ The shell may look identical across topics. The topic's reader model, navigation
 - Full pill radii are reserved for compact status labels.
 - Diagram text follows reduced table text sizing; ordinary body copy remains the renderer baseline.
 
-The DenchCo standard wiki keeps this teal family. A conforming derived wiki may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify so 2D and 3D interactions inherit it. Do not alter Zensical chrome structure to create a topic identity.
+The unconfigured DenchCo Standard Wiki keeps this teal family. A consumer using the manual adapter may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify. A consumer selecting the configurable adapter uses the generated roles described below. Do not alter Zensical chrome structure to create a topic identity.
 
 ## Appearance
 
@@ -246,7 +246,7 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - When Human, Agent, and Graph surfaces are all shown, use three separately labelled sibling boxes, each reached directly from canonical knowledge. Where verification follows, each path rejoins it. Their visual separation does not make them separate canonical corpora or evidence authorities.
 - No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
 - Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
-- The production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent.
+- The unconfigured production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent. The optional configured adapter uses the exact brand colour for the header and selected navigation, with contrasting text and transparent header controls.
 - Mermaid `11.17.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects
@@ -268,3 +268,26 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
   `1.63.0` rendered desktop/mobile geometry, pixel checks, controls, overflow,
   and public-CDN exclusion. Deployment and public HTTP health are separate
   release-adapter gates.
+
+## Configurable appearance candidate
+
+This reviewed local candidate adds an optional appearance adapter under the existing design and verification requirements. The [technical review](docs/project/configurable-appearance-review.md) records its origin, repairs and pending formal intake. No acceptance, release or consumer adoption is implied.
+
+Use `config/wiki-appearance.json` as the input for a consumer that selects the adapter:
+
+```json
+{
+  "schemaVersion": "1.0",
+  "accent": "#e1efdd",
+  "appearance": "light",
+  "width": "wide"
+}
+```
+
+The example choices belong to the originating consumer. They are not universal defaults. Existing projects without this file retain their renderer settings exactly.
+
+Run `npm run prepare:appearance` before the renderer. The command writes only generated assets under `docs/assets/appearance/` and `zensical.appearance.toml`. Build from that generated configuration. The live-config preparer uses it too. Keep these paths ignored and listed as derived outputs in verification. Do not edit generated colours or reorder native palettes by hand.
+
+The shared module preserves the exact accent on visible header and selected-navigation surfaces. It derives matching OKLCH colour roles, reducing chroma only when sRGB requires it, then checks contrast after rounding to the final hex values. Dark inputs receive a readable light question-panel tint. Graph publication reads the same configuration. Native Zensical still owns appearance storage, and saved reader choices take precedence over configured initial settings. Preserve the canonical palette order because Zensical saves a radio index. The generator selects the fresh default with native `media = "all"` and `media = "not all"`, independent of the operating-system theme. It never reorders radios or writes preference storage. The width control retains its existing storage key and uses the configured fallback when storage is missing, invalid or unavailable.
+
+The unit fixtures cover pale, dark, saturated and neutral inputs, invalid configuration, deterministic output, final-colour contrast and native configuration generation. The browser fixtures build real pinned Zensical pages. They cover light/wide and dark/standard defaults, native saved preferences before adoption and after default changes, visible brand surfaces and 390px containment. Existing consumers must carry the complete adapter closure and verify their own content before adopting it.

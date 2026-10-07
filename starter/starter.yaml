@@ -56,6 +56,8 @@ classifications:
       - "site/"
       - "graphify-out/"
       - "docs/assets/vendor/"
+      - "docs/assets/appearance/"
+      - "zensical.appearance.toml"
       - "docs/assets/graphify/"
       - "output/"
 
@@ -79,6 +81,53 @@ consumer_owned:
   - "tracked proposal origin records, payload approvals, issue observations, and optional adoption decisions"
 
 entries:
+  - target: "config/wiki-appearance.json"
+    role: "optional-wiki-appearance-configuration"
+    classification: "render-template"
+    template: "starter/templates/config/wiki-appearance.json.tmpl"
+    requirements: ["DKBWS-DESIGN-001"]
+  - target: "scripts/wiki-appearance.mjs"
+    role: "appearance-derivation"
+    classification: "adapt-from-release"
+    source: "scripts/wiki-appearance.mjs"
+    planning_only: true
+    dependency_closure: "validated appearance configuration, prepare-wiki-appearance, named renderer and graph roles, configured width fallback, generated native defaults with stable palette indexes, ignored outputs, unit and browser checks"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/prepare-wiki-appearance.mjs"
+    role: "appearance-generation"
+    classification: "adapt-from-release"
+    source: "scripts/prepare-wiki-appearance.mjs"
+    planning_only: true
+    dependency_closure: "wiki-appearance module, config/wiki-appearance.json, schema/wiki-appearance-v1.json, generated CSS/JS, zensical.appearance.toml build input, live-config preparation and verification output allowlist"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "schema/wiki-appearance-v1.json"
+    role: "appearance-schema"
+    classification: "adapt-from-release"
+    source: "schema/wiki-appearance-v1.json"
+    planning_only: true
+    dependency_closure: "strict appearance validator and positive/negative fixtures"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/wiki-appearance.test.mjs"
+    role: "appearance-unit-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/wiki-appearance.test.mjs"
+    planning_only: true
+    dependency_closure: "wiki-appearance module, appearance schema and locked Ajv runtime"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/prepare-wiki-appearance.test.mjs"
+    role: "appearance-generation-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/prepare-wiki-appearance.test.mjs"
+    planning_only: true
+    dependency_closure: "prepare-wiki-appearance module and graph publisher with configured shared roles"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-wiki-appearance-browser.mjs"
+    role: "appearance-browser-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-wiki-appearance-browser.mjs"
+    planning_only: true
+    dependency_closure: "appearance generator, native renderer and patch adapter, serve-built-site, canonical theme/width assets, locked browser runtime and ignored verification output"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-RENDER-001", "DKBWS-VERIFY-001"]
   - target: ".wiki-standard.yaml"
     role: "manifest"
     classification: "render-template"

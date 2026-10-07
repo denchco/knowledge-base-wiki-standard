@@ -37,7 +37,9 @@ The local Zensical service is registered as `denchco-kb-wiki-standard` at `http:
 
 ## Current bounded priorities
 
-No active maintenance priorities remain from the October review. The scoped security and dependency-updater maintenance merged through protected PR #13 at `fef1392548381276a03ca89a2ede435a3d04ec08` on 3 October 2026. Post-merge Verify run `37101094460` passed on that exact revision. [SRC-044](../sources.md#src-044), [SRC-045](../sources.md#src-045)
+One contribution remains pending formal intake: the [Thirlwall configurable appearance review](configurable-appearance-review.md). Complete exact-payload approval, governed issue submission and linkage, then record the explicit Standard decision against the verified integration commit. Release and Thirlwall adoption remain separate decisions.
+
+No active maintenance priorities remain from the earlier October review. The scoped security and dependency-updater maintenance merged through protected PR #13 at `fef1392548381276a03ca89a2ede435a3d04ec08` on 3 October 2026. Post-merge Verify run `37101094460` passed on that exact revision. [SRC-044](../sources.md#src-044), [SRC-045](../sources.md#src-045)
 
 Fresh hosted uv Dependabot run `37103486583` also passed on that revision using uv `0.12.18`; both targeted dependency resolutions exited successfully. This closes [STD-VAL-008](../validation-queue.md). The generated Graphify and Zensical upgrade proposals require their own qualification and are not adopted by this evidence record. [SRC-046](../sources.md#src-046)
 

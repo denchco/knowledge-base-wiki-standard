@@ -68,7 +68,8 @@ body[data-md-color-scheme] {
     width: 0.6rem;
   }
 
-  html[data-layout-width="wide"] .md-grid {
+  html[data-layout-width="wide"] .md-grid,
+  html[data-layout-default-width="wide"]:not([data-layout-width="standard"]) .md-grid {
     max-width: calc(100% - 0.5rem);
   }
 }
