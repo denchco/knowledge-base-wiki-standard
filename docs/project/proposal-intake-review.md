@@ -7,7 +7,7 @@ status: draft
 
 # Three-contribution intake review
 
-The owner authorised completion of intake and acceptance for these three contributions on 19 October 2026. The technical review supports acceptance against Standard revision `ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7`. The exact payload approvals and final governed-form submissions remain pending. No issue linkage or completed acceptance is claimed by this review.
+The owner authorised completion of intake and acceptance for these three contributions on 19 October 2026. The technical review supports acceptance against Standard revision `ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7`. The owner then approved all three exact payloads below and delegated their final submission through the governed forms. The approvals are recorded in the originating records. Browser authentication must complete before submission; no issue linkage or completed acceptance is claimed yet.
 
 The originating records remain authoritative. Their immutable implementations and pins were checked again. Read-only `check` and `sync --check` returned valid and current with no diagnostics. Searches covered open and closed issues by each stable marker and found no submitted match. The 121-file verification archive for the reviewed Standard revision passed all recorded size and SHA-256 checks. Its full-profile report is complete and conformant.
 
@@ -29,7 +29,7 @@ The handoff mechanism requires a grounded assessment of the continuing Wiki subj
 
 Each payload below includes its exact repository, title, labels and body. Its digest covers the compact ordered JSON object `{repository,title,labels,body}` with no trailing newline. All three bind governed form SHA-256 `3624749c2915771b98dabb7ec93f7ae34618da7b914bd28d20a557abd86f4adf`. The public form still matches that digest.
 
-The standing `AGENTS.md` rule says: “the user performs final submission.” The owner may explicitly delegate that final governed-form action for these three exact payloads. Any payload or form edit invalidates approval. The [governed workflow](../llm-wiki/standard-proposals.md) requires verified exact issue linkage before a terminal decision can be recorded.
+The standing `AGENTS.md` rule says: “the user performs final submission.” The owner's explicit delegation covers only these three exact payloads. The general rule remains in force. Any payload or form edit invalidates approval. The [governed workflow](../llm-wiki/standard-proposals.md) requires verified exact issue linkage before a terminal decision can be recorded.
 
 After submission, record each observed issue linkage and acceptance in separate Jujutsu phases. Publish the matching acceptance registry through the governed repository process, then reconcile the consumer records against it. Release inclusion, Documentation synchronisation and consumer adoption remain separate. Existing pins do not change.
 
