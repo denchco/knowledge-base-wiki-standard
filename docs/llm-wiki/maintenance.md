@@ -35,9 +35,10 @@ Static checks prove that the policy reaches new setups and shared instructions. 
 
 ## Reader source links
 
+- Use numeric superscript citations whose numbers come from stable source identities, with leading zeroes and full accessible identities retained. Preserve explanatory notes and canonical Markdown.
 - Add a stable anchor to every mapped source-register row. Link each visible source identity independently to its exact internal row; link every list member and only the displayed endpoints of a compact range.
 - Use a registered primary URL when prose directly links a specifically named official authority, guidance, or publication. Do not turn generic institution names into decorative authority links.
-- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, lost visible brackets, and broken destination journeys.
+- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, missing numeric superscripts, and broken destination journeys.
 
 ## Canonical governing question
 

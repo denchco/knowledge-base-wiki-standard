@@ -222,6 +222,8 @@ A consumer using the manual adapter may replace the complete accent family in th
 
 ## Appearance
 
+Fresh desktop readers receive Wide layout. An explicit appearance configuration may select Standard initially; saved Standard or Wide choices take precedence. Missing, invalid or unavailable storage falls back to the configured width, or Wide without configuration. Mobile layouts remain contained and retain the saved desktop choice.
+
 The reference adapter offers native Zensical light (`default`) and dark (`slate`) palettes. Light remains the initial Standard appearance; a consumer may choose another initial palette and records that choice here. The native sun/moon control sits immediately before Wide, names the action it performs, retains keyboard focus and remains visible on mobile when Wide is hidden. Zensical owns the saved preference and its navigation/reload behaviour; do not add a competing storage key or appearance controller.
 
 For Zensical 0.0.59, reflect the resolved native body scheme into the corresponding radio's checked state on initialisation and scheme changes. This repairs keyboard entry after preference restoration without dispatching events, moving focus or writing preference storage. Verify the selected radio and visible focus before the first toggle interaction, including after reload and navigation in both appearances.
@@ -238,7 +240,7 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. When the Wiki declares one canonical question, use that governed component for every verbatim repetition in its bounded reader set. Keep paraphrases and unrelated quotations neutral.
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
-- Render every displayed `SRC-NNN` as an independently focusable internal link to its exact source-register row while preserving the visible `[SRC-NNN]` grammar. Lists keep separate link targets and compact ranges link their displayed endpoints. Do not suppress the native focus indication or make brackets the only accessible label.
+- Render registered source citations as numeric superscripts: `SRC-002` displays as `002` with its leading zeroes preserved. Each number is an independently focusable native link to its exact source-register row, with the full identity in its accessible name. Adjacent citations use comma-and-space separators in authored order; compact ranges retain their displayed endpoints. Preserve canonical Markdown, explanatory notes and full source-register row identities. Keep visible keyboard focus and active-theme contrast; reject the former bracket presentation unless an explicit scoped deviation applies.
 - Keep reference navigation free of lifecycle status icons and tooltips, including the renderer's fallback information icon. Preserve source lifecycle metadata, page titles, subtitles, page icons, section controls and keyboard access. The pinned `overrides/partials/nav-item.html` adapter removes status output only; carry it with the `custom_dir` setting.
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.
 - Avoid marketing heroes, nested cards, decorative panels, and prose that overstates evidence.
@@ -286,7 +288,7 @@ Use `config/wiki-appearance.json` as the input for a consumer that selects the a
 }
 ```
 
-The example choices belong to the originating consumer. They are not universal defaults. Existing projects without this file retain their renderer settings exactly.
+The example accent belongs to the originating consumer. Light appearance and Wide layout are the reference defaults. Without this file, the Standard keeps its declared renderer palette and uses Wide as the fresh desktop fallback. Existing consumers retain their pinned contract until adoption; saved reader choices remain valid.
 
 Run `npm run prepare:appearance` before the renderer. The command writes only generated assets under `docs/assets/appearance/` and `zensical.appearance.toml`. Build from that generated configuration. The live-config preparer uses it too. Keep these paths ignored and listed as derived outputs in verification. Do not edit generated colours or reorder native palettes by hand.
 

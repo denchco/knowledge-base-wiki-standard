@@ -39,7 +39,7 @@ No `WAIVED` result was recognised. A narrative decision not to adopt OKF, Graph 
 | [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 4 | 12 |
 | [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 4 | 0 | 1 | 10 |
 
-The retained `DKBWS-HUMAN-001` findings and counts cover only the historical strict-build and stable-URL wording. None of these audits assessed the status-free default or its navigation accessibility checks added on 19 October 2026. They do not establish conformance to that expanded scope.
+The retained `DKBWS-HUMAN-001` findings and counts cover only the historical strict-build and stable-URL wording. None of these audits assessed the status-free default or its navigation accessibility checks added on 19 October 2026. They do not establish conformance to that expanded scope. The retained `DKBWS-DESIGN-001` results likewise cover historical tokens and linting only; they provide no proof of the current Wide default, saved-width precedence or storage-failure behaviour.
 
 These counts are diagnostic rather than rankings. X-Lab deliberately omits capabilities that its purpose does not currently justify. Regulation 28's legacy Level 4 label similarly prevents the audit from silently treating advanced Ask/deployment work as a higher formal claim.
 
@@ -180,7 +180,7 @@ NHS Data Sharing demonstrates the complete reusable pattern: a semantically iden
 
 The five 2026-08-03 audits predated `DKBWS-HUMAN-003`. Earlier catalogue overlays added low-confidence `NOT_IMPLEMENTED` results because those audits contained no marker evidence. The identifier is now retired, so the current overlays exclude it and their totals each decrease by one. This updates catalogue accounting; the original observations and immutable release records remain unchanged.
 
-Those audits also predate `DKBWS-LINK-002` and did not test independent citation targets, stable destination-row anchors, registered named-authority URLs, or a built-output exact-fragment journey. Their added reader-source-navigation results are therefore conservative low-confidence `NOT_IMPLEMENTED` states. The independently verified Health IT Governance consumer revision supplies the positive implementation evidence; it does not retroactively change the historical five-project results.
+Those audits also predate `DKBWS-LINK-002` and did not test independent citation targets, stable destination-row anchors, registered named-authority URLs, or a built-output exact-fragment journey. Their added reader-source-navigation results are therefore conservative low-confidence `NOT_IMPLEMENTED` states. The independently verified Health IT Governance consumer revision supplies historical exact-row navigation evidence, not proof of the later numeric superscript presentation; it does not retroactively change the historical five-project results.
 
 They also predate `DKBWS-PROMPT-002`. None includes a captured development response checked for live absolute Wiki URLs, proof that those URLs use the exact configured origin, or route-health evidence for every displayed Wiki destination. Each project therefore records a low-confidence `NOT_IMPLEMENTED`; a configured URL or generic root HTTP result alone is not treated as response-navigation proof.
 

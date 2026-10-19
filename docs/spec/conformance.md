@@ -25,7 +25,9 @@ The candidate catalogue records each requirement's stable ID, normative statemen
 
 The selected profile is an exhaustive requirement closure. A formal report MUST enumerate every inherited requirement ID and MUST NOT silently omit an element because the target uses another renderer, path layout, parser, or runtime adapter. Normative outcomes are absolute when applicable; implementation identity is not. A consumer-specific algorithm, route name, corpus count, or example remains evidence unless the catalogue deliberately makes it normative. Conditional absence is recorded as `not-applicable` with its predicate evidence, while unavailable proof remains `not-checked` or fails an asserted claim.
 
-The conformance kit contains positive and negative fixtures. A source/configuration assertion cannot prove browser-visible behaviour; rendered claims require built-output browser checks. In particular, `DKBWS-HUMAN-002` passes only when computed governing-question rail and text colours both equal the runtime-resolved active accent at each supported verification viewport and an ordinary quotation remains neutral. `DKBWS-HUMAN-004` additionally requires an authoritative question mapping, an exact-text scan over the declared bounded reader set, and desktop/mobile browser proof on every route where that question repeats; paraphrases and records outside the bounded reader set remain neutral controls. `DKBWS-HUMAN-001` requires built-output proof of status-free default navigation with intact page titles, section controls and accessibility. `DKBWS-LINK-002` requires source lint and a built-output journey that focuses a representative source link, preserves its accessible identity and citation grammar, follows its exact fragment, and confirms the destination anchor belongs to the intended source-register row at desktop and mobile widths.
+The conformance kit contains positive and negative fixtures. A source/configuration assertion cannot prove browser-visible behaviour; rendered claims require built-output browser checks. In particular, `DKBWS-HUMAN-002` passes only when computed governing-question rail and text colours both equal the runtime-resolved active accent at each supported verification viewport and an ordinary quotation remains neutral. `DKBWS-HUMAN-004` additionally requires an authoritative question mapping, an exact-text scan over the declared bounded reader set, and desktop/mobile browser proof on every route where that question repeats; paraphrases and records outside the bounded reader set remain neutral controls. `DKBWS-HUMAN-001` requires built-output proof of status-free default navigation with intact page titles, section controls and accessibility. `DKBWS-LINK-002` requires source lint, renderer fixtures, independent citation accounting across all built reader pages, and browser checks of every citation-bearing reader route. Each numeric superscript must retain its full accessible source identity, accept keyboard focus, and reach the exact mapped source-register row at desktop and mobile widths. The built-output check MUST compare rendered citations with canonical source expectations so a missing renderer or missing link cannot produce an empty passing result.
+
+`DKBWS-DESIGN-001` requires source and runtime fixtures plus browser evidence for layout, initial defaults, saved preferences and appearance. Under the reference adapter, tests MUST exercise a fresh reader with no appearance configuration or saved preference, valid saved Standard and Wide choices, invalid and unavailable storage, and an explicit configured Standard default. Tests must preserve saved-choice precedence through navigation, reload and viewport changes, while proving Wide as the unconfigured desktop fallback and containment on mobile. Optional appearance configuration must preserve readable colours and native palette behaviour when present; its absence must not remove baseline width verification.
 
 `inspect` and `validate` are wholly read-only. `verify` MUST leave canonical inputs unchanged, but MAY rebuild declared derived outputs in deterministic paths so freshness can be proved. A project MUST list those derived paths; unexpected worktree changes fail verification. Upgrade remains a separate explicit, reviewable operation.
 
@@ -91,7 +93,48 @@ npm run conformance:test
 
 No command above modifies the target. A caller MAY redirect export output to a new artifact; the CLI never selects or overwrites an output file itself.
 
-The full-profile report builder consumes `schema/verification-receipt-v1.json`. A receipt names the selected profile, evaluation date, environment, canonical-input mutation result, and explicit gate results with evidence references. An absent gate remains `not-checked`; a successful command does not implicitly pass requirements that its receipt does not name. The report builder materializes an explicit result for every inherited requirement, so missing evidence cannot make an obligation disappear. `DKBWS-PROV-001` accepts only the read-only maintainer-mode provenance receipt with both Git and Jujutsu passing plus a successful instruction/helper gate for the development-turn commit rule, and `DKBWS-SEC-001` requires all four subcontrols. The generated report distinguishes complete evaluation from a conformant outcome and validates itself against `schema/conformance-report-v1.json` before emission. The reference paths `output/verification/receipt.json` and `output/verification/conformance-report.json` are reserved for those two schema-valid artifacts; an ad hoc project summary at either path is a failing fixture, not partial evidence.
+The full-profile report builder consumes `schema/verification-receipt-v1.json`. A receipt names the selected profile, evaluation date, environment, canonical-input mutation result, and explicit gate results with evidence references. An absent gate remains `not-checked`; a successful command does not implicitly pass requirements that its receipt does not name. The report builder materializes an explicit result for every inherited requirement and every required proof, so missing evidence cannot make an obligation disappear. `DKBWS-PROV-001` accepts only the read-only maintainer-mode provenance receipt with both Git and Jujutsu passing plus a successful instruction/helper gate for the development-turn commit rule, and `DKBWS-SEC-001` requires all four subcontrols. The generated report distinguishes complete evaluation from a conformant outcome and validates itself against `schema/conformance-report-v1.json` before emission. The reference paths `output/verification/receipt.json` and `output/verification/conformance-report.json` are reserved for those two schema-valid artifacts; an ad hoc project summary at either path is a failing fixture, not partial evidence.
+
+### Proof accounting and receipt migration
+
+Each gate result or manual check uses `proofs` to name the semantic obligations its evidence establishes. The result's status and evidence apply only to those named proofs. Proof names describe verification scope, not a command, renderer, path or gate ID. A consumer MAY use different commands and split proofs across gates. A manual check MAY supply a proof when its recorded observations cover the same scope. Neither adapter may label a source check as browser evidence.
+
+Every applicable proof MUST have explicit passing evidence before its requirement can pass. A failed contribution makes the requirement fail even if another contribution passes. A missing proof remains `not-checked` and appears in `proofResults` and `outstandingManualChecks`, including when another proof of that requirement failed. That evaluation remains incomplete. Unqualified legacy PASS results cannot fill missing proofs. Required capability results inherit their mapped requirements' incomplete or failed state; the `browser_verification` capability also depends on the selected rendered requirements. Omitting a required capability declaration or using the wrong exact value cannot produce conformance. The global canonical-mutation guard must pass for every profile: an unchecked guard leaves verification incomplete, a failed guard prevents conformance, and a PASS with changed canonical paths is an invalid receipt.
+
+The current proof catalogue is:
+
+| Requirement | Required proof names |
+| --- | --- |
+| `DKBWS-CORE-001` | `canonical-source` |
+| `DKBWS-CORE-002` | `manifest` |
+| `DKBWS-OKF-001` | `okf-validation`, `source-identity`, `lossless-fixtures` |
+| `DKBWS-OKF-002` | `lossless-fixtures` |
+| `DKBWS-OKF-003` | `bundle-mapping` |
+| `DKBWS-EVID-001` | `source-register` |
+| `DKBWS-EVID-002` | `evidence-review` |
+| `DKBWS-HUMAN-001` | `strict-build`, `http`, `browser-navigation` |
+| `DKBWS-HUMAN-002` | `browser-presentation` |
+| `DKBWS-HUMAN-004` | `source-consistency`, `browser-repetitions` |
+| `DKBWS-LLM-001` | `agent-contract` |
+| `DKBWS-LINK-001` | `source-links` |
+| `DKBWS-LINK-002` | `source-links`, `renderer-fixtures`, `built-citations`, `browser-citations` |
+| `DKBWS-GRAPH-001` | `publication`, `browser-2d`, `browser-3d` |
+| `DKBWS-DESIGN-001` | `design-source`, `design-fixtures`, `browser-layout`, `browser-defaults`, `browser-saved-preferences`, `browser-appearance` |
+| `DKBWS-RENDER-001` | `dependencies`, `browser-network` |
+| `DKBWS-PROV-001` | `turn-policy`, plus the separate maintainer workspace receipt |
+| `DKBWS-VERIFY-001` | `toolchain`, `canonical-mutation`, plus agreement with the receipt's canonical-mutation result |
+| `DKBWS-VERIFY-002` | `report-fixtures` |
+| `DKBWS-RUNTIME-001` | `canonical-http` |
+| `DKBWS-RUNTIME-002` | `service-fixtures`, `live-service` in maintainer mode |
+| `DKBWS-PROMPT-001` | `policy-source`, `policy-fixtures` |
+| `DKBWS-PROMPT-002` | `policy-source`, `response-fixtures` |
+| `DKBWS-UPDATE-001` | `lifecycle-fixtures` |
+| `DKBWS-UPDATE-002` | `record-validation`, `lifecycle-fixtures`, `approval-fixtures`, `release-fixtures`, `remote-write-fixtures` |
+| `DKBWS-RELEASE-001` | `immutable-release`, `migration-notes` |
+
+`DKBWS-SEC-001` retains its four separately evidenced subcontrols instead of generic proof labels. A `DKBWS-PROV-001` gate cannot replace the separate read-only maintainer workspace receipt; that result appears as `maintainer-workspace` in the report. Distribution mode cannot supply `live-service` or maintainer Jujutsu proof. A validated manifest waiver or `not-applicable` record retains its explicit status across the affected proof results. Absence of a capability, source citation or governing question does not automatically create such a record. Subject-empty and citation-free fixtures must remain neutral and must not invent content to satisfy a check.
+
+Consumers must update their receipt adapters when adopting this proof catalogue. Existing v1 receipts remain readable, but a generic PASS without `proofs` becomes `not-checked`. Rerun each applicable check and name only the proofs its evidence establishes. Do not add the full proof list to an old summary without performing the missing checks. Consumers pinned to a historical release retain that release's contract until a separately authorised adoption; historical receipts and releases are not rewritten.
 
 When Standard Production selects `standard_change_intake`, the full-profile receipt MUST include an explicit `DKBWS-UPDATE-002` gate result. A manifest declaration alone cannot pass it; absent proposal-schema, direct-state/terminal-transition, payload-binding, exact registry-revision/ancestry, public immutable-release, historical-bridge, disclosure, and remote-write-negative evidence remains `not-checked`.
 

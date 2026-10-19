@@ -26,7 +26,7 @@ When the user's intent is to instantiate an independent wiki by pointing at this
 ## Authority and safety
 
 - Canonical knowledge lives in maintained Markdown and registered evidence, never in generated HTML, LLM artifacts, Graphify output, or conversational answers.
-- When a Human Wiki displays registered source identities, keep each identity as an independent internal link to its exact mapped source-register row; direct links naming official authorities or publications use registered source URLs. Do not invent citations for subject-empty or citation-free content.
+- When a Human Wiki displays registered source identities, render each citation as a stable numeric superscript with its full identity in the accessible name and an independent internal link to its exact mapped source-register row; direct links naming official authorities or publications use registered source URLs. Do not invent citations for subject-empty or citation-free content.
 - When a Human Wiki declares a canonical governing question, map its authoritative source and bounded reader-source set. Every verbatim repetition in that set uses the governed callout; paraphrases, unrelated quotations, and records outside the declared reader set remain neutral. Do not invent a question for a subject-empty Wiki.
 - Preserve unknown OKF frontmatter fields and documented local deviations.
 - Do not silently change the declared profile, waive a requirement, publish to GitHub, deploy, or alter evidence status.

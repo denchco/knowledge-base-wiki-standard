@@ -13,5 +13,6 @@ requires:
   - DKBWS-PROMPT-002
 capabilities:
   human_wiki: required
+  source_citation_style: numeric-superscript
   llm_wiki: required
   development_response_links: live-wiki

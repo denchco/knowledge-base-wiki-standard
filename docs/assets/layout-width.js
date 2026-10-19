@@ -8,7 +8,7 @@
   const root = document.documentElement;
 
   const readPreference = () => {
-    const fallback = root.dataset.layoutDefaultWidth === "wide";
+    const fallback = root.dataset.layoutDefaultWidth !== "standard";
     try {
       const saved = window.localStorage.getItem(storageKey);
       return saved === "wide" ? true : saved === "standard" ? false : fallback;

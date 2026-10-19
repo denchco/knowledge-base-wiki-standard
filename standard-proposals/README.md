@@ -48,4 +48,4 @@ The approval digest is lowercase SHA-256 over the compact UTF-8 JSON bytes with 
 - The release ledger is recorded in a later JJ commit because a tracked file cannot contain the commit identifier of the commit that contains itself.
 - Consumer adoption requires separate authority, the old and new Standard pins, a committed consumer revision, and post-adoption verification. Synchronisation never changes the pin.
 
-The reader-source navigation precedent is backfilled as accepted `DKBWS-LINK-002`, pending release, using `pre-registry-local-history`; it has no fabricated or duplicate issue.
+The reader-source navigation precedent is recorded as accepted `DKBWS-LINK-002` and included in immutable `v0.1.0-rc.4`, using the sole `pre-registry-local-history` bridge. It has no fabricated or duplicate issue. This historical exact-row navigation acceptance does not accept the separate numeric-citation contribution.

@@ -135,6 +135,38 @@ test("appearance script provides width fallback only, preserving native palette 
   }
 });
 
+test("desktop width defaults to Wide without configuration and preserves explicit and saved Standard choices", () => {
+  const script = readFileSync(new URL("../docs/assets/layout-width.js", import.meta.url), "utf8");
+  const cases = [
+    { saved: null, expected: "wide" },
+    { saved: "invalid", expected: "wide" },
+    { unavailable: true, expected: "wide" },
+    { saved: "standard", expected: "standard" },
+    { saved: "wide", expected: "wide" },
+    { configured: "standard", saved: null, expected: "standard" },
+    { configured: "standard", saved: "invalid", expected: "standard" },
+    { configured: "standard", unavailable: true, expected: "standard" },
+    { configured: "standard", saved: "wide", expected: "wide" },
+    { configured: "wide", saved: "standard", expected: "standard" },
+  ];
+  for (const entry of cases) {
+    const root = { dataset: entry.configured ? { layoutDefaultWidth: entry.configured } : {} };
+    let writes = 0;
+    vm.runInNewContext(script, {
+      document: { documentElement: root, readyState: "loading", addEventListener() {},
+        querySelector: selector => selector.startsWith("link[") ? {} : null },
+      window: { localStorage: {
+        getItem() { if (entry.unavailable) throw new Error("Storage unavailable"); return entry.saved ?? null; },
+        setItem() { writes += 1; },
+      } },
+    });
+    assert.equal(root.dataset.layoutWidth, entry.expected, JSON.stringify(entry));
+    assert.equal(writes, 0, "Resolving a default must not overwrite a reader choice");
+  }
+  const template = JSON.parse(readFileSync(new URL("../starter/templates/config/wiki-appearance.json.tmpl", import.meta.url), "utf8"));
+  assert.equal(template.width, "wide", "New consumer configuration must select the same Wide default");
+});
+
 test("native palette configuration selects fresh defaults without changing native indexes", () => {
   for (const source of [toml, reversedToml]) for (const appearance of ["light", "dark"]) {
     const derived = deriveAppearance({ ...config, appearance });

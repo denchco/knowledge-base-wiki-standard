@@ -52,13 +52,17 @@ nav = [
     {"Local precedents" = "reference/local-precedents.md"},
     {"Project status" = "project/status.md"},
     {"Appearance contribution review" = "project/configurable-appearance-review.md"},
-    {"Navigation status migration" = "reference/navigation-status-migration.md"}
+    {"Navigation status migration" = "reference/navigation-status-migration.md"},
+    {"Reader defaults migration" = "reference/reader-defaults-migration.md"},
+    {"Release preparation" = "project/release-readiness.md"}
   ]}
 ]
 
 [project.markdown_extensions]
 admonition = {}
 attr_list = {}
+footnotes = {}
+source_citations = { register_file = "docs/sources.md" }
 tables = {}
 "pymdownx.details" = {}
 

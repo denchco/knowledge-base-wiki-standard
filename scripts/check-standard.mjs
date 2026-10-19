@@ -64,6 +64,7 @@ const required = [
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/check-governing-question-repetitions.mjs", "scripts/check-governing-question-repetitions.test.mjs",
   "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
+  "scripts/source_citations.py", "scripts/test_source_citations.py", "scripts/check_rendered_source_citations.py",
   "scripts/development-response-links.mjs", "scripts/development-response-links.test.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
@@ -108,6 +109,22 @@ if (authoringEntry?.classification !== "render-template"
 if (starterManifest?.bootstrap?.defaults?.authoring_policy !== "denchco-asd-ste100-inspired-80-percent") {
   failures.push("starter must select the pragmatic authoring policy as an automatic bootstrap default");
 }
+if (starterManifest?.bootstrap?.defaults?.desktop_width !== "wide"
+  || !starterManifest?.bootstrap?.no_question_defaults?.includes("Wide desktop width")) {
+  failures.push("starter must select Wide desktop width without a routine bootstrap question");
+}
+const starterAppearance = JSON.parse(readFileSync("starter/templates/config/wiki-appearance.json.tmpl", "utf8"));
+if (starterAppearance.width !== "wide") failures.push("starter appearance configuration must use the Wide desktop default");
+for (const phrase of ["Wide desktop width", "Wide applies without an appearance configuration", "valid saved reader choices", "hidden width control"]) {
+  if (!prompt.includes(phrase)) failures.push(`prompt lacks the governed width-default boundary: ${phrase}`);
+}
+const starterWidthDesign = readFileSync("starter/templates/DESIGN.md.tmpl", "utf8");
+for (const phrase of ["Start fresh desktop readers in Wide", "valid saved Standard or Wide choices", "Missing, invalid or unavailable storage", "hidden and content contained on mobile"]) {
+  if (!starterWidthDesign.includes(phrase)) failures.push(`starter design lacks the governed width-default boundary: ${phrase}`);
+}
+if (!readFileSync("scripts/runtime-browser-contract.playwright.js", "utf8").includes('appearance?.config.width ?? "wide"')) {
+  failures.push("the complete browser contract must expect unconfigured fresh-reader Wide");
+}
 for (const target of [".node-version", ".npmrc"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
   if (entry?.classification !== "adapt-from-release"
@@ -144,6 +161,24 @@ if (starterSourceLinks?.classification !== "adapt-from-release"
   || !(starterSourceLinks?.requirements ?? []).includes("DKBWS-LINK-002")) {
   failures.push("starter must adapt the pinned reader source-link checker for DKBWS-LINK-002");
 }
+for (const target of ["scripts/source_citations.py", "scripts/test_source_citations.py", "scripts/check_rendered_source_citations.py"]) {
+  const entry = starterEntries.find(candidate => candidate?.target === target);
+  if (entry?.classification !== "adapt-from-release" || entry?.source !== target || entry?.planning_only !== true || !entry?.requirements?.includes("DKBWS-LINK-002")) {
+    failures.push(`starter must carry the numeric source-citation dependency closure: ${target}`);
+  }
+}
+if (standardManifest.capabilities?.source_citation_style !== "numeric-superscript"
+  || humanAndAgentProfile.capabilities?.source_citation_style !== "numeric-superscript"
+  || starterManifest.bootstrap?.defaults?.source_citation_style !== "numeric-superscript"
+  || !starterManifest.bootstrap?.no_question_defaults?.includes("numeric superscript source citations")
+  || !readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8").includes('source_citation_style: "numeric-superscript"')) {
+  failures.push("current Human profile and new-wiki defaults must explicitly select numeric-superscript source citations");
+}
+for (const file of ["zensical.toml", "starter/templates/zensical.toml.tmpl"]) {
+  const renderer = readFileSync(file, "utf8");
+  if (!renderer.includes('source_citations = { register_file = "docs/sources.md" }') || !renderer.includes("footnotes = {}")) failures.push(`${file} must enable numeric source citations and explanatory footnotes`);
+}
+if (!prompt.includes("numeric superscript source citations")) failures.push("URL-only bootstrap must declare numeric superscript source citations");
 const starterGoverningQuestion = starterEntries.find((candidate) => candidate?.target === "scripts/check-governing-question-repetitions.mjs");
 if (starterGoverningQuestion?.classification !== "adapt-from-release"
   || starterGoverningQuestion?.source !== "scripts/check-governing-question-repetitions.mjs"
@@ -545,6 +580,11 @@ if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent un
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
 }
+if (!pkg.scripts?.["check:source-links"]?.includes("scripts/test_source_citations.py")) failures.push("source-link gate must include numeric renderer and independent built-accounting fixtures");
+if (!pkg.scripts?.["check:citations-built"]?.includes("scripts/check_rendered_source_citations.py")) failures.push("whole-built citation accounting gate is missing");
+for (const command of ["dev", "build:site"]) {
+  if (!pkg.scripts?.[command]?.includes("PYTHONPATH=scripts")) failures.push(`${command} must load the numeric citation renderer`);
+}
 if (!pkg.scripts?.["check:governing-question"]?.includes("check-governing-question-repetitions.mjs")) failures.push("missing check:governing-question command");
 if (!pkg.scripts?.check?.includes("check:governing-question")) failures.push("npm run check must include the governing-question repetition gate");
 if (!pkg.scripts?.["conformance:test"]?.includes("check-governing-question-repetitions.test.mjs")) failures.push("conformance:test must include governing-question repetition fixtures");
@@ -668,7 +708,7 @@ for (const file of [
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
-for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:browser", "service:status"]) {
+for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:citations-built", "check:browser", "service:status"]) {
   if (!verifyOrchestrator.includes(`"${gate}"`)) failures.push(`verify orchestrator does not exercise ${gate}`);
 }
 
@@ -696,6 +736,7 @@ for (const pin of [
 }
 
 const schema = JSON.parse(readFileSync("schema/manifest-v1.json", "utf8"));
+if (schema.properties?.capabilities?.properties?.source_citation_style?.const !== "numeric-superscript") failures.push("manifest schema must validate the numeric-superscript capability");
 if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") failures.push("manifest schema dialect is not Draft 2020-12");
 
 for (const file of sourceFiles(["docs", "knowledge", "prompts", "starter"])) {

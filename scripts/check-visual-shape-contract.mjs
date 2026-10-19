@@ -70,10 +70,15 @@ requireIn(requirements, "DKBWS-LINK-002", "the normative catalogue must define D
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-004", "the Human and Agent profile must require DKBWS-HUMAN-004");
 requireIn(humanProfile, "- DKBWS-LINK-002", "the Human and Agent profile must require DKBWS-LINK-002");
-requireIn(design, "independently focusable internal link", "DESIGN.md must preserve independent source-row links");
+requireIn(design, "independently focusable native link to its exact source-register row", "DESIGN.md must preserve independent source-row links");
 requireIn(starterDesign, "independently focusable internal link", "starter DESIGN.md must preserve independent source-row links");
-requireIn(content, '.md-typeset a[href*="#src-"]::before', "source-row links must restore the visible opening bracket");
-requireIn(content, '.md-typeset a[href*="#src-"]::after', "source-row links must restore the visible closing bracket");
+requireIn(content, ".md-typeset .source-citations", "source citations must have a numeric presentation rule");
+requireIn(selectorBlock(content, ".md-typeset .source-citations"), "vertical-align: super", "numeric source citations must use superscript");
+requireIn(selectorBlock(content, ".md-typeset .source-citations"), "white-space: nowrap", "source citation groups must stay together");
+for (const [source, label] of [[zensical, "zensical.toml"], [starterZensical, "starter zensical template"]]) {
+  requireIn(source, 'source_citations = { register_file = "docs/sources.md" }', `${label} must enable the mapped numeric citation renderer`);
+  requireIn(source, 'footnotes = {}', `${label} must preserve explanatory footnotes`);
+}
 for (const issue of governingQuestionMarkupIssues(home)) errors.push(`Standard homepage ${issue}`);
 for (const issue of governingQuestionMarkupIssues(architecture)) errors.push(`Standard architecture ${issue}`);
 requireIn(

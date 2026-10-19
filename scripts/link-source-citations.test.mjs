@@ -102,3 +102,52 @@ test("filesystem fixtures cover conforming and nonconforming reader navigation",
   assert.match(issues, /DKBWS-LINK-002-FRAGMENT.*fragment must be #src-002/);
   assert.match(issues, /DKBWS-LINK-002-AUTHORITY.*external authority link is not registered/);
 });
+
+test("canonical source footnotes validate their full identity and exact row before numeric rendering", () => {
+  const options = { file: "docs/research/example.md", registeredIds };
+  const valid = "Claim.[^SRC-002]\n\n[^SRC-002]: [SRC-002: Named source](../sources.md#src-002).";
+  assert.deepEqual(sourceLinkIssues(valid, options), []);
+  assert.deepEqual(sourceLinkIssues("Claim.[^SRC-002]\n\n[^SRC-002]:\n    [SRC-002](../sources.md#src-002).\n\n    Keep this qualification.[^SRC-001]\n\n[^SRC-001]: [SRC-001](../sources.md#src-001).", options), []);
+  assert.match(sourceLinkIssues("Claim.[^SRC-002]", options).join("\n"), /DKBWS-LINK-002-FOOTNOTE/);
+  assert.match(sourceLinkIssues(valid.replace("#src-002", "#src-001"), options).join("\n"), /DKBWS-LINK-002-FRAGMENT/);
+  assert.match(sourceLinkIssues(valid.replace("[SRC-002:", "[SRC-001:"), options).join("\n"), /DKBWS-LINK-002-FOOTNOTE/);
+  const literal = "```md\nClaim.[^SRC-999]\n[^SRC-999]: [SRC-999](wrong.md).\n```";
+  assert.deepEqual(sourceLinkIssues(literal, options), []);
+});
+
+test("indented code and code-labelled links remain literal for lint and rewriting", () => {
+  const markdown = "Example:\n\n    [SRC-999](wrong.md#src-999)\n\n[`SRC-002`](wrong.md#src-002)";
+  assert.deepEqual(sourceLinkIssues(markdown, { file: "docs/example.md", registeredIds }), []);
+  assert.equal(linkBareSourceIdentities(markdown, "./sources.md"), markdown);
+  assert.equal(linkCitationGroups(markdown, "./sources.md"), markdown);
+});
+
+test("optional rewriting preserves source footnotes and references inside explanatory notes", () => {
+  const markdown = [
+    "Claim.[^SRC-002][^note] Again.[^SRC-002] Bare SRC-001.",
+    "",
+    "[^SRC-002]: [SRC-002: Named source](../sources.md#src-002).",
+    "[^note]: Explanation with a source.[^SRC-002]",
+    "",
+    "    Further qualification.[^SRC-002]",
+  ].join("\n");
+  const rewrite = text => linkBareSourceIdentities(linkCitationGroups(text, "../sources.md"), "../sources.md");
+  const linked = rewrite(markdown);
+  assert.equal(linked, markdown.replace("Bare SRC-001", "Bare [SRC-001](../sources.md#src-001)"));
+  assert.equal(rewrite(linked), linked);
+  assert.deepEqual(sourceLinkIssues(linked, { file: "docs/research/example.md", registeredIds }), []);
+});
+
+test("lint rejects source links nested inside corrupted footnote labels", () => {
+  const markdown = "Claim.[^[SRC-002](../sources.md#src-002)]\n\n[^SRC-002]: [SRC-002](../sources.md#src-002).";
+  assert.match(sourceLinkIssues(markdown, { file: "docs/research/example.md", registeredIds }).join("\n"),
+    /DKBWS-LINK-002-FOOTNOTE.*SRC-002 source link is nested inside a malformed footnote label/);
+});
+
+
+test("escaped source and footnote labels remain literal in lint and optional rewriting", () => {
+  const markdown = String.raw`Literal \[SRC-002] and \[^SRC-003] and \[SRC-001](sources.md#src-001).`;
+  assert.deepEqual(sourceLinkIssues(markdown, { file: "docs/example.md", registeredIds, registeredUrls: new Set() }), []);
+  assert.equal(linkBareSourceIdentities(markdown, "./sources.md"), markdown);
+  assert.equal(linkCitationGroups(markdown, "./sources.md"), markdown);
+});

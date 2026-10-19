@@ -21,11 +21,13 @@ bootstrap:
     local_service: "auto-select-platform-user-service-adapter"
     deployment: "none"
     authoring_policy: "denchco-asd-ste100-inspired-80-percent"
+    desktop_width: "wide"
+    source_citation_style: "numeric-superscript"
   inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
   conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
   required_design_question: "state the inferred or default accent hex and ask whether to use or replace it"
   accent_derivation: "derive and record an accessible family; verify 4.5:1 normal-text and 3:1 non-text boundary contrast against rendered backgrounds"
-  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment", "pragmatic authoring policy"]
+  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment", "pragmatic authoring policy", "Wide desktop width", "numeric superscript source citations"]
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
@@ -377,6 +379,27 @@ entries:
     source: "scripts/link-source-citations.mjs"
     planning_only: true
     dependency_closure: "mapped reader evidence surfaces, source-register path and identity grammar, stable row anchors, optional idempotent rewrite, lint fixtures, visible citation styling, and built-output exact-row browser proof"
+    requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/source_citations.py"
+    role: "reader-source-citation-renderer"
+    classification: "adapt-from-release"
+    source: "scripts/source_citations.py"
+    planning_only: true
+    dependency_closure: "pinned Python-Markdown through Zensical, PYTHONPATH=scripts and PYTHONDONTWRITEBYTECODE=1 for build and serve, mapped register_file, footnotes extension, numeric superscript CSS, and source-link lint"
+    requirements: ["DKBWS-LINK-002", "DKBWS-RENDER-001"]
+  - target: "scripts/test_source_citations.py"
+    role: "reader-source-citation-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/test_source_citations.py"
+    planning_only: true
+    dependency_closure: "source_citations.py, check_rendered_source_citations.py, pinned Python-Markdown, unittest, and source/ordinary-footnote identity, grouping and negative presentation fixtures"
+    requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/check_rendered_source_citations.py"
+    role: "built-source-citation-accounting"
+    classification: "adapt-from-release"
+    source: "scripts/check_rendered_source_citations.py"
+    planning_only: true
+    dependency_closure: "manifest citation-style capability, mapped source register, canonical reader Markdown, complete built HTML, exact source sequence comparison, and all-route desktop/mobile browser checks"
     requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
   - target: "scripts/check-governing-question-repetitions.mjs"
     role: "governing-question-consistency-check"

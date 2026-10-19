@@ -44,7 +44,11 @@ try {
     try {
       const origin = await waitForServer(server);
       if (!fixture.config) {
-        await runLegacyCase(origin);
+        for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
+          await runUnconfiguredCase(origin, viewport);
+        }
+        for (const mode of ["missing", "invalid", "unavailable"]) await runWidthStorageCase(fixture, origin, mode);
+        for (const savedWidth of ["standard", "wide"]) await runSavedWidthCase(fixture, origin, savedWidth);
         continue;
       }
       for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
@@ -52,6 +56,7 @@ try {
       }
       await runWidthStorageCase(fixture, origin, "invalid");
       await runWidthStorageCase(fixture, origin, "unavailable");
+      for (const savedWidth of ["standard", "wide"]) await runSavedWidthCase(fixture, origin, savedWidth);
       for (const scheme of ["default", "slate"]) await runAdoptionCase(fixture, origin, scheme);
     } finally {
       server.kill("SIGTERM");
@@ -72,7 +77,7 @@ if (failure) {
   console.error(`Appearance browser fixtures failed: ${failure.message}`);
   process.exitCode = 1;
 } else {
-  console.log(`Appearance browser fixtures passed: ${report.cases.length} cases; native light/dark defaults, exact accent surfaces, contrast, saved choices across adoption/default changes, width storage fallback and 390px containment.`);
+  console.log(`Appearance browser fixtures passed: ${report.cases.length} cases; native light/dark defaults, exact accent surfaces, contrast, Wide fallback without configuration, saved choices across adoption/default changes, width storage fallback and 390px containment.`);
 }
 
 function buildFixture(fixture) {
@@ -216,7 +221,7 @@ async function runWidthStorageCase(fixture, origin, mode) {
   await context.addInitScript(({ mode, key }) => {
     if (mode === "invalid") {
       localStorage.setItem(key, "neither-wide-nor-standard");
-    } else {
+    } else if (mode === "unavailable") {
       for (const name of ["getItem", "setItem"]) {
         const original = Storage.prototype[name];
         Storage.prototype[name] = function (...args) {
@@ -228,16 +233,70 @@ async function runWidthStorageCase(fixture, origin, mode) {
   }, { mode, key: widthKey });
   try {
     await page.goto(origin, { waitUntil: "networkidle" });
-    const scheme = fixture.config.appearance === "light" ? "default" : "slate";
-    await ready(page, scheme, fixture.config.width);
+    const scheme = fixture.config?.appearance === "dark" ? "slate" : "default";
+    const defaultWidth = fixture.config?.width ?? "wide";
+    await ready(page, scheme, defaultWidth);
+    await assertMobileWidthPersistence(page, defaultWidth);
     await page.locator(".layout-width-toggle").click();
-    const changedWidth = fixture.config.width === "wide" ? "standard" : "wide";
+    const changedWidth = defaultWidth === "wide" ? "standard" : "wide";
     await ready(page, scheme, changedWidth);
     await page.reload({ waitUntil: "networkidle" });
-    await ready(page, scheme, fixture.config.width);
+    const restoredWidth = mode === "missing" ? changedWidth : defaultWidth;
+    await ready(page, scheme, restoredWidth);
+    await page.getByRole("link", { name: "Read the second page", exact: true }).click();
+    await page.waitForURL("**/second/");
+    await ready(page, scheme, restoredWidth);
+    await page.reload({ waitUntil: "networkidle" });
+    await ready(page, scheme, restoredWidth);
     assert.deepEqual(state.errors, []);
     assert.deepEqual(state.external, []);
-    report.cases.push({ fixture: fixture.name, storage: mode, defaultWidth: fixture.config.width, controlRemainsOperable: true });
+    report.cases.push({ fixture: fixture.name, storage: mode, defaultWidth, restoredWidth, controlRemainsOperable: true });
+  } finally {
+    await context.close();
+  }
+}
+
+async function assertMobileWidthPersistence(page, expectedWidth) {
+  const desktop = page.viewportSize();
+  const saved = () => page.evaluate(key => {
+    try { return localStorage.getItem(key); } catch { return "storage-unavailable"; }
+  }, widthKey);
+  const prior = await saved();
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.locator(".layout-width-toggle").isVisible(), false, "Mobile keeps the desktop width control hidden");
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), "Mobile remains contained for both desktop width choices");
+  assert.equal(await page.locator("html").getAttribute("data-layout-width"), expectedWidth);
+  assert.equal(await saved(), prior, "Resizing must not replace a saved desktop width");
+  await page.reload({ waitUntil: "networkidle" });
+  assert.equal(await page.locator("html").getAttribute("data-layout-width"), expectedWidth, "Mobile reload preserves the resolved desktop width");
+  assert.equal(await saved(), prior, "Mobile reload must not replace a saved desktop width");
+  await page.setViewportSize(desktop);
+  assert.equal(await page.locator(".layout-width-toggle").getAttribute("aria-pressed"), String(expectedWidth === "wide"));
+}
+
+async function runSavedWidthCase(fixture, origin, savedWidth) {
+  const state = await createContext(origin);
+  const { context, page } = state;
+  const scheme = fixture.config?.appearance === "dark" ? "slate" : "default";
+  try {
+    await page.goto(origin, { waitUntil: "networkidle" });
+    await ready(page, scheme, fixture.config?.width ?? "wide");
+    // Save both choices through the reader control, including the initial default.
+    await page.locator(".layout-width-toggle").click();
+    if (await page.locator("html").getAttribute("data-layout-width") !== savedWidth) {
+      await page.locator(".layout-width-toggle").click();
+    }
+    await ready(page, scheme, savedWidth);
+    assert.equal(await page.evaluate(key => localStorage.getItem(key), widthKey), savedWidth);
+    await page.getByRole("link", { name: "Read the second page", exact: true }).click();
+    await page.waitForURL("**/second/");
+    await ready(page, scheme, savedWidth);
+    await page.reload({ waitUntil: "networkidle" });
+    await ready(page, scheme, savedWidth);
+    await assertMobileWidthPersistence(page, savedWidth);
+    assert.deepEqual(state.errors, []);
+    assert.deepEqual(state.external, []);
+    report.cases.push({ fixture: fixture.name, savedWidth, survivedNavigationReloadAndMobile: true });
   } finally {
     await context.close();
   }
@@ -258,11 +317,11 @@ async function runAdoptionCase(fixture, origin, savedScheme) {
     // Set preferences through native controls, before the adapter exists.
     await context.route(rootUrl, route => route.fulfill({ path: path.join(legacySite, "index.html"), contentType: "text/html" }));
     await page.goto(rootUrl, { waitUntil: "networkidle" });
-    await ready(page, "default", "standard");
+    await ready(page, "default", "wide");
     await setScheme(page, savedScheme === "default" ? "slate" : "default");
     await setScheme(page, savedScheme);
     await page.locator(".layout-width-toggle").click();
-    if (savedWidth === "standard") await page.locator(".layout-width-toggle").click();
+    if (savedWidth === "wide") await page.locator(".layout-width-toggle").click();
     await ready(page, savedScheme, savedWidth);
     assert.equal(await page.evaluate(key => localStorage.getItem(key), widthKey), savedWidth);
     const saved = await readSavedPalette();
@@ -294,18 +353,29 @@ async function runAdoptionCase(fixture, origin, savedScheme) {
   }
 }
 
-async function runLegacyCase(origin) {
-  const state = await createContext(origin);
+async function runUnconfiguredCase(origin, viewport) {
+  const state = await createContext(origin, viewport);
   const { context, page } = state;
   try {
     await page.goto(origin, { waitUntil: "networkidle" });
-    await ready(page, "default", "standard");
+    await ready(page, "default", "wide");
     const navigation = await inspectNavigation(page);
     assert.equal(await page.locator("html").getAttribute("data-layout-default-width"), null);
     assert.equal(await page.locator('script[src$="/assets/appearance/appearance.js"]').count(), 0);
+    assert.equal(await page.evaluate(key => localStorage.getItem(key), widthKey), null, "Fresh Wide must not need a saved choice");
+    if (viewport.width === 390) {
+      assert.equal(await page.locator(".layout-width-toggle").isVisible(), false);
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    } else {
+      const wide = await page.locator(".md-main__inner").evaluate(element => element.getBoundingClientRect().width);
+      await page.locator(".layout-width-toggle").click();
+      await ready(page, "default", "standard");
+      const standard = await page.locator(".md-main__inner").evaluate(element => element.getBoundingClientRect().width);
+      assert.ok(wide - standard > 100, "Fresh unconfigured Wide must widen the actual desktop content rail");
+    }
     assert.deepEqual(state.errors, []);
     assert.deepEqual(state.external, []);
-    report.cases.push({ fixture: "unconfigured", defaultWidth: "standard", scheme: "default", navigation });
+    report.cases.push({ fixture: "unconfigured", defaultWidth: "wide", scheme: "default", viewport, navigation });
   } finally {
     await context.close();
   }

@@ -374,32 +374,62 @@ export default async (page, options = {}) => {
   };
   const inspectSourceLink = async (viewportName, followDestination = false) => {
     if (!sourceLinksEnabled) return null;
+    if (Array.isArray(options.citationRoutes) && options.citationRoutes.length === 0) return { routes: [], count: 0 };
     await goto(sourceLinksRoute);
-    const citation = page.locator('.md-content__inner a[href*="#src-"]').first();
-    await citation.waitFor({ state: "visible" });
-    const metrics = await citation.evaluate(element => ({
-      id: element.textContent.trim(),
-      accessibleName: element.getAttribute("aria-label") || element.textContent.trim(),
-      href: element.href,
-      tabIndex: element.tabIndex,
-      before: getComputedStyle(element, "::before").content,
-      after: getComputedStyle(element, "::after").content,
-      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    }));
-    const target = new URL(metrics.href);
-    check(/^SRC-\d{3}$/.test(metrics.id), `The representative source link must retain its stable identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.accessibleName.includes(metrics.id), `The representative source link must keep an intelligible accessible identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.tabIndex === 0, `The representative source link must be keyboard focusable at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.before === '"["' && metrics.after === '"]"', `The representative source link must visibly render as [${metrics.id}] at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(target.pathname === sourceRegisterRoute && target.hash === `#${metrics.id.toLowerCase()}`, `The representative source link must target its exact mapped source row at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.pageOverflow <= 1, `Reader source links must not create page overflow at ${viewportName} width`);
-    await citation.focus();
-    check(await citation.evaluate(element => document.activeElement === element), `The representative source link must accept keyboard focus at ${viewportName} width`);
-
+    const citationRoutes = options.citationRoutes?.length ? options.citationRoutes : [{ route: sourceLinksRoute }];
+    const routeResults = [];
+    for (const entry of citationRoutes) {
+      await goto(entry.route);
+      const citations = page.locator('.md-content__inner a[href*="#src-"], .md-content__inner a[data-source-id]');
+      await citations.evaluateAll(elements => elements.forEach(element => {
+        for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+          if (parent.tagName === "DETAILS") parent.open = true;
+        }
+      }));
+      const inspection = await citations.evaluateAll(inspectSourceCitationElements);
+      const rows = inspection.rows;
+      for (const fixture of inspection.hiddenFixtures) {
+        check(fixture.pass, `Invisible citation fixture ${fixture.name} must fail visibility on ${entry.route} at ${viewportName} width: ${JSON.stringify(fixture)}`);
+      }
+      check(rows.length > 0, `Citation-bearing route ${entry.route} must retain its source links at ${viewportName} width`);
+      if (entry.count !== undefined) check(rows.length === entry.count, `Every canonical citation on ${entry.route} must render at ${viewportName} width`);
+      if (entry.identities) check(JSON.stringify(rows.map(item => item.id)) === JSON.stringify(entry.identities), `Citation identities on ${entry.route} must retain canonical order at ${viewportName} width`);
+      for (const row of rows) {
+        const target = new URL(row.href);
+        const location = `${entry.route} ${row.id} at ${viewportName} width`;
+        check(/^SRC-\d{3,}$/.test(row.id), `Citation must retain its registered identity: ${location}`);
+        check(row.accessibleName === `Source ${row.id}`, `Citation must expose its full accessible identity: ${location}`);
+        check(row.tabIndex === 0 && row.focused && row.visible, `Citation must remain visible and independently keyboard focusable: ${location}`);
+        check(row.label === row.id.slice(4) && row.superscript, `Citation must display its stable zero-padded number in superscript: ${location}`);
+        check(row.groupText === row.groupExpected, `Adjacent citations must retain comma-separated groups: ${location}`);
+        check([row.before, row.after].every(value => !value.includes("[") && !value.includes("]")), `Numeric citations must not inherit brackets: ${location}`);
+        check(target.pathname === sourceRegisterRoute && target.hash === `#${row.id.toLowerCase()}`, `Citation must reach its exact mapped row: ${location}`);
+        check(row.groupContained && row.pageOverflow <= 1, `Citations must stay contained: ${location}`);
+      }
+      routeResults.push({ route: entry.route, count: rows.length });
+    }
+    await goto(sourceLinksRoute);
+    const citation = page.locator('.md-content__inner .source-citations a').first();
+    const metrics = await citation.evaluate(element => ({ id: element.dataset.sourceId, href: element.href }));
+    metrics.routes = routeResults;
+    await page.locator(".md-skip").focus();
+    const tabLimit = await page.locator('a[href], button, input, select, textarea, [tabindex="0"]').count() + 10;
+    for (let step = 0; step < tabLimit; step += 1) {
+      await page.keyboard.press("Tab");
+      if (await citation.evaluate(element => document.activeElement === element)) break;
+    }
+    const keyboard = await citation.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { focused: document.activeElement === element, visible: element.matches(":focus-visible"), outline: style.outlineStyle, width: style.outlineWidth };
+    });
+    check(keyboard.focused && keyboard.visible && keyboard.outline !== "none" && px(keyboard.width) >= 2,
+      `Tab must reach a source citation with a visible focus ring at ${viewportName} width: ${JSON.stringify(keyboard)}`);
+    metrics.keyboard = keyboard;
+    if (options.capture) await options.capture(`citations-${viewportName}`, await page.screenshot({ fullPage: true }));
     if (!followDestination) return metrics;
     await Promise.all([
       page.waitForURL(url => url.pathname === sourceRegisterRoute && url.hash === `#${metrics.id.toLowerCase()}`),
-      citation.click(),
+      page.keyboard.press("Enter"),
     ]);
     const anchor = page.locator(`#${metrics.id.toLowerCase()}`);
     await anchor.waitFor({ state: "attached" });
@@ -757,7 +787,7 @@ export default async (page, options = {}) => {
     : await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
   check(await page.locator("body").getAttribute("data-md-color-scheme") === initialScheme, "A fresh browser must start in the configured initial appearance");
   const initialWidth = await page.locator("html").getAttribute("data-layout-width");
-  check(initialWidth === (appearance?.config.width ?? "standard"), "A fresh browser must start in the configured initial width");
+  check(initialWidth === (appearance?.config.width ?? "wide"), "A fresh browser must start in Wide unless an explicit configured width overrides it");
   await inspectPaletteKeyboard(initialScheme, "desktop", "first load");
   await selectNativeScheme("default");
   const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
@@ -1397,3 +1427,58 @@ export default async (page, options = {}) => {
     requestCount: requests.length,
   };
 }
+
+// Kept self-contained so the same DOM inspection supports focused browser checks.
+export const inspectSourceCitationElements = elements => {
+  const visible = element => element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
+    && !/rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(getComputedStyle(element).color);
+  const links = elements.filter(element => !element.querySelector("code, pre") && (
+    element.dataset.sourceId || /^(?:SRC-)?\d{3,}(?:: .+)?$/.test(element.textContent.trim())
+  ));
+  const probe = links[0];
+  const hiddenFixtures = [];
+  if (probe) {
+    const originalStyle = probe.getAttribute("style");
+    const originalParentStyle = probe.parentElement.getAttribute("style");
+    const inspectHidden = (name, element, property, value) => {
+      const saved = element.getAttribute("style");
+      // Probe the completed hidden state, not a theme transition frame.
+      element.setAttribute("style", `${saved ?? ""}; transition: none !important; ${property}: ${value} !important`);
+      const style = getComputedStyle(probe);
+      hiddenFixtures.push({ name, pass: !visible(probe), color: style.color,
+        opacity: style.opacity, parentOpacity: getComputedStyle(probe.parentElement).opacity,
+        visibility: style.visibility });
+      element.setAttribute("style", `${saved ?? ""}; transition: none !important`);
+      // Resolve the restored value before re-enabling native transitions.
+      getComputedStyle(element).getPropertyValue(property);
+      if (saved === null) element.removeAttribute("style"); else element.setAttribute("style", saved);
+    };
+    inspectHidden("citation opacity: 0", probe, "opacity", "0");
+    inspectHidden("citation visibility: hidden", probe, "visibility", "hidden");
+    inspectHidden("citation color: transparent", probe, "color", "transparent");
+    inspectHidden("parent opacity: 0", probe.parentElement, "opacity", "0");
+    if (originalStyle === null) probe.removeAttribute("style"); else probe.setAttribute("style", originalStyle);
+    if (originalParentStyle === null) probe.parentElement.removeAttribute("style"); else probe.parentElement.setAttribute("style", originalParentStyle);
+  }
+  return { hiddenFixtures, rows: links.map(element => {
+    element.focus();
+    const group = element.parentElement;
+    const box = group.getBoundingClientRect();
+    return {
+      id: element.dataset.sourceId || "",
+      label: element.textContent.trim(),
+      accessibleName: element.getAttribute("aria-label"),
+      href: element.href,
+      tabIndex: element.tabIndex,
+      focused: document.activeElement === element,
+      visible: visible(element),
+      before: getComputedStyle(element, "::before").content,
+      after: getComputedStyle(element, "::after").content,
+      superscript: group.tagName === "SUP" && getComputedStyle(group).verticalAlign === "super",
+      groupText: group.textContent.trim(),
+      groupExpected: [...group.querySelectorAll("a")].map(link => link.dataset.sourceId?.slice(4)).join(", "),
+      groupContained: box.width <= document.documentElement.clientWidth,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  }) };
+};
