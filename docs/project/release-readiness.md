@@ -37,6 +37,8 @@ After the turn commit, the generated package lives under `output/verification/re
 
 The native appearance revision above must agree with the registry. A source or registry difference invalidates the package inventory and must be reconciled before publication.
 
+The [three-contribution intake review](proposal-intake-review.md) records the current acceptance scope and all three exact prepared public payloads.
+
 ## Consumer origins and pending intake
 
 | Contribution | Authoritative record | Immutable origin and pin | Remaining formal state |
