@@ -215,10 +215,6 @@ ${declarations(dark)}
   --focus: var(--selected-text);
   --focus-contrast: var(--selected-background);
 }
-.md-nav--primary .md-nav__item--active > .md-nav__link .md-status::after,
-.md-nav--primary .md-nav__item .md-nav__link--active .md-status::after {
-  background-color: var(--selected-text);
-}
 .md-typeset blockquote.governing-question {
   background-color: var(--question-background);
   border-inline-start-color: var(--question-border);

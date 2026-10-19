@@ -81,7 +81,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo upgrade/diff mechanism exists."},
     {"id": "bounded-ask-wiki", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/llm/chat-function.md"], "finding": "Chat is a planned design, not a deployed capability."}
   ],
-  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 13},
+  "requirement_summary": {"PASS": 6, "FAIL": 5, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 12},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check_wiki.py"], "finding": "Canonical knowledge is Markdown with checked relative links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares version, role mappings, capabilities or deviations."},
@@ -90,9 +90,8 @@
     {"id": "DKBWS-OKF-003", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": ["docs/operating-model/conformance.md"], "finding": "No DenchCo manifest maps a canonical OKF bundle directory."},
     {"id": "DKBWS-EVID-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["docs/sources/index.md"], "finding": "Sources have provenance and descriptive names but no stable source identifiers."},
     {"id": "DKBWS-EVID-002", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/evidence-matrix.md", "docs/further-research-priorities.md"], "finding": "Material conclusions expose confidence, boundaries and unresolved evidence."},
-    {"id": "DKBWS-HUMAN-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["mkdocs.yml", "docs/operating-model/conformance.md"], "finding": "Strict build exists, but a stable navigable URL is explicitly not implemented."},
+    {"id": "DKBWS-HUMAN-001", "status": "FAIL", "confidence": "HIGH", "evidence_paths": ["mkdocs.yml", "docs/operating-model/conformance.md"], "finding": "Strict build exists, but a stable navigable URL is explicitly not implemented.", "limitations": ["Historical HUMAN-001 evidence covers only the 2026-08-03 strict-build and stable-URL wording. Status-free navigation and its accessibility behaviour added on 2026-10-19 were not assessed; no pass for that expanded scope is inferred."]},
     {"id": "DKBWS-HUMAN-002", "status": "NOT_APPLICABLE", "confidence": "HIGH", "evidence_paths": [], "finding": "Scoped inspection found no governing-question callout, so the accent rail-and-text obligation does not apply."},
-    {"id": "DKBWS-HUMAN-003", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no dedicated draft marker, readable status mapping, or chevron-alignment evidence; no pass is inferred."},
     {"id": "DKBWS-HUMAN-004", "status": "NOT_APPLICABLE", "confidence": "HIGH", "evidence_paths": [], "finding": "Scoped inspection found no governing-question declaration or callout, so verbatim-repetition governance does not apply."},
     {"id": "DKBWS-LLM-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm/index.md", "docs/llm/maintenance-contract.md", "AGENTS.md"], "finding": "Read order, maintenance, query routing, authority and generated boundaries are defined."},
     {"id": "DKBWS-LINK-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm/index.md", "docs/llm/context-map.md", "scripts/check_wiki.py"], "finding": "Context maps and operational links go beyond navigation; local links are checked."},

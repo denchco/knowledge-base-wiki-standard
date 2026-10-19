@@ -13,7 +13,8 @@ function copyInputs() {
 test("the five adoption audits cover the requirement catalogue with consistent counts and unique IDs", () => {
   const inputs = copyInputs();
   assert.equal(inputs.reports.length, 5);
-  assert.equal(inputs.catalogueIds.length, 28);
+  assert.equal(inputs.catalogueIds.length, 27);
+  assert.equal(inputs.catalogueIds.includes("DKBWS-HUMAN-003"), false);
   assert.deepEqual(validateAdoptionAuditRecords(inputs), []);
 });
 

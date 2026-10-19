@@ -412,83 +412,37 @@ export default async (page, options = {}) => {
     check(destination.pageOverflow <= 1, `The source-register destination must not overflow at ${viewportName} width`);
     return { ...metrics, destination };
   };
-  const inspectDraftNavigation = async viewportName => {
+  const inspectNavigation = async viewportName => {
     const metrics = await page.evaluate(() => {
-      const visible = element => {
-        if (!element) return false;
-        const style = getComputedStyle(element);
-        const bounds = element.getBoundingClientRect();
-        return style.display !== "none" && style.visibility !== "hidden" && bounds.width > 0 && bounds.height > 0;
-      };
       const navigation = document.querySelector(".md-nav--primary");
-      const markers = [...(navigation?.querySelectorAll("a.md-nav__link > .md-status--draft") || [])]
-        .filter(visible);
-      const chevrons = [...(navigation?.querySelectorAll(".md-nav__item--nested > label.md-nav__link > .md-nav__icon") || [])]
-        .filter(visible);
-      const marker = markers[0] || null;
-      const chevron = chevrons[0] || null;
-      const markerBounds = marker?.getBoundingClientRect() || null;
-      const chevronBounds = chevron?.getBoundingClientRect() || null;
-      const markerRowBounds = marker?.parentElement?.getBoundingClientRect() || null;
-      const chevronRowBounds = chevron?.parentElement?.getBoundingClientRect() || null;
-      const negative = document.createElement("span");
-      negative.className = "md-status md-status--stable";
-      negative.style.cssText = "position:absolute;left:-10000px;top:0";
-      document.body.append(negative);
-      try {
-        const markerPseudo = marker ? getComputedStyle(marker, "::after") : null;
-        const negativePseudo = getComputedStyle(negative, "::after");
-        return {
-          count: markers.length,
-          titles: [...new Set(markers.map(item => item.getAttribute("title") || ""))],
-          markerMask: markerPseudo?.maskImage || markerPseudo?.webkitMaskImage || "",
-          negativeMask: negativePseudo.maskImage || negativePseudo.webkitMaskImage || "",
-          markerWidth: markerBounds?.width ?? null,
-          markerHeight: markerBounds?.height ?? null,
-          chevronWidth: chevronBounds?.width ?? null,
-          chevronHeight: chevronBounds?.height ?? null,
-          markerCenter: markerBounds ? markerBounds.left + markerBounds.width / 2 : null,
-          chevronCenter: chevronBounds ? chevronBounds.left + chevronBounds.width / 2 : null,
-          markerRowDelta: markerBounds && markerRowBounds
-            ? markerBounds.top + markerBounds.height / 2 - (markerRowBounds.top + markerRowBounds.height / 2)
-            : null,
-          chevronRowDelta: chevronBounds && chevronRowBounds
-            ? chevronBounds.top + chevronBounds.height / 2 - (chevronRowBounds.top + chevronRowBounds.height / 2)
-            : null,
-          pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-        };
-      } finally {
-        negative.remove();
-      }
+      const links = [...(navigation?.querySelectorAll("a.md-nav__link") || [])];
+      const controls = [...(navigation?.querySelectorAll(".md-nav__item--nested > label.md-nav__link") || [])];
+      return {
+        statusCount: navigation?.querySelectorAll(".md-status").length ?? null,
+        accessibleName: navigation?.getAttribute("aria-label") || "",
+        linkCount: links.length,
+        unnamedLinks: links.filter(link => !(link.getAttribute("aria-label") || link.textContent).trim()).length,
+        nonFocusableLinks: links.filter(link => link.tabIndex !== 0).length,
+        controlCount: controls.length,
+        invalidControls: controls.filter(control => {
+          const toggle = document.getElementById(control.htmlFor);
+          const nested = control.parentElement.querySelector("nav[aria-labelledby]");
+          return !control.textContent.trim() || !control.querySelector(".md-nav__icon") ||
+            !toggle || toggle.type !== "checkbox" || !nested || nested.getAttribute("aria-labelledby") !== control.id;
+        }).length,
+        heading: document.querySelector(".md-content h1")?.textContent.trim() || "",
+        title: document.title,
+        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
     });
-    check(metrics.count > 0, `Primary navigation must expose at least one draft marker at ${viewportName} width`);
-    check(
-      metrics.titles.length === 1 && metrics.titles[0] === "Draft — research in progress",
-      `Every draft marker must expose the governed readable status text at ${viewportName} width`,
-    );
-    check(metrics.markerMask.includes("pen-circle.svg"), `Draft markers must use the registered Pen Circle asset at ${viewportName} width`);
-    check(!metrics.negativeMask.includes("pen-circle.svg"), `Non-draft status must not inherit the Pen Circle asset at ${viewportName} width`);
-    check(
-      metrics.markerWidth !== null && metrics.markerHeight !== null &&
-        metrics.chevronWidth !== null && metrics.chevronHeight !== null &&
-        metrics.markerWidth > 0 && metrics.markerHeight > 0 &&
-        closeTo(metrics.markerWidth, metrics.chevronWidth, 0.2) &&
-        closeTo(metrics.markerHeight, metrics.chevronHeight, 0.2),
-      `Draft marker dimensions must match the stock chevron at ${viewportName} width`,
-    );
-    check(
-      metrics.markerCenter !== null && metrics.chevronCenter !== null && closeTo(metrics.markerCenter, metrics.chevronCenter, 0.2),
-      `Draft marker and nested-navigation chevron must share the trailing centreline at ${viewportName} width`,
-    );
-    check(
-      metrics.markerRowDelta !== null && closeTo(metrics.markerRowDelta, 0, 0.5),
-      `Draft marker must be vertically centred in its navigation row at ${viewportName} width`,
-    );
-    check(
-      metrics.chevronRowDelta !== null && closeTo(metrics.chevronRowDelta, 0, 0.5),
-      `Nested-navigation chevron must be vertically centred in its navigation row at ${viewportName} width`,
-    );
-    check(metrics.pageOverflow <= 1, `Draft navigation markers must not create page overflow at ${viewportName} width`);
+    check(metrics.statusCount === 0, `Reference navigation must omit lifecycle status icons, tooltips and fallback information icons at ${viewportName} width`);
+    check(Boolean(metrics.accessibleName), `Primary navigation must keep its accessible name at ${viewportName} width`);
+    check(metrics.linkCount > 0 && metrics.unnamedLinks === 0 && metrics.nonFocusableLinks === 0,
+      `Navigation links must retain page names and keyboard focus at ${viewportName} width`);
+    check(metrics.controlCount > 0 && metrics.invalidControls === 0,
+      `Native section labels, chevrons and toggle associations must remain intact at ${viewportName} width`);
+    check(Boolean(metrics.heading) && Boolean(metrics.title), `Page and document titles must remain present at ${viewportName} width`);
+    check(metrics.pageOverflow <= 1, `Navigation must not create page overflow at ${viewportName} width`);
     return metrics;
   };
   const screenshotPixels = async buffer => {
@@ -822,7 +776,7 @@ export default async (page, options = {}) => {
     desktopGoverningQuestion,
   );
   await goto(questionRoute);
-  const desktopDraftNavigation = await inspectDraftNavigation("desktop");
+  const desktopNavigation = await inspectNavigation("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
     header: Boolean(document.querySelector(".md-header__inner")),
@@ -1138,6 +1092,7 @@ export default async (page, options = {}) => {
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
+  const mobileNavigation = await inspectNavigation("mobile");
   const mobileGoverningQuestion = await inspectGoverningQuestion(
     "mobile",
     questionRoute,
@@ -1371,7 +1326,7 @@ export default async (page, options = {}) => {
 
   const prohibitedCdnHosts = ["unpkg.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"];
   const cdnRequests = requests.filter(requestUrl => prohibitedCdnHosts.some(host => requestUrl.includes(`//${host}/`)));
-  const localAssets = ["/assets/vendor/mermaid.min.js", "/assets/pen-circle.svg"];
+  const localAssets = ["/assets/vendor/mermaid.min.js"];
   if (graphEnabled) localAssets.push("/assets/vendor/vis-network.min.js", "/assets/vendor/3d-force-graph.min.js");
   for (const asset of localAssets) {
     check(requests.some(requestUrl => requestUrl.startsWith(baseUrl) && requestUrl.split(/[?#]/)[0].endsWith(asset)), `Browser contract did not observe local runtime ${asset}`);
@@ -1415,8 +1370,9 @@ export default async (page, options = {}) => {
         mobile: mobileGoverningQuestionRepetitions,
       },
     },
-    draftNavigation: {
-      desktop: desktopDraftNavigation,
+    navigation: {
+      desktop: desktopNavigation,
+      mobile: mobileNavigation,
     },
     sourceLinks: {
       desktop: desktopSourceLink,

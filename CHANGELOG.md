@@ -4,6 +4,10 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased
 
+- Retire `DKBWS-HUMAN-003` from the active specification, inherited profiles, adapters, starter mappings, conformance reports and fixtures. Preserve the identifier without reuse and retain historical releases and source records. COPPER TIGER's verified implementation is `e6ccef8ed7be1230a3cd0f9fc233fb97a4960831`; this Standard retirement is separately requested and verified.
+- Make Human Wiki navigation status-free by default under `DKBWS-HUMAN-001`. Remove Pen Circle assets, draft tooltip mappings, marker tokens, styling and geometry tests. The Zensical template override suppresses status markup, including fallback information icons, while retaining lifecycle metadata, page titles, section controls and keyboard navigation. Verify retirement accounting, pinned-template preservation and real-renderer lifecycle cases at desktop/mobile widths.
+- Migration: follow the [status-free navigation guide](docs/reference/navigation-status-migration.md), carry the complete override and starter closure, remove obsolete active mappings and regenerate derived outputs. Consumer pins, prior reports and immutable releases remain unchanged until separately authorised adoption.
+
 - Candidate extension to `DKBWS-PROMPT-001`: every development cycle assesses the continuing Wiki subject and reports up to three prioritised, content-first next steps using `Proposed update:`, `Why it matters:` and `Done when:`. Required failed or unrun verification takes priority. Preserve completion-first work, the cycle guard, grounded selection and separate execution authority; state explicitly when no grounded update qualifies.
 - Add shared root/starter/skill/prompt instructions, captured-draft format checks and positive, negative and no-update fixtures. The checker does not establish evidence grounding or intercept uncaptured responses. Migration replaces the conditional-only handoff after separately authorised adoption; existing pins, immutable releases and consumer content remain unchanged. Local technical integration records no formal classification or acceptance.
 

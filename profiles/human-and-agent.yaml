@@ -5,7 +5,6 @@ extends:
 requires:
   - DKBWS-HUMAN-001
   - DKBWS-HUMAN-002
-  - DKBWS-HUMAN-003
   - DKBWS-HUMAN-004
   - DKBWS-LLM-001
   - DKBWS-LINK-001

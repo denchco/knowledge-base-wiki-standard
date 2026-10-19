@@ -82,13 +82,17 @@ function buildFixture(fixture) {
   const assets = path.join(docs, "assets");
   const site = path.join(directory, "site");
   fs.mkdirSync(assets, { recursive: true });
-  for (const filename of ["theme.css", "content.css", "layout-width.css", "wiki.js", "layout-width.js", "pen-circle.svg"]) {
+  for (const filename of ["theme.css", "content.css", "layout-width.css", "wiki.js", "layout-width.js"]) {
     fs.copyFileSync(path.join(root, "docs/assets", filename), path.join(assets, filename));
   }
-  const content = `---\nstatus: draft\n---\n\n# Appearance fixture\n\n<blockquote class="governing-question"><p>Can a reader use the configured appearance?</p></blockquote>\n\nThis fixture tests the real renderer. [Read the second page](second.md).\n\n| First column | Second column | Third column | Fourth column | Fifth column | Sixth column |\n|---|---|---|---|---|---|\n| Long fixture content for narrow screens | Saved choices persist | Native palette control | Configured width fallback | Visible source accent | Contained table scrolling |\n`;
+  const content = `---\nstatus: draft\nsubtitle: Fixture subtitle\nicon: lucide/house\n---\n\n# Appearance fixture\n\n<blockquote class="governing-question"><p>Can a reader use the configured appearance?</p></blockquote>\n\nThis fixture tests the real renderer. [Read the second page](second.md).\n\n| First column | Second column | Third column | Fourth column | Fifth column | Sixth column |\n|---|---|---|---|---|---|\n| Long fixture content for narrow screens | Saved choices persist | Native palette control | Configured width fallback | Visible source accent | Contained table scrolling |\n`;
   fs.writeFileSync(path.join(docs, "index.md"), content);
-  fs.writeFileSync(path.join(docs, "second.md"), content.replace("# Appearance fixture", "# Second page").replace("[Read the second page](second.md)", "[Return to fixture](index.md)"));
-  const toml = `[project]\nsite_name = "Appearance fixture"\nsite_url = "http://127.0.0.1/"\ndocs_dir = "docs"\nsite_dir = "site"\nextra_css = ["assets/content.css", "assets/layout-width.css", "assets/theme.css"]\nextra_javascript = ["assets/wiki.js", "assets/layout-width.js"]\nnav = [{"Pages" = [{"Home" = "index.md"}, {"Second page" = "second.md"}]}]\n\n[project.extra.status]\ndraft = "Draft — test fixture"\n\n[project.markdown_extensions]\ntables = {}\n\n[project.theme]\nfont = false\nfeatures = ["navigation.instant"]\n\n[[project.theme.palette]]\nscheme = "default"\nprimary = "custom"\naccent = "custom"\ntoggle.icon = "lucide/moon"\ntoggle.name = "Switch to dark mode"\n\n[[project.theme.palette]]\nscheme = "slate"\nprimary = "custom"\naccent = "custom"\ntoggle.icon = "lucide/sun"\ntoggle.name = "Switch to light mode"\n`;
+  fs.cpSync(path.join(root, "overrides"), path.join(directory, "overrides"), { recursive: true });
+  fs.writeFileSync(path.join(docs, "second.md"), content.replace("status: draft", "status: stable").replace("# Appearance fixture", "# Second page").replace("[Read the second page](second.md)", "[Return to fixture](index.md)"));
+  for (const [slug, title, status] of [["deprecated", "Deprecated page", "deprecated"], ["unmapped", "Unmapped page", "unmapped-lifecycle"], ["plain", "Plain page", null]]) {
+    fs.writeFileSync(path.join(docs, `${slug}.md`), `${status ? `---\nstatus: ${status}\n---\n\n` : ""}# ${title}\n\nNavigation fixture.\n`);
+  }
+  const toml = `[project]\nsite_name = "Appearance fixture"\nsite_url = "http://127.0.0.1/"\ndocs_dir = "docs"\nsite_dir = "site"\nextra_css = ["assets/content.css", "assets/layout-width.css", "assets/theme.css"]\nextra_javascript = ["assets/wiki.js", "assets/layout-width.js"]\nnav = [{"Pages" = [{"Home" = "index.md"}, {"Second page" = "second.md"}, {"Deprecated page" = "deprecated.md"}, {"Unmapped page" = "unmapped.md"}, {"Plain page" = "plain.md"}]}]\n\n[project.markdown_extensions]\ntables = {}\n\n[project.theme]\ncustom_dir = "overrides"\nfont = false\nfeatures = ["navigation.instant"]\n\n[[project.theme.palette]]\nscheme = "default"\nprimary = "custom"\naccent = "custom"\ntoggle.icon = "lucide/moon"\ntoggle.name = "Switch to dark mode"\n\n[[project.theme.palette]]\nscheme = "slate"\nprimary = "custom"\naccent = "custom"\ntoggle.icon = "lucide/sun"\ntoggle.name = "Switch to light mode"\n`;
   fs.writeFileSync(path.join(directory, "zensical.toml"), toml);
   if (fixture.config) {
     fixture.derived = deriveAppearance(fixture.config);
@@ -168,6 +172,7 @@ async function runCase(fixture, origin, viewport) {
     assert.equal(native.paletteCount, 2);
     assert.equal(native.appearanceScripts, 1);
     assert.deepEqual([...native.mediaQueries].sort(), ["all", "not all"], "Native defaults must use unconditional media, independent of the OS");
+    const navigation = await inspectNavigation(page);
     const initial = await inspectAppearance(page, config.accent, derived[config.appearance], viewport.width);
     const initialGridWidth = await page.locator(".md-main__inner").evaluate(node => node.getBoundingClientRect().width);
     if (viewport.width >= 960) {
@@ -199,7 +204,7 @@ async function runCase(fixture, origin, viewport) {
     assert.deepEqual(state.external, [], "Fixture must use local assets only");
     assert.deepEqual(state.errors, [], "No browser or asset errors");
     assert.ok(state.requests.some(url => url.endsWith("bundle.344b8276.min.js")), "Pinned native renderer bundle must execute");
-    report.cases.push({ fixture: fixture.name, viewport, initial, alternate: changed, native, savedPreferenceSurvivedNavigationAndReload: true });
+    report.cases.push({ fixture: fixture.name, viewport, initial, alternate: changed, native, navigation, savedPreferenceSurvivedNavigationAndReload: true });
   } finally {
     await context.close();
   }
@@ -295,14 +300,52 @@ async function runLegacyCase(origin) {
   try {
     await page.goto(origin, { waitUntil: "networkidle" });
     await ready(page, "default", "standard");
+    const navigation = await inspectNavigation(page);
     assert.equal(await page.locator("html").getAttribute("data-layout-default-width"), null);
     assert.equal(await page.locator('script[src$="/assets/appearance/appearance.js"]').count(), 0);
     assert.deepEqual(state.errors, []);
     assert.deepEqual(state.external, []);
-    report.cases.push({ fixture: "unconfigured", defaultWidth: "standard", scheme: "default" });
+    report.cases.push({ fixture: "unconfigured", defaultWidth: "standard", scheme: "default", navigation });
   } finally {
     await context.close();
   }
+}
+
+async function inspectNavigation(page) {
+  const mobile = page.viewportSize().width < 1220;
+  if (mobile) await page.locator('.md-header label[for="__drawer"]').click();
+  const navigation = page.locator(".md-nav--primary");
+  assert.ok(await navigation.getAttribute("aria-label"), "Navigation keeps its accessible name");
+  assert.equal(await navigation.locator(".md-status").count(), 0,
+    "Draft, stable, deprecated and unmapped lifecycle values must emit no status or fallback icon");
+  const expected = ["Home", "Second page", "Deprecated page", "Unmapped page", "Plain page"];
+  for (const title of expected) {
+    const link = navigation.getByRole("link", { name: new RegExp(`^${title}(?: Fixture subtitle)?$`, "u") });
+    assert.equal(await link.count(), 1, `Navigation preserves the ${title} title`);
+    await link.focus();
+    assert.equal(await link.evaluate(element => document.activeElement === element), true,
+      `${title} remains keyboard focusable`);
+  }
+  const home = navigation.getByRole("link", { name: "Home Fixture subtitle", exact: true });
+  assert.equal(await home.locator("small").textContent(), "Fixture subtitle", "Page subtitles remain intact");
+  assert.equal(await home.locator("svg").count(), 1, "Explicit page icons remain intact");
+  const control = navigation.locator('.md-nav__item--nested > label.md-nav__link[tabindex="0"]').first();
+  const id = await control.getAttribute("for");
+  assert.ok(id, "Section control retains its native toggle association");
+  assert.equal(await control.locator(".md-nav__icon").count(), 1, "Section chevron remains intact");
+  const toggle = navigation.locator(`input[id="${id}"]`);
+  const wasChecked = await toggle.isChecked();
+  await control.focus();
+  assert.equal(await control.evaluate(element => document.activeElement === element), true, "Section control accepts keyboard focus");
+  await control.press("Enter");
+  await page.waitForFunction(({ id, expected }) => document.getElementById(id).checked === expected, { id, expected: !wasChecked });
+  await control.press("Enter");
+  await page.waitForFunction(({ id, expected }) => document.getElementById(id).checked === expected, { id, expected: wasChecked });
+  assert.equal(await page.locator(".md-content h1").textContent(), "Appearance fixture");
+  assert.match(await page.title(), /Appearance fixture/u);
+  if (mobile) await page.reload({ waitUntil: "networkidle" });
+  return { lifecycleValues: ["draft", "stable", "deprecated", "unmapped-lifecycle", null], statusCount: 0,
+    pageTitles: expected, pageIconAndSubtitlePreserved: true, keyboardSectionToggle: true, mobile };
 }
 
 async function inspectAppearance(page, accent, palette, viewportWidth) {
@@ -350,7 +393,6 @@ async function inspectAppearance(page, accent, palette, viewportWidth) {
       question: inspect("blockquote.governing-question p"),
       table: inspect(".md-typeset table th"),
       selected: inspect(".md-nav--primary .md-nav__link--active"),
-      draft: inspect(".md-nav--primary .md-nav__link--active .md-status", "::after"),
       link: inspect(".md-content p a"),
       documentWidth: document.documentElement.scrollWidth,
       viewportWidth: innerWidth,
@@ -365,7 +407,7 @@ async function inspectAppearance(page, accent, palette, viewportWidth) {
   assert.deepEqual(snapshot.table.background, rgb(palette.tableHeader));
   for (const [role, result] of Object.entries(snapshot)) {
     if (!result || typeof result.contrast !== "number") continue;
-    assert.ok(result.contrast >= (role === "draft" ? 3 : 4.5), `${role} contrast ${result.contrast.toFixed(2)} is insufficient: ${JSON.stringify(result)}`);
+    assert.ok(result.contrast >= 4.5, `${role} contrast ${result.contrast.toFixed(2)} is insufficient: ${JSON.stringify(result)}`);
   }
   for (const result of snapshot.headerControls) assert.ok(result.contrast >= 4.5, `Header control ${result.label} contrast ${result.contrast.toFixed(2)} is insufficient`);
   assert.equal(snapshot.viewportWidth, viewportWidth);

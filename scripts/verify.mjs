@@ -295,10 +295,9 @@ function buildReceipt(provenance) {
         evidence("browser-dependency-lock", "dependency-lock", "Playwright and browser runtimes are exactly locked.", "package-lock.json"),
       ],
       results: [
-        result("DKBWS-HUMAN-001", ["browser-contract"], "The Human Wiki returned HTTP 200 and remained usable at tested viewports, including contained scrolling for a representative wide mobile table."),
+        result("DKBWS-HUMAN-001", ["browser-contract"], "The Human Wiki returned HTTP 200 and remained usable at tested viewports, including status-free navigation with accessible page links and section controls, and contained scrolling for a representative wide mobile table."),
         result("DKBWS-HUMAN-002", ["browser-contract"], "The governing-question marker rendered its rail and text in the resolved active accent at desktop and mobile widths while an ordinary quotation remained neutral."),
         result("DKBWS-HUMAN-004", ["browser-contract"], "Every exact canonical-question repetition route rendered the same governed text and passed the desktop/mobile accent, neutral-quotation, and containment checks."),
-        result("DKBWS-HUMAN-003", ["browser-contract"], "Draft navigation markers rendered with readable status text, the dedicated Pen Circle asset, stock-chevron dimensions, shared trailing centreline, vertical row centring, and no page overflow."),
         result("DKBWS-LINK-002", ["browser-contract"], "A representative source identity retained visible brackets and an intelligible native link, accepted keyboard focus, targeted and reached its exact mapped source-register row, and stayed contained at desktop and mobile widths."),
         result("DKBWS-DESIGN-001", ["browser-contract"], "Ordinary entry and architecture Mermaid diagrams retained renderer-default node treatment and passed desktop, tablet, mobile, collision, and accessibility checks."),
         result("DKBWS-GRAPH-001", ["browser-contract"], "The selected profile's required 2D/3D graph routes rendered at desktop and mobile widths with nonblank canvases and usable controls."),

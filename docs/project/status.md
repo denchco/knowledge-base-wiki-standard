@@ -11,7 +11,7 @@ status: draft
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
 | Evidence governance | Implemented candidate with stable row anchors, individual internal citation links, registered named-authority URLs, and exact-destination lint |
-| Human Zensical wiki | Governed reference runtime with strict build, local assets, dedicated readable draft-navigation markers, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
+| Human Zensical wiki | Governed reference runtime with strict build, local assets, status-free navigation with retained lifecycle metadata, titles and controls, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
 | Writing policy | ASD-STE100-inspired 80% default under `DKBWS-PROMPT-001`, carried by the mapped authoring policy, prompt, starter and shared instructions; prospective application, protected content and no computed compliance claim |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, completion/cycle guards, and canonical live-URL response navigation |
 | Manifest and stable requirements | Implemented candidate with machine schemas, stable diagnostics, and explicit result accounting for every requirement inherited from the selected profile |
@@ -21,7 +21,7 @@ status: draft
 | Managed local preview | `DKBWS-RUNTIME-002` implemented with serialized atomic reservation, exact twelve-field registration, byte-identical generated/installed LaunchAgent, loaded-job and marker identity checks, fail-closed `service:preview`, and maintainer-only live status; distribution/CI reports it not checked |
 | Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, exact `jj 0.45.1` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
 | Graphify publication | Versioned shared data plus enriched 2D/3D views, governed consumer mount templates, local runtimes, and fail-closed selected-profile route checks implemented |
-| Built-output browser contract | Independent representative routes; desktop/mobile geometry, every canonical-question repetition route, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and draft row-centre checks implemented |
+| Built-output browser contract | Independent representative routes; desktop/mobile geometry, every canonical-question repetition route, exact reader-to-source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and status-free navigation checks implemented |
 | Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
 | Subject-empty starter | Allowlisted policy/graph/planning templates implemented with conditional reader-evidence navigation, consumer-owned licensing, and maintainer-sync exclusion; root copying, invented citations, and Standard-corpus reuse forbidden; no apply command or falsely complete Standard Production scaffold |
@@ -41,7 +41,15 @@ The local Standard implementation extends `DKBWS-PROMPT-001` with development-cy
 
 ## Current bounded priorities
 
-One contribution remains pending formal intake: the [Thirlwall configurable appearance review](configurable-appearance-review.md). Complete exact-payload approval, governed issue submission and linkage, then record the explicit Standard decision against the verified integration commit. Release and Thirlwall adoption remain separate decisions.
+No active content priorities are available from the current evidence. No further grounded content update is available.
+
+The [status-free navigation migration](../reference/navigation-status-migration.md) records the completed retirement scope and COPPER TIGER's immutable precedent. The turn commit records the Standard's applicable verification. This retirement leaves historical releases, the Documentation snapshot and consumer pins unchanged.
+
+| Parked work | `blocked_by` | `reopen_when` | `last_checked` |
+|---|---|---|---|
+| [Thirlwall configurable appearance intake](configurable-appearance-review.md) | Exact-payload approval, user submission, exact issue linkage and an explicit maintainer decision | The owner supplies approval or a governed issue is available for reconciliation; no new authority was supplied in this retirement cycle | 2026-10-19 |
+
+Release and Thirlwall adoption remain separate decisions. The completed technical review is not an active follow-up priority.
 
 No active maintenance priorities remain from the earlier October review. The scoped security and dependency-updater maintenance merged through protected PR #13 at `fef1392548381276a03ca89a2ede435a3d04ec08` on 3 October 2026. Post-merge Verify run `37101094460` passed on that exact revision. [SRC-044](../sources.md#src-044), [SRC-045](../sources.md#src-045)
 

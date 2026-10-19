@@ -81,7 +81,6 @@ spacing:
   md: "12px"
   lg: "16px"
   xl: "24px"
-  draftStatusIconSize: ".9rem"
 components:
   page:
     backgroundColor: "{colors.background}"
@@ -106,8 +105,6 @@ components:
     textColor: "{colors.success}"
   status-warning:
     textColor: "{colors.warning}"
-  status-draft:
-    size: "{spacing.draftStatusIconSize}"
   table-header:
     backgroundColor: "{colors.tableHeader}"
     textColor: "{colors.text}"
@@ -161,8 +158,6 @@ components:
     textColor: "{colors.darkSuccess}"
   dark-status-warning:
     textColor: "{colors.darkWarning}"
-  dark-status-draft:
-    size: "{spacing.draftStatusIconSize}"
   dark-table-header:
     backgroundColor: "{colors.darkAccentLightest}"
     textColor: "{colors.darkText}"
@@ -244,7 +239,7 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
 - Render every displayed `SRC-NNN` as an independently focusable internal link to its exact source-register row while preserving the visible `[SRC-NNN]` grammar. Lists keep separate link targets and compact ranges link their displayed endpoints. Do not suppress the native focus indication or make brackets the only accessible label.
-- When primary navigation exposes a page's `draft` status, use the registered Pen Circle edit marker with the native “Draft — research in progress” tooltip. In the Zensical reference adapter its trailing centre aligns with the stock nested-navigation chevron column; stable or deprecated states retain their own semantics and artwork.
+- Keep reference navigation free of lifecycle status icons and tooltips, including the renderer's fallback information icon. Preserve source lifecycle metadata, page titles, subtitles, page icons, section controls and keyboard access. The pinned `overrides/partials/nav-item.html` adapter removes status output only; carry it with the `custom_dir` setting.
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.
 - Avoid marketing heroes, nested cards, decorative panels, and prose that overstates evidence.
 - Tables, Mermaid diagrams, and Graphify frames use named border and radius tokens only.

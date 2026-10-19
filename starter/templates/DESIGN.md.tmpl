@@ -14,13 +14,9 @@ typography:
     lineHeight: "1.6"
 rounded:
   component: ".35rem"
-spacing:
-  draftStatusIconSize: ".9rem"
 components:
   governing-question:
     textColor: "{colors.accent}"
-  status-draft:
-    size: "{spacing.draftStatusIconSize}"
 ---
 
 # Design Contract
@@ -35,7 +31,7 @@ For Zensical 0.0.59, retain the reference adapter that reflects the resolved bod
 
 Every displayed governing-question callout must expose the `governing-question` marker and use the active accent colour for both its inline-start rail and question text at every supported viewport. When the Wiki declares one canonical question, every verbatim repetition in its bounded reader set uses that governed component. Paraphrases and unrelated quotations remain neutral.
 
-When primary navigation exposes a page's `draft` status, adapt the pinned Pen Circle marker and “Draft — research in progress” tooltip with the complete renderer asset closure. Align the marker's trailing centre with the open/close chevron column in the supported desktop navigation. Other lifecycle states keep distinct semantics and artwork.
+Keep reference navigation free of lifecycle status icons and tooltips, including fallback information icons. Carry the pinned `overrides/partials/nav-item.html` adapter and `custom_dir` setting together. Preserve source lifecycle metadata, page titles, subtitles, page icons, section controls and keyboard access.
 
 When the Human Wiki displays registered source identities, render each one as an independently focusable internal link to its exact source-register row while preserving the target's declared citation grammar. Keep an intelligible source identity as the link's accessible name, retain native focus indication, and verify the representative journey at desktop and mobile widths.
 

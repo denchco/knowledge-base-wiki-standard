@@ -114,7 +114,7 @@ function writeProfile(root, profileId, source) {
   writeFileSync(path.join(root, "profiles", `${profileId}.yaml`), source, "utf8");
 }
 
-function withCurrentLifecycleRelease(callback) {
+function withCurrentLifecycleRelease(callback, { parentRevision = null } = {}) {
   const fixtureRoot = realpathSync(mkdtempSync(path.join(os.tmpdir(), "denchco-bootstrap-release-")));
   const releaseRoot = path.join(fixtureRoot, "standard");
   try {
@@ -132,6 +132,10 @@ function withCurrentLifecycleRelease(callback) {
     }
     for (const args of [
       ["-c", "init.templateDir=", "init", "--quiet"],
+      ...(parentRevision ? [
+        ["fetch", "--quiet", "--no-tags", ROOT, parentRevision],
+        ["update-ref", "HEAD", "FETCH_HEAD"],
+      ] : []),
       ["add", "."],
       ["-c", "user.name=Bootstrap fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", "commit", "--quiet", "-m", "Current bootstrap contract fixture"],
     ]) {
@@ -722,6 +726,10 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   const licensingEntry = starter.entries.find((entry) => entry.target === "LICENSING.md");
   assert.equal(licensingEntry?.classification, "render-template");
   assert.equal(licensingEntry?.always, true);
+  const navigationEntry = starter.entries.find((entry) => entry.target === "overrides/partials/nav-item.html");
+  assert.equal(navigationEntry?.classification, "render-template");
+  assert.ok(navigationEntry?.requirements.includes("DKBWS-HUMAN-001"));
+  assert.equal(navigationEntry?.requirements.includes("DKBWS-HUMAN-003"), false);
   const graphIndexEntry = starter.entries.find((entry) => entry.target === "docs/graph/index.md");
   assert.equal(graphIndexEntry?.classification, "render-template");
   const graphIndexTemplate = readFileSync(path.join(ROOT, graphIndexEntry.template), "utf8");
@@ -748,7 +756,11 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
       const templatePath = path.join(ROOT, entry.template);
       assert.equal(existsSync(templatePath), true, `missing starter template ${entry.template}`);
       const template = readFileSync(templatePath, "utf8");
-      assert.match(template, /\{\{[A-Z0-9_]+\}\}/, `${entry.template} needs an explicit placeholder`);
+      if (entry.target === "overrides/partials/nav-item.html") {
+        assert.equal(template, readFileSync(path.join(ROOT, entry.target), "utf8"), "the native Jinja template must remain identical to the reference override");
+      } else {
+        assert.match(template, /\{\{[A-Z0-9_]+\}\}/, `${entry.template} needs an explicit placeholder`);
+      }
       assert.doesNotMatch(template, forbiddenTemplateContent, `${entry.template} leaks standard/example content`);
     }
     if (entry.classification === "adapt-from-release") {
@@ -789,6 +801,24 @@ test("lifecycle diff compares the consumer version and selected profile without 
   assert.equal(diff.candidate.manifest.sha256, createHash("sha256").update(headManifest.stdout).digest("hex"));
 });
 
+test("status-free navigation preserves the pinned renderer template outside status output", () => {
+  const upstream = readFileSync(path.join(ROOT, ".venv/lib/python3.12/site-packages/zensical/templates/partials/nav-item.html"), "utf8");
+  const withoutNotice = (source) => source.replace(/^\{#-[\s\S]*?-#\}\r?\n/, "");
+  let expected = withoutNotice(upstream);
+  const statusMacro = /\{% macro render_status\(nav_item, type\) %\}[\s\S]*?\{% endmacro %\}\n/;
+  assert.match(expected, statusMacro);
+  expected = expected.replace(statusMacro, "");
+  for (const [condition, argument] of [
+    ["nav_item.meta and nav_item.encrypted", '"encrypted"'],
+    ["nav_item.meta and nav_item.meta.status", "nav_item.meta.status"],
+  ]) {
+    const output = `  {% if ${condition} %}\n    {{ render_status(nav_item, ${argument}) }}\n  {% endif %}\n`;
+    assert.equal(expected.split(output).length, 2, `pinned renderer must contain exactly one ${condition} block`);
+    expected = expected.replace(output, "");
+  }
+  assert.equal(withoutNotice(readFileSync(path.join(ROOT, "overrides/partials/nav-item.html"), "utf8")), expected);
+});
+
 test("lifecycle diff compares equal version labels by immutable revision and requirement IDs", () => {
   const before = treeHash(RC3_CONSUMER);
   const result = run("diff", RC3_CONSUMER, "--date", "2026-08-04", "--json");
@@ -802,17 +832,51 @@ test("lifecycle diff compares equal version labels by immutable revision and req
   assert.equal(diff.summary.safeToPlanUpgrade, false);
   assert.match(diff.consumer.resolvedRevision, /^[0-9a-f]{40}$/);
   assert.ok(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-002"));
-  assert.equal(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-003"), false);
+  assert.equal(diff.consumer.pinnedProfileRequirements.includes("DKBWS-RUNTIME-002"), false);
   assert.ok(diff.changes.some((change) => change.id === "standard-revision-review" && change.blocking));
   assert.ok(diff.changes.some((change) => (
-    change.id === "requirement-introduced-DKBWS-HUMAN-003"
-    && change.proposed === "DKBWS-HUMAN-003"
+    change.id === "requirement-introduced-DKBWS-RUNTIME-002"
+    && change.proposed === "DKBWS-RUNTIME-002"
     && change.blocking
   )));
   assert.equal(
-    diff.requirements.find((item) => item.id === "DKBWS-HUMAN-003")?.introducedSinceConsumerRevision,
+    diff.requirements.find((item) => item.id === "DKBWS-RUNTIME-002")?.introducedSinceConsumerRevision,
     true,
   );
+});
+
+test("lifecycle retirement preserves released requirements and requires a read-only migration review", () => {
+  const historicalRevision = spawnSync("git", ["rev-parse", "v0.1.0-rc.5^{commit}"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(historicalRevision.status, 0, historicalRevision.stderr);
+  const revision = historicalRevision.stdout.trim();
+  withCurrentLifecycleRelease(({ fixtureRoot, runPlan }) => {
+    const consumer = path.join(fixtureRoot, "consumer");
+    cpSync(RC3_CONSUMER, consumer, { recursive: true });
+    const manifestPath = path.join(consumer, ".wiki-standard.yaml");
+    writeFileSync(manifestPath, readFileSync(manifestPath, "utf8")
+      .replace('revision: "v0.1.0-rc.3"', `revision: "${revision}"`));
+    const before = treeHash(consumer);
+    const result = runPlan("diff", consumer, "--json");
+    assert.equal(result.status, 1, result.stderr || result.stdout);
+    const diff = JSON.parse(result.stdout);
+    assertLifecycleSchemaShape(diff);
+    assert.equal(diff.summary.revisionState, "candidate-newer");
+    assert.equal(diff.consumer.resolvedRevision, revision);
+    assert.ok(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-003"));
+    assert.equal(diff.candidate.profile.requirements.includes("DKBWS-HUMAN-003"), false);
+    assert.equal(diff.requirements.some((item) => item.id === "DKBWS-HUMAN-003"), false);
+    assert.ok(diff.changes.some((change) => (
+      change.id === "requirement-removed-DKBWS-HUMAN-003"
+      && change.current === "DKBWS-HUMAN-003"
+      && change.proposed === null
+      && change.blocking
+      && !change.automatic
+    )));
+    assert.equal(treeHash(consumer), before);
+  }, { parentRevision: revision });
 });
 
 test("the current lifecycle catalogue introduces managed preview and live response links after rc.3", () => {
@@ -1225,6 +1289,31 @@ test("full-profile reporting leaves absent gates not checked and rejects unsuppo
   assert.throws(
     () => buildFullProfileReport({ target: POSITIVE, receipt: invalid }),
     (error) => error instanceof ReceiptError && /does not match|no explicit evidence/.test(error.message),
+  );
+});
+
+test("current profile accounting excludes the retired identifier and rejects obsolete receipt results", () => {
+  const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
+  assert.equal(catalogue.ids.has("DKBWS-HUMAN-003"), false);
+  for (const profileId of listProfileIds({ standardRoot: ROOT })) {
+    const profile = loadProfile(profileId, { standardRoot: ROOT, requirementIds: catalogue.ids });
+    assert.equal(profile.requirements.includes("DKBWS-HUMAN-003"), false, profileId);
+  }
+  const report = buildFullProfileReport({
+    target: ROOT,
+    receipt: receiptFor(ROOT, "standard-production", [], { gates: [] }),
+  });
+  assert.equal(report.requirementResults.some((item) => item.requirement === "DKBWS-HUMAN-003"), false);
+  assert.throws(
+    () => buildFullProfileReport({
+      target: ROOT,
+      receipt: receiptFor(ROOT, "standard-production", [{
+        requirement: "DKBWS-HUMAN-003",
+        status: "pass",
+        evidence: ["suite"],
+      }]),
+    }),
+    (error) => error instanceof ReceiptError && /unknown requirement DKBWS-HUMAN-003/.test(error.message),
   );
 });
 

@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-10-19
+
+- **Navigation retirement**: Retire `DKBWS-HUMAN-003` at the owner's request. Preserve its identifier and historical records while removing the active marker contract. The [migration guide](reference/navigation-status-migration.md) records COPPER TIGER's exact implementation, the wider status-free Standard default, consumer steps and the release/adoption boundary. [SRC-060](sources.md#src-060)
+- **Reference closure**: Remove the Pen Circle asset, tooltip configuration, marker tokens and geometry checks. Suppress navigation status markup through the pinned renderer template while preserving lifecycle metadata, titles, section controls and accessibility. Carry the override into the starter and documentation allowlist. Browser fixtures cover lifecycle values and native navigation behaviour.
+- **Discovery and verification**: Query Graphify, then use its scoped report and canonical sources where recall is truncated. The initial shell selected an older uv; the existing qualified toolchain restores the exact reference versions. The turn commit records complete applicable verification and the read-only provenance result.
+
 ## 2026-10-07
 
 - **Configurable appearance technical review**: Integrate the exact Thirlwall candidate into the local Standard tree. Fix native palette reordering that reversed saved reader choices during adoption. Use stable radio indexes and native unconditional media defaults, with regression cases for prior choices and later default changes. Clarify configured brand surfaces and derived active colours in the design and starter contracts. The [review record](project/configurable-appearance-review.md) retains the original proposal and keeps approval, issue linkage, formal acceptance, release and adoption separate.

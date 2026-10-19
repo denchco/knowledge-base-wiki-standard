@@ -18,7 +18,7 @@ const architecture = read("docs/architecture.md");
 const starterHome = read("starter/templates/docs/index.md.tmpl");
 const starterDesign = read("starter/templates/DESIGN.md.tmpl");
 const starterZensical = read("starter/templates/zensical.toml.tmpl");
-const draftIcon = read("docs/assets/pen-circle.svg");
+const navigationTemplate = read("overrides/partials/nav-item.html");
 
 for (const token of [
   "accentDark", "accentDarker", "accentVisited", "accentLight", "accentLightest",
@@ -28,7 +28,6 @@ for (const token of [
   "sourceRowRailWidth", "accentRailWidth", "layoutWidthControlContentRailOffset",
   "headerTitleContentRailOffset", "listMarkerIndent", "listMarkerSize",
   "compactDataFontSize", "diagramTextSize", "sequentialMenuRailWidth",
-  "draftStatusIconSize",
 ]) {
   requireIn(design, token, `DESIGN.md must define ${token}`);
 }
@@ -65,13 +64,10 @@ requireIn(design, "three separately labelled sibling boxes", "DESIGN.md must req
 requireIn(starterDesign, "three separately labelled sibling boxes", "starter DESIGN.md must carry the separate Human, Agent, and Graph box rule");
 requireIn(design, "no more than 60px", "DESIGN.md must bound the three-product mobile containment exception");
 requireIn(starterDesign, "no more than 60px", "starter DESIGN.md must carry the bounded three-product mobile containment exception");
-requireIn(starterDesign, "Draft — research in progress", "starter DESIGN.md must carry the readable draft-status contract");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
-requireIn(requirements, "DKBWS-HUMAN-003", "the normative catalogue must define DKBWS-HUMAN-003");
 requireIn(requirements, "DKBWS-HUMAN-004", "the normative catalogue must define DKBWS-HUMAN-004");
 requireIn(requirements, "DKBWS-LINK-002", "the normative catalogue must define DKBWS-LINK-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
-requireIn(humanProfile, "- DKBWS-HUMAN-003", "the Human and Agent profile must require DKBWS-HUMAN-003");
 requireIn(humanProfile, "- DKBWS-HUMAN-004", "the Human and Agent profile must require DKBWS-HUMAN-004");
 requireIn(humanProfile, "- DKBWS-LINK-002", "the Human and Agent profile must require DKBWS-LINK-002");
 requireIn(design, "independently focusable internal link", "DESIGN.md must preserve independent source-row links");
@@ -116,7 +112,6 @@ for (const token of [
   "--source-row-rail-width:", "--accent-rail-width:", "--list-marker-indent:",
   "--list-marker-size: 1em", "--compact-data-font-size: .64rem",
   "--diagram-text-size:", "--sequential-menu-rail-width:",
-  "--draft-status-icon-size: .9rem",
 ]) {
   requireIn(theme, token, `docs/assets/theme.css must define ${token}`);
 }
@@ -250,22 +245,14 @@ if (hasDiagramStylingOptIn(`${governedThreeProductLayout}\nflowchart TB\n  A["A"
   errors.push("Mermaid native-default guard must accept the exact governed three-product layout override");
 }
 requireIn(theme, "border-inline-start: var(--sequential-menu-rail-width) solid var(--border)", "page outline must use its quiet rail");
-const draftMarker = selectorBlock(theme, ".md-status--draft::after");
-requireIn(draftMarker, 'mask-image: url("pen-circle.svg")', "draft status must use the registered Pen Circle mask");
-const draftMarkerColumn = selectorBlock(theme, ".md-nav--primary .md-nav__link > .md-status");
-requireIn(draftMarkerColumn, "flex: 0 0 var(--draft-status-icon-size)", "draft status must use the governed marker size");
-requireIn(draftMarkerColumn, "margin-inline-end: calc(var(--draft-status-icon-size) / -2)", "draft status must share the chevron trailing centreline");
-for (const phrase of [
-  "Pen Circle by SVG Repo",
-  "https://www.svgrepo.com/svg/532983/pen-circle",
-  "Licence: CC0 1.0",
-  'viewBox="0 0 24 24"',
-]) {
-  requireIn(draftIcon, phrase, `draft icon asset must retain: ${phrase}`);
-}
 for (const [source, label] of [[zensical, "zensical.toml"], [starterZensical, "starter zensical template"]]) {
-  requireIn(source, '[project.extra.status]', `${label} must declare renderer status text`);
-  requireIn(source, 'draft = "Draft — research in progress"', `${label} must expose readable draft status text`);
+  requireIn(source, 'custom_dir = "overrides"', `${label} must select the status-free navigation override`);
+}
+if (/render_status|md-status|nav_item\.meta\.status/.test(navigationTemplate)) {
+  errors.push("Navigation must not render lifecycle status or a fallback status icon");
+}
+for (const phrase of ["nav_item.title", "nav_item.children", "md-nav__toggle", 'aria-labelledby=', 'aria-expanded=', 'tabindex=']) {
+  requireIn(navigationTemplate, phrase, `navigation override must preserve native titles and section accessibility: ${phrase}`);
 }
 requireIn(layout, "--layout-width-control-content-rail-offset: 2rem", "Wide control must use the body-rail offset");
 requireIn(layout, "--header-title-content-rail-offset: 8.162rem", "header title must use the body-rail offset");

@@ -16,9 +16,8 @@ status: draft
 | DKBWS-OKF-003 | A DenchCo manifest MUST map one repository-relative canonical `okf_bundle` directory. | DenchCo claims | Manifest and filesystem check |
 | DKBWS-EVID-001 | Sources MUST have stable identities and provenance. | Evidence profile | Source-register check |
 | DKBWS-EVID-002 | Material claims MUST route to evidence state, limitations, or a validation gap. | Evidence profile | Evidence check/manual review |
-| DKBWS-HUMAN-001 | A Human Wiki MUST provide a stable navigable URL and strict build. | Human profile | Build/HTTP check |
+| DKBWS-HUMAN-001 | A Human Wiki MUST provide a stable navigable URL and strict build. Primary navigation MUST be status-free by default, including suppression of generic information-icon fallbacks. Navigation MUST preserve page titles, section controls and accessibility; its rendering MUST NOT remove or change source lifecycle metadata. | Human profile | Build/HTTP check plus built-output navigation and accessibility checks |
 | DKBWS-HUMAN-002 | Every callout designated as a Human Wiki's governing question MUST be machine-identifiable as `governing-question` and MUST render both its inline-start rail and all question text using the implementation's active accent colour. Ordinary quotations MUST remain neutral. | Human profile when a governing-question callout is present | Built-output browser comparison with the resolved active accent token |
-| DKBWS-HUMAN-003 | When a Human Wiki exposes `draft` status in primary navigation, it MUST use a dedicated draft-edit marker rather than a generic information marker, MUST provide human-readable draft-status text, MUST align the marker with the navigation's trailing expand/collapse-control column, and MUST keep both the marker and stock control vertically centred in their own rows without page overflow. | Human profile when draft status is displayed in primary navigation | Built-output browser check of status text, marker asset, row/trailing-centre geometry, and overflow |
 | DKBWS-HUMAN-004 | When a Human Wiki declares a canonical governing question, it MUST map one authoritative canonical-question source and a bounded set of reader sources. Every verbatim reader-facing repetition within that set MUST be the same governed callout and satisfy `DKBWS-HUMAN-002`. Unrelated quotations and paraphrases MUST remain neutral, and explicitly out-of-scope historical or source records MUST NOT be promoted merely because they preserve the same text. | Human profile when a canonical governing question is declared | Exact-text bounded-reader lint plus built-output desktop/mobile checks of every repetition route and the neutral-quotation control |
 | DKBWS-LLM-001 | An LLM Wiki MUST define read order, ingest, query, lint, authority, and generated boundaries. | Agent profile | Required-role check |
 | DKBWS-LINK-001 | Canonical pages MUST have contextual inbound links beyond navigation. | Maintained wiki | Concept-link check |
@@ -40,6 +39,12 @@ status: draft
 
 Candidate identifiers remain stable through `0.x`; incompatible renaming requires a migration map.
 
+## Retired requirements
+
+`DKBWS-HUMAN-003` is retired and MUST NOT be reused. Its conditional draft-navigation marker rule is absent from active profiles and conformance results. Historical releases retain their original requirements. A consumer pinned to an earlier release keeps that contract until it adopts a reviewed migration.
+
+The [navigation status migration](../reference/navigation-status-migration.md) explains removal of the former presentation adapter and preservation of source lifecycle metadata. Status-free default navigation is covered by `DKBWS-HUMAN-001`.
+
 ## Governing-question rendering
 
 `DKBWS-HUMAN-002` is conditional on presenting a governing-question callout; it does not require every Human Wiki to invent one. A conforming renderer MAY choose its native semantic element, but the built output MUST expose a stable `governing-question` marker so agents and verification tools can distinguish the callout from quoted evidence.
@@ -57,14 +62,6 @@ The `governing_question` role identifies semantic authority, not a required sepa
 The rule is deliberately exact and bounded. A paraphrase, an unrelated quotation, a historical amendment, or a source record outside the declared reader set is not silently restyled. A project that cannot map an authoritative canonical source MAY instead declare an explicit route allowlist, but it MUST still prove that each listed route contains exactly one matching governed callout and MUST NOT claim repository-wide equality coverage. A subject-empty Wiki or a Wiki with no declared canonical question records the requirement as not applicable and invents nothing.
 
 Migration identifies the authoritative question source, declares the bounded reader sources, wraps every existing verbatim reader-facing repetition in the governed component, and records all resulting routes in the built-output browser proof. Question wording and evidence do not change. Upgrade tooling reports unmatched repetitions and preserves local deviations; it does not rewrite prose automatically.
-
-## Draft navigation rendering
-
-`DKBWS-HUMAN-003` is conditional on rendering draft state inside primary navigation; it does not require lifecycle markers in a Wiki that omits them. The visible marker supplements, rather than replaces, readable status text exposed through a tooltip or equivalent accessible description. Other lifecycle states must not inherit draft artwork.
-
-The Zensical reference adapter maps `.md-status--draft` to the registered CC0 Pen Circle asset, exposes “Draft — research in progress”, and sizes the marker so its trailing centre matches the stock nested-navigation chevron. Its browser evidence also compares each control's vertical centre with its own navigation row and rejects page overflow. Another renderer MAY use an equivalent open-licensed draft-edit glyph and native status affordance when its own built-output check proves the same semantic distinction and alignment outcome.
-
-Migration from a generic information marker requires the dedicated draft asset, readable status mapping, renderer-local alignment rule, third-party licence record, and positive browser evidence. A simpler renderer without navigation status markers records the conditional requirement as not applicable; it need not add decoration solely for conformance.
 
 ## Reader evidence navigation
 
