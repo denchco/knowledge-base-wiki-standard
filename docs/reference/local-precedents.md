@@ -20,7 +20,7 @@ status: draft
 
 COPPER TIGER's verified implementation at `e6ccef8ed7be1230a3cd0f9fc233fb97a4960831` removes draft navigation markers while retaining source lifecycle metadata. The owner subsequently requested retirement of `DKBWS-HUMAN-003` across the Standard. The [migration guide](navigation-status-migration.md) records the status-free default and separate consumer adoption boundary. The Health IT Governance draft-marker contribution above remains historical provenance. [SRC-060](../sources.md#src-060)
 
-The DShCR numeric-superscript contribution extends presentation beyond that historical exact-row navigation acceptance. Its immutable origin and pending formal lifecycle are recorded in the [release inventory](../project/release-readiness.md). [SRC-061](../sources.md#src-061)
+The DShCR numeric-superscript contribution extends presentation beyond that historical exact-row navigation acceptance. Its immutable origin, preferred acceptance through governed issue #32, and pending release/adoption are recorded in the [release inventory](../project/release-readiness.md). [SRC-061](../sources.md#src-061)
 
 ## Anti-rabbit-hole handoff synthesis
 

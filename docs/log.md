@@ -7,6 +7,13 @@ status: draft
 
 # Research and change log
 
+## 2026-10-20
+
+- **Governed consumer intake:** Submit the three exact approved payloads through their governed forms under the owner's scoped delegation. Issues #32, #33 and #34 each match the approved repository, title, labels, body and single stable marker. Consumer issue linkage and acceptance use separate JJ phases.
+- **Explicit acceptance:** Record preferred numeric citations and reusable appearance configuration and content-first handoffs under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc`. Reconcile the originating records with the published registry. Preserve the reviewed implementation, source evidence, existing releases and consumer pins. [SRC-063](sources.md#src-063)
+- **Release inventory:** Remove completed intake from current priorities, reconcile the [review](project/proposal-intake-review.md) and [release preparation](project/release-readiness.md), and retain publication and adoption as separate outcomes. The fresh package binds the final committed candidate and verification evidence.
+- **Dependency finding:** Record the newly observed Graphify advisory under [STD-VAL-011](validation-queue.md). The pinned version is affected, although the current Python audit did not report it. Qualify a patched version before the broader candidate release. [SRC-062](sources.md#src-062)
+
 ## 2026-10-19
 
 - **Reader-default enforcement:** Promote Wide from an optional setting to the unconfigured desktop baseline. Integrate the stable numeric citation adapter and repaired explanatory notes, require the numeric Human capability and check every generated reader citation. Preserve saved choices, source identities, metadata, mobile containment and status-free navigation. The [migration guide](reference/reader-defaults-migration.md) records adoption checks. [SRC-061](sources.md#src-061)

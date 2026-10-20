@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-The [current release preparation](project/release-readiness.md) tracks unreleased integrations, pending contribution decisions and exact migration checks. Local completion is distinct from publication and consumer adoption.
+The [current release preparation](project/release-readiness.md) tracks unreleased integrations, accepted contribution decisions and exact migration checks. Local completion is distinct from publication and consumer adoption.
 
 ## Completed through `v0.1.0-rc.5`
 

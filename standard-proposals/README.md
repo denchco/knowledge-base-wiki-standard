@@ -49,3 +49,27 @@ The approval digest is lowercase SHA-256 over the compact UTF-8 JSON bytes with 
 - Consumer adoption requires separate authority, the old and new Standard pins, a committed consumer revision, and post-adoption verification. Synchronisation never changes the pin.
 
 The reader-source navigation precedent is recorded as accepted `DKBWS-LINK-002` and included in immutable `v0.1.0-rc.4`, using the sole `pre-registry-local-history` bridge. It has no fabricated or duplicate issue. This historical exact-row navigation acceptance does not accept the separate numeric-citation contribution.
+
+## Decision: three consumer contributions, 20 October 2026
+
+The Standard accepts the three contributions below with the stated classifications and requirement mappings. Each governed issue was read back and matched to its exact approved payload and single stable marker.
+
+Andrew Dench authorised acceptance of these contributions on 19 October 2026. He approved their exact prepared payloads and explicitly delegated their final governed-form submissions. This delegation applies only to these three payloads. The standing manual-submission rule remains unchanged.
+
+The reviewed local Standard implementation is `ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7`. Its completed verification includes 209 Node tests, 14 Python tests, 23 appearance scenarios and browser checks for 103 citations across 11 routes. Independent removal of browser evidence made all five affected requirements incomplete. The local implementation and its verification archive were reviewed; this acceptance record does not publish that candidate implementation.
+
+| Contribution | Verified governed issue | Classification | Accepted requirements |
+|---|---|---|---|
+| Stable numeric superscript citations | [#32](https://github.com/denchco/knowledge-base-wiki-standard/issues/32) | Preferred | `DKBWS-LINK-002` |
+| Configurable appearance family | [#33](https://github.com/denchco/knowledge-base-wiki-standard/issues/33) | Reusable | `DKBWS-DESIGN-001`, `DKBWS-PROMPT-001`, `DKBWS-RENDER-001`, `DKBWS-VERIFY-001` |
+| Content-first development handoff | [#34](https://github.com/denchco/knowledge-base-wiki-standard/issues/34) | Reusable | `DKBWS-PROMPT-001` |
+
+Numeric citations preserve identity-derived numbers, leading zeroes, authored order, exact source-register targets, accessible identities and explanatory notes. The original proposal's `DKBWS-RENDER-001` mapping remains an affected compatibility constraint; this decision accepts the citation behaviour under `DKBWS-LINK-002`.
+
+The appearance mechanism supplies validated configuration, deterministic colour derivation, renderer and graph integration, saved reader preferences, and source and browser checks. The originating pale-green colour remains project-specific. The Standard-owned Wide baseline is a separate correction.
+
+The handoff mechanism requires a grounded assessment of the continuing Wiki subject and evidence after each development cycle. Instruction and fixture checks enforce cadence, structure and explicit selection rules. They do not certify the quality of uncaptured responses.
+
+The registry records the exact originating commits, pins, approved payloads, issue identities and this decision revision. The source implementations remain in their originating repositories. No subject evidence or attachments are published here.
+
+All three contributions remain release-pending. This decision changes neither released requirements nor consumer pins. Publication of the candidate implementation, immutable-release inclusion, Documentation synchronization and consumer adoption remain separate.

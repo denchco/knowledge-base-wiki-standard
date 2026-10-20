@@ -7,17 +7,17 @@ status: draft
 
 # Three-contribution intake review
 
-The owner authorised completion of intake and acceptance for these three contributions on 19 October 2026. The technical review supports acceptance against Standard revision `ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7`. The owner then approved all three exact payloads below and delegated their final submission through the governed forms. The approvals are recorded in the originating records. Browser authentication must complete before submission; no issue linkage or completed acceptance is claimed yet.
+The owner authorised completion of intake and acceptance for these three contributions on 19 October 2026. The technical review supports acceptance against Standard revision `ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7`. The owner then approved all three exact payloads below and delegated their final submission through the governed forms. All three governed issues exactly match their approved payloads. Standard decision `b0b5e8021a5a93feb767e486699ec7c524955da6` accepts them against the reviewed implementation. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc`. The originating records retain separate issue-linkage and acceptance phases.
 
-The originating records remain authoritative. Their immutable implementations and pins were checked again. Read-only `check` and `sync --check` returned valid and current with no diagnostics. Searches covered open and closed issues by each stable marker and found no submitted match. The 121-file verification archive for the reviewed Standard revision passed all recorded size and SHA-256 checks. Its full-profile report is complete and conformant.
+The originating records remain authoritative. Their immutable implementations and pins were checked again. Read-only `check` and `sync --check` returned valid and current with no diagnostics. Before submission, searches covered open and closed issues by each stable marker and found no submitted match. Later exact issue readbacks and consumer reconciliation establish the completed intake. The 121-file verification archive for the reviewed Standard revision passed all recorded size and SHA-256 checks. Its full-profile report is complete and conformant.
 
 ## Acceptance scope
 
-| Contribution | Classification | Accepted requirement mapping after exact issue linkage |
+| Contribution and verified issue | Classification | Accepted requirement mapping |
 |---|---|---|
-| DShCR numeric citations | Preferred | `DKBWS-LINK-002` |
-| Configurable appearance family | Reusable | `DKBWS-DESIGN-001`, `DKBWS-PROMPT-001`, `DKBWS-RENDER-001`, `DKBWS-VERIFY-001` |
-| Content-first development handoff | Reusable | `DKBWS-PROMPT-001` |
+| [DShCR numeric citations, #32](https://github.com/denchco/knowledge-base-wiki-standard/issues/32) | Preferred | `DKBWS-LINK-002` |
+| [Configurable appearance family, #33](https://github.com/denchco/knowledge-base-wiki-standard/issues/33) | Reusable | `DKBWS-DESIGN-001`, `DKBWS-PROMPT-001`, `DKBWS-RENDER-001`, `DKBWS-VERIFY-001` |
+| [Content-first development handoff, #34](https://github.com/denchco/knowledge-base-wiki-standard/issues/34) | Reusable | `DKBWS-PROMPT-001` |
 
 Numeric citations preserve identity-derived numbers, leading zeroes, authored order, exact source-row links, accessible identities and explanatory notes. `DKBWS-RENDER-001` remains an affected compatibility constraint in the original proposal; citation semantics do not add a separate dependency or network obligation.
 
@@ -31,7 +31,9 @@ Each payload below includes its exact repository, title, labels and body. Its di
 
 The standing `AGENTS.md` rule says: “the user performs final submission.” The owner's explicit delegation covers only these three exact payloads. The general rule remains in force. Any payload or form edit invalidates approval. The [governed workflow](../llm-wiki/standard-proposals.md) requires verified exact issue linkage before a terminal decision can be recorded.
 
-After submission, record each observed issue linkage and acceptance in separate Jujutsu phases. Publish the matching acceptance registry through the governed repository process, then reconcile the consumer records against it. Release inclusion, Documentation synchronisation and consumer adoption remain separate. Existing pins do not change.
+Issue linkage and acceptance are recorded in separate Jujutsu phases. The matching registry is published through the protected repository process, and the consumer records reconcile against it. Release inclusion, Documentation synchronisation and consumer adoption remain separate. Existing pins do not change.
+
+The exact payloads below retain their preparation-time wording, including statements that approval or acceptance was then pending. Those historical statements do not override the current lifecycle records above. No approved payload bytes were changed.
 
 ## Exact prepared payloads
 

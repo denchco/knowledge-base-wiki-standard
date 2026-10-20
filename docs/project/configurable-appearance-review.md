@@ -1,13 +1,13 @@
 ---
 type: Technical Review
 title: Configurable appearance contribution review
-description: Thirlwall contribution provenance, review repairs and pending formal acceptance.
+description: Thirlwall contribution provenance, review repairs and governed acceptance.
 status: draft
 ---
 
 # Configurable appearance contribution review
 
-The reusable mechanism is reviewed and integrated locally for a verified technical handoff. Formal Standard acceptance remains pending governed intake and an explicit maintainer decision. The authoritative consumer record remains `standard-proposals/configurable-appearance-family.json` in Thirlwall; this review does not duplicate or replace it.
+The reusable mechanism is reviewed and integrated locally for a verified technical handoff. Governed issue [#33](https://github.com/denchco/knowledge-base-wiki-standard/issues/33) is accepted as reusable under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) publishes that decision and its registry entry. The authoritative consumer record remains `standard-proposals/configurable-appearance-family.json` in Thirlwall; this review does not duplicate or replace it.
 
 ## Recorded origin
 
@@ -21,15 +21,15 @@ The reusable mechanism is reviewed and integrated locally for a verified technic
 | Proposal-record commit | `136f7c47df1bd4c2a23417221f6272030e9c2733` |
 | Reviewed candidate | `3ec5e3c545d3d6bc423d42983910217cff4abee8` |
 
-The proposal file matches its recorded commit byte for byte. Its SHA-256 is `3ef9e32537960eb0af7104c550c0aa8e54517147b20c10f3e1fdffd684a1ad7c`. The original implementation is an ancestor of that record commit. The candidate applies to the pinned Standard baseline without conflicts.
+At technical review, the prepared proposal file matched its recorded commit byte for byte. Its preparation-time SHA-256 is `3ef9e32537960eb0af7104c550c0aa8e54517147b20c10f3e1fdffd684a1ad7c`. The original implementation is an ancestor of that record commit. The candidate applies to the pinned Standard baseline without conflicts.
 
 Graphify discovery was query-first. Its truncated result led to the scoped graph report, design contract, appearance implementation and governed proposal workflow. Graph output supplied navigation only.
 
-## Scope and classification recommendation
+## Scope and accepted classification
 
-The technical recommendation is **reusable** within Standard Production. One optional validated configuration supplies the brand seed, fresh appearance and desktop width. Shared OKLCH derivation provides named renderer, Mermaid and graph roles, with contrast checked after sRGB rounding. Zensical retains appearance storage ownership; the width control retains its existing storage key.
+The accepted classification is **reusable** within Standard Production. One optional validated configuration supplies the brand seed, fresh appearance and desktop width. Shared OKLCH derivation provides named renderer, Mermaid and graph roles, with contrast checked after sRGB rounding. Zensical retains appearance storage ownership; the width control retains its existing storage key.
 
-Pale green `#e1efdd`, light appearance and wide layout remain Thirlwall choices. At the reviewed integration commit, the Standard had no appearance configuration and retained its teal, light and standard-width defaults. A later, separately authorised Standard presentation change aligns its blue family, white page and wordmark with the public Documentation Wiki. That change does not alter this contribution's origin, review evidence or pending intake. The later [reader-default correction](../reference/reader-defaults-migration.md) makes Wide the unconfigured baseline; it preserves the original contribution history and saved reader choices. Existing consumers retain their pins and manual token adapters until they select a migration.
+Pale green `#e1efdd`, light appearance and wide layout remain Thirlwall choices. At the reviewed integration commit, the Standard had no appearance configuration and retained its teal, light and standard-width defaults. A later, separately authorised Standard presentation change aligns its blue family, white page and wordmark with the public Documentation Wiki. That change does not alter this contribution's origin or review evidence. The later [reader-default correction](../reference/reader-defaults-migration.md) makes Wide the unconfigured baseline; it preserves the original contribution history and saved reader choices. Existing consumers retain their pins and manual token adapters until they select a migration.
 
 This adapter implements existing `DKBWS-DESIGN-001`, `DKBWS-PROMPT-001`, `DKBWS-RENDER-001` and `DKBWS-VERIFY-001` obligations. It adds no profile requirement or waiver. Migration requires the schema, generator, build/live configuration, graph integration, width fallback, ignored-output declarations and tests together. Unsupported renderer configuration fails explicitly.
 
@@ -55,18 +55,14 @@ Read-only checks on 7 October 2026 confirmed a valid consumer record, matching p
 - Prepared payload SHA-256: `a2df6614797be42909b60d9756c344a76368ee4d350915e2064bc94116d8f117`.
 - Governed form SHA-256: `3624749c2915771b98dabb7ec93f7ae34618da7b914bd28d20a557abd86f4adf`.
 
-Approval remains pending. The issue is not submitted. Formal classification, acceptance and release inclusion remain pending; adoption remains not considered. The Standard registry cannot receive a new governed-issue entry until exact issue linkage exists. Its single historical exception is unavailable to this proposal.
+The owner approved the exact payload and delegated its final governed-form submission. Issue #33 matches the approved payload digest, and the published form matches the governed form digest. Its issue-linkage and accepted-decision records use separate consumer JJ commits. The Standard registry records reusable acceptance under `b0b5e8021a5a93feb767e486699ec7c524955da6`; release inclusion remains pending and adoption remains not considered.
 
-Follow the [tracked proposal workflow](../llm-wiki/standard-proposals.md):
-
-1. Review and explicitly approve the existing exact payload, then record approval against its digest and form revision in Thirlwall. If the payload changes to describe this review, prepare it again and approve the new digest. Open the governed form only when requested; the user submits it.
-2. Reconcile the submitted issue by its stable marker and exact payload. Record the observed issue linkage in its own JJ phase.
-3. Obtain the Standard maintainer's explicit reusable acceptance decision against the verified full integration commit and named requirement IDs. Record it in the Standard registry, then record the corresponding consumer decision in a separate JJ phase.
+The completed [tracked proposal workflow](../llm-wiki/standard-proposals.md) preserves the exact preparation-time payload. Current read-only reconciliation compares the consumer record with the published acceptance registry. The original implementation, pin and review evidence remain unchanged.
 
 Immutable release inclusion and any Thirlwall pin change require later, separate decisions. Technical integration does not authorise publication, release or consumer adoption.
 
 | Parked transition | `blocked_by` | `reopen_when` | `last_checked` |
 |---|---|---|---|
-| Formal intake and acceptance | Exact-payload approval, user submission, exact issue linkage and explicit maintainer decision | The authorised user supplies approval or the governed issue becomes available for reconciliation | 2026-10-07 |
+| Thirlwall adoption | No new immutable release or consumer adoption authority | The owner selects an exact released revision and authorises verified migration | 2026-10-20 |
 
 See [project status](status.md) for the current bounded priority.
