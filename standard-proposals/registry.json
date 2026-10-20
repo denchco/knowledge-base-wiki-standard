@@ -4,6 +4,102 @@
   "targetRepository": "https://github.com/denchco/knowledge-base-wiki-standard",
   "entries": [
     {
+      "id": "DKBWS-PROP-configurable-appearance-family-070ebc0d2b395466901499f48f72d8d0",
+      "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-configurable-appearance-family-070ebc0d2b395466901499f48f72d8d0 -->",
+      "intakeMode": "governed-issue",
+      "origin": {
+        "project": "Thirlwall Inquiry: Implications for Defence Healthcare",
+        "publicUrl": null,
+        "implementationCommit": "0def10afdb6126508ec257321a39d8e5adc9b048",
+        "verificationCommit": "0def10afdb6126508ec257321a39d8e5adc9b048",
+        "pinnedStandardRevision": "d339a0e30de41c4a3260f22c00c96898299a1834"
+      },
+      "issue": {
+        "url": "https://github.com/denchco/knowledge-base-wiki-standard/issues/33",
+        "number": 33
+      },
+      "classification": "reusable",
+      "decision": "accepted",
+      "decisionDate": "2026-10-20T08:09:58.495Z",
+      "decisionRevision": "b0b5e8021a5a93feb767e486699ec7c524955da6",
+      "decisionEvidence": "Andrew Dench authorised acceptance of the three reviewed contributions and explicitly approved this exact payload and delegated final governed-form submission. Issue #33 was read back and exactly matched approved repository/title/labels/body SHA-256 a2df6614797be42909b60d9756c344a76368ee4d350915e2064bc94116d8f117 with its single stable marker and governed form SHA-256 3624749c2915771b98dabb7ec93f7ae34618da7b914bd28d20a557abd86f4adf. Standard decision commit b0b5e8021a5a93feb767e486699ec7c524955da6 records the reviewed local implementation ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7 and its completed verification. This ledger publishes acceptance only; it does not publish or release that implementation.",
+      "acceptedRequirements": [
+        "DKBWS-DESIGN-001",
+        "DKBWS-PROMPT-001",
+        "DKBWS-RENDER-001",
+        "DKBWS-VERIFY-001"
+      ],
+      "release": {
+        "status": "pending",
+        "tag": null,
+        "revision": null,
+        "recordedAt": null
+      },
+      "notes": "Accepted as a reusable Standard Production mechanism for validated appearance configuration, deterministic accessible colour derivation, renderer and graph integration, saved reader preferences and source/browser checks. The originating pale-green identity remains project-specific. The later Standard-owned Wide baseline is a separate correction. Candidate implementation publication, immutable release inclusion and consumer adoption remain separate; existing pins do not change."
+    },
+    {
+      "id": "DKBWS-PROP-content-first-development-next-steps-08dfca0ab059007d75c4ed691a19f8bf",
+      "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-content-first-development-next-steps-08dfca0ab059007d75c4ed691a19f8bf -->",
+      "intakeMode": "governed-issue",
+      "origin": {
+        "project": "Thirlwall Inquiry: Implications for Defence Healthcare",
+        "publicUrl": null,
+        "implementationCommit": "ad966d4e43b56931ea22db804c4fde10704d043b",
+        "verificationCommit": "ad966d4e43b56931ea22db804c4fde10704d043b",
+        "pinnedStandardRevision": "d339a0e30de41c4a3260f22c00c96898299a1834"
+      },
+      "issue": {
+        "url": "https://github.com/denchco/knowledge-base-wiki-standard/issues/34",
+        "number": 34
+      },
+      "classification": "reusable",
+      "decision": "accepted",
+      "decisionDate": "2026-10-20T08:09:58.495Z",
+      "decisionRevision": "b0b5e8021a5a93feb767e486699ec7c524955da6",
+      "decisionEvidence": "Andrew Dench authorised acceptance of the three reviewed contributions and explicitly approved this exact payload and delegated final governed-form submission. Issue #34 was read back and exactly matched approved repository/title/labels/body SHA-256 188db2cb41c269049d772dc668f7a9c33ab0d14e81131c16ab0366af3c72127e with its single stable marker and governed form SHA-256 3624749c2915771b98dabb7ec93f7ae34618da7b914bd28d20a557abd86f4adf. Standard decision commit b0b5e8021a5a93feb767e486699ec7c524955da6 records the reviewed local implementation ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7 and its completed verification. This ledger publishes acceptance only; it does not publish or release that implementation.",
+      "acceptedRequirements": [
+        "DKBWS-PROMPT-001"
+      ],
+      "release": {
+        "status": "pending",
+        "tag": null,
+        "revision": null,
+        "recordedAt": null
+      },
+      "notes": "Accepted as a reusable DKBWS-PROMPT-001 handoff policy: assess continuing subject and evidence maturity, offer up to three grounded priorities with proposed update, value and completion condition, retain cycle guards, and state when no grounded update is available. Fixtures prove instruction consistency and response structure, not uncaptured response quality. Recommendations do not authorise execution. Candidate implementation publication, immutable release inclusion and consumer adoption remain separate; existing pins do not change."
+    },
+    {
+      "id": "DKBWS-PROP-dshcr-numeric-source-citations-6f20cb144cc87ed7977425df68469964",
+      "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-dshcr-numeric-source-citations-6f20cb144cc87ed7977425df68469964 -->",
+      "intakeMode": "governed-issue",
+      "origin": {
+        "project": "dshcr-research",
+        "publicUrl": null,
+        "implementationCommit": "885700d67e3a408c08818747b601d857f3f40576",
+        "verificationCommit": "885700d67e3a408c08818747b601d857f3f40576",
+        "pinnedStandardRevision": "4aae4d4efbcea526f28ec8bcbfaf203dae34bc25"
+      },
+      "issue": {
+        "url": "https://github.com/denchco/knowledge-base-wiki-standard/issues/32",
+        "number": 32
+      },
+      "classification": "preferred",
+      "decision": "accepted",
+      "decisionDate": "2026-10-20T08:09:58.495Z",
+      "decisionRevision": "b0b5e8021a5a93feb767e486699ec7c524955da6",
+      "decisionEvidence": "Andrew Dench authorised acceptance of the three reviewed contributions and explicitly approved this exact payload and delegated final governed-form submission. Issue #32 was read back and exactly matched approved repository/title/labels/body SHA-256 a58526e8511572a250f7f73f287b0492ffa52e3d4d90e8c8c4dbbf74e4080514 with its single stable marker and governed form SHA-256 3624749c2915771b98dabb7ec93f7ae34618da7b914bd28d20a557abd86f4adf. Standard decision commit b0b5e8021a5a93feb767e486699ec7c524955da6 records the reviewed local implementation ced1ee1588ce3640b6c0a680b15f5dec4f2fdee7 and its completed verification. This ledger publishes acceptance only; it does not publish or release that implementation.",
+      "acceptedRequirements": [
+        "DKBWS-LINK-002"
+      ],
+      "release": {
+        "status": "pending",
+        "tag": null,
+        "revision": null,
+        "recordedAt": null
+      },
+      "notes": "Accepted as preferred source-citation behaviour under DKBWS-LINK-002: stable identity-derived numeric superscripts, retained leading zeroes and authored order, independent exact source-row links, full accessible identities and explanatory-note preservation. DKBWS-RENDER-001 remains an affected compatibility constraint rather than a separately accepted citation requirement. Candidate implementation publication, immutable release inclusion and consumer adoption remain separate; existing pins do not change."
+    },
+    {
       "id": "DKBWS-PROP-native-appearance-toggle-37c93b3f736773545cf704dee55ed22a",
       "marker": "<!-- dkbws-standard-proposal:v1:DKBWS-PROP-native-appearance-toggle-37c93b3f736773545cf704dee55ed22a -->",
       "intakeMode": "governed-issue",
