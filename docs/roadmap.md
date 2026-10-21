@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions and exact migration checks. Standard publication, Documentation migration and public reader verification are complete for the recorded revisions. Other consumer records, pins and adoption states remain unchanged.
+The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions, the rc.7 dependency follow-up and exact migration checks. Standard publication, Documentation migration and public reader verification are complete for the recorded revisions. Other consumer records, pins and adoption states remain unchanged.
 
 ## Completed through `v0.1.0-rc.5`
 
@@ -41,6 +41,10 @@ The October security and dependency-updater maintenance merged through protected
 
 Protected PR #38 and exact-revision post-merge Verify published the reader defaults, numeric citations, status-free navigation, complete proof accounting, appearance mechanisms, content-first handoffs and guarded dependency qualification. Immutable rc.6 resolves to `8c134952dacfcd7a60c8da82d59aecb67117c512`. The later registry includes the four accepted contributions while preserving their origins and earlier decisions. Documentation migration, protected deployment and public reader verification are complete at `4df1493c737b355b25c7846f40bb13b997f100c3`, pinned to that release. Independent consumer release reconciliation and adoption remain separately governed. [SRC-067](sources.md#src-067), [SRC-069](sources.md#src-069)
 
-The remaining bounded dependency recommendation addresses the low-severity KaTeX/Mermaid finding without preselecting a replacement pair. [STD-VAL-012](validation-queue.md) records its completion condition.
+## Completed in `v0.1.0-rc.7`
+
+Protected PR #40 and successful exact-revision post-merge Verify published the scoped KaTeX `0.18.2` compatibility exception for retained Mermaid `11.17.2`. Immutable rc.7 resolves to `5de406bfee155993308cd789dc4eacae7e49f5de`; complete verification and the zero-finding npm audit passed. Documentation adopted that exact release at `701b21a557636af6038566a7db7bff68764ff17a` and passed protected deployment and public reader/math checks. [STD-VAL-012](validation-queue.md) is resolved. Other consumer pins and proposal records remain unchanged. [SRC-071](sources.md#src-071), [SRC-072](sources.md#src-072)
+
+No further grounded content update is available.
 
 Future compatibility fixtures require a reproduced consumer gap or evidenced upstream change. Absolute interception of uncaptured responses remains unproven; the supported Stop adapter supplies one bounded corrective continuation after local review and trust. A dedicated Standard MCP remains deferred until a consumer identifies a named task not served by the files, CLI, skill/plugin, Git, and optional read-only repository integration.
