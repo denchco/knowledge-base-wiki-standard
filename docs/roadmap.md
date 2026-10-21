@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-The [current release preparation](project/release-readiness.md) tracks unreleased integrations, accepted contribution decisions and exact migration checks. Local completion is distinct from publication and consumer adoption.
+The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions and exact migration checks. Standard publication, Documentation migration and public reader verification are complete for the recorded revisions. Other consumer records, pins and adoption states remain unchanged.
 
 ## Completed through `v0.1.0-rc.5`
 
@@ -35,6 +35,12 @@ The [current release preparation](project/release-readiness.md) tracks unrelease
 
 ## Completed October maintenance
 
-The October security and dependency-updater maintenance merged through protected PR #13 on 3 October 2026 at `fef1392548381276a03ca89a2ede435a3d04ec08`. Post-merge Verify run `37101094460` and fresh hosted uv Dependabot run `37103486583` passed on that exact revision, closing [STD-VAL-008](validation-queue.md). Hosted uv `0.12.18` successfully resolved both proposed dependency updates; the reference runtime still requires exact uv `0.12.10`. This publication created no immutable release and changed no consumer pin. [SRC-044](sources.md#src-044), [SRC-045](sources.md#src-045), [SRC-046](sources.md#src-046)
+The October security and dependency-updater maintenance merged through protected PR #13 on 3 October 2026 at `fef1392548381276a03ca89a2ede435a3d04ec08`. Post-merge Verify run `37101094460` and fresh hosted uv Dependabot run `37103486583` passed on that exact revision, closing [STD-VAL-008](validation-queue.md). Hosted uv `0.12.18` successfully resolved both proposed dependency updates; the reference runtime then required exact uv `0.12.10`. That October maintenance publication created no immutable release and changed no consumer pin. [SRC-044](sources.md#src-044), [SRC-045](sources.md#src-045), [SRC-046](sources.md#src-046)
+
+## Completed in `v0.1.0-rc.6`
+
+Protected PR #38 and exact-revision post-merge Verify published the reader defaults, numeric citations, status-free navigation, complete proof accounting, appearance mechanisms, content-first handoffs and guarded dependency qualification. Immutable rc.6 resolves to `8c134952dacfcd7a60c8da82d59aecb67117c512`. The later registry includes the four accepted contributions while preserving their origins and earlier decisions. Documentation migration, protected deployment and public reader verification are complete at `4df1493c737b355b25c7846f40bb13b997f100c3`, pinned to that release. Independent consumer release reconciliation and adoption remain separately governed. [SRC-067](sources.md#src-067), [SRC-069](sources.md#src-069)
+
+The remaining bounded dependency recommendation addresses the low-severity KaTeX/Mermaid finding without preselecting a replacement pair. [STD-VAL-012](validation-queue.md) records its completion condition.
 
 Future compatibility fixtures require a reproduced consumer gap or evidenced upstream change. Absolute interception of uncaptured responses remains unproven; the supported Stop adapter supplies one bounded corrective continuation after local review and trust. A dedicated Standard MCP remains deferred until a consumer identifies a named task not served by the files, CLI, skill/plugin, Git, and optional read-only repository integration.

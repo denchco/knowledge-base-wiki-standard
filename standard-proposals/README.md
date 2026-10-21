@@ -72,4 +72,10 @@ The handoff mechanism requires a grounded assessment of the continuing Wiki subj
 
 The registry records the exact originating commits, pins, approved payloads, issue identities and this decision revision. The source implementations remain in their originating repositories. No subject evidence or attachments are published here.
 
-All three contributions remain release-pending. This decision changes neither released requirements nor consumer pins. Publication of the candidate implementation, immutable-release inclusion, Documentation synchronization and consumer adoption remain separate.
+At this acceptance decision, all three contributions remained release-pending. That decision changed neither released requirements nor consumer pins. Publication of the candidate implementation, immutable-release inclusion, Documentation synchronization and consumer adoption were separate later transitions.
+
+## Release inclusion, 21 October 2026
+
+Immutable `v0.1.0-rc.6` at `8c134952dacfcd7a60c8da82d59aecb67117c512` includes these three contributions and the earlier accepted native appearance contribution (#7). The release was read back as public, non-draft and immutable after exact-revision post-merge Verify passed. This strictly later registry records inclusion while preserving every immutable origin, accepted requirement and decision-evidence field, together with the earlier rc.4 bridge.
+
+Originating consumer records and pins remain unchanged. The three records still show accepted, release pending and adoption not considered until their separate governed release transitions are authorised. Documentation has separately adopted rc.6 at `4df1493c737b355b25c7846f40bb13b997f100c3` and passed protected deployment and public reader verification. Standard publication does not authorise other consumer adoption.

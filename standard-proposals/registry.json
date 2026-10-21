@@ -30,12 +30,12 @@
         "DKBWS-VERIFY-001"
       ],
       "release": {
-        "status": "pending",
-        "tag": null,
-        "revision": null,
-        "recordedAt": null
+        "status": "included",
+        "tag": "v0.1.0-rc.6",
+        "revision": "8c134952dacfcd7a60c8da82d59aecb67117c512",
+        "recordedAt": "2026-10-21T09:04:44Z"
       },
-      "notes": "Accepted as a reusable Standard Production mechanism for validated appearance configuration, deterministic accessible colour derivation, renderer and graph integration, saved reader preferences and source/browser checks. The originating pale-green identity remains project-specific. The later Standard-owned Wide baseline is a separate correction. Candidate implementation publication, immutable release inclusion and consumer adoption remain separate; existing pins do not change."
+      "notes": "Accepted as a reusable Standard Production mechanism for validated appearance configuration, deterministic accessible colour derivation, renderer and graph integration, saved reader preferences and source/browser checks. The originating pale-green identity remains project-specific. The later Standard-owned Wide baseline is a separate correction. Included in immutable v0.1.0-rc.6 at 8c134952dacfcd7a60c8da82d59aecb67117c512. Originating consumer release reconciliation, adoption and pin changes remain separately governed."
     },
     {
       "id": "DKBWS-PROP-content-first-development-next-steps-08dfca0ab059007d75c4ed691a19f8bf",
@@ -61,12 +61,12 @@
         "DKBWS-PROMPT-001"
       ],
       "release": {
-        "status": "pending",
-        "tag": null,
-        "revision": null,
-        "recordedAt": null
+        "status": "included",
+        "tag": "v0.1.0-rc.6",
+        "revision": "8c134952dacfcd7a60c8da82d59aecb67117c512",
+        "recordedAt": "2026-10-21T09:04:44Z"
       },
-      "notes": "Accepted as a reusable DKBWS-PROMPT-001 handoff policy: assess continuing subject and evidence maturity, offer up to three grounded priorities with proposed update, value and completion condition, retain cycle guards, and state when no grounded update is available. Fixtures prove instruction consistency and response structure, not uncaptured response quality. Recommendations do not authorise execution. Candidate implementation publication, immutable release inclusion and consumer adoption remain separate; existing pins do not change."
+      "notes": "Accepted as a reusable DKBWS-PROMPT-001 handoff policy: assess continuing subject and evidence maturity, offer up to three grounded priorities with proposed update, value and completion condition, retain cycle guards, and state when no grounded update is available. Fixtures prove instruction consistency and response structure, not uncaptured response quality. Recommendations do not authorise execution. Included in immutable v0.1.0-rc.6 at 8c134952dacfcd7a60c8da82d59aecb67117c512. Originating consumer release reconciliation, adoption and pin changes remain separately governed."
     },
     {
       "id": "DKBWS-PROP-dshcr-numeric-source-citations-6f20cb144cc87ed7977425df68469964",
@@ -92,12 +92,12 @@
         "DKBWS-LINK-002"
       ],
       "release": {
-        "status": "pending",
-        "tag": null,
-        "revision": null,
-        "recordedAt": null
+        "status": "included",
+        "tag": "v0.1.0-rc.6",
+        "revision": "8c134952dacfcd7a60c8da82d59aecb67117c512",
+        "recordedAt": "2026-10-21T09:04:44Z"
       },
-      "notes": "Accepted as preferred source-citation behaviour under DKBWS-LINK-002: stable identity-derived numeric superscripts, retained leading zeroes and authored order, independent exact source-row links, full accessible identities and explanatory-note preservation. DKBWS-RENDER-001 remains an affected compatibility constraint rather than a separately accepted citation requirement. Candidate implementation publication, immutable release inclusion and consumer adoption remain separate; existing pins do not change."
+      "notes": "Accepted as preferred source-citation behaviour under DKBWS-LINK-002: stable identity-derived numeric superscripts, retained leading zeroes and authored order, independent exact source-row links, full accessible identities and explanatory-note preservation. DKBWS-RENDER-001 remains an affected compatibility constraint rather than a separately accepted citation requirement. Included in immutable v0.1.0-rc.6 at 8c134952dacfcd7a60c8da82d59aecb67117c512. Originating consumer release reconciliation, adoption and pin changes remain separately governed."
     },
     {
       "id": "DKBWS-PROP-native-appearance-toggle-37c93b3f736773545cf704dee55ed22a",
@@ -125,12 +125,12 @@
         "DKBWS-RENDER-001"
       ],
       "release": {
-        "status": "pending",
-        "tag": null,
-        "revision": null,
-        "recordedAt": null
+        "status": "included",
+        "tag": "v0.1.0-rc.6",
+        "revision": "8c134952dacfcd7a60c8da82d59aecb67117c512",
+        "recordedAt": "2026-10-21T09:04:44Z"
       },
-      "notes": "Accepted as a reusable Standard Production reference-adapter improvement: native light/dark appearance before Wide, scheme-scoped accessible colours, in-place graph themes and restored keyboard selection. Standard keeps its light default and teal identity. The original consumer coverage gap is disclosed in issue #7 and corrected upstream. The user expressly delegated final issue submission for this contribution; the general manual-submission rule remains in force. Immutable release inclusion and consumer adoption remain separate pending decisions."
+      "notes": "Accepted as a reusable Standard Production reference-adapter improvement: native light/dark appearance before Wide, scheme-scoped accessible colours, in-place graph themes and restored keyboard selection. At acceptance, the Standard kept its light default and teal identity; later authorised Standard presentation changes are separate from this origin. The original consumer coverage gap is disclosed in issue #7 and corrected upstream. The user expressly delegated final issue submission for this contribution; the general manual-submission rule remains in force. Included in immutable v0.1.0-rc.6 at 8c134952dacfcd7a60c8da82d59aecb67117c512. Originating consumer release reconciliation, adoption and pin changes remain separately governed."
     },
     {
       "id": "DKBWS-PROP-uk-digital-health-reader-source-navigation-38f4b5cbcddce10fbcde32f70862143b",
