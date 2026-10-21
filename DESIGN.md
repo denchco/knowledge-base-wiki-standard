@@ -273,9 +273,9 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
   and public-CDN exclusion. Deployment and public HTTP health are separate
   release-adapter gates.
 
-## Configurable appearance candidate
+## Configurable appearance
 
-This reviewed local candidate adds an optional appearance adapter under the existing design and verification requirements. The [technical review](docs/project/configurable-appearance-review.md) records its origin, repairs and pending formal intake. No acceptance, release or consumer adoption is implied.
+The optional appearance adapter is accepted as reusable and included in immutable `v0.1.0-rc.6`. It operates under the existing design and verification requirements. The [technical review](docs/project/configurable-appearance-review.md) records its origin, repairs and acceptance. Consumer adoption remains a separate authorised action.
 
 Use `config/wiki-appearance.json` as the input for a consumer that selects the adapter:
 
