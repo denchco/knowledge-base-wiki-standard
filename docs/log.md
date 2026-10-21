@@ -7,7 +7,13 @@ status: draft
 
 # Research and change log
 
+## 2026-10-21
+
+- **Security qualification refresh:** The required Python audit found Certifi `2026.7.22` affected by newly reported `PYSEC-2026-4320`. Select `2026.10.19` and exact uv `0.13.4` following the official Python security announcement. Update runtime checks, CI and the resolver floor together, preserve historical qualification records and rerun the complete release contract. [SRC-065](sources.md#src-065), [SRC-066](sources.md#src-066)
+
 ## 2026-10-20
+
+- **Authorised reader-default release:** Prepare guarded Graphify `0.9.70` qualification and `v0.1.0-rc.6`, including the complete Documentation snapshot closure and an explicit pre-`1.0.0` compatibility rule. The owner authorised protected publication, immutable release, Documentation migration and live reader verification. Other consumer pins remain unchanged. The release record distinguishes this preparation from completed publication. [SRC-064](sources.md#src-064)
 
 - **Governed consumer intake:** Submit the three exact approved payloads through their governed forms under the owner's scoped delegation. Issues #32, #33 and #34 each match the approved repository, title, labels, body and single stable marker. Consumer issue linkage and acceptance use separate JJ phases.
 - **Explicit acceptance:** Record preferred numeric citations and reusable appearance configuration and content-first handoffs under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc`. Reconcile the originating records with the published registry. Preserve the reviewed implementation, source evidence, existing releases and consumer pins. [SRC-063](sources.md#src-063)

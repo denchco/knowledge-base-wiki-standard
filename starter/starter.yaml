@@ -499,6 +499,20 @@ entries:
     planning_only: true
     dependency_closure: "adapted package.json and its exact resolved dependency graph"
     requirements: ["DKBWS-VERIFY-001"]
+  - target: "scripts/graphify-update.py"
+    role: "guarded-graph-indexing"
+    classification: "adapt-from-release"
+    source: "scripts/graphify-update.py"
+    planning_only: true
+    dependency_closure: "exact Graphify lock, isolated Python entry point, corpus input rejection, disabled external preprocessing and guarded package commands"
+    requirements: ["DKBWS-GRAPH-001", "DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-graphify-inputs.test.py"
+    role: "graph-input-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-graphify-inputs.test.py"
+    planning_only: true
+    dependency_closure: "guarded graph indexing wrapper, exact installed API, benign extraction and negative unsupported-input fixtures"
+    requirements: ["DKBWS-GRAPH-001", "DKBWS-SEC-001", "DKBWS-VERIFY-001"]
   - target: "pyproject.toml"
     role: "python-build-contract"
     classification: "adapt-from-release"

@@ -17,7 +17,7 @@
     "build:site": "npm run check:toolchain && npm run prepare:runtime && npm run prepare:appearance && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=scripts uv run zensical build -f zensical.appearance.toml --strict && npm run patch:renderer && npm run build:llms",
     "design:lint": "design.md lint DESIGN.md",
     "graph:publish": "node scripts/publish-graphify-assets.mjs",
-    "graph:update": "npm run check:toolchain && npm run prepare:runtime && uv run graphify update . --force && npm run graph:publish",
+    "graph:update": "npm run check:toolchain && npm run prepare:runtime && PYTHONDONTWRITEBYTECODE=1 uv run --no-sync python -I -B scripts/graphify-update.py && npm run graph:publish",
     "check:visual-shape": "node scripts/check-visual-shape-contract.mjs",
     "check:graphify": "node scripts/check-graphify-assets.mjs",
     "check:browser": "node scripts/check-runtime-browser-contract.mjs",
@@ -44,7 +44,7 @@
     "sync:documentation:apply": "node scripts/sync-documentation-snapshot.mjs --apply",
     "sync:documentation:test": "node --test scripts/sync-documentation-snapshot.test.mjs",
     "conformance:test": "node --test scripts/check-reference-toolchain.test.mjs scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/check-governing-question-repetitions.test.mjs scripts/dev-service.test.mjs scripts/development-response-links.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/link-source-citations.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/standard-proposal-cli.test.mjs scripts/sync-documentation-snapshot.test.mjs scripts/runtime-bundle.test.mjs scripts/codex-stop-hook.test.mjs scripts/publish-llms.test.mjs scripts/package-wiki-plugin.test.mjs scripts/patch-zensical-runtime.test.mjs scripts/wiki-appearance.test.mjs scripts/prepare-wiki-appearance.test.mjs scripts/development-next-steps.test.mjs",
-    "check": "npm run check:toolchain && node scripts/check-standard.mjs && npm run standard:proposal -- check --all && npm run check:canonical-content && npm run check:governing-question && npm run check:source-links && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run check:renderer && npm run check:runtime && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
+    "check": "npm run check:toolchain && node scripts/check-standard.mjs && npm run standard:proposal -- check --all && npm run check:canonical-content && npm run check:governing-question && npm run check:source-links && npm run check:graphify-inputs && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run check:renderer && npm run check:runtime && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
     "verify": "node scripts/verify.mjs",
     "verify:workspace": "npm run verify && npm run sync:documentation:check",
     "service:register": "node scripts/dev-service.mjs register",
@@ -67,7 +67,8 @@
     "prepare:local-config": "node scripts/prepare-local-zensical-config.mjs",
     "prepare:appearance": "node scripts/prepare-wiki-appearance.mjs",
     "check:appearance-browser": "node scripts/check-wiki-appearance-browser.mjs",
-    "response:next-steps:check": "node scripts/development-next-steps.mjs"
+    "response:next-steps:check": "node scripts/development-next-steps.mjs",
+    "check:graphify-inputs": "npm run check:toolchain && uv run --no-sync python -I -B scripts/graphify-update.py --check && uv run --no-sync python -I -B scripts/check-graphify-inputs.test.py"
   },
   "codexDevServer": {
     "serviceId": "denchco-kb-wiki-standard",

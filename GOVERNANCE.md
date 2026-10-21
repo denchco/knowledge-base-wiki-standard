@@ -22,6 +22,8 @@ Maintainer triage records classification and decision in the versioned Standard 
 
 Patterns progress through `experimental`, `project-specific`, `reusable`, `preferred`, and `core`. Complexity alone is not promotion evidence. A promoted pattern records its reuse class, dependencies, accessibility and browser evidence, limitations, and simpler fallback.
 
-Deprecation begins in a minor release. Removal or a change that invalidates a previously conforming implementation requires a major release. Security corrections may accelerate this process but must remain documented.
+Before `1.0.0`, candidate prereleases may change or retire conformance requirements. Under `DKBWS-RELEASE-001`, each incompatible candidate change MUST identify affected requirement IDs, compatibility impact, verification criteria and an explicit migration in the changelog and release notes. Previous immutable releases MUST remain intact. Consumer pins and adoption states change only through separately authorised migration.
+
+From `1.0.0`, deprecation begins in a minor release. Removal or a change that invalidates a previously conforming implementation requires a major release. Security corrections may accelerate deprecation but must remain documented.
 
 Local projects never track `main` as their conformance pin. They consume immutable releases and receive reviewable migration patches or pull requests. A proposal, accepted decision, or release-available result never changes a consumer pin automatically.

@@ -1,8 +1,13 @@
 # Changelog
 
-All notable standard changes are recorded here. The candidate follows Semantic Versioning for its declared conformance contract.
+All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
-## Unreleased
+## v0.1.0-rc.6 — 2026-10-21
+
+- Package `v0.1.0-rc.6` under `DKBWS-RELEASE-001`. Make the pre-`1.0.0` candidate compatibility boundary explicit: incompatible candidate changes require affected IDs, verification and migration notes; immutable releases and separately authorised adoption remain mandatory. The post-`1.0.0` major-release rule is unchanged.
+- Replace the affected `graphifyy==0.9.55` pin with upstream's first patched release, `0.9.70`, under `DKBWS-SEC-001` and `DKBWS-GRAPH-001`. Bound reference indexing so unsupported preprocessed Fortran input fails before extraction. Qualification covers the exact lock, the input boundary, the complete graph/browser contract and both security audits; it does not qualify arbitrary external corpora or later Graphify releases. Migration requires the complete guarded indexing command and fixtures with the new frozen lock.
+- Qualify exact uv `0.13.4` and locked `certifi==2026.10.19` for the newly reported certificate-security incident (`DKBWS-SEC-001`, `DKBWS-VERIFY-001`). Update local/CI probes and the resolver bootstrap floor together; retain earlier runtime qualification as history. Reinstall the qualified toolchain and frozen lock before verification.
+- Complete the Documentation snapshot allowlist with the active handoff, Jujutsu-phase and graph-input verification scripts. Snapshot synchronization remains separate from adapting Documentation's own renderer and publishing its site.
 
 - Complete governed intake and acceptance of numeric citations (#32, preferred), configurable appearance (#33, reusable) and content-first handoffs (#34, reusable). Preserve exact approved payloads, immutable origins and separate JJ lifecycle phases. The protected acceptance ledger records decision `b0b5e8021a5a93feb767e486699ec7c524955da6`; implementation publication, immutable release and consumer adoption remain separate.
 

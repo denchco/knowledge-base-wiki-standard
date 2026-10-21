@@ -58,6 +58,7 @@ const required = [
   "profiles/standard-production.yaml", "scripts/sync-runtime-assets.mjs",
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
   "scripts/publish-graphify-assets.mjs", "scripts/check-graphify-assets.mjs",
+  "scripts/graphify-update.py", "scripts/check-graphify-inputs.test.py",
   "scripts/check-visual-shape-contract.mjs", "scripts/check-runtime-browser-contract.mjs",
   "scripts/runtime-browser-contract-config.mjs", "scripts/runtime-browser-contract-config.test.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
@@ -649,6 +650,9 @@ if (!pkg.scripts?.["conformance:test"]?.includes("jj-phase.test.mjs")) {
   failures.push("conformance:test does not exercise end-of-development-turn JJ commit semantics");
 }
 if (!pkg.scripts?.check?.includes("check:visual-shape")) failures.push("check does not exercise check:visual-shape");
+if (pkg.scripts?.["graph:update"] !== "npm run check:toolchain && npm run prepare:runtime && PYTHONDONTWRITEBYTECODE=1 uv run --no-sync python -I -B scripts/graphify-update.py && npm run graph:publish") failures.push("graph:update must use the qualified guarded indexing boundary");
+if (!pkg.scripts?.check?.includes("check:graphify-inputs")
+  || pkg.scripts?.["check:graphify-inputs"] !== "npm run check:toolchain && uv run --no-sync python -I -B scripts/graphify-update.py --check && uv run --no-sync python -I -B scripts/check-graphify-inputs.test.py") failures.push("check must verify graph input rejection and runtime preprocessing guards");
 if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("check does not exercise Draft 2020-12 artifact validation");
 if (!pkg.scripts?.check?.includes("check:provenance")) failures.push("check does not exercise the explicit provenance mode");
 if (!pkg.scripts?.check?.includes("audit:node") || !pkg.scripts?.check?.includes("audit:python")) failures.push("check does not exercise both locked dependency audits");
@@ -670,6 +674,11 @@ for (const file of [
   "overrides/partials/nav-item.html",
   "docs/assets/service-identity.json",
   "scripts/dev-service.test.mjs",
+  "scripts/development-next-steps.mjs",
+  "scripts/development-next-steps.test.mjs",
+  "scripts/jj-phase.test.mjs",
+  "scripts/graphify-update.py",
+  "scripts/check-graphify-inputs.test.py",
   "scripts/check-governing-question-repetitions.mjs",
   "scripts/check-governing-question-repetitions.test.mjs",
   "fixtures/conforming/governing-question-repetitions/.wiki-standard.yaml",
@@ -714,8 +723,8 @@ for (const gate of ["check:toolchain", "build", "check", "check:graphify", "chec
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
 const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
-if (!/^required-version\s*=\s*">=0\.12\.10"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.12.10; reference qualification remains exactly 0.12.10");
-for (const pin of ["zensical==0.0.59", "graphifyy==0.9.55", "pip-audit==2.10.1"])
+if (!/^required-version\s*=\s*">=0\.13\.4"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.13.4; reference qualification remains exactly 0.13.4");
+for (const pin of ["zensical==0.0.59", "graphifyy==0.9.70", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
@@ -727,7 +736,7 @@ for (const pin of [
   "astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1",
   "node-version: 24.20.0",
   "runs-on: ubuntu-24.04",
-  'version: "0.12.10"',
+  'version: "0.13.4"',
   'python-version: "3.12.14"',
   "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",

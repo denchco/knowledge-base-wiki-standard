@@ -14,7 +14,7 @@ function withToolchain(overrides, callback) {
   const fixture = mkdtempSync(path.join(os.tmpdir(), "dkbws-toolchain-"));
   const bin = path.join(fixture, "bin");
   const log = path.join(fixture, "output/verification/probes.jsonl");
-  const versions = { npm: "11.19.0", uv: "uv 0.12.10 (fixture)", python: "3.12.14", ...overrides };
+  const versions = { npm: "11.19.0", uv: "uv 0.13.4 (fixture)", python: "3.12.14", ...overrides };
   mkdirSync(bin);
   mkdirSync(path.dirname(log), { recursive: true });
   writeFileSync(log, "");
@@ -65,18 +65,18 @@ test("exact reference versions pass and check the interpreter only after uv iden
 });
 
 test("older and newer uv resolvers fail qualification before invoking uv run", () => {
-  for (const version of ["0.12.9", "0.12.15", "1.0.0"]) {
+  for (const version of ["0.12.10", "0.13.3", "0.13.5", "1.0.0"]) {
     withToolchain({ uv: `uv ${version}` }, ({ run, probes }) => {
       const result = run();
       assert.equal(result.status, 1);
-      assert.match(result.stderr, new RegExp(`uv: expected 0\\.12\\.10, found ${version.replaceAll(".", "\\.")}`));
+      assert.match(result.stderr, new RegExp(`uv: expected 0\\.13\\.4, found ${version.replaceAll(".", "\\.")}`));
       assert.deepEqual(probes(), [["npm", "--version"], ["uv", "--version"]]);
     });
   }
 });
 
 test("missing or malformed uv version evidence fails closed before running Python", () => {
-  for (const output of ["", "uv unknown", "not-uv 0.12.10", "uv 0.12.10rc1"]) {
+  for (const output of ["", "uv unknown", "not-uv 0.13.4", "uv 0.13.4rc1"]) {
     withToolchain({ uv: output }, ({ run, probes }) => {
       const result = run();
       assert.equal(result.status, 1);
@@ -105,11 +105,11 @@ test("npm and Python still require the exact qualified versions", () => {
 });
 
 test("verification rejects newer uv before build or any project Python execution", () => {
-  withToolchain({ uv: "uv 0.12.15" }, ({ fixture, env, run, probes }) => {
+  withToolchain({ uv: "uv 0.13.5" }, ({ fixture, env, run, probes }) => {
     execFileSync("git", ["init", "--quiet", fixture], { env });
     const result = run(path.join(root, "scripts/verify.mjs"));
     assert.equal(result.status, 1);
-    assert.match(result.stderr, /uv: expected 0\.12\.10, found 0\.12\.15/);
+    assert.match(result.stderr, /uv: expected 0\.13\.4, found 0\.13\.5/);
     assert.match(result.stderr, /gate failure: check:toolchain/);
     assert.deepEqual(probes(), [["npm", "run", "check:toolchain"], ["npm", "--version"], ["uv", "--version"]]);
     assert(!result.stdout.includes("[verify] npm run build"));
@@ -121,16 +121,17 @@ test("direct build, serve, graph and Python checks reject newer uv before projec
   const npmCli = process.env.npm_execpath ?? path.join(execFileSync("npm", ["root", "-g"], { encoding: "utf8" }).trim(), "npm/bin/npm-cli.js");
   const tasks = ["dev", "build:site", "graph:update", "audit:python"];
   if (scripts["check:source-links"].includes("uv run")) tasks.push("check:source-links");
+  if (scripts["check:graphify-inputs"]) tasks.push("check:graphify-inputs");
   if (scripts["build:local"]) tasks.push("build:local");
   for (const task of tasks) {
-    withToolchain({ uv: "uv 0.12.15" }, ({ fixture, env, probes }) => {
+    withToolchain({ uv: "uv 0.13.5" }, ({ fixture, env, probes }) => {
       // Execute the actual npm task through npm's shell, with only tool probes replaced.
       writeFileSync(path.join(fixture, "package.json"), JSON.stringify({ scripts }));
       const result = spawnSync(process.execPath, [npmCli, "--cache", path.join(fixture, ".cache/npm"), "run", task], {
         cwd: fixture, env, encoding: "utf8",
       });
       assert.equal(result.status, 1, `${task}: ${result.stderr}`);
-      assert.match(result.stderr, /uv: expected 0\.12\.10, found 0\.12\.15/, task);
+      assert.match(result.stderr, /uv: expected 0\.13\.4, found 0\.13\.5/, task);
       assert.deepEqual(probes(), [["npm", "run", "check:toolchain"], ["npm", "--version"], ["uv", "--version"]], task);
     });
   }
@@ -142,11 +143,12 @@ import pathlib, tomllib
 from packaging.specifiers import SpecifierSet
 config = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
 requirement = config["tool"]["uv"]["required-version"]
-assert requirement == ">=0.12.10", requirement
+assert requirement == ">=0.13.4", requirement
 versions = SpecifierSet(requirement)
-assert "0.12.9" not in versions
-assert "0.12.10" in versions
-assert "0.12.15" in versions
+assert "0.12.10" not in versions
+assert "0.13.3" not in versions
+assert "0.13.4" in versions
+assert "0.13.5" in versions
 assert "1.0.0" in versions
 `], { cwd: root, env: { ...process.env, UV_OFFLINE: "1" }, encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
@@ -158,7 +160,7 @@ test("verification and scheduled audits keep exact uv setup and audit qualificat
     const steps = Object.values(workflow.jobs).flatMap((job) => job.steps ?? []);
     const setup = steps.filter((step) => step.uses?.startsWith("astral-sh/setup-uv@"));
     assert(setup.length > 0, name);
-    assert(setup.every((step) => step.with?.version === "0.12.10"), name);
+    assert(setup.every((step) => step.with?.version === "0.13.4"), name);
     if (name === "security-audit.yml") assert(steps.some((step) => step.run === "npm run check:toolchain"));
   }
 });

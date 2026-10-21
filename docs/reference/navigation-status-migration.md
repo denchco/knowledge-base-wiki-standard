@@ -7,7 +7,7 @@ status: draft
 
 # Status-free navigation migration
 
-`DKBWS-HUMAN-003` is retired from the unreleased Standard on 19 October 2026. Its identifier remains reserved and must not be reused. Historical releases, changelog entries and source records retain their original meaning.
+`DKBWS-HUMAN-003` is retired in the `v0.1.0-rc.6` candidate, following the implementation on 19 October 2026. Its identifier remains reserved and must not be reused. Historical releases, changelog entries and source records retain their original meaning.
 
 The Human Wiki default now omits lifecycle status from navigation under `DKBWS-HUMAN-001`. The reference adapter renders no status icon or tooltip, including generic fallback information icons. Source lifecycle metadata, page titles, section controls and navigation accessibility remain intact.
 
@@ -35,6 +35,6 @@ The override derives from the exact Zensical `0.0.59` navigation template. It re
 
 The active requirement catalogue and selected-profile reports exclude the retired identifier. Revision-aware lifecycle fixtures still resolve older pins that included it and report its removal. Current dogfood comparison rows follow the active identifier catalogue. Their retained `DKBWS-HUMAN-001` findings cover only the historical build/URL scope and explicitly leave the new navigation behaviour unassessed. Original observations remain available in Git and released snapshots.
 
-The reference checks verify absence of rendered status markup as well as preserved navigation behaviour. They do not certify every browser or assistive technology. The end-of-turn commit records the completed verification and any failed or unrun gate. This change does not publish a release, update the Documentation snapshot or authorise a consumer migration.
+The reference checks verify absence of rendered status markup as well as preserved navigation behaviour. They do not certify every browser or assistive technology. The end-of-turn commit records the completed verification and any failed or unrun gate. This guide does not authorise a consumer migration. The release record separately identifies immutable publication and Documentation synchronization.
 
 See the [retired requirement record](../spec/requirements.md#retired-requirements), [profile contract](../spec/profiles.md) and [candidate status](../project/status.md).

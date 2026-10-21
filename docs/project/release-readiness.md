@@ -7,9 +7,9 @@ status: draft
 
 # Reader defaults release preparation
 
-This record prepares one reviewable candidate for Wide defaults, numeric superscript citations and complete conformance proof. It also accounts for earlier local changes that are absent from the published release. It does not record a new release or consumer adoption.
+This record prepares `v0.1.0-rc.6` for Wide defaults, numeric superscript citations and complete conformance proof. It also accounts for earlier local changes that are absent from the published release. Publication is authorised; release inclusion is recorded only after the immutable release exists.
 
-The owner authorised implementation, verification, a committed handoff and preparation of this package on 19 October 2026. The Standard-owned corrections extend `DKBWS-DESIGN-001`, `DKBWS-LINK-002` and `DKBWS-VERIFY-002`. The three consumer-derived mechanisms retain their original records and are now accepted under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. Release inclusion and adoption remain pending.
+The owner authorised implementation, verification, a committed handoff and preparation of this package on 19 October 2026. On 20 October, the owner authorised patched Graphify qualification, protected publication, an immutable release and Documentation synchronization with live reader verification. Other consumer pins remain unchanged. The Standard-owned corrections extend `DKBWS-DESIGN-001`, `DKBWS-LINK-002` and `DKBWS-VERIFY-002`. The three consumer-derived mechanisms retain their original records and are accepted under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`.
 
 ## Revision boundary
 
@@ -53,15 +53,17 @@ On 19 October 2026, governed `check` and GET-only `sync --check` validated all t
 
 The owner subsequently approved all three exact reviewed payloads and delegated final submission through their governed forms on 19 October 2026. The originating records contain those approvals. The governed submissions and exact issue-linkage checks completed. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) records decision `b0b5e8021a5a93feb767e486699ec7c524955da6` and publishes the matching registry at `c836eb7184cb836193b229f68fe487e70e3e3bfc`. Consumer linkage and acceptance use separate JJ commits; release and adoption remain pending. Any payload or form edit invalidates approval. Preserve the original project record instead of creating another proposal for the same contribution. [The intake workflow](../llm-wiki/standard-proposals.md) defines the transitions.
 
-GitHub reports `GHSA-pcc4-rvhr-2pr8` against the pinned Graphify version. Qualify a patched version before publishing the broader candidate. The current locked Python audit did not report this advisory; that audit does not clear the separate GitHub finding. See [STD-VAL-011](../validation-queue.md).
+The candidate replaces the affected Graphify `0.9.55` pin with `0.9.70` and requires the guarded reference indexing command. The qualification excludes external Fortran preprocessing. A patched dependency label alone does not qualify arbitrary input. Complete graph, browser, input-boundary and security checks must pass before publication. The earlier locked Python audit did not report `GHSA-pcc4-rvhr-2pr8`; that result did not clear the separate GitHub finding. See [STD-VAL-011](../validation-queue.md).
+
+The candidate compatibility rule under `DKBWS-RELEASE-001` permits this pre-`1.0.0` release only with explicit incompatible-change and migration notes. `DKBWS-HUMAN-003` is retired; `DKBWS-HUMAN-001` requires status-free navigation; `DKBWS-DESIGN-001`, `DKBWS-LINK-002` and `DKBWS-VERIFY-002` change the defaults and required evidence. Existing release contracts remain intact.
 
 ## Publication and migration sequence
 
 1. Review the exact generated package revision and its complete verification results. Confirm that negative proof fixtures reject incomplete receipts and that all-page citation checks and fresh-reader width checks pass.
 2. Retain the completed issue-linkage and acceptance evidence against the reviewed integration. Reconcile the consumer records with the published registry; their accepted states do not establish release inclusion.
-3. Publish the chosen candidate through the protected pull-request and verification process when authorised. Reconcile any later remote changes and verify the exact merged revision.
-4. Publish a separately authorised immutable release, then record inclusion against a strictly later registry revision. Retain historical tags and source records.
-5. Synchronise Documentation to that exact released revision and verify its snapshot and reader presentation. A prepared local package does not change the live Documentation pin.
+3. Publish the authorised candidate through the protected pull-request and verification process. Reconcile any later remote changes and verify the exact merged revision.
+4. Publish the authorised immutable release, then record inclusion against a strictly later registry revision. Retain historical tags and source records.
+5. Synchronise Documentation to that exact released revision and adapt its own renderer, width control, navigation override and verification. A snapshot update alone does not change those Documentation-owned files. Publish through its protected process and verify fresh-reader Wide, saved preferences and status-free navigation on the public Wiki.
 6. For each authorised consumer, follow the [reader-defaults migration](../reference/reader-defaults-migration.md) and [navigation migration](../reference/navigation-status-migration.md). Verify its own content, saved preferences, source-row journeys and full selected profile before recording adoption.
 
 The [current status](status.md) and [validation queue](../validation-queue.md) track the remaining bounded work. Dedicated MCP, deployment expansion and automatic upgrade application are not prerequisites for these reader defaults.
