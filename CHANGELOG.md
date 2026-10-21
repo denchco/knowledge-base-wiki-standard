@@ -2,6 +2,13 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
+## v0.1.0-rc.7 — 2026-10-21
+
+- Pin KaTeX `0.18.2` as an explicit compatibility exception for retained Mermaid `11.17.2` under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. A scoped override replaces the affected transitive `^0.16.47` dependency without selecting Mermaid 12's layout and browser changes. Keep DOMPurify `3.4.16` and the existing renderer/toolchain pins.
+- Attest the shipped math implementation through one resolved core input, exact runtime identity, input hashes and CycloneDX evidence. Add old/missing dependency and override fixtures, isolated inherited-trust/settings/macro regressions, public output compatibility fixtures and real desktop/mobile MathML checks under `DKBWS-VERIFY-001`.
+- Migration: carry the exact direct pin, scoped override, frozen lock, runtime builder, entry point and tests together; reinstall with `npm ci`, regenerate runtime/graph assets and run complete selected-profile verification. Preserve Wide defaults, numeric citations, status-free menus, canonical diagrams, saved preferences and navigation accessibility. Historical releases and independently governed consumer pins remain unchanged.
+- Reconcile the Standard wiki's appearance design note with the accepted contribution and its rc.6 inclusion. Protected publication, immutable release and Documentation adoption remain separate recorded steps.
+
 ## v0.1.0-rc.6 — 2026-10-21
 
 - Package `v0.1.0-rc.6` under `DKBWS-RELEASE-001`. Make the pre-`1.0.0` candidate compatibility boundary explicit: incompatible candidate changes require affected IDs, verification and migration notes; immutable releases and separately authorised adoption remain mandatory. The post-`1.0.0` major-release rule is unchanged.

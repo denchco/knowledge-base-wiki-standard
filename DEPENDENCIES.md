@@ -8,7 +8,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
 | Reference renderer | Human Wiki | Python `3.12.14` and uv `0.13.4` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1` |
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.70`, with guarded reference indexing |
-| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with locked `dompurify==3.4.16`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
+| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.16`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
 | Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
@@ -88,6 +88,12 @@ No rendered page may load Mermaid, vis-network, or 3d-force-graph from a public 
 Adapters whose homepage does not contain every representative shape set local-path-only `DKBWS_BROWSER_QUESTION_ROUTE`, `DKBWS_BROWSER_MERMAID_ROUTE`, `DKBWS_BROWSER_ARCHITECTURE_ROUTE`, `DKBWS_BROWSER_TABLE_ROUTE`, `DKBWS_BROWSER_LIST_ROUTE`, and `DKBWS_BROWSER_SOURCE_LINKS_ROUTE` values. The source-register destination route is derived from the manifest's mapped role. Graph routes use the corresponding `_GRAPH_2D_ROUTE` and `_GRAPH_3D_ROUTE` overrides. Mermaid source inspection is inferred from the route or supplied through `_MERMAID_SOURCE` and `_ARCHITECTURE_SOURCE`; remote, query-bearing, fragment-bearing, and traversal values are rejected. A manifest may record `DKBWS-LINK-002` as not applicable when its Human Wiki displays no source identities; the browser contract then skips this representative rather than inventing a citation.
 
 ## Tested renderer compatibility
+
+The reference Mermaid `11.17.2` core uses an exact KaTeX `0.18.2` compatibility exception to its upstream `^0.16.47` range. KaTeX `0.18.2` is the first patched release for `GHSA-238p-pmpm-9mq7`. The direct pin and scoped npm override select one implementation; the bundle alias, runtime version guard, input hashes and SBOM identify the code actually shipped. Mermaid `12.2.0` is not selected by this repair. [SRC-070](docs/sources.md#src-070)
+
+The exception applies to Mermaid's public `renderToString` calls. Fixtures cover its MathML and HTML-plus-MathML output modes, inherited trust/settings and macro rejection, and missing or old dependency evidence. Browser checks exercise native MathML fractions and integrals, accessible descriptions, untrusted commands, local-only requests and desktop/mobile containment. The reference browser qualification does not expand to arbitrary browsers or KaTeX's private APIs.
+
+Migration requires the exact direct pin, scoped override, frozen lock, runtime builder, entry point and matching fixtures together. Run `npm ci`, rebuild runtime and graph assets, inspect their dependency evidence, and run complete verification. A lock-only replacement does not carry this compatibility contract. Other consumer pins remain separately authorised.
 
 The Graphify reference adapter uses exactly `graphifyy==0.9.70`, the first patched version listed for `GHSA-pcc4-rvhr-2pr8`. Indexing must use `scripts/graphify-update.py` through `npm run graph:update`. The wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, checks the installed API boundary, and disables external preprocessing during extraction. Direct indexing commands bypass this qualified boundary. Read-only queries of the generated graph remain available.
 

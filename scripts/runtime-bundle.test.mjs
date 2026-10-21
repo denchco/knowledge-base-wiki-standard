@@ -3,11 +3,14 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test, { before } from "node:test";
-import { buildRuntimeAssets, compareRuntimeAssets, inspectSanitizer, runtimeVersions, sha256 } from "./runtime-bundle.mjs";
+import { execFileSync } from "node:child_process";
+import katex from "katex";
+import { buildRuntimeAssets, compareRuntimeAssets, inspectMathRenderer, inspectSanitizer, runtimeVersions, sha256 } from "./runtime-bundle.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const vendor = "docs/assets/vendor";
 const sanitizerPath = "node_modules/dompurify/dist/purify.es.mjs";
+const mathPath = "node_modules/katex/dist/katex.mjs";
 let assets;
 before(async () => { assets = await buildRuntimeAssets(root); });
 const metadata = () => JSON.parse(assets.get(`${vendor}/runtime-metafile.json`));
@@ -38,6 +41,81 @@ test("Mermaid is rebuilt from core and includes exactly the locked sanitizer imp
   assert.deepEqual(sanitizer.map((item) => item.path), [sanitizerPath]);
   assert.equal(sanitizer[0].sha256, sha256(fs.readFileSync(path.join(root, sanitizerPath))));
   assert(Object.values(evidence.metafile.outputs).every((item) => item.imports.length === 0));
+});
+
+test("Mermaid resolves one qualified KaTeX implementation with audited input identity", () => {
+  const evidence = metadata();
+  assert.deepEqual(evidence.mathRenderer, {
+    name: "katex", version: "0.18.2", source: mathPath, overrideFor: "mermaid@11.17.2",
+  });
+  const inputs = evidence.inputs.filter(item => item.component === "node_modules/katex");
+  assert.deepEqual(inputs.map(item => item.path), [mathPath]);
+  assert.equal(inputs[0].sha256, sha256(fs.readFileSync(path.join(root, mathPath))));
+  const inspect = overrides => inspectMathRenderer({
+    inputs: evidence.metafile.inputs, source: fs.readFileSync(path.join(root, mathPath), "utf8"), ...overrides,
+  });
+  inspect();
+  assert.throws(() => inspect({ source: 'var version = "0.16.47";' }), /KaTeX source embeds 0.16.47/);
+  const missing = { ...evidence.metafile.inputs };
+  delete missing[mathPath];
+  assert.throws(() => inspect({ inputs: missing }), /exactly the qualified KaTeX module/);
+  assert.throws(() => inspect({ inputs: { ...evidence.metafile.inputs, "node_modules/mermaid/node_modules/katex/dist/katex.mjs": {} } }), /exactly the qualified KaTeX module/);
+});
+
+test("qualified KaTeX preserves the public rendering modes used by Mermaid", () => {
+  assert.equal(katex.version, runtimeVersions.katex);
+  const formula = String.raw`\frac{1}{2}+\int_0^1 x^2\,dx`;
+  for (const output of ["mathml", "htmlAndMathml"]) {
+    const rendered = katex.renderToString(formula, { throwOnError: true, displayMode: true, output });
+    assert.match(rendered, /<math\b/);
+    assert.match(rendered, /<mfrac>/);
+    assert.match(rendered, /∫/);
+    assert.doesNotMatch(rendered, /katex-error/);
+    if (output === "htmlAndMathml") assert.match(rendered, /class="katex-html"/);
+  }
+});
+
+test("untrusted KaTeX cannot inherit trust, setting metadata or macro definitions", () => {
+  // Each scenario gets a disposable process, including the global-prototype
+  // cases. Benign destinations test trust handling without network or scripts.
+  for (const scenario of ["options", "trust", "default", "processor", "namespace"]) {
+    execFileSync(process.execPath, ["--input-type=module", "-e", String.raw`
+      import assert from "node:assert/strict";
+      import katex from "katex";
+      const scenario = process.argv[1];
+      const expression = "\\href{https://example.invalid/}{reference}";
+      const render = options => katex.renderToString(expression, options);
+      assert.match(render({ trust: true }), /<a\b/);
+      assert.doesNotMatch(render({ trust: false }), /<a\b/);
+      let property;
+      let previous;
+      try {
+        if (scenario === "options") {
+          assert.doesNotMatch(render(Object.create({ trust: true })), /<a\b/);
+        } else if (scenario === "namespace") {
+          const name = "\\readerMacro";
+          assert.match(katex.renderToString(name, { macros: { [name]: "x" } }), /<mi>x<\/mi>/);
+          assert.throws(() => katex.renderToString(name, { macros: Object.create({ [name]: "x" }) }), /Undefined control sequence/);
+          property = name;
+          previous = Object.getOwnPropertyDescriptor(Object.prototype, property);
+          Object.defineProperty(Object.prototype, property, { configurable: true, writable: true, value: "x" });
+          assert.throws(() => katex.renderToString(name), error => error instanceof katex.ParseError);
+        } else {
+          property = scenario;
+          previous = Object.getOwnPropertyDescriptor(Object.prototype, property);
+          Object.defineProperty(Object.prototype, property, {
+            configurable: true, writable: true, value: scenario === "processor" ? (() => true) : true,
+          });
+          assert.doesNotMatch(render(scenario === "processor" ? { trust: false } : {}), /<a\b/);
+        }
+      } finally {
+        if (property) {
+          if (previous) Object.defineProperty(Object.prototype, property, previous);
+          else delete Object.prototype[property];
+        }
+      }
+    `, scenario], { cwd: root, stdio: "pipe" });
+  }
 });
 
 test("two independent builds emit byte-identical assets and portable evidence", async () => {
@@ -74,6 +152,7 @@ test("SBOM identities match the audited lock and distinguish opaque copied bundl
     assert.equal(component.properties.find((item) => item.name === "dkbws:lock-integrity").value, locked.integrity);
   }
   assert.equal(sbom.components.find((item) => item.name === "dompurify").version, runtimeVersions.dompurify);
+  assert.equal(sbom.components.find((item) => item.name === "katex").version, runtimeVersions.katex);
   for (const asset of metadata().assets) {
     assert.equal(asset.sha256, sha256(assets.get(asset.path)));
     if (asset.path.endsWith("mermaid.min.js")) assert.equal(asset.coverage, "resolved-core-module-inputs");
@@ -109,5 +188,22 @@ test("a drifted installed-lock contract is rejected before the build", async () 
     lock.packages["node_modules/dompurify"].version = "3.4.15";
     fs.writeFileSync(path.join(fixture, "package-lock.json"), JSON.stringify(lock));
     await assert.rejects(buildRuntimeAssets(fixture), /dompurify must be directly pinned and locked at 3.4.16/);
+  } finally { fs.rmSync(fixture, { recursive: true, force: true }); }
+});
+
+test("old KaTeX locks and missing scoped overrides cannot pass runtime qualification", async () => {
+  const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "dkbws-math-lock-"));
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+    const lock = JSON.parse(fs.readFileSync(path.join(root, "package-lock.json"), "utf8"));
+    fs.writeFileSync(path.join(fixture, "package.json"), JSON.stringify(pkg));
+    fs.writeFileSync(path.join(fixture, "package-lock.json"), JSON.stringify({
+      ...lock, packages: { ...lock.packages, "node_modules/katex": { ...lock.packages["node_modules/katex"], version: "0.16.47" } },
+    }));
+    await assert.rejects(buildRuntimeAssets(fixture), /katex must be directly pinned and locked at 0.18.2/);
+    fs.writeFileSync(path.join(fixture, "package-lock.json"), JSON.stringify(lock));
+    delete pkg.overrides;
+    fs.writeFileSync(path.join(fixture, "package.json"), JSON.stringify(pkg));
+    await assert.rejects(buildRuntimeAssets(fixture), /qualified Mermaid KaTeX override/);
   } finally { fs.rmSync(fixture, { recursive: true, force: true }); }
 });

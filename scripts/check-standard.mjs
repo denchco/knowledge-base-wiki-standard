@@ -569,6 +569,7 @@ const exactNodePins = {
   "ajv": "8.20.0",
   "dompurify": "3.4.16",
   "esbuild": "0.28.2",
+  "katex": "0.18.2",
   "mermaid": "11.17.2",
   "vis-network": "10.1.2",
   "yaml": "2.9.0",
@@ -577,6 +578,7 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
   const actual = pkg.devDependencies?.[dependency];
   if (actual !== expected) failures.push(`dependency ${dependency} must be exactly ${expected}; found ${actual ?? "unlisted"}`);
 }
+if (pkg.overrides?.["mermaid@11.17.2"]?.katex !== "$katex") failures.push("Mermaid must use the qualified exact KaTeX override");
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
