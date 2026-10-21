@@ -3,17 +3,27 @@ import fs from "node:fs";
 import path from "node:path";
 import { build, version as esbuildVersion } from "esbuild";
 
-export const runtimeVersions = Object.freeze({ mermaid: "11.17.2", dompurify: "3.4.16", esbuild: "0.28.2", "vis-network": "10.1.2", "3d-force-graph": "1.80.0" });
+export const runtimeVersions = Object.freeze({ mermaid: "11.17.2", katex: "0.18.2", dompurify: "3.4.16", esbuild: "0.28.2", "vis-network": "10.1.2", "3d-force-graph": "1.80.0" });
 const outputDirectory = "docs/assets/vendor";
 const mermaidOutput = `${outputDirectory}/mermaid.min.js`;
 const entryPoint = "scripts/mermaid-runtime-entry.mjs";
 const sanitizerInput = "node_modules/dompurify/dist/purify.es.mjs";
+const mathInput = "node_modules/katex/dist/katex.mjs";
 const copiedAssets = [
   { name: "vis-network", source: "node_modules/vis-network/standalone/umd/vis-network.min.js", destination: `${outputDirectory}/vis-network.min.js` },
   { name: "3d-force-graph", source: "node_modules/3d-force-graph/dist/3d-force-graph.min.js", destination: `${outputDirectory}/3d-force-graph.min.js` },
 ];
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 export const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+
+export function inspectMathRenderer({ inputs, source, expected = runtimeVersions.katex }) {
+  const paths = Object.keys(inputs).filter((name) => /(?:^|\/)katex\//.test(name));
+  if (paths.length !== 1 || paths[0] !== mathInput) {
+    throw new Error(`Mermaid must embed exactly the qualified KaTeX module; found ${paths.join(", ") || "none"}`);
+  }
+  const version = source.match(/\bvar version\s*=\s*['"]([^'"]+)['"]/u)?.[1];
+  if (version !== expected) throw new Error(`KaTeX source embeds ${version ?? "no version"}; expected ${expected}`);
+}
 
 export function inspectSanitizer({ inputs, source, output, expected = runtimeVersions.dompurify }) {
   const sanitizerPaths = Object.keys(inputs).filter((name) => /(?:^|\/)dompurify\//.test(name));
@@ -45,12 +55,15 @@ export async function buildRuntimeAssets(root = process.cwd()) {
       throw new Error(`${name} must be directly pinned and locked at ${expected}`);
     }
   }
+  if (pkg.overrides?.[`mermaid@${runtimeVersions.mermaid}`]?.katex !== "$katex") {
+    throw new Error("The qualified Mermaid KaTeX override must track the exact direct pin");
+  }
   if (esbuildVersion !== runtimeVersions.esbuild) throw new Error(`Unqualified esbuild ${esbuildVersion}`);
   const result = await build({
     absWorkingDir: root,
     entryPoints: [entryPoint],
     outfile: mermaidOutput,
-    alias: { dompurify: path.join(root, sanitizerInput) },
+    alias: { dompurify: path.join(root, sanitizerInput), katex: path.join(root, mathInput) },
     bundle: true,
     format: "iife",
     platform: "browser",
@@ -67,6 +80,7 @@ export async function buildRuntimeAssets(root = process.cwd()) {
   const { inputs, outputs } = result.metafile;
   if (Object.values(outputs).some((item) => item.imports.length)) throw new Error("Mermaid runtime contains unresolved browser imports");
   inspectSanitizer({ inputs, source: read(sanitizerInput), output });
+  inspectMathRenderer({ inputs, source: read(mathInput) });
 
   const packages = new Map();
   function componentFor(source) {
@@ -121,6 +135,7 @@ export async function buildRuntimeAssets(root = process.cwd()) {
     builder: { name: "esbuild", version: esbuildVersion, entryPoint, target: "es2022", format: "iife", minify: true, sanitizerInput },
     packageLockSha256: sha256(lockBytes),
     sanitizer: { name: "dompurify", version: runtimeVersions.dompurify, source: sanitizerInput },
+    mathRenderer: { name: "katex", version: runtimeVersions.katex, source: mathInput, overrideFor: `mermaid@${runtimeVersions.mermaid}` },
     inputs: inputEvidence,
     metafile: result.metafile,
     assets: runtimeEvidence,

@@ -251,7 +251,7 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
 - Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
 - The unconfigured production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent. The optional configured adapter uses the exact brand colour for the header and selected navigation, with contrasting text and transparent header controls.
-- Mermaid `11.17.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
+- Mermaid `11.17.2` with qualified KaTeX `0.18.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects
   the governed radius, text, and line tokens into Zensical's closed diagram
@@ -273,9 +273,9 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
   and public-CDN exclusion. Deployment and public HTTP health are separate
   release-adapter gates.
 
-## Configurable appearance candidate
+## Configurable appearance
 
-This reviewed local candidate adds an optional appearance adapter under the existing design and verification requirements. The [technical review](docs/project/configurable-appearance-review.md) records its origin, repairs and pending formal intake. No acceptance, release or consumer adoption is implied.
+The optional appearance adapter is accepted as reusable and included in immutable `v0.1.0-rc.6`. It operates under the existing design and verification requirements. The [technical review](docs/project/configurable-appearance-review.md) records its origin, repairs and acceptance. Consumer adoption remains a separate authorised action.
 
 Use `config/wiki-appearance.json` as the input for a consumer that selects the adapter:
 

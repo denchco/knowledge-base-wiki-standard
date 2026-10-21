@@ -1065,6 +1065,7 @@ export default async (page, options = {}) => {
   check(new Set(mermaidProbe.defaultNodeFills).size === 1, "Ordinary Mermaid nodes must share one default fill");
   check(new Set(mermaidProbe.defaultNodeStrokes).size === 1, "Ordinary Mermaid nodes must share one default boundary");
   check(mermaidProbe.defaultNodeFills[0] !== mermaidProbe.canonicalFill, "Ordinary Mermaid nodes must not inherit optional canonical-role styling");
+  const desktopMath = await inspectMermaidMath(page, { name: "desktop", capture: options.capture });
 
   await goto(tableRoute);
   await page.waitForSelector(".md-typeset table tbody td");
@@ -1164,6 +1165,7 @@ export default async (page, options = {}) => {
   check(mobileMermaidGeometry.pageOverflow <= 1, "Mobile Mermaid page must not overflow horizontally");
   check(mobileMermaidGeometry.widthControlDisplay === "none", "Desktop width control must not crowd the mobile header");
   check(mobileMermaidPixels.distinctColours > 24, "Mobile Mermaid pixels must be nonblank");
+  const mobileMath = await inspectMermaidMath(page, { name: "mobile", capture: options.capture });
   const architectureMobile = await inspectMermaidPage({
     route: architectureRoute,
     pageName: "Architecture",
@@ -1418,6 +1420,7 @@ export default async (page, options = {}) => {
         mobile: architectureMobile,
       },
       representativeTablet,
+      math: { desktop: desktopMath, mobile: mobileMath },
       nodeRadius: mermaidProbe.nodeRadiusX,
       strokeWidth: mermaidProbe.nodeStrokeWidth,
     },
@@ -1426,6 +1429,123 @@ export default async (page, options = {}) => {
     localRuntimeAssets: localAssets,
     requestCount: requests.length,
   };
+}
+
+// Use the shipped Mermaid API without changing its configuration. Sequence
+// notes exercise native MathML while the adapter retains SVG flowchart labels.
+export async function inspectMermaidMath(page, { name = "focused", capture } = {}) {
+  const origin = new URL(page.url()).origin;
+  const externalRequests = [];
+  const blockExternal = async route => {
+    const url = route.request().url();
+    if (/^https?:/u.test(url) && new URL(url).origin !== origin) {
+      externalRequests.push(url);
+      await route.abort();
+    } else await route.continue();
+  };
+  const marker = `math-contract-${name}`;
+  await page.route("**/*", blockExternal);
+  try {
+    const metrics = await page.evaluate(async marker => {
+      if (!window.mermaid?.render) throw new Error("Pinned local Mermaid runtime is unavailable for math qualification");
+      const article = document.querySelector(".md-content__inner");
+      if (!article) throw new Error("Math qualification requires the rendered content rail");
+      const mount = document.createElement("div");
+      mount.dataset.mathContractProbe = marker;
+      article.append(mount);
+      const title = "Mathematical compatibility probe";
+      const description = "One half and the integral of x squared from zero to one.";
+      const source = String.raw`sequenceDiagram
+accTitle: Mathematical compatibility probe
+accDescr: One half and the integral of x squared from zero to one.
+participant A as Calculus
+Note over A: $$\frac{1}{2}$$
+Note over A: $$\int_0^1 x^2\,dx$$`;
+      const normal = document.createElement("div");
+      normal.innerHTML = (await window.mermaid.render(`${marker}-normal`, source)).svg;
+      mount.append(normal);
+      const svg = normal.querySelector("svg");
+      const rect = element => {
+        const bounds = element.getBoundingClientRect();
+        return { left: bounds.left, right: bounds.right, top: bounds.top, bottom: bounds.bottom,
+          width: bounds.width, height: bounds.height };
+      };
+      const within = (inner, outer) => inner.left >= outer.left - 1 && inner.right <= outer.right + 1
+        && inner.top >= outer.top - 1 && inner.bottom <= outer.bottom + 1;
+      const svgBounds = rect(svg);
+      const math = [...normal.querySelectorAll("math")].map(element => {
+        const bounds = rect(element);
+        const foreignObject = element.closest("foreignObject");
+        return {
+          namespace: element.namespaceURI,
+          text: element.textContent,
+          bounds,
+          visible: element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
+            && !element.closest('[aria-hidden="true"]'),
+          contained: within(bounds, svgBounds) && Boolean(foreignObject && within(bounds, rect(foreignObject))),
+          fraction: Boolean(element.querySelector("mfrac")),
+          integral: [...element.querySelectorAll("mo")].some(operator => operator.textContent === "∫"),
+          powers: element.querySelectorAll("msup, msubsup").length,
+        };
+      });
+      const namedText = attribute => (svg.getAttribute(attribute) ?? "").split(/\s+/u)
+        .map(id => normal.querySelector(`[id=${JSON.stringify(id)}]`)?.textContent ?? "").join(" ");
+      const accessibleTitle = namedText("aria-labelledby");
+      const accessibleDescription = namedText("aria-describedby");
+      const untrusted = [];
+      for (const [kind, expression] of [
+        ["link", String.raw`\href{javascript:alert(1)}{untrusted}`],
+        ["image", String.raw`\includegraphics{https://math-probe.invalid/image.png}`],
+      ]) {
+        const container = document.createElement("div");
+        const rendered = await window.mermaid.render(`${marker}-${kind}`,
+          `sequenceDiagram\nparticipant A as Untrusted input\nNote over A: $$${expression}$$`);
+        container.innerHTML = rendered.svg;
+        mount.append(container);
+        const activeAttributes = [...container.querySelectorAll("*")].flatMap(element => [...element.attributes]
+          .filter(attribute => /^(?:on|href$|xlink:href$|src$|srcset$|action$|formaction$)/iu.test(attribute.name))
+          .map(attribute => `${element.tagName}.${attribute.name}=${attribute.value}`));
+        untrusted.push({ kind, mathCount: container.querySelectorAll("math").length,
+          activeElements: container.querySelectorAll("a, img, image, script, iframe, object, embed").length,
+          activeAttributes, visibleLiteral: container.querySelector("math")?.textContent ?? "" });
+        container.remove();
+      }
+      return {
+        viewport: { width: innerWidth, height: innerHeight },
+        svg: svgBounds, math,
+        accessible: { role: svg.getAttribute("role"), title: accessibleTitle, description: accessibleDescription,
+          exact: accessibleTitle === title && accessibleDescription === description },
+        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        railContained: svgBounds.left >= article.getBoundingClientRect().left - 1
+          && svgBounds.right <= article.getBoundingClientRect().right + 1,
+        untrusted,
+      };
+    }, marker);
+    const require = (condition, message) => {
+      if (!condition) throw new Error(`${name} Mermaid math contract: ${message}`);
+    };
+    require(metrics.svg.width > 100 && metrics.svg.height > 40, "rendered diagram must have nonempty geometry");
+    require(metrics.math.length === 2, "both expressions must render as native MathML");
+    require(metrics.math.every(item => item.namespace === "http://www.w3.org/1998/Math/MathML"
+      && item.visible && item.contained && item.bounds.width > 4 && item.bounds.height > 10),
+    "MathML must remain visible and contained in its measured diagram labels");
+    require(metrics.math[0].fraction && metrics.math[0].text === "12", "fraction semantics must preserve numerator and denominator");
+    require(metrics.math[1].integral && metrics.math[1].powers === 2, "integral limits and exponent must retain MathML semantics");
+    require(metrics.accessible.exact && metrics.accessible.role?.includes("graphics-document"),
+      "diagram title, description and accessible role must survive math rendering");
+    require(metrics.railContained && metrics.pageOverflow <= 1, "math diagram must fit its desktop or mobile content rail");
+    require(metrics.untrusted.every(item => item.mathCount === 1 && item.activeElements === 0
+      && item.activeAttributes.length === 0 && item.visibleLiteral.includes(item.kind === "link" ? "href" : "includegraphics")),
+    "untrusted link and image commands must remain inert visible math, without executable attributes");
+    if (capture) await capture(`math-${name}.png`, await page.locator(`[data-math-contract-probe="${marker}"]`).screenshot());
+    // Flush requests caused by layout before releasing the temporary network guard.
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    require(externalRequests.length === 0, `math rendering attempted external resources: ${externalRequests.join(", ")}`);
+    return { ...metrics, externalRequests };
+  } finally {
+    await page.locator(`[data-math-contract-probe="${marker}"]`).evaluateAll(elements => elements.forEach(element => element.remove()));
+    await page.unroute("**/*", blockExternal);
+  }
 }
 
 // Kept self-contained so the same DOM inspection supports focused browser checks.
