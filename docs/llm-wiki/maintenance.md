@@ -35,9 +35,10 @@ Static checks prove that the policy reaches new setups and shared instructions. 
 
 ## Reader source links
 
+- Use numeric superscript citations whose numbers come from stable source identities, with leading zeroes and full accessible identities retained. Preserve explanatory notes and canonical Markdown.
 - Add a stable anchor to every mapped source-register row. Link each visible source identity independently to its exact internal row; link every list member and only the displayed endpoints of a compact range.
 - Use a registered primary URL when prose directly links a specifically named official authority, guidance, or publication. Do not turn generic institution names into decorative authority links.
-- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, lost visible brackets, and broken destination journeys.
+- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, missing numeric superscripts, and broken destination journeys.
 
 ## Canonical governing question
 
@@ -53,4 +54,4 @@ Validate direct record states offline as well as command transitions: outcome me
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
 
-Follow-up selection follows the same file's completion and cycle guard. A candidate is eligible only when it advances unfinished requested scope, addresses a failed or unrun required check, or asks for authority needed to continue. It must fit one follow-up pass and state a completion condition. Park blocked work in project status or the validation queue with `blocked_by`, `reopen_when`, and `last_checked`; it remains ineligible until that trigger occurs. Do not recommend optional adjacent research or generic maintenance merely to fill a list.
+Complete the requested scope before recommending more work. At the end of every development cycle, assess the Wiki's continuing subject, governing question when declared, evidence and content maturity. Prioritise subject content and evidence work; address a failed or unrun required check before optional content work. Include no more than three prioritised Next Steps. Each must fit one follow-up pass and state `Proposed update:`, `Why it matters:` and `Done when:`. Suggestions are recommendations, not continuation authority. Use project status, the validation queue and relevant handoff evidence to exclude completed work. Do not reopen bounded, parked or evidence-blocked work without new evidence, a due scheduled recheck or explicit user instruction. Parked work retains `blocked_by`, `reopen_when` and `last_checked`. If no grounded content update or required follow-up qualifies, state `No further grounded content update is available.` Never invent filler. Check captured drafts with `response:next-steps:check` when available; format checks do not prove grounding or intercept uncaptured responses.

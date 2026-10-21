@@ -19,6 +19,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { runInNewContext } from "node:vm";
 
 import Ajv2020 from "ajv/dist/2020.js";
 import { parseDocument } from "yaml";
@@ -26,6 +27,7 @@ import { parseDocument } from "yaml";
 import {
   buildFullProfileReport,
   ReceiptError,
+  REQUIREMENT_PROOFS,
   selectedNotCheckedCapabilityIds,
 } from "./full-profile-report.mjs";
 import {
@@ -114,7 +116,7 @@ function writeProfile(root, profileId, source) {
   writeFileSync(path.join(root, "profiles", `${profileId}.yaml`), source, "utf8");
 }
 
-function withCurrentLifecycleRelease(callback) {
+function withCurrentLifecycleRelease(callback, { parentRevision = null } = {}) {
   const fixtureRoot = realpathSync(mkdtempSync(path.join(os.tmpdir(), "denchco-bootstrap-release-")));
   const releaseRoot = path.join(fixtureRoot, "standard");
   try {
@@ -132,6 +134,10 @@ function withCurrentLifecycleRelease(callback) {
     }
     for (const args of [
       ["-c", "init.templateDir=", "init", "--quiet"],
+      ...(parentRevision ? [
+        ["fetch", "--quiet", "--no-tags", ROOT, parentRevision],
+        ["update-ref", "HEAD", "FETCH_HEAD"],
+      ] : []),
       ["add", "."],
       ["-c", "user.name=Bootstrap fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", "commit", "--quiet", "-m", "Current bootstrap contract fixture"],
     ]) {
@@ -243,7 +249,13 @@ function receiptFor(target, profile, results, options = {}) {
       status: "pass",
       exitCode: 0,
       evidence: [{ id: "suite", kind: "command", description: "Fixture verification suite passed." }],
-      results,
+      // This synthetic suite explicitly asserts all named proofs unless a test
+      // supplies a narrower list. Production receipt labels are never inferred.
+      results: results.map(result => ({
+        ...result,
+        ...(REQUIREMENT_PROOFS[result.requirement] && !Object.hasOwn(result, "proofs")
+          ? { proofs: [...REQUIREMENT_PROOFS[result.requirement]] } : {}),
+      })),
     }],
     ...(options.provenance ? { provenance: options.provenance } : {}),
   };
@@ -679,6 +691,9 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   assert.equal(starter.bootstrap.defaults.deployment, "none");
   assert.equal(starter.bootstrap.defaults.authoring_policy, "denchco-asd-ste100-inspired-80-percent");
   assert.ok(starter.bootstrap.no_question_defaults.includes("pragmatic authoring policy"));
+  assert.equal(starter.bootstrap.defaults.desktop_width, "wide");
+  assert.ok(starter.bootstrap.no_question_defaults.includes("Wide desktop width"));
+  assert.equal(JSON.parse(readFileSync(path.join(ROOT, "starter/templates/config/wiki-appearance.json.tmpl"), "utf8")).width, "wide");
   assert.equal(starter.executable_scope.apply_supported, false);
   assert.match(starter.executable_scope.portable_core, /pinned standard release/i);
   assert.match(starter.executable_scope.standard_production, /complete .* dependency closure/i);
@@ -722,6 +737,10 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   const licensingEntry = starter.entries.find((entry) => entry.target === "LICENSING.md");
   assert.equal(licensingEntry?.classification, "render-template");
   assert.equal(licensingEntry?.always, true);
+  const navigationEntry = starter.entries.find((entry) => entry.target === "overrides/partials/nav-item.html");
+  assert.equal(navigationEntry?.classification, "render-template");
+  assert.ok(navigationEntry?.requirements.includes("DKBWS-HUMAN-001"));
+  assert.equal(navigationEntry?.requirements.includes("DKBWS-HUMAN-003"), false);
   const graphIndexEntry = starter.entries.find((entry) => entry.target === "docs/graph/index.md");
   assert.equal(graphIndexEntry?.classification, "render-template");
   const graphIndexTemplate = readFileSync(path.join(ROOT, graphIndexEntry.template), "utf8");
@@ -748,7 +767,11 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
       const templatePath = path.join(ROOT, entry.template);
       assert.equal(existsSync(templatePath), true, `missing starter template ${entry.template}`);
       const template = readFileSync(templatePath, "utf8");
-      assert.match(template, /\{\{[A-Z0-9_]+\}\}/, `${entry.template} needs an explicit placeholder`);
+      if (entry.target === "overrides/partials/nav-item.html") {
+        assert.equal(template, readFileSync(path.join(ROOT, entry.target), "utf8"), "the native Jinja template must remain identical to the reference override");
+      } else {
+        assert.match(template, /\{\{[A-Z0-9_]+\}\}/, `${entry.template} needs an explicit placeholder`);
+      }
       assert.doesNotMatch(template, forbiddenTemplateContent, `${entry.template} leaks standard/example content`);
     }
     if (entry.classification === "adapt-from-release") {
@@ -789,6 +812,24 @@ test("lifecycle diff compares the consumer version and selected profile without 
   assert.equal(diff.candidate.manifest.sha256, createHash("sha256").update(headManifest.stdout).digest("hex"));
 });
 
+test("status-free navigation preserves the pinned renderer template outside status output", () => {
+  const upstream = readFileSync(path.join(ROOT, ".venv/lib/python3.12/site-packages/zensical/templates/partials/nav-item.html"), "utf8");
+  const withoutNotice = (source) => source.replace(/^\{#-[\s\S]*?-#\}\r?\n/, "");
+  let expected = withoutNotice(upstream);
+  const statusMacro = /\{% macro render_status\(nav_item, type\) %\}[\s\S]*?\{% endmacro %\}\n/;
+  assert.match(expected, statusMacro);
+  expected = expected.replace(statusMacro, "");
+  for (const [condition, argument] of [
+    ["nav_item.meta and nav_item.encrypted", '"encrypted"'],
+    ["nav_item.meta and nav_item.meta.status", "nav_item.meta.status"],
+  ]) {
+    const output = `  {% if ${condition} %}\n    {{ render_status(nav_item, ${argument}) }}\n  {% endif %}\n`;
+    assert.equal(expected.split(output).length, 2, `pinned renderer must contain exactly one ${condition} block`);
+    expected = expected.replace(output, "");
+  }
+  assert.equal(withoutNotice(readFileSync(path.join(ROOT, "overrides/partials/nav-item.html"), "utf8")), expected);
+});
+
 test("lifecycle diff compares equal version labels by immutable revision and requirement IDs", () => {
   const before = treeHash(RC3_CONSUMER);
   const result = run("diff", RC3_CONSUMER, "--date", "2026-08-04", "--json");
@@ -802,17 +843,51 @@ test("lifecycle diff compares equal version labels by immutable revision and req
   assert.equal(diff.summary.safeToPlanUpgrade, false);
   assert.match(diff.consumer.resolvedRevision, /^[0-9a-f]{40}$/);
   assert.ok(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-002"));
-  assert.equal(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-003"), false);
+  assert.equal(diff.consumer.pinnedProfileRequirements.includes("DKBWS-RUNTIME-002"), false);
   assert.ok(diff.changes.some((change) => change.id === "standard-revision-review" && change.blocking));
   assert.ok(diff.changes.some((change) => (
-    change.id === "requirement-introduced-DKBWS-HUMAN-003"
-    && change.proposed === "DKBWS-HUMAN-003"
+    change.id === "requirement-introduced-DKBWS-RUNTIME-002"
+    && change.proposed === "DKBWS-RUNTIME-002"
     && change.blocking
   )));
   assert.equal(
-    diff.requirements.find((item) => item.id === "DKBWS-HUMAN-003")?.introducedSinceConsumerRevision,
+    diff.requirements.find((item) => item.id === "DKBWS-RUNTIME-002")?.introducedSinceConsumerRevision,
     true,
   );
+});
+
+test("lifecycle retirement preserves released requirements and requires a read-only migration review", () => {
+  const historicalRevision = spawnSync("git", ["rev-parse", "v0.1.0-rc.5^{commit}"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(historicalRevision.status, 0, historicalRevision.stderr);
+  const revision = historicalRevision.stdout.trim();
+  withCurrentLifecycleRelease(({ fixtureRoot, runPlan }) => {
+    const consumer = path.join(fixtureRoot, "consumer");
+    cpSync(RC3_CONSUMER, consumer, { recursive: true });
+    const manifestPath = path.join(consumer, ".wiki-standard.yaml");
+    writeFileSync(manifestPath, readFileSync(manifestPath, "utf8")
+      .replace('revision: "v0.1.0-rc.3"', `revision: "${revision}"`));
+    const before = treeHash(consumer);
+    const result = runPlan("diff", consumer, "--json");
+    assert.equal(result.status, 1, result.stderr || result.stdout);
+    const diff = JSON.parse(result.stdout);
+    assertLifecycleSchemaShape(diff);
+    assert.equal(diff.summary.revisionState, "candidate-newer");
+    assert.equal(diff.consumer.resolvedRevision, revision);
+    assert.ok(diff.consumer.pinnedProfileRequirements.includes("DKBWS-HUMAN-003"));
+    assert.equal(diff.candidate.profile.requirements.includes("DKBWS-HUMAN-003"), false);
+    assert.equal(diff.requirements.some((item) => item.id === "DKBWS-HUMAN-003"), false);
+    assert.ok(diff.changes.some((change) => (
+      change.id === "requirement-removed-DKBWS-HUMAN-003"
+      && change.current === "DKBWS-HUMAN-003"
+      && change.proposed === null
+      && change.blocking
+      && !change.automatic
+    )));
+    assert.equal(treeHash(consumer), before);
+  }, { parentRevision: revision });
 });
 
 test("the current lifecycle catalogue introduces managed preview and live response links after rc.3", () => {
@@ -1228,6 +1303,31 @@ test("full-profile reporting leaves absent gates not checked and rejects unsuppo
   );
 });
 
+test("current profile accounting excludes the retired identifier and rejects obsolete receipt results", () => {
+  const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
+  assert.equal(catalogue.ids.has("DKBWS-HUMAN-003"), false);
+  for (const profileId of listProfileIds({ standardRoot: ROOT })) {
+    const profile = loadProfile(profileId, { standardRoot: ROOT, requirementIds: catalogue.ids });
+    assert.equal(profile.requirements.includes("DKBWS-HUMAN-003"), false, profileId);
+  }
+  const report = buildFullProfileReport({
+    target: ROOT,
+    receipt: receiptFor(ROOT, "standard-production", [], { gates: [] }),
+  });
+  assert.equal(report.requirementResults.some((item) => item.requirement === "DKBWS-HUMAN-003"), false);
+  assert.throws(
+    () => buildFullProfileReport({
+      target: ROOT,
+      receipt: receiptFor(ROOT, "standard-production", [{
+        requirement: "DKBWS-HUMAN-003",
+        status: "pass",
+        evidence: ["suite"],
+      }]),
+    }),
+    (error) => error instanceof ReceiptError && /unknown requirement DKBWS-HUMAN-003/.test(error.message),
+  );
+});
+
 test("reserved verification receipt paths reject project-only consumer summaries", () => {
   const summary = JSON.parse(readFileSync(INVALID_CONSUMER_RECEIPT, "utf8"));
   const validate = new Ajv2020({ strict: false, allErrors: true }).compile(RECEIPT_SCHEMA);
@@ -1270,7 +1370,8 @@ test("distribution provenance cannot satisfy Standard Production maintainer prov
   const report = buildFullProfileReport({ target: ROOT, receipt });
   assert.equal(report.requirementResults.find((item) => item.requirement === "DKBWS-PROV-001").status, "not-checked");
   assert.ok(report.capabilityStates.some((item) => item.expected === null && item.verificationStatus === "not-checked"));
-  assert.deepEqual(selectedNotCheckedCapabilityIds(report), ["jujutsu"]);
+  assert.deepEqual(new Set(selectedNotCheckedCapabilityIds(report)), new Set(["local_service", "jujutsu"]));
+  assert.equal(report.requirementResults.find(item => item.requirement === "DKBWS-RUNTIME-002").status, "not-checked");
   assert.equal(report.summary.profileComplete, false);
   assert.equal(report.summary.evaluationComplete, false);
 });
@@ -1360,14 +1461,294 @@ test("full-profile conformance fails required-false and exact-value capability d
     });
     const report = buildFullProfileReport({ target: root, receipt });
     assert.equal(report.summary.profileComplete, false);
-    assert.equal(report.summary.failedCapabilities, 4);
+    assert.equal(report.summary.failedCapabilities, 5);
     assert.equal(report.capabilityStates.find((item) => item.id === "evidence_governance").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "human_renderer").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "standard_change_intake").verificationStatus, "fail");
     assert.equal(report.capabilityStates.find((item) => item.id === "development_response_links").verificationStatus, "fail");
+    assert.equal(report.capabilityStates.find((item) => item.id === "source_citation_style").verificationStatus, "fail");
   });
 });
 
+
+const MAINTAINER_PROVENANCE_FIXTURE = {
+  requirement: "DKBWS-PROV-001",
+  mode: "maintainer",
+  status: "pass",
+  readOnly: true,
+  git: { status: "pass" },
+  jujutsu: { status: "pass" },
+};
+
+function completeProductionReceipt(target = ROOT) {
+  const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
+  const profile = loadProfile("standard-production", { standardRoot: ROOT, requirementIds: catalogue.ids });
+  return receiptFor(target, profile.id, profile.requirements.map(requirement => ({
+    requirement,
+    status: "pass",
+    evidence: ["suite"],
+    ...(requirement === "DKBWS-SEC-001" ? {
+      subcontrols: [
+        "secrets-and-authorization",
+        "personal-and-confidential-data",
+        "copyright-licensing-and-retention",
+        "untrusted-and-generated-content",
+      ].map(id => ({ id, status: "pass", evidence: ["suite"] })),
+    } : {}),
+  })), { provenance: MAINTAINER_PROVENANCE_FIXTURE });
+}
+
+function reportRequirement(report, requirement) {
+  return report.requirementResults.find(item => item.requirement === requirement);
+}
+
+test("full-profile proof catalogue covers every active requirement without reviving retired identifiers", () => {
+  const catalogue = loadRequirementCatalogue({ standardRoot: ROOT });
+  assert.deepEqual(new Set(Object.keys(REQUIREMENT_PROOFS)), new Set([...catalogue.ids].filter(id => id !== "DKBWS-SEC-001")));
+  for (const [requirement, proofs] of Object.entries(REQUIREMENT_PROOFS)) {
+    assert.ok(proofs.length > 0, requirement);
+    assert.equal(new Set(proofs).size, proofs.length, requirement);
+  }
+  assert.equal(Object.hasOwn(REQUIREMENT_PROOFS, "DKBWS-HUMAN-003"), false);
+});
+
+test("reference receipt proof ownership follows executed commands and no deleted gate retains its proofs", () => {
+  const source = readFileSync(path.join(ROOT, "scripts/verify.mjs"), "utf8");
+  // Exercise the production emitter without executing verification or reading
+  // derived artifacts. Fixture evidence is deliberate and remains in memory.
+  const emitter = source.slice(source.indexOf("function buildReceipt("), source.indexOf("function evidence("));
+  const resultHelpers = source.slice(source.indexOf("function result("), source.indexOf("function exactSet("));
+  const gateDeclaration = source.slice(source.indexOf("const gates = ["), source.indexOf("const receiptDirectory ="));
+  const context = {
+    root: ROOT, path, process, readFileSync,
+    parse: text => parseDocument(text).toJS(),
+    provenanceMode: "maintainer",
+    provenance: MAINTAINER_PROVENANCE_FIXTURE,
+    canonicalAfter: { size: 1 },
+    startedAt: "2026-08-03T10:00:00Z",
+    evidence: (id, kind, description, location) => ({ id, kind, description, location }),
+  };
+  const { receipt, commands } = JSON.parse(runInNewContext(
+    `${emitter}\n${resultHelpers}\n${gateDeclaration}\nJSON.stringify({ receipt: buildReceipt(provenance), commands: gates })`, context,
+  ));
+  for (const gate of receipt.gates.filter(item => item.command.startsWith("npm run "))) {
+    assert.ok(commands.includes(gate.command.slice("npm run ".length)), `${gate.id} must record a command executed by verify`);
+  }
+  const owners = (requirement, proof) => receipt.gates.filter(gate => gate.results.some(result => result.requirement === requirement && result.proofs?.includes(proof))).map(gate => gate.id);
+  for (const [requirement, proof, owner] of [
+    ["DKBWS-DESIGN-001", "design-fixtures", "check"],
+    ["DKBWS-RENDER-001", "dependencies", "check"],
+    ["DKBWS-RUNTIME-002", "service-fixtures", "check"],
+    ["DKBWS-RUNTIME-002", "live-service", "managed-service"],
+    ["DKBWS-LINK-002", "built-citations", "built-citations"],
+    ["DKBWS-LINK-002", "browser-citations", "browser"],
+  ]) assert.deepEqual(owners(requirement, proof), [owner], `${requirement}:${proof}`);
+  assert.equal(buildFullProfileReport({ target: ROOT, receipt }).summary.profileComplete, true);
+  for (const removed of receipt.gates) {
+    const incomplete = structuredClone(receipt);
+    incomplete.gates = incomplete.gates.filter(gate => gate.id !== removed.id);
+    const report = buildFullProfileReport({ target: ROOT, receipt: incomplete });
+    assert.equal(report.summary.profileComplete, false, removed.id);
+    for (const result of removed.results) {
+      for (const proof of result.proofs ?? []) {
+        const outcome = reportRequirement(report, result.requirement).proofResults.find(item => item.id === proof);
+        assert.equal(outcome.status, "not-checked", `${removed.id}:${result.requirement}:${proof}`);
+      }
+    }
+  }
+});
+
+test("full-profile reporting requires each proof of every selected compound obligation", () => {
+  const complete = completeProductionReceipt();
+  const baseline = buildFullProfileReport({ target: ROOT, receipt: complete });
+  assert.equal(baseline.summary.profileComplete, true, JSON.stringify(baseline.summary));
+  for (const result of complete.gates[0].results.filter(item => item.proofs?.length > 1)) {
+    for (const missing of result.proofs) {
+      const receipt = structuredClone(complete);
+      receipt.gates[0].results.find(item => item.requirement === result.requirement).proofs = result.proofs.filter(id => id !== missing);
+      const report = buildFullProfileReport({ target: ROOT, receipt });
+      const outcome = reportRequirement(report, result.requirement);
+      assert.equal(outcome.status, "not-checked", `${result.requirement}:${missing}`);
+      assert.deepEqual(outcome.proofResults.filter(item => item.status === "not-checked").map(item => item.id), [missing]);
+      assert.equal(report.summary.profileComplete, false, `${result.requirement}:${missing}`);
+      assert.equal(report.summary.evaluationComplete, false, `${result.requirement}:${missing}`);
+      assert.ok(report.outstandingManualChecks.some(item => item.requirement === result.requirement && item.proof === missing));
+    }
+  }
+});
+
+test("full-profile reporting cannot use generic legacy passes to replace missing browser and citation proofs", () => {
+  const receipt = completeProductionReceipt();
+  const browserRequirements = ["DKBWS-HUMAN-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-GRAPH-001", "DKBWS-DESIGN-001"];
+  for (const result of receipt.gates[0].results) {
+    if (!browserRequirements.includes(result.requirement)) continue;
+    result.proofs = result.proofs.filter(id => !id.startsWith("browser-") && id !== "built-citations");
+  }
+  receipt.gates.push({
+    id: "renamed-consumer-browser-suite",
+    status: "pass",
+    exitCode: 0,
+    evidence: [{ id: "old-output", kind: "command", description: "Legacy summary did not identify its proof scope." }],
+    results: browserRequirements.map(requirement => ({ requirement, status: "pass", evidence: ["old-output"] })),
+  });
+  const report = buildFullProfileReport({ target: ROOT, receipt });
+  for (const requirement of browserRequirements) assert.equal(reportRequirement(report, requirement).status, "not-checked", requirement);
+  for (const id of ["human_wiki", "human_renderer", "graphify", "browser_verification", "source_citation_style"]) {
+    assert.equal(report.capabilityStates.find(item => item.id === id).verificationStatus, "not-checked", id);
+  }
+  assert.equal(report.summary.profileComplete, false);
+});
+
+test("full-profile proof evidence can be split across independent consumer gates and explicit manual checks", () => {
+  const receipt = completeProductionReceipt();
+  const requirement = "DKBWS-LINK-002";
+  receipt.gates[0].results = receipt.gates[0].results.filter(item => item.requirement !== requirement);
+  receipt.gates.push(...REQUIREMENT_PROOFS[requirement].slice(0, -1).map((proof, index) => ({
+    id: `consumer-command-${index}`,
+    status: "pass",
+    exitCode: 0,
+    evidence: [{ id: "observations", kind: "command", description: `Explicit ${proof} evidence.` }],
+    results: [{ requirement, status: "pass", proofs: [proof], evidence: ["observations"] }],
+  })));
+  receipt.manualChecks = [{
+    id: "consumer-accessibility-review",
+    requirement,
+    status: "pass",
+    reason: "The reviewer exercised all reader citations at desktop and mobile widths.",
+    evidence: [{ id: "review", kind: "manual-review", description: "Recorded browser interaction review." }],
+  }];
+  const generic = buildFullProfileReport({ target: ROOT, receipt });
+  assert.equal(reportRequirement(generic, requirement).status, "not-checked");
+  receipt.manualChecks[0].proofs = ["browser-citations"];
+  const complete = buildFullProfileReport({ target: ROOT, receipt });
+  assert.equal(complete.summary.profileComplete, true);
+  assert.equal(reportRequirement(complete, requirement).proofResults.find(item => item.id === "browser-citations").evidence[0], "manual:consumer-accessibility-review:review");
+
+  receipt.gates.push({
+    id: "contradictory-current-browser-review",
+    status: "fail",
+    evidence: [{ id: "broken-target", kind: "browser-test", description: "A current citation target failed." }],
+    results: [{ requirement, status: "fail", proofs: ["browser-citations"], evidence: ["broken-target"] }],
+  });
+  const failed = buildFullProfileReport({ target: ROOT, receipt });
+  assert.equal(reportRequirement(failed, requirement).status, "fail");
+  assert.equal(reportRequirement(failed, requirement).proofResults.find(item => item.id === "browser-citations").status, "fail");
+  assert.equal(failed.summary.profileComplete, false);
+});
+
+test("full-profile proof validation rejects unknown, duplicate and cross-requirement labels", () => {
+  for (const proofs of [["browser-layout"], ["source-links", "source-links"], ["invented-pass"]]) {
+    const receipt = completeProductionReceipt();
+    receipt.gates[0].results.find(item => item.requirement === "DKBWS-LINK-002").proofs = proofs;
+    assert.throws(() => buildFullProfileReport({ target: ROOT, receipt }), ReceiptError, proofs.join(","));
+  }
+  const receipt = completeProductionReceipt();
+  receipt.gates[0].results.find(item => item.requirement === "DKBWS-SEC-001").proofs = ["source-links"];
+  assert.throws(() => buildFullProfileReport({ target: ROOT, receipt }), /unknown proof/);
+});
+
+test("full-profile failed requirements retain their missing proofs and incomplete evaluation", () => {
+  const receipt = completeProductionReceipt();
+  const requirement = "DKBWS-LINK-002";
+  const result = receipt.gates[0].results.find(item => item.requirement === requirement);
+  result.status = "fail";
+  result.proofs = ["source-links"];
+  const report = buildFullProfileReport({ target: ROOT, receipt });
+  assert.equal(reportRequirement(report, requirement).status, "fail");
+  assert.equal(report.summary.evaluationComplete, false);
+  assert.equal(report.verification.result.status, "fail");
+  assert.deepEqual(report.outstandingManualChecks.filter(item => item.requirement === requirement).map(item => item.proof), ["renderer-fixtures", "built-citations", "browser-citations"]);
+});
+
+test("full-profile mutation evidence cannot contradict itself or disappear on a narrower profile", () => {
+  const contradictory = completeProductionReceipt();
+  contradictory.canonicalMutation.changedPaths = ["docs/index.md"];
+  assert.throws(() => buildFullProfileReport({ target: ROOT, receipt: contradictory }), ReceiptError);
+  const portableResults = ["DKBWS-CORE-001", "DKBWS-CORE-002", "DKBWS-OKF-001", "DKBWS-OKF-002", "DKBWS-OKF-003"]
+    .map(requirement => ({ requirement, status: "pass", evidence: ["suite"] }));
+  for (const status of ["fail", "not-checked"]) {
+    const receipt = receiptFor(POSITIVE, "portable-core", portableResults, {
+      canonicalMutation: { status, changedPaths: status === "fail" ? ["knowledge/concept.md"] : [] },
+    });
+    const report = buildFullProfileReport({ target: POSITIVE, receipt });
+    assert.equal(report.summary.profileComplete, false);
+    assert.equal(report.verification.result.status, status === "fail" ? "fail" : "partial");
+    assert.equal(report.summary.evaluationComplete, status === "fail");
+    assert.equal(report.requirementResults.some(item => item.requirement === "DKBWS-VERIFY-001"), false, "the global guard must not change the selected requirement closure");
+  }
+});
+
+test("full-profile evidence keeps security, provenance and canonical mutation independently required", () => {
+  const receipt = completeProductionReceipt();
+  receipt.gates[0].results.find(item => item.requirement === "DKBWS-SEC-001").subcontrols.pop();
+  receipt.gates[0].results.find(item => item.requirement === "DKBWS-PROV-001").proofs = [];
+  receipt.canonicalMutation = { status: "not-checked", changedPaths: [], reason: "No before/after snapshot." };
+  const report = buildFullProfileReport({ target: ROOT, receipt });
+  for (const requirement of ["DKBWS-SEC-001", "DKBWS-PROV-001", "DKBWS-VERIFY-001"]) {
+    assert.equal(reportRequirement(report, requirement).status, "not-checked", requirement);
+  }
+  assert.equal(reportRequirement(report, "DKBWS-PROV-001").proofResults.find(item => item.id === "turn-policy").status, "not-checked");
+  assert.equal(reportRequirement(report, "DKBWS-PROV-001").proofResults.find(item => item.id === "maintainer-workspace").status, "pass");
+  assert.equal(reportRequirement(report, "DKBWS-VERIFY-001").proofResults.find(item => item.id === "canonical-mutation").status, "not-checked");
+  receipt.canonicalMutation.status = "fail";
+  receipt.canonicalMutation.changedPaths = ["docs/index.md"];
+  const mutated = buildFullProfileReport({ target: ROOT, receipt });
+  assert.equal(reportRequirement(mutated, "DKBWS-VERIFY-001").status, "fail");
+  assert.equal(reportRequirement(mutated, "DKBWS-VERIFY-001").proofResults.find(item => item.id === "canonical-mutation").status, "fail");
+
+  const uncheckedSecurity = completeProductionReceipt();
+  uncheckedSecurity.gates[0].status = "not-checked";
+  uncheckedSecurity.gates[0].results = [uncheckedSecurity.gates[0].results.find(item => item.requirement === "DKBWS-SEC-001")];
+  uncheckedSecurity.gates[0].results[0].status = "not-checked";
+  assert.throws(() => buildFullProfileReport({ target: ROOT, receipt: uncheckedSecurity }), /cannot emit a passing security subcontrol/);
+});
+
+test("full-profile release proof requires both immutable identity and migration notes", () => {
+  withTemporaryRoot(root => {
+    writePortableProject(root);
+    const manifest = parseDocument(readFileSync(path.join(ROOT, ".wiki-standard.yaml"), "utf8"));
+    manifest.set("profile", "managed-full");
+    writeFileSync(path.join(root, ".wiki-standard.yaml"), manifest.toString());
+    const receipt = completeProductionReceipt(root);
+    receipt.profile = "managed-full";
+    for (const missing of REQUIREMENT_PROOFS["DKBWS-RELEASE-001"]) {
+      receipt.gates[0].results = receipt.gates[0].results.filter(item => item.requirement !== "DKBWS-RELEASE-001");
+      receipt.gates[0].results.push({
+        requirement: "DKBWS-RELEASE-001",
+        status: "pass",
+        proofs: REQUIREMENT_PROOFS["DKBWS-RELEASE-001"].filter(id => id !== missing),
+        evidence: ["suite"],
+      });
+      const result = reportRequirement(buildFullProfileReport({ target: root, receipt }), "DKBWS-RELEASE-001");
+      assert.equal(result.status, "not-checked");
+      assert.deepEqual(result.proofResults.filter(item => item.status === "not-checked").map(item => item.id), [missing]);
+    }
+  });
+});
+
+test("full-profile proof overlays preserve conditional not-applicable and explicit waiver boundaries", () => {
+  withTemporaryRoot(root => {
+    writePortableProject(root);
+    const manifest = parseDocument(readFileSync(path.join(ROOT, ".wiki-standard.yaml"), "utf8"));
+    manifest.set("deviations", [
+      { requirement: "DKBWS-HUMAN-004", status: "not-applicable", reason: "The subject-empty fixture declares no governing question." },
+      { requirement: "DKBWS-GRAPH-001", status: "waived", reason: "Fixture-only bounded waiver.", authority: "human:fixture", reviewed_at: "2026-08-03" },
+    ]);
+    manifest.deleteIn(["roles", "governing_question"]);
+    manifest.deleteIn(["capabilities", "governing_question"]);
+    writeFileSync(path.join(root, ".wiki-standard.yaml"), manifest.toString());
+    const receipt = completeProductionReceipt(root);
+    receipt.gates[0].results = receipt.gates[0].results.filter(item => !["DKBWS-HUMAN-004", "DKBWS-GRAPH-001"].includes(item.requirement));
+    const report = buildFullProfileReport({ target: root, receipt });
+    for (const [requirement, expected] of [["DKBWS-HUMAN-004", "not-applicable"], ["DKBWS-GRAPH-001", "waived"]]) {
+      const result = reportRequirement(report, requirement);
+      assert.equal(result.status, expected);
+      assert.ok(result.proofResults.every(item => item.status === expected));
+      assert.equal(report.outstandingManualChecks.some(item => item.requirement === requirement), false);
+    }
+    assert.equal(report.capabilityStates.find(item => item.id === "human_wiki").verificationStatus, "pass");
+  });
+});
 
 test("OKF timestamps validate offsets, calendar dates, every timestamp field, and schema parity", () => {
   const ajv = new Ajv2020({ strict: false, allErrors: true });

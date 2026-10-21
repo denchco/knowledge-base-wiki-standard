@@ -50,16 +50,19 @@ nav = [
   {"References" = [
     {"Tools and sources" = "reference/tools-and-sources.md"},
     {"Local precedents" = "reference/local-precedents.md"},
-    {"Project status" = "project/status.md"}
+    {"Project status" = "project/status.md"},
+    {"Appearance contribution review" = "project/configurable-appearance-review.md"},
+    {"Navigation status migration" = "reference/navigation-status-migration.md"},
+    {"Reader defaults migration" = "reference/reader-defaults-migration.md"},
+    {"Release preparation" = "project/release-readiness.md"}
   ]}
 ]
-
-[project.extra.status]
-draft = "Draft — research in progress"
 
 [project.markdown_extensions]
 admonition = {}
 attr_list = {}
+footnotes = {}
+source_citations = { register_file = "docs/sources.md" }
 tables = {}
 "pymdownx.details" = {}
 
@@ -69,6 +72,9 @@ class = "mermaid"
 format = "pymdownx.superfences.fence_code_format"
 
 [project.theme]
+custom_dir = "overrides"
+logo = "assets/brand/denchco-wordmark.png"
+favicon = "assets/brand/denchco-wordmark.png"
 
 [[project.theme.palette]]
 scheme = "default"

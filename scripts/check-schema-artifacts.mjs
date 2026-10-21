@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -63,6 +63,10 @@ for (const [name, schema] of schemas) {
 
 const manifest = parse(readFileSync(path.join(root, ".wiki-standard.yaml"), "utf8"));
 validate("manifest-v1.json", manifest, ".wiki-standard.yaml");
+
+if (existsSync(path.join(root, "config/wiki-appearance.json"))) {
+  validate("wiki-appearance-v1.json", parseJsonStrict(readFileSync(path.join(root, "config/wiki-appearance.json"), "utf8"), "config/wiki-appearance.json"), "config/wiki-appearance.json");
+}
 
 validate("okf-source-lock-v1.json", parseJsonStrict(
   readFileSync(path.join(root, "config/okf-source-lock.json"), "utf8"), "config/okf-source-lock.json",

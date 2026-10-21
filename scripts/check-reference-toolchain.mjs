@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 const run = (command, args) => execFileSync(command, args, {encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]}).trim();
 try {
-  const expected = { node: readFileSync(".node-version", "utf8").trim(), npm: "11.19.0", uv: "0.12.10", python: readFileSync(".python-version", "utf8").trim() };
+  const expected = { node: readFileSync(".node-version", "utf8").trim(), npm: "11.19.0", uv: "0.13.4", python: readFileSync(".python-version", "utf8").trim() };
   const actual = {};
   const probes = {
     node: () => process.versions.node,

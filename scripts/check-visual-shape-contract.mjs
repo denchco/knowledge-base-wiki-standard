@@ -18,7 +18,7 @@ const architecture = read("docs/architecture.md");
 const starterHome = read("starter/templates/docs/index.md.tmpl");
 const starterDesign = read("starter/templates/DESIGN.md.tmpl");
 const starterZensical = read("starter/templates/zensical.toml.tmpl");
-const draftIcon = read("docs/assets/pen-circle.svg");
+const navigationTemplate = read("overrides/partials/nav-item.html");
 
 for (const token of [
   "accentDark", "accentDarker", "accentVisited", "accentLight", "accentLightest",
@@ -28,18 +28,22 @@ for (const token of [
   "sourceRowRailWidth", "accentRailWidth", "layoutWidthControlContentRailOffset",
   "headerTitleContentRailOffset", "listMarkerIndent", "listMarkerSize",
   "compactDataFontSize", "diagramTextSize", "sequentialMenuRailWidth",
-  "draftStatusIconSize",
 ]) {
   requireIn(design, token, `DESIGN.md must define ${token}`);
 }
 for (const [token, value] of [
-  ["primary", "#174a5b"],
-  ["accent", "#0b7285"],
-  ["accentDark", "#075866"],
-  ["accentLightest", "#d9f0f3"],
+  ["primary", "#003f69"],
+  ["accent", "#004d80"],
+  ["accentDark", "#003f69"],
+  ["accentLightest", "#d9e7f0"],
 ]) {
   requireIn(design, `${token}: "${value}"`, `DESIGN.md must pin DenchCo ${token} to ${value}`);
 }
+for (const field of ["logo", "favicon"]) {
+  requireIn(zensical, `${field} = "assets/brand/denchco-wordmark.png"`, `The Standard ${field} must use its governed DenchCo wordmark`);
+}
+requireIn(theme, "--background: #ffffff", "The Standard light page must match the white Documentation page");
+requireIn(selectorBlock(theme, ".md-logo img"), "background-color: var(--logo-surface)", "The wordmark must retain its readable backing in either appearance");
 requireIn(design, 'compactDataFontSize: ".64rem"', "DESIGN.md must pin reduced table text");
 requireIn(design, 'diagramTextSize: ".64rem"', "DESIGN.md must match Mermaid and reduced table text");
 requireIn(design, 'diagramEmphasisLineWidth: "3px"', "DESIGN.md must pin the Mermaid emphasis line");
@@ -60,19 +64,21 @@ requireIn(design, "three separately labelled sibling boxes", "DESIGN.md must req
 requireIn(starterDesign, "three separately labelled sibling boxes", "starter DESIGN.md must carry the separate Human, Agent, and Graph box rule");
 requireIn(design, "no more than 60px", "DESIGN.md must bound the three-product mobile containment exception");
 requireIn(starterDesign, "no more than 60px", "starter DESIGN.md must carry the bounded three-product mobile containment exception");
-requireIn(starterDesign, "Draft — research in progress", "starter DESIGN.md must carry the readable draft-status contract");
 requireIn(requirements, "DKBWS-HUMAN-002", "the normative catalogue must define DKBWS-HUMAN-002");
-requireIn(requirements, "DKBWS-HUMAN-003", "the normative catalogue must define DKBWS-HUMAN-003");
 requireIn(requirements, "DKBWS-HUMAN-004", "the normative catalogue must define DKBWS-HUMAN-004");
 requireIn(requirements, "DKBWS-LINK-002", "the normative catalogue must define DKBWS-LINK-002");
 requireIn(humanProfile, "- DKBWS-HUMAN-002", "the Human and Agent profile must require DKBWS-HUMAN-002");
-requireIn(humanProfile, "- DKBWS-HUMAN-003", "the Human and Agent profile must require DKBWS-HUMAN-003");
 requireIn(humanProfile, "- DKBWS-HUMAN-004", "the Human and Agent profile must require DKBWS-HUMAN-004");
 requireIn(humanProfile, "- DKBWS-LINK-002", "the Human and Agent profile must require DKBWS-LINK-002");
-requireIn(design, "independently focusable internal link", "DESIGN.md must preserve independent source-row links");
+requireIn(design, "independently focusable native link to its exact source-register row", "DESIGN.md must preserve independent source-row links");
 requireIn(starterDesign, "independently focusable internal link", "starter DESIGN.md must preserve independent source-row links");
-requireIn(content, '.md-typeset a[href*="#src-"]::before', "source-row links must restore the visible opening bracket");
-requireIn(content, '.md-typeset a[href*="#src-"]::after', "source-row links must restore the visible closing bracket");
+requireIn(content, ".md-typeset .source-citations", "source citations must have a numeric presentation rule");
+requireIn(selectorBlock(content, ".md-typeset .source-citations"), "vertical-align: super", "numeric source citations must use superscript");
+requireIn(selectorBlock(content, ".md-typeset .source-citations"), "white-space: nowrap", "source citation groups must stay together");
+for (const [source, label] of [[zensical, "zensical.toml"], [starterZensical, "starter zensical template"]]) {
+  requireIn(source, 'source_citations = { register_file = "docs/sources.md" }', `${label} must enable the mapped numeric citation renderer`);
+  requireIn(source, 'footnotes = {}', `${label} must preserve explanatory footnotes`);
+}
 for (const issue of governingQuestionMarkupIssues(home)) errors.push(`Standard homepage ${issue}`);
 for (const issue of governingQuestionMarkupIssues(architecture)) errors.push(`Standard architecture ${issue}`);
 requireIn(
@@ -102,8 +108,8 @@ if (governingQuestionMarkupIssues(mismatchedGoverningQuestionFixture).length ===
 }
 
 for (const token of [
-  "--primary: #174a5b", "--accent: #0b7285", "--accent-dark: #075866",
-  "--accent-darker:", "--accent-visited:", "--accent-light:", "--accent-lightest: #d9f0f3",
+  "--primary: #003f69", "--accent: #004d80", "--accent-dark: #003f69",
+  "--accent-darker:", "--accent-visited:", "--accent-light:", "--accent-lightest: #d9e7f0",
   "--accent-transparent:", "--accent-transparent-strong:", "--accent-contrast:",
   "--conditional:", "--success:", "--warning:", "--component-radius:",
   "--component-radius-small:", "--component-radius-large:", "--diagram-node-radius:",
@@ -111,7 +117,6 @@ for (const token of [
   "--source-row-rail-width:", "--accent-rail-width:", "--list-marker-indent:",
   "--list-marker-size: 1em", "--compact-data-font-size: .64rem",
   "--diagram-text-size:", "--sequential-menu-rail-width:",
-  "--draft-status-icon-size: .9rem",
 ]) {
   requireIn(theme, token, `docs/assets/theme.css must define ${token}`);
 }
@@ -245,25 +250,17 @@ if (hasDiagramStylingOptIn(`${governedThreeProductLayout}\nflowchart TB\n  A["A"
   errors.push("Mermaid native-default guard must accept the exact governed three-product layout override");
 }
 requireIn(theme, "border-inline-start: var(--sequential-menu-rail-width) solid var(--border)", "page outline must use its quiet rail");
-const draftMarker = selectorBlock(theme, ".md-status--draft::after");
-requireIn(draftMarker, 'mask-image: url("pen-circle.svg")', "draft status must use the registered Pen Circle mask");
-const draftMarkerColumn = selectorBlock(theme, ".md-nav--primary .md-nav__link > .md-status");
-requireIn(draftMarkerColumn, "flex: 0 0 var(--draft-status-icon-size)", "draft status must use the governed marker size");
-requireIn(draftMarkerColumn, "margin-inline-end: calc(var(--draft-status-icon-size) / -2)", "draft status must share the chevron trailing centreline");
-for (const phrase of [
-  "Pen Circle by SVG Repo",
-  "https://www.svgrepo.com/svg/532983/pen-circle",
-  "Licence: CC0 1.0",
-  'viewBox="0 0 24 24"',
-]) {
-  requireIn(draftIcon, phrase, `draft icon asset must retain: ${phrase}`);
-}
 for (const [source, label] of [[zensical, "zensical.toml"], [starterZensical, "starter zensical template"]]) {
-  requireIn(source, '[project.extra.status]', `${label} must declare renderer status text`);
-  requireIn(source, 'draft = "Draft — research in progress"', `${label} must expose readable draft status text`);
+  requireIn(source, 'custom_dir = "overrides"', `${label} must select the status-free navigation override`);
+}
+if (/render_status|md-status|nav_item\.meta\.status/.test(navigationTemplate)) {
+  errors.push("Navigation must not render lifecycle status or a fallback status icon");
+}
+for (const phrase of ["nav_item.title", "nav_item.children", "md-nav__toggle", 'aria-labelledby=', 'aria-expanded=', 'tabindex=']) {
+  requireIn(navigationTemplate, phrase, `navigation override must preserve native titles and section accessibility: ${phrase}`);
 }
 requireIn(layout, "--layout-width-control-content-rail-offset: 2rem", "Wide control must use the body-rail offset");
-requireIn(layout, "--header-title-content-rail-offset: 10.5rem", "header title must use the body-rail offset");
+requireIn(layout, "--header-title-content-rail-offset: 8.162rem", "header title must use the body-rail offset");
 requireIn(layout, "margin-inline-start: var(--header-title-content-rail-offset)", "header title must consume its rail token");
 requireIn(layout, "margin-inline: var(--layout-width-control-inline-start) var(--layout-width-control-content-rail-offset)", "Wide control must align to the content rail");
 requireIn(layout, ".md-header__title .md-header__topic", "the visible header topic must be governed");
@@ -283,7 +280,7 @@ if (selectorBlock(theme, ".md-typeset blockquote").includes("var(--accent)")) {
 }
 requireIn(graph, "border: var(--technical-frame-border-width) solid var(--accent-light)", "Graph pane must use one 1.75px rail");
 requireIn(selectorBlock(graph, ".graph-frame"), "border: 0", "Graph iframe must not add a second border");
-requireIn(publisher, 'const primary = process.env.GRAPHIFY_PRIMARY ?? "#0b7285"', "Graph publication must default to DenchCo teal");
+requireIn(publisher, 'const primary = appearance?.light.accent ?? process.env.GRAPHIFY_PRIMARY ?? "#004d80"', "Graph publication must use configured appearance with the DenchCo blue fallback");
 requireIn(publisher, "--component-border-width: 1px", "Graphify 3D controls must define a border token");
 requireIn(publisher, "--panel-radius: 8px", "Graphify 3D panels must retain a bounded radius");
 

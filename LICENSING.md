@@ -16,4 +16,6 @@ The MIT licence does not transfer ownership of the DenchCo name or presentation 
 
 | Asset | Source | Licence | Use |
 |---|---|---|---|
-| `docs/assets/pen-circle.svg` | [Pen Circle by SVG Repo](https://www.svgrepo.com/svg/532983/pen-circle) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Draft-status marker in the Zensical reference navigation adapter |
+| `overrides/partials/nav-item.html` and its starter template | Zensical `0.0.59` distribution, `templates/partials/nav-item.html` | MIT; complete upstream notice retained in each template | Native navigation with status rendering removed |
+
+Pen Circle is no longer bundled in the active reference adapter. Its original source and licence remain registered as historical evidence in [the source register](docs/sources.md#src-017).

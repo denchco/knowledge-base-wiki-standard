@@ -1,5 +1,9 @@
 # Bundle update log
 
+## 2026-10-19
+
+- **Status-free navigation**: Retire `DKBWS-HUMAN-003` without reusing its identifier. Remove its active requirements and reference marker implementation. Keep lifecycle metadata and historical release records. The [migration guide](../docs/reference/navigation-status-migration.md) defines the reviewed consumer steps; `DKBWS-HUMAN-001` retains titles, controls and accessible navigation.
+
 ## 2026-08-09
 
 - **Exact managed preview**: `DKBWS-RUNTIME-002` now exact-matches twelve registration fields, the generated installed/loaded job, marker identity, and canonical URL; `service:preview` fails closed, and only maintainer verification supplies live persistent-service evidence.

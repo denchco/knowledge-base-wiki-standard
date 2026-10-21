@@ -5,10 +5,10 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import YAML from "yaml";
 
-const SOURCE_ID = "SRC-\\d{3}";
+const SOURCE_ID = "SRC-\\d{3,}";
 const SOURCE_TOKEN = new RegExp(`(?<![A-Z0-9-])${SOURCE_ID}(?![A-Z0-9-])`, "g");
 const SOURCE_LINK = new RegExp(
-  `(?<!!)\\[(${SOURCE_ID})\\]\\(([^)\\s]+)(?:\\s+[\"'][^\"']*[\"'])?\\)`,
+  `(?<!!)\\[(${SOURCE_ID})(?:: [^\\]\\n]+)?\\]\\(([^)\\s]+)(?:\\s+[\"'][^\"']*[\"'])?\\)`,
   "g",
 );
 const COMBINED_SOURCE_LINK = new RegExp(
@@ -46,7 +46,7 @@ export function authorityMarkdownFiles(root = process.cwd()) {
 
 export function registeredSourceIds(sourceRegister) {
   return new Set(
-    [...sourceRegister.matchAll(/^\|\s*(SRC-\d{3})\s*\|\s*<span id="(src-\d{3})"><\/span>/gm)]
+    [...sourceRegister.matchAll(/^\|\s*(SRC-\d{3,})\s*\|\s*<span id="(src-\d{3,})"><\/span>/gm)]
       .filter(([, id, anchor]) => anchor === id.toLowerCase())
       .map(([, id]) => id),
   );
@@ -61,7 +61,7 @@ export function registeredSourceUrls(sourceRegister) {
 
 export function sourceRegisterAnchorIssues(sourceRegister) {
   const issues = [];
-  for (const match of sourceRegister.matchAll(/^\|\s*(SRC-\d{3})\s*\|([^\n]*)$/gm)) {
+  for (const match of sourceRegister.matchAll(/^\|\s*(SRC-\d{3,})\s*\|([^\n]*)$/gm)) {
     const id = match[1];
     const anchor = match[2].match(/<span id="([^"]+)"><\/span>/)?.[1] ?? "";
     if (anchor !== id.toLowerCase()) {
@@ -81,7 +81,8 @@ export function linkCitationGroups(markdown, sourceTarget) {
 export function linkBareSourceIdentities(markdown, sourceTarget) {
   const visible = visibleMarkdown(markdown);
   const output = visible.split("");
-  for (const match of visible.matchAll(/(?<!!)\[[^\]\n]+\]\((?:\\.|[^)\n])*\)/g)) {
+  // Footnote labels identify existing definitions; they are not bare reader text.
+  for (const match of visible.matchAll(/(?<!!)\[\^[^\]\n]+\]|(?<!!)\[[^\]\n]+\]\((?:\\.|[^)\n])*\)/g)) {
     for (let index = match.index; index < match.index + match[0].length; index += 1) {
       if (output[index] !== "\n" && output[index] !== "\r") output[index] = " ";
     }
@@ -104,6 +105,18 @@ export function sourceLinkIssues(markdown, options) {
   const visible = visibleMarkdown(markdown);
   const linkedTokenStarts = new Set();
 
+  const definitions = new Map();
+  for (const match of visibleMarkdown(markdown, true).matchAll(/^ {0,3}\[\^(SRC-\d{3,})\]:[ \t]*([^\n]*(?:\n(?:[ \t]*\n)*(?: {4}|\t)[^\n]*)*)/gm)) {
+    if (definitions.has(match[1])) issues.push(at(markdown, match.index, file, "DKBWS-LINK-002-FOOTNOTE", `duplicate definition for ${match[1]}`));
+    definitions.set(match[1], match[2]);
+  }
+  for (const match of visible.matchAll(/(?<!!)\[\^(SRC-\d{3,})\]/g)) {
+    linkedTokenStarts.add(match.index + 2);
+    const body = definitions.get(match[1]);
+    const link = body && [...body.matchAll(SOURCE_LINK)].find(candidate => candidate[1] === match[1]);
+    if (!link) issues.push(at(markdown, match.index, file, "DKBWS-LINK-002-FOOTNOTE", `${match[1]} needs a definition linking its own exact source row`));
+  }
+
   for (const match of visible.matchAll(COMBINED_SOURCE_LINK)) {
     for (const token of match[1].matchAll(new RegExp(SOURCE_ID, "g"))) {
       linkedTokenStarts.add(match.index + 1 + token.index);
@@ -115,6 +128,10 @@ export function sourceLinkIssues(markdown, options) {
     const [full, id, rawTarget] = match;
     const tokenStart = match.index + full.indexOf(id);
     linkedTokenStarts.add(tokenStart);
+
+    if (visible.slice(Math.max(0, match.index - 2), match.index) === "[^") {
+      issues.push(at(markdown, match.index, file, "DKBWS-LINK-002-FOOTNOTE", `${id} source link is nested inside a malformed footnote label`));
+    }
 
     const [targetPath, fragment = ""] = rawTarget.split("#", 2);
     const resolved = path.normalize(path.join(path.dirname(file), targetPath)).split(path.sep).join("/");
@@ -212,7 +229,7 @@ function relativeSourceTarget(file, canonicalSourceFile) {
   return relative.startsWith(".") ? relative : `./${relative}`;
 }
 
-function visibleMarkdown(markdown) {
+function visibleMarkdown(markdown, keepDefinitions = false) {
   const output = markdown.split("");
   const mask = (start, end) => {
     for (let index = start; index < end; index += 1) {
@@ -223,21 +240,39 @@ function visibleMarkdown(markdown) {
   const frontmatter = markdown.match(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/);
   if (frontmatter) mask(0, frontmatter[0].length);
   for (const match of markdown.matchAll(/<!--[\s\S]*?-->/g)) mask(match.index, match.index + match[0].length);
-  for (const match of markdown.matchAll(/^\s{0,3}\[[^\]\n]+\]:[^\n]*(?:\n|$)/gm)) mask(match.index, match.index + match[0].length);
+  if (!keepDefinitions) {
+    for (const match of markdown.matchAll(/^ {0,3}\[\^[^\]\n]+\]:/gm)) mask(match.index, match.index + match[0].length);
+    for (const match of markdown.matchAll(/^ {0,3}\[(?!\^)[^\]\n]+\]:[^\n]*(?:\n|$)/gm)) mask(match.index, match.index + match[0].length);
+  }
   for (const match of markdown.matchAll(/<[^>\n]+>/g)) mask(match.index, match.index + match[0].length);
 
   let fence = null;
+  let footnote = false;
+  let indentedCode = false;
+  let previousBlank = true;
   let offset = 0;
   for (const line of markdown.split(/(?<=\n)/)) {
+    const blank = /^\s*$/.test(line);
+    const indented = /^(?: {4}|\t)/.test(line);
+    if (/^ {0,3}\[\^[^\]\n]+\]:/.test(line)) footnote = true;
+    else if (!blank && !indented) footnote = false;
+    if (!footnote && indented && (previousBlank || indentedCode)) indentedCode = true;
+    else if (!blank && !indented) indentedCode = false;
     const marker = line.match(/^\s*(`{3,}|~{3,})/);
     if (marker) {
       if (!fence) fence = { character: marker[1][0], length: marker[1].length };
       else if (marker[1][0] === fence.character && marker[1].length >= fence.length) fence = null;
       mask(offset, offset + line.length);
-    } else if (fence) {
+    } else if (fence || indentedCode) {
       mask(offset, offset + line.length);
     }
+    previousBlank = blank;
     offset += line.length;
+  }
+
+  // An escaped source label is literal Markdown, including footnote examples.
+  for (const match of output.join("").matchAll(/(\\+)\[(?:\^)?SRC-\d{3,}\](?:\([^\n)]*\))?/g)) {
+    if (match[1].length % 2 === 1) mask(match.index, match.index + match[0].length);
   }
 
   const withoutBlocks = output.join("");

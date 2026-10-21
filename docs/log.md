@@ -7,7 +7,32 @@ status: draft
 
 # Research and change log
 
+## 2026-10-21
+
+- **Security qualification refresh:** The required Python audit found Certifi `2026.7.22` affected by newly reported `PYSEC-2026-4320`. Select `2026.10.19` and exact uv `0.13.4` following the official Python security announcement. Update runtime checks, CI and the resolver floor together, preserve historical qualification records and rerun the complete release contract. [SRC-065](sources.md#src-065), [SRC-066](sources.md#src-066)
+
+## 2026-10-20
+
+- **Authorised reader-default release:** Prepare guarded Graphify `0.9.70` qualification and `v0.1.0-rc.6`, including the complete Documentation snapshot closure and an explicit pre-`1.0.0` compatibility rule. The owner authorised protected publication, immutable release, Documentation migration and live reader verification. Other consumer pins remain unchanged. The release record distinguishes this preparation from completed publication. [SRC-064](sources.md#src-064)
+
+- **Governed consumer intake:** Submit the three exact approved payloads through their governed forms under the owner's scoped delegation. Issues #32, #33 and #34 each match the approved repository, title, labels, body and single stable marker. Consumer issue linkage and acceptance use separate JJ phases.
+- **Explicit acceptance:** Record preferred numeric citations and reusable appearance configuration and content-first handoffs under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc`. Reconcile the originating records with the published registry. Preserve the reviewed implementation, source evidence, existing releases and consumer pins. [SRC-063](sources.md#src-063)
+- **Release inventory:** Remove completed intake from current priorities, reconcile the [review](project/proposal-intake-review.md) and [release preparation](project/release-readiness.md), and retain publication and adoption as separate outcomes. The fresh package binds the final committed candidate and verification evidence.
+- **Dependency finding:** Record the newly observed Graphify advisory under [STD-VAL-011](validation-queue.md). The pinned version is affected, although the current Python audit did not report it. Qualify a patched version before the broader candidate release. [SRC-062](sources.md#src-062)
+
+## 2026-10-19
+
+- **Reader-default enforcement:** Promote Wide from an optional setting to the unconfigured desktop baseline. Integrate the stable numeric citation adapter and repaired explanatory notes, require the numeric Human capability and check every generated reader citation. Preserve saved choices, source identities, metadata, mobile containment and status-free navigation. The [migration guide](reference/reader-defaults-migration.md) records adoption checks. [SRC-061](sources.md#src-061)
+- **Conformance accounting correction:** Require explicit proof obligations for every selected requirement. Negative receipts remove individual proofs and must not report complete conformance. Prior full browser runs remain evidence of the commands they executed; their old aggregation rule is not reused to claim the new obligations.
+- **Release preparation:** Reconcile [project status](project/status.md) and the [change inventory](project/release-readiness.md). Preserve exact consumer origins and pending formal states. Verification and the final package bind the current committed implementation; no new release or consumer pin is implied.
+
+- **Navigation retirement**: Retire `DKBWS-HUMAN-003` at the owner's request. Preserve its identifier and historical records while removing the active marker contract. The [migration guide](reference/navigation-status-migration.md) records COPPER TIGER's exact implementation, the wider status-free Standard default, consumer steps and the release/adoption boundary. [SRC-060](sources.md#src-060)
+- **Reference closure**: Remove the Pen Circle asset, tooltip configuration, marker tokens and geometry checks. Suppress navigation status markup through the pinned renderer template while preserving lifecycle metadata, titles, section controls and accessibility. Carry the override into the starter and documentation allowlist. Browser fixtures cover lifecycle values and native navigation behaviour.
+- **Discovery and verification**: Query Graphify, then use its scoped report and canonical sources where recall is truncated. The initial shell selected an older uv; the existing qualified toolchain restores the exact reference versions. The turn commit records complete applicable verification and the read-only provenance result.
+
 ## 2026-10-07
+
+- **Configurable appearance technical review**: Integrate the exact Thirlwall candidate into the local Standard tree. Fix native palette reordering that reversed saved reader choices during adoption. Use stable radio indexes and native unconditional media defaults, with regression cases for prior choices and later default changes. Clarify configured brand surfaces and derived active colours in the design and starter contracts. The [review record](project/configurable-appearance-review.md) retains the original proposal and keeps approval, issue linkage, formal acceptance, release and adoption separate.
 
 - **Prospective writing default**: Researched official ASD-STE100 sources and added the [80% house writing policy](spec/writing-style.md). The current official issue is 9, dated 15 January 2025. The percentage is a local pragmatic preference; no official 80% measure was identified. `DKBWS-PROMPT-001` now carries the default into new Wiki setups and new original English prose, with protected forms and review limits. Existing content and consumer pins remain unchanged. Author review covered the new policy, its template and the changed guidance. A synthetic rewrite preserved uncertainty, an exact quotation, a command and its source identifier. This was a bounded fidelity check, not a linguistic score or corpus-wide review. [SRC-057](sources.md#src-057), [SRC-058](sources.md#src-058), [SRC-059](sources.md#src-059)
 

@@ -7,6 +7,8 @@ status: draft
 
 # Roadmap
 
+The [current release preparation](project/release-readiness.md) tracks unreleased integrations, accepted contribution decisions and exact migration checks. Local completion is distinct from publication and consumer adoption.
+
 ## Completed through `v0.1.0-rc.5`
 
 1. Established the canonical specification, profiles, prompt, policies, dependency contract, Git history, and colocated Jujutsu provenance.

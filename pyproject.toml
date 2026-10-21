@@ -5,13 +5,13 @@ description = "Canonical OKF-compatible standard for evidence-governed human and
 license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
-  "graphifyy==0.9.55",
+  "graphifyy==0.9.70",
   "zensical==0.0.59",
 ]
 
 [tool.uv]
-# Dependency-update resolvers may advance; check:toolchain qualifies exactly 0.12.10.
-required-version = ">=0.12.10"
+# Dependency-update resolvers may advance; check:toolchain qualifies exactly 0.13.4.
+required-version = ">=0.13.4"
 package = false
 
 [dependency-groups]

@@ -3,42 +3,43 @@ version: "0.1.0-candidate"
 name: "DenchCo Knowledge Base Wiki Standard"
 description: "Deterministic DenchCo visual and interaction contract for a production Zensical evidence-linked wiki."
 colors:
-  primary: "#174a5b"
-  accent: "#0b7285"
-  accentDark: "#075866"
-  accentDarker: "#06444f"
-  accentVisited: "#096777"
-  accentLight: "#42a5b3"
-  accentLightest: "#d9f0f3"
-  accentTransparent: "rgb(11 114 133 / 10%)"
-  accentTransparentStrong: "rgb(11 114 133 / 16%)"
+  primary: "#003f69"
+  accent: "#004d80"
+  accentDark: "#003f69"
+  accentDarker: "#003452"
+  accentVisited: "#00436f"
+  accentLight: "#4d83a7"
+  accentLightest: "#d9e7f0"
+  accentTransparent: "rgb(0 77 128 / 10%)"
+  accentTransparentStrong: "rgb(0 77 128 / 16%)"
   accentContrast: "#ffffff"
-  background: "#f6f8f9"
+  background: "#ffffff"
   text: "#1f2933"
   muted: "#52606d"
   border: "#aab7c0"
   surface: "#ffffff"
-  tableHeader: "#d9f0f3"
-  link: "#0b7285"
+  logoSurface: "#ffffff"
+  tableHeader: "#d9e7f0"
+  link: "#004d80"
   conditional: "#a15c00"
   success: "#007f3b"
   warning: "#d5281b"
-  darkPrimary: "#dff6f7"
-  darkAccent: "#66c5d1"
-  darkAccentDark: "#8cdbe4"
-  darkAccentDarker: "#c3f1f5"
-  darkAccentVisited: "#9ed1d9"
-  darkAccentLight: "#5db0bc"
-  darkAccentLightest: "#16323a"
-  darkAccentTransparent: "rgb(102 197 209 / 10%)"
-  darkAccentTransparentStrong: "rgb(102 197 209 / 16%)"
+  darkPrimary: "#d0e8ff"
+  darkAccent: "#83c4ff"
+  darkAccentDark: "#abd6ff"
+  darkAccentDarker: "#d0e8ff"
+  darkAccentVisited: "#9ed0ff"
+  darkAccentLight: "#6aabe4"
+  darkAccentLightest: "#212d37"
+  darkAccentTransparent: "rgb(131 196 255 / 10%)"
+  darkAccentTransparentStrong: "rgb(131 196 255 / 16%)"
   darkAccentContrast: "#111a1e"
   darkBackground: "#111a1e"
   darkSurface: "#18242a"
   darkText: "#e5eef1"
   darkMuted: "#b5c2c9"
   darkBorder: "#798f9a"
-  darkFocus: "#8cdbe4"
+  darkFocus: "#abd6ff"
   darkFocusContrast: "#111a1e"
   darkConditional: "#edbc74"
   darkSuccess: "#90d7aa"
@@ -65,7 +66,7 @@ shape:
   diagramLabelMaskWidth: "4px"
   componentBorderWidth: "1px"
   technicalFrameBorderWidth: "1.75px"
-  headerTitleContentRailOffset: "10.5rem"
+  headerTitleContentRailOffset: "8.162rem"
   sourceRowRailWidth: ".25rem"
   accentRailWidth: ".3rem"
   layoutWidthControlContentRailOffset: "2rem"
@@ -80,7 +81,6 @@ spacing:
   md: "12px"
   lg: "16px"
   xl: "24px"
-  draftStatusIconSize: ".9rem"
 components:
   page:
     backgroundColor: "{colors.background}"
@@ -105,8 +105,6 @@ components:
     textColor: "{colors.success}"
   status-warning:
     textColor: "{colors.warning}"
-  status-draft:
-    size: "{spacing.draftStatusIconSize}"
   table-header:
     backgroundColor: "{colors.tableHeader}"
     textColor: "{colors.text}"
@@ -129,6 +127,8 @@ components:
     backgroundColor: "{colors.border}"
   diagram-boundary:
     backgroundColor: "{colors.accentLight}"
+  header-logo:
+    backgroundColor: "{colors.logoSurface}"
   header:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
@@ -158,8 +158,6 @@ components:
     textColor: "{colors.darkSuccess}"
   dark-status-warning:
     textColor: "{colors.darkWarning}"
-  dark-status-draft:
-    size: "{spacing.draftStatusIconSize}"
   dark-table-header:
     backgroundColor: "{colors.darkAccentLightest}"
     textColor: "{colors.darkText}"
@@ -216,9 +214,15 @@ The shell may look identical across topics. The topic's reader model, navigation
 - Full pill radii are reserved for compact status labels.
 - Diagram text follows reduced table text sizing; ordinary body copy remains the renderer baseline.
 
-The DenchCo standard wiki keeps this teal family. A conforming derived wiki may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify so 2D and 3D interactions inherit it. Do not alter Zensical chrome structure to create a topic identity.
+The unconfigured DenchCo Standard Wiki uses the public Documentation Wiki's DenchCo blue family, anchored to `#004d80`, on a white page. Its existing `docs/assets/brand/denchco-wordmark.png` supplies the header logo and favicon. The header title offset accounts for the wordmark's `1032:350` aspect ratio.
+
+The header wordmark uses a fixed white backing for contrast in either appearance; its source pixels remain unchanged. The backing protects the blue artwork when a configured header uses any brand colour. This branding belongs to the Standard and Documentation Wikis. The subject-empty starter retains its own configurable identity and excludes the wordmark.
+
+A consumer using the manual adapter may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify. A consumer selecting the configurable adapter uses the generated roles described below. Do not alter Zensical chrome structure to create a topic identity.
 
 ## Appearance
+
+Fresh desktop readers receive Wide layout. An explicit appearance configuration may select Standard initially; saved Standard or Wide choices take precedence. Missing, invalid or unavailable storage falls back to the configured width, or Wide without configuration. Mobile layouts remain contained and retain the saved desktop choice.
 
 The reference adapter offers native Zensical light (`default`) and dark (`slate`) palettes. Light remains the initial Standard appearance; a consumer may choose another initial palette and records that choice here. The native sun/moon control sits immediately before Wide, names the action it performs, retains keyboard focus and remains visible on mobile when Wide is hidden. Zensical owns the saved preference and its navigation/reload behaviour; do not add a competing storage key or appearance controller.
 
@@ -236,8 +240,8 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - Mark every displayed governing-question callout as `governing-question`; render both its inline-start rail and all question text in the active accent colour at every supported viewport. When the Wiki declares one canonical question, use that governed component for every verbatim repetition in its bounded reader set. Keep paraphrases and unrelated quotations neutral.
 - Keep entry pages concise and route to canonical detail.
 - Use square list markers aligned to the body-text rail, restrained sequential navigation, contextual links, and stable source-row anchors.
-- Render every displayed `SRC-NNN` as an independently focusable internal link to its exact source-register row while preserving the visible `[SRC-NNN]` grammar. Lists keep separate link targets and compact ranges link their displayed endpoints. Do not suppress the native focus indication or make brackets the only accessible label.
-- When primary navigation exposes a page's `draft` status, use the registered Pen Circle edit marker with the native “Draft — research in progress” tooltip. In the Zensical reference adapter its trailing centre aligns with the stock nested-navigation chevron column; stable or deprecated states retain their own semantics and artwork.
+- Render registered source citations as numeric superscripts: `SRC-002` displays as `002` with its leading zeroes preserved. Each number is an independently focusable native link to its exact source-register row, with the full identity in its accessible name. Adjacent citations use comma-and-space separators in authored order; compact ranges retain their displayed endpoints. Preserve canonical Markdown, explanatory notes and full source-register row identities. Keep visible keyboard focus and active-theme contrast; reject the former bracket presentation unless an explicit scoped deviation applies.
+- Keep reference navigation free of lifecycle status icons and tooltips, including the renderer's fallback information icon. Preserve source lifecycle metadata, page titles, subtitles, page icons, section controls and keyboard access. The pinned `overrides/partials/nav-item.html` adapter removes status output only; carry it with the `custom_dir` setting.
 - Do not rely on navigation alone for discoverability; canonical pages need contextual inbound links and LLM routing links.
 - Avoid marketing heroes, nested cards, decorative panels, and prose that overstates evidence.
 - Tables, Mermaid diagrams, and Graphify frames use named border and radius tokens only.
@@ -246,7 +250,7 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - When Human, Agent, and Graph surfaces are all shown, use three separately labelled sibling boxes, each reached directly from canonical knowledge. Where verification follows, each path rejoins it. Their visual separation does not make them separate canonical corpora or evidence authorities.
 - No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
 - Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
-- The production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent.
+- The unconfigured production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent. The optional configured adapter uses the exact brand colour for the header and selected navigation, with contrasting text and transparent header controls.
 - Mermaid `11.17.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects
@@ -268,3 +272,26 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
   `1.63.0` rendered desktop/mobile geometry, pixel checks, controls, overflow,
   and public-CDN exclusion. Deployment and public HTTP health are separate
   release-adapter gates.
+
+## Configurable appearance candidate
+
+This reviewed local candidate adds an optional appearance adapter under the existing design and verification requirements. The [technical review](docs/project/configurable-appearance-review.md) records its origin, repairs and pending formal intake. No acceptance, release or consumer adoption is implied.
+
+Use `config/wiki-appearance.json` as the input for a consumer that selects the adapter:
+
+```json
+{
+  "schemaVersion": "1.0",
+  "accent": "#e1efdd",
+  "appearance": "light",
+  "width": "wide"
+}
+```
+
+The example accent belongs to the originating consumer. Light appearance and Wide layout are the reference defaults. Without this file, the Standard keeps its declared renderer palette and uses Wide as the fresh desktop fallback. Existing consumers retain their pinned contract until adoption; saved reader choices remain valid.
+
+Run `npm run prepare:appearance` before the renderer. The command writes only generated assets under `docs/assets/appearance/` and `zensical.appearance.toml`. Build from that generated configuration. The live-config preparer uses it too. Keep these paths ignored and listed as derived outputs in verification. Do not edit generated colours or reorder native palettes by hand.
+
+The shared module preserves the exact accent on visible header and selected-navigation surfaces. It derives matching OKLCH colour roles, reducing chroma only when sRGB requires it, then checks contrast after rounding to the final hex values. Dark inputs receive a readable light question-panel tint. Graph publication reads the same configuration. Native Zensical still owns appearance storage, and saved reader choices take precedence over configured initial settings. Preserve the canonical palette order because Zensical saves a radio index. The generator selects the fresh default with native `media = "all"` and `media = "not all"`, independent of the operating-system theme. It never reorders radios or writes preference storage. The width control retains its existing storage key and uses the configured fallback when storage is missing, invalid or unavailable.
+
+The unit fixtures cover pale, dark, saturated and neutral inputs, invalid configuration, deterministic output, final-colour contrast and native configuration generation. The browser fixtures build real pinned Zensical pages. They cover light/wide and dark/standard defaults, native saved preferences before adoption and after default changes, visible brand surfaces and 390px containment. Existing consumers must carry the complete adapter closure and verify their own content before adopting it.

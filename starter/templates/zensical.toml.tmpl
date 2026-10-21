@@ -22,12 +22,11 @@ nav = [
   ]}
 ]
 
-[project.extra.status]
-draft = "Draft — research in progress"
-
 [project.markdown_extensions]
 admonition = {}
 attr_list = {}
+footnotes = {}
+source_citations = { register_file = "docs/sources.md" }
 tables = {}
 "pymdownx.details" = {}
 
@@ -37,6 +36,7 @@ class = "mermaid"
 format = "pymdownx.superfences.fence_code_format"
 
 [project.theme]
+custom_dir = "overrides"
 
 [[project.theme.palette]]
 scheme = "default"

@@ -54,6 +54,9 @@
     },
     "capabilities": {
       "type": "object",
+      "properties": {
+        "source_citation_style": { "const": "numeric-superscript" }
+      },
       "additionalProperties": {
         "$ref": "#/$defs/capabilityValue"
       }

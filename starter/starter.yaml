@@ -21,11 +21,13 @@ bootstrap:
     local_service: "auto-select-platform-user-service-adapter"
     deployment: "none"
     authoring_policy: "denchco-asd-ste100-inspired-80-percent"
+    desktop_width: "wide"
+    source_citation_style: "numeric-superscript"
   inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
   conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
   required_design_question: "state the inferred or default accent hex and ask whether to use or replace it"
   accent_derivation: "derive and record an accessible family; verify 4.5:1 normal-text and 3:1 non-text boundary contrast against rendered backgrounds"
-  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment", "pragmatic authoring policy"]
+  no_question_defaults: ["profile", "standard revision", "loopback URL", "local service adapter", "no deployment", "pragmatic authoring policy", "Wide desktop width", "numeric superscript source citations"]
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
@@ -56,6 +58,8 @@ classifications:
       - "site/"
       - "graphify-out/"
       - "docs/assets/vendor/"
+      - "docs/assets/appearance/"
+      - "zensical.appearance.toml"
       - "docs/assets/graphify/"
       - "output/"
 
@@ -79,6 +83,53 @@ consumer_owned:
   - "tracked proposal origin records, payload approvals, issue observations, and optional adoption decisions"
 
 entries:
+  - target: "config/wiki-appearance.json"
+    role: "optional-wiki-appearance-configuration"
+    classification: "render-template"
+    template: "starter/templates/config/wiki-appearance.json.tmpl"
+    requirements: ["DKBWS-DESIGN-001"]
+  - target: "scripts/wiki-appearance.mjs"
+    role: "appearance-derivation"
+    classification: "adapt-from-release"
+    source: "scripts/wiki-appearance.mjs"
+    planning_only: true
+    dependency_closure: "validated appearance configuration, prepare-wiki-appearance, named renderer and graph roles, configured width fallback, generated native defaults with stable palette indexes, ignored outputs, unit and browser checks"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/prepare-wiki-appearance.mjs"
+    role: "appearance-generation"
+    classification: "adapt-from-release"
+    source: "scripts/prepare-wiki-appearance.mjs"
+    planning_only: true
+    dependency_closure: "wiki-appearance module, config/wiki-appearance.json, schema/wiki-appearance-v1.json, generated CSS/JS, zensical.appearance.toml build input, live-config preparation and verification output allowlist"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "schema/wiki-appearance-v1.json"
+    role: "appearance-schema"
+    classification: "adapt-from-release"
+    source: "schema/wiki-appearance-v1.json"
+    planning_only: true
+    dependency_closure: "strict appearance validator and positive/negative fixtures"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/wiki-appearance.test.mjs"
+    role: "appearance-unit-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/wiki-appearance.test.mjs"
+    planning_only: true
+    dependency_closure: "wiki-appearance module, appearance schema and locked Ajv runtime"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/prepare-wiki-appearance.test.mjs"
+    role: "appearance-generation-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/prepare-wiki-appearance.test.mjs"
+    planning_only: true
+    dependency_closure: "prepare-wiki-appearance module and graph publisher with configured shared roles"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-wiki-appearance-browser.mjs"
+    role: "appearance-browser-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-wiki-appearance-browser.mjs"
+    planning_only: true
+    dependency_closure: "appearance generator, native renderer and patch adapter, serve-built-site, canonical theme/width assets, locked browser runtime and ignored verification output"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-RENDER-001", "DKBWS-VERIFY-001"]
   - target: ".wiki-standard.yaml"
     role: "manifest"
     classification: "render-template"
@@ -174,7 +225,7 @@ entries:
     role: "human-wiki"
     classification: "render-template"
     template: "starter/templates/docs/index.md.tmpl"
-    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
   - target: "docs/llm-wiki/index.md"
     role: "llm-wiki"
     classification: "render-template"
@@ -205,19 +256,25 @@ entries:
     role: "design-contract"
     classification: "render-template"
     template: "starter/templates/DESIGN.md.tmpl"
-    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
   - target: "zensical.toml"
     role: "renderer-config"
     classification: "render-template"
     template: "starter/templates/zensical.toml.tmpl"
-    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-003"]
+    requirements: ["DKBWS-HUMAN-001", "DKBWS-RENDER-001"]
+  - target: "overrides/partials/nav-item.html"
+    role: "status-free-navigation"
+    classification: "render-template"
+    template: "starter/templates/overrides/partials/nav-item.html.tmpl"
+    dependency_closure: "pinned Zensical navigation template copied verbatim with its native Jinja syntax, renderer custom_dir setting, preserved page titles and section controls, and built-output navigation accessibility checks"
+    requirements: ["DKBWS-HUMAN-001", "DKBWS-RENDER-001"]
   - target: "docs/assets/"
     role: "local-runtime-assets"
     classification: "adapt-from-release"
     source: "docs/assets/"
     planning_only: true
     dependency_closure: "renderer scripts, local browser packages, exact locks, and verification gates; exclude the Standard's service marker because the project-owned marker is rendered separately"
-    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-RENDER-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
   - target: "docs/assets/service-identity.json"
     role: "managed-service-identity"
     classification: "render-template"
@@ -288,6 +345,20 @@ entries:
     planning_only: true
     dependency_closure: "the target's complete verification command, Git/Jujutsu status inspection, failed-check disclosure, clean-turn guard, and end-of-turn commit tests"
     requirements: ["DKBWS-PROV-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/development-next-steps.mjs"
+    role: "development-cycle-handoff"
+    classification: "adapt-from-release"
+    planning_only: true
+    source: "scripts/development-next-steps.mjs"
+    requirements: ["DKBWS-PROMPT-001"]
+    dependency_closure: "Adapt the captured development-cycle response checker; preserve cadence, three-field format and explicit no-update outcome without claiming automatic grounding or host interception."
+  - target: "scripts/development-next-steps.test.mjs"
+    role: "development-cycle-handoff-fixtures"
+    classification: "adapt-from-release"
+    planning_only: true
+    source: "scripts/development-next-steps.test.mjs"
+    requirements: ["DKBWS-PROMPT-001"]
+    dependency_closure: "Adapt instruction and response fixtures to the target layout, including missing cadence/fields, the replaced conditional policy and the no-update case."
   - target: "scripts/development-response-links.mjs"
     role: "development-response-link-check"
     classification: "adapt-from-release"
@@ -308,6 +379,27 @@ entries:
     source: "scripts/link-source-citations.mjs"
     planning_only: true
     dependency_closure: "mapped reader evidence surfaces, source-register path and identity grammar, stable row anchors, optional idempotent rewrite, lint fixtures, visible citation styling, and built-output exact-row browser proof"
+    requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/source_citations.py"
+    role: "reader-source-citation-renderer"
+    classification: "adapt-from-release"
+    source: "scripts/source_citations.py"
+    planning_only: true
+    dependency_closure: "pinned Python-Markdown through Zensical, PYTHONPATH=scripts and PYTHONDONTWRITEBYTECODE=1 for build and serve, mapped register_file, footnotes extension, numeric superscript CSS, and source-link lint"
+    requirements: ["DKBWS-LINK-002", "DKBWS-RENDER-001"]
+  - target: "scripts/test_source_citations.py"
+    role: "reader-source-citation-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/test_source_citations.py"
+    planning_only: true
+    dependency_closure: "source_citations.py, check_rendered_source_citations.py, pinned Python-Markdown, unittest, and source/ordinary-footnote identity, grouping and negative presentation fixtures"
+    requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
+  - target: "scripts/check_rendered_source_citations.py"
+    role: "built-source-citation-accounting"
+    classification: "adapt-from-release"
+    source: "scripts/check_rendered_source_citations.py"
+    planning_only: true
+    dependency_closure: "manifest citation-style capability, mapped source register, canonical reader Markdown, complete built HTML, exact source sequence comparison, and all-route desktop/mobile browser checks"
     requirements: ["DKBWS-LINK-002", "DKBWS-VERIFY-001"]
   - target: "scripts/check-governing-question-repetitions.mjs"
     role: "governing-question-consistency-check"
@@ -407,6 +499,20 @@ entries:
     planning_only: true
     dependency_closure: "adapted package.json and its exact resolved dependency graph"
     requirements: ["DKBWS-VERIFY-001"]
+  - target: "scripts/graphify-update.py"
+    role: "guarded-graph-indexing"
+    classification: "adapt-from-release"
+    source: "scripts/graphify-update.py"
+    planning_only: true
+    dependency_closure: "exact Graphify lock, isolated Python entry point, corpus input rejection, disabled external preprocessing and guarded package commands"
+    requirements: ["DKBWS-GRAPH-001", "DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-graphify-inputs.test.py"
+    role: "graph-input-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-graphify-inputs.test.py"
+    planning_only: true
+    dependency_closure: "guarded graph indexing wrapper, exact installed API, benign extraction and negative unsupported-input fixtures"
+    requirements: ["DKBWS-GRAPH-001", "DKBWS-SEC-001", "DKBWS-VERIFY-001"]
   - target: "pyproject.toml"
     role: "python-build-contract"
     classification: "adapt-from-release"

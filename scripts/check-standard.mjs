@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
+import { checkHandoffInstructions } from "./development-next-steps.mjs";
 
 const required = [
   "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "AUTHORING.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
@@ -25,7 +26,7 @@ const required = [
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
   "docs/assets/brand/denchco-wordmark.png",
-  "docs/assets/pen-circle.svg", "docs/assets/service-identity.json",
+  "overrides/partials/nav-item.html", "docs/assets/service-identity.json",
   "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json", "schema/service-identity-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
   "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
@@ -57,12 +58,14 @@ const required = [
   "profiles/standard-production.yaml", "scripts/sync-runtime-assets.mjs",
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
   "scripts/publish-graphify-assets.mjs", "scripts/check-graphify-assets.mjs",
+  "scripts/graphify-update.py", "scripts/check-graphify-inputs.test.py",
   "scripts/check-visual-shape-contract.mjs", "scripts/check-runtime-browser-contract.mjs",
   "scripts/runtime-browser-contract-config.mjs", "scripts/runtime-browser-contract-config.test.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/check-governing-question-repetitions.mjs", "scripts/check-governing-question-repetitions.test.mjs",
   "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
+  "scripts/source_citations.py", "scripts/test_source_citations.py", "scripts/check_rendered_source_citations.py",
   "scripts/development-response-links.mjs", "scripts/development-response-links.test.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
@@ -76,7 +79,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -106,6 +109,22 @@ if (authoringEntry?.classification !== "render-template"
 }
 if (starterManifest?.bootstrap?.defaults?.authoring_policy !== "denchco-asd-ste100-inspired-80-percent") {
   failures.push("starter must select the pragmatic authoring policy as an automatic bootstrap default");
+}
+if (starterManifest?.bootstrap?.defaults?.desktop_width !== "wide"
+  || !starterManifest?.bootstrap?.no_question_defaults?.includes("Wide desktop width")) {
+  failures.push("starter must select Wide desktop width without a routine bootstrap question");
+}
+const starterAppearance = JSON.parse(readFileSync("starter/templates/config/wiki-appearance.json.tmpl", "utf8"));
+if (starterAppearance.width !== "wide") failures.push("starter appearance configuration must use the Wide desktop default");
+for (const phrase of ["Wide desktop width", "Wide applies without an appearance configuration", "valid saved reader choices", "hidden width control"]) {
+  if (!prompt.includes(phrase)) failures.push(`prompt lacks the governed width-default boundary: ${phrase}`);
+}
+const starterWidthDesign = readFileSync("starter/templates/DESIGN.md.tmpl", "utf8");
+for (const phrase of ["Start fresh desktop readers in Wide", "valid saved Standard or Wide choices", "Missing, invalid or unavailable storage", "hidden and content contained on mobile"]) {
+  if (!starterWidthDesign.includes(phrase)) failures.push(`starter design lacks the governed width-default boundary: ${phrase}`);
+}
+if (!readFileSync("scripts/runtime-browser-contract.playwright.js", "utf8").includes('appearance?.config.width ?? "wide"')) {
+  failures.push("the complete browser contract must expect unconfigured fresh-reader Wide");
 }
 for (const target of [".node-version", ".npmrc"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
@@ -143,6 +162,24 @@ if (starterSourceLinks?.classification !== "adapt-from-release"
   || !(starterSourceLinks?.requirements ?? []).includes("DKBWS-LINK-002")) {
   failures.push("starter must adapt the pinned reader source-link checker for DKBWS-LINK-002");
 }
+for (const target of ["scripts/source_citations.py", "scripts/test_source_citations.py", "scripts/check_rendered_source_citations.py"]) {
+  const entry = starterEntries.find(candidate => candidate?.target === target);
+  if (entry?.classification !== "adapt-from-release" || entry?.source !== target || entry?.planning_only !== true || !entry?.requirements?.includes("DKBWS-LINK-002")) {
+    failures.push(`starter must carry the numeric source-citation dependency closure: ${target}`);
+  }
+}
+if (standardManifest.capabilities?.source_citation_style !== "numeric-superscript"
+  || humanAndAgentProfile.capabilities?.source_citation_style !== "numeric-superscript"
+  || starterManifest.bootstrap?.defaults?.source_citation_style !== "numeric-superscript"
+  || !starterManifest.bootstrap?.no_question_defaults?.includes("numeric superscript source citations")
+  || !readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8").includes('source_citation_style: "numeric-superscript"')) {
+  failures.push("current Human profile and new-wiki defaults must explicitly select numeric-superscript source citations");
+}
+for (const file of ["zensical.toml", "starter/templates/zensical.toml.tmpl"]) {
+  const renderer = readFileSync(file, "utf8");
+  if (!renderer.includes('source_citations = { register_file = "docs/sources.md" }') || !renderer.includes("footnotes = {}")) failures.push(`${file} must enable numeric source citations and explanatory footnotes`);
+}
+if (!prompt.includes("numeric superscript source citations")) failures.push("URL-only bootstrap must declare numeric superscript source citations");
 const starterGoverningQuestion = starterEntries.find((candidate) => candidate?.target === "scripts/check-governing-question-repetitions.mjs");
 if (starterGoverningQuestion?.classification !== "adapt-from-release"
   || starterGoverningQuestion?.source !== "scripts/check-governing-question-repetitions.mjs"
@@ -483,22 +520,11 @@ for (const [name, source] of [
     if (!source.includes(phrase)) failures.push(`${name} lacks development-turn completion phrase: ${phrase}`);
   }
 }
-for (const phrase of [
-  "Complete the requested scope before proposing further work",
-  "recommendations, not continuation authority",
-  "Include no more than three",
-  "failed or unrun required check",
-  "blocked_by",
-  "reopen_when",
-  "last_checked",
-  "If no item qualifies, omit the section and stop",
-]) {
-  if (!agentsHandoff?.includes(phrase)) failures.push(`completion/handoff policy lacks: ${phrase}`);
+for (const [name, source] of [["root handoff", agentsHandoff], ["starter handoff", starterHandoff], ["Standard skill", codexSkill], ["canonical prompt", prompt], ["Standard maintenance", maintenance], ["starter maintenance", starterMaintenance]]) {
+  for (const diagnostic of checkHandoffInstructions(source ?? "")) failures.push(`${name}: ${diagnostic}`);
 }
 if (/exactly three/i.test(prompt)) failures.push("prompt retains an unconditional exactly-three handoff quota");
-for (const phrase of ["completion-first", "no more than three", "If no item qualifies, omit the section"]) {
-  if (!prompt.includes(phrase)) failures.push(`prompt lacks anti-rabbit-hole handoff contract: ${phrase}`);
-}
+if (!prompt.includes("completion-first")) failures.push("prompt lacks completion-first handoff contract");
 for (const boundary of [
   "starter/starter.yaml",
   "current default-branch HEAD",
@@ -531,6 +557,8 @@ for (const phrase of ["Give this URL to an AI agent", "research topic seed", "su
 }
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+if (pkg.scripts?.["response:next-steps:check"] !== "node scripts/development-next-steps.mjs") failures.push("captured next-step format checker is missing");
+if (!pkg.scripts?.["conformance:test"]?.includes("scripts/development-next-steps.test.mjs")) failures.push("next-step fixtures are outside complete verification");
 const licence = readFileSync("LICENSE", "utf8");
 if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failures.push("LICENSE must identify MIT and copyright Andrew Dench");
 if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);
@@ -552,6 +580,11 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
+}
+if (!pkg.scripts?.["check:source-links"]?.includes("scripts/test_source_citations.py")) failures.push("source-link gate must include numeric renderer and independent built-accounting fixtures");
+if (!pkg.scripts?.["check:citations-built"]?.includes("scripts/check_rendered_source_citations.py")) failures.push("whole-built citation accounting gate is missing");
+for (const command of ["dev", "build:site"]) {
+  if (!pkg.scripts?.[command]?.includes("PYTHONPATH=scripts")) failures.push(`${command} must load the numeric citation renderer`);
 }
 if (!pkg.scripts?.["check:governing-question"]?.includes("check-governing-question-repetitions.mjs")) failures.push("missing check:governing-question command");
 if (!pkg.scripts?.check?.includes("check:governing-question")) failures.push("npm run check must include the governing-question repetition gate");
@@ -617,6 +650,9 @@ if (!pkg.scripts?.["conformance:test"]?.includes("jj-phase.test.mjs")) {
   failures.push("conformance:test does not exercise end-of-development-turn JJ commit semantics");
 }
 if (!pkg.scripts?.check?.includes("check:visual-shape")) failures.push("check does not exercise check:visual-shape");
+if (pkg.scripts?.["graph:update"] !== "npm run check:toolchain && npm run prepare:runtime && PYTHONDONTWRITEBYTECODE=1 uv run --no-sync python -I -B scripts/graphify-update.py && npm run graph:publish") failures.push("graph:update must use the qualified guarded indexing boundary");
+if (!pkg.scripts?.check?.includes("check:graphify-inputs")
+  || pkg.scripts?.["check:graphify-inputs"] !== "npm run check:toolchain && uv run --no-sync python -I -B scripts/graphify-update.py --check && uv run --no-sync python -I -B scripts/check-graphify-inputs.test.py") failures.push("check must verify graph input rejection and runtime preprocessing guards");
 if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("check does not exercise Draft 2020-12 artifact validation");
 if (!pkg.scripts?.check?.includes("check:provenance")) failures.push("check does not exercise the explicit provenance mode");
 if (!pkg.scripts?.check?.includes("audit:node") || !pkg.scripts?.check?.includes("audit:python")) failures.push("check does not exercise both locked dependency audits");
@@ -635,9 +671,14 @@ for (const file of [
   ".github/ISSUE_TEMPLATE/config.yml",
   ".github/ISSUE_TEMPLATE/standard-change.yml",
   "docs/llm-wiki/standard-proposals.md",
-  "docs/assets/pen-circle.svg",
+  "overrides/partials/nav-item.html",
   "docs/assets/service-identity.json",
   "scripts/dev-service.test.mjs",
+  "scripts/development-next-steps.mjs",
+  "scripts/development-next-steps.test.mjs",
+  "scripts/jj-phase.test.mjs",
+  "scripts/graphify-update.py",
+  "scripts/check-graphify-inputs.test.py",
   "scripts/check-governing-question-repetitions.mjs",
   "scripts/check-governing-question-repetitions.test.mjs",
   "fixtures/conforming/governing-question-repetitions/.wiki-standard.yaml",
@@ -676,14 +717,14 @@ for (const file of [
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
-for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:browser", "service:status"]) {
+for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:citations-built", "check:browser", "service:status"]) {
   if (!verifyOrchestrator.includes(`"${gate}"`)) failures.push(`verify orchestrator does not exercise ${gate}`);
 }
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
 const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
-if (!/^required-version\s*=\s*">=0\.12\.10"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.12.10; reference qualification remains exactly 0.12.10");
-for (const pin of ["zensical==0.0.59", "graphifyy==0.9.55", "pip-audit==2.10.1"])
+if (!/^required-version\s*=\s*">=0\.13\.4"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.13.4; reference qualification remains exactly 0.13.4");
+for (const pin of ["zensical==0.0.59", "graphifyy==0.9.70", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
@@ -695,7 +736,7 @@ for (const pin of [
   "astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1",
   "node-version: 24.20.0",
   "runs-on: ubuntu-24.04",
-  'version: "0.12.10"',
+  'version: "0.13.4"',
   'python-version: "3.12.14"',
   "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",
@@ -704,6 +745,7 @@ for (const pin of [
 }
 
 const schema = JSON.parse(readFileSync("schema/manifest-v1.json", "utf8"));
+if (schema.properties?.capabilities?.properties?.source_citation_style?.const !== "numeric-superscript") failures.push("manifest schema must validate the numeric-superscript capability");
 if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") failures.push("manifest schema dialect is not Draft 2020-12");
 
 for (const file of sourceFiles(["docs", "knowledge", "prompts", "starter"])) {

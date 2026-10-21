@@ -33,6 +33,12 @@ export default async (page, options = {}) => {
   const governingQuestionRepetitionRoutes = Array.isArray(options.governingQuestion?.repetitionRoutes)
     ? options.governingQuestion.repetitionRoutes.filter(entry => entry && typeof entry.route === "string")
     : [];
+  const appearance = options.appearance ?? null;
+  const lightColors = appearance?.light ?? {
+    headerBackground: "#ffffff", headerText: "#1f2933", background: "#ffffff",
+    accent: "#004d80", accentContrast: "#ffffff", surface: "#ffffff",
+  };
+  const rgb = hex => `rgb(${hex.slice(1).match(/../g).map(channel => parseInt(channel, 16)).join(", ")})`;
   const failures = [];
   const requests = [];
   const resourceRequests = [];
@@ -368,32 +374,62 @@ export default async (page, options = {}) => {
   };
   const inspectSourceLink = async (viewportName, followDestination = false) => {
     if (!sourceLinksEnabled) return null;
+    if (Array.isArray(options.citationRoutes) && options.citationRoutes.length === 0) return { routes: [], count: 0 };
     await goto(sourceLinksRoute);
-    const citation = page.locator('.md-content__inner a[href*="#src-"]').first();
-    await citation.waitFor({ state: "visible" });
-    const metrics = await citation.evaluate(element => ({
-      id: element.textContent.trim(),
-      accessibleName: element.getAttribute("aria-label") || element.textContent.trim(),
-      href: element.href,
-      tabIndex: element.tabIndex,
-      before: getComputedStyle(element, "::before").content,
-      after: getComputedStyle(element, "::after").content,
-      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    }));
-    const target = new URL(metrics.href);
-    check(/^SRC-\d{3}$/.test(metrics.id), `The representative source link must retain its stable identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.accessibleName.includes(metrics.id), `The representative source link must keep an intelligible accessible identity at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.tabIndex === 0, `The representative source link must be keyboard focusable at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.before === '"["' && metrics.after === '"]"', `The representative source link must visibly render as [${metrics.id}] at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(target.pathname === sourceRegisterRoute && target.hash === `#${metrics.id.toLowerCase()}`, `The representative source link must target its exact mapped source row at ${viewportName} width: ${JSON.stringify(metrics)}`);
-    check(metrics.pageOverflow <= 1, `Reader source links must not create page overflow at ${viewportName} width`);
-    await citation.focus();
-    check(await citation.evaluate(element => document.activeElement === element), `The representative source link must accept keyboard focus at ${viewportName} width`);
-
+    const citationRoutes = options.citationRoutes?.length ? options.citationRoutes : [{ route: sourceLinksRoute }];
+    const routeResults = [];
+    for (const entry of citationRoutes) {
+      await goto(entry.route);
+      const citations = page.locator('.md-content__inner a[href*="#src-"], .md-content__inner a[data-source-id]');
+      await citations.evaluateAll(elements => elements.forEach(element => {
+        for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+          if (parent.tagName === "DETAILS") parent.open = true;
+        }
+      }));
+      const inspection = await citations.evaluateAll(inspectSourceCitationElements);
+      const rows = inspection.rows;
+      for (const fixture of inspection.hiddenFixtures) {
+        check(fixture.pass, `Invisible citation fixture ${fixture.name} must fail visibility on ${entry.route} at ${viewportName} width: ${JSON.stringify(fixture)}`);
+      }
+      check(rows.length > 0, `Citation-bearing route ${entry.route} must retain its source links at ${viewportName} width`);
+      if (entry.count !== undefined) check(rows.length === entry.count, `Every canonical citation on ${entry.route} must render at ${viewportName} width`);
+      if (entry.identities) check(JSON.stringify(rows.map(item => item.id)) === JSON.stringify(entry.identities), `Citation identities on ${entry.route} must retain canonical order at ${viewportName} width`);
+      for (const row of rows) {
+        const target = new URL(row.href);
+        const location = `${entry.route} ${row.id} at ${viewportName} width`;
+        check(/^SRC-\d{3,}$/.test(row.id), `Citation must retain its registered identity: ${location}`);
+        check(row.accessibleName === `Source ${row.id}`, `Citation must expose its full accessible identity: ${location}`);
+        check(row.tabIndex === 0 && row.focused && row.visible, `Citation must remain visible and independently keyboard focusable: ${location}`);
+        check(row.label === row.id.slice(4) && row.superscript, `Citation must display its stable zero-padded number in superscript: ${location}`);
+        check(row.groupText === row.groupExpected, `Adjacent citations must retain comma-separated groups: ${location}`);
+        check([row.before, row.after].every(value => !value.includes("[") && !value.includes("]")), `Numeric citations must not inherit brackets: ${location}`);
+        check(target.pathname === sourceRegisterRoute && target.hash === `#${row.id.toLowerCase()}`, `Citation must reach its exact mapped row: ${location}`);
+        check(row.groupContained && row.pageOverflow <= 1, `Citations must stay contained: ${location}`);
+      }
+      routeResults.push({ route: entry.route, count: rows.length });
+    }
+    await goto(sourceLinksRoute);
+    const citation = page.locator('.md-content__inner .source-citations a').first();
+    const metrics = await citation.evaluate(element => ({ id: element.dataset.sourceId, href: element.href }));
+    metrics.routes = routeResults;
+    await page.locator(".md-skip").focus();
+    const tabLimit = await page.locator('a[href], button, input, select, textarea, [tabindex="0"]').count() + 10;
+    for (let step = 0; step < tabLimit; step += 1) {
+      await page.keyboard.press("Tab");
+      if (await citation.evaluate(element => document.activeElement === element)) break;
+    }
+    const keyboard = await citation.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { focused: document.activeElement === element, visible: element.matches(":focus-visible"), outline: style.outlineStyle, width: style.outlineWidth };
+    });
+    check(keyboard.focused && keyboard.visible && keyboard.outline !== "none" && px(keyboard.width) >= 2,
+      `Tab must reach a source citation with a visible focus ring at ${viewportName} width: ${JSON.stringify(keyboard)}`);
+    metrics.keyboard = keyboard;
+    if (options.capture) await options.capture(`citations-${viewportName}`, await page.screenshot({ fullPage: true }));
     if (!followDestination) return metrics;
     await Promise.all([
       page.waitForURL(url => url.pathname === sourceRegisterRoute && url.hash === `#${metrics.id.toLowerCase()}`),
-      citation.click(),
+      page.keyboard.press("Enter"),
     ]);
     const anchor = page.locator(`#${metrics.id.toLowerCase()}`);
     await anchor.waitFor({ state: "attached" });
@@ -406,83 +442,37 @@ export default async (page, options = {}) => {
     check(destination.pageOverflow <= 1, `The source-register destination must not overflow at ${viewportName} width`);
     return { ...metrics, destination };
   };
-  const inspectDraftNavigation = async viewportName => {
+  const inspectNavigation = async viewportName => {
     const metrics = await page.evaluate(() => {
-      const visible = element => {
-        if (!element) return false;
-        const style = getComputedStyle(element);
-        const bounds = element.getBoundingClientRect();
-        return style.display !== "none" && style.visibility !== "hidden" && bounds.width > 0 && bounds.height > 0;
-      };
       const navigation = document.querySelector(".md-nav--primary");
-      const markers = [...(navigation?.querySelectorAll("a.md-nav__link > .md-status--draft") || [])]
-        .filter(visible);
-      const chevrons = [...(navigation?.querySelectorAll(".md-nav__item--nested > label.md-nav__link > .md-nav__icon") || [])]
-        .filter(visible);
-      const marker = markers[0] || null;
-      const chevron = chevrons[0] || null;
-      const markerBounds = marker?.getBoundingClientRect() || null;
-      const chevronBounds = chevron?.getBoundingClientRect() || null;
-      const markerRowBounds = marker?.parentElement?.getBoundingClientRect() || null;
-      const chevronRowBounds = chevron?.parentElement?.getBoundingClientRect() || null;
-      const negative = document.createElement("span");
-      negative.className = "md-status md-status--stable";
-      negative.style.cssText = "position:absolute;left:-10000px;top:0";
-      document.body.append(negative);
-      try {
-        const markerPseudo = marker ? getComputedStyle(marker, "::after") : null;
-        const negativePseudo = getComputedStyle(negative, "::after");
-        return {
-          count: markers.length,
-          titles: [...new Set(markers.map(item => item.getAttribute("title") || ""))],
-          markerMask: markerPseudo?.maskImage || markerPseudo?.webkitMaskImage || "",
-          negativeMask: negativePseudo.maskImage || negativePseudo.webkitMaskImage || "",
-          markerWidth: markerBounds?.width ?? null,
-          markerHeight: markerBounds?.height ?? null,
-          chevronWidth: chevronBounds?.width ?? null,
-          chevronHeight: chevronBounds?.height ?? null,
-          markerCenter: markerBounds ? markerBounds.left + markerBounds.width / 2 : null,
-          chevronCenter: chevronBounds ? chevronBounds.left + chevronBounds.width / 2 : null,
-          markerRowDelta: markerBounds && markerRowBounds
-            ? markerBounds.top + markerBounds.height / 2 - (markerRowBounds.top + markerRowBounds.height / 2)
-            : null,
-          chevronRowDelta: chevronBounds && chevronRowBounds
-            ? chevronBounds.top + chevronBounds.height / 2 - (chevronRowBounds.top + chevronRowBounds.height / 2)
-            : null,
-          pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-        };
-      } finally {
-        negative.remove();
-      }
+      const links = [...(navigation?.querySelectorAll("a.md-nav__link") || [])];
+      const controls = [...(navigation?.querySelectorAll(".md-nav__item--nested > label.md-nav__link") || [])];
+      return {
+        statusCount: navigation?.querySelectorAll(".md-status").length ?? null,
+        accessibleName: navigation?.getAttribute("aria-label") || "",
+        linkCount: links.length,
+        unnamedLinks: links.filter(link => !(link.getAttribute("aria-label") || link.textContent).trim()).length,
+        nonFocusableLinks: links.filter(link => link.tabIndex !== 0).length,
+        controlCount: controls.length,
+        invalidControls: controls.filter(control => {
+          const toggle = document.getElementById(control.htmlFor);
+          const nested = control.parentElement.querySelector("nav[aria-labelledby]");
+          return !control.textContent.trim() || !control.querySelector(".md-nav__icon") ||
+            !toggle || toggle.type !== "checkbox" || !nested || nested.getAttribute("aria-labelledby") !== control.id;
+        }).length,
+        heading: document.querySelector(".md-content h1")?.textContent.trim() || "",
+        title: document.title,
+        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
     });
-    check(metrics.count > 0, `Primary navigation must expose at least one draft marker at ${viewportName} width`);
-    check(
-      metrics.titles.length === 1 && metrics.titles[0] === "Draft — research in progress",
-      `Every draft marker must expose the governed readable status text at ${viewportName} width`,
-    );
-    check(metrics.markerMask.includes("pen-circle.svg"), `Draft markers must use the registered Pen Circle asset at ${viewportName} width`);
-    check(!metrics.negativeMask.includes("pen-circle.svg"), `Non-draft status must not inherit the Pen Circle asset at ${viewportName} width`);
-    check(
-      metrics.markerWidth !== null && metrics.markerHeight !== null &&
-        metrics.chevronWidth !== null && metrics.chevronHeight !== null &&
-        metrics.markerWidth > 0 && metrics.markerHeight > 0 &&
-        closeTo(metrics.markerWidth, metrics.chevronWidth, 0.2) &&
-        closeTo(metrics.markerHeight, metrics.chevronHeight, 0.2),
-      `Draft marker dimensions must match the stock chevron at ${viewportName} width`,
-    );
-    check(
-      metrics.markerCenter !== null && metrics.chevronCenter !== null && closeTo(metrics.markerCenter, metrics.chevronCenter, 0.2),
-      `Draft marker and nested-navigation chevron must share the trailing centreline at ${viewportName} width`,
-    );
-    check(
-      metrics.markerRowDelta !== null && closeTo(metrics.markerRowDelta, 0, 0.5),
-      `Draft marker must be vertically centred in its navigation row at ${viewportName} width`,
-    );
-    check(
-      metrics.chevronRowDelta !== null && closeTo(metrics.chevronRowDelta, 0, 0.5),
-      `Nested-navigation chevron must be vertically centred in its navigation row at ${viewportName} width`,
-    );
-    check(metrics.pageOverflow <= 1, `Draft navigation markers must not create page overflow at ${viewportName} width`);
+    check(metrics.statusCount === 0, `Reference navigation must omit lifecycle status icons, tooltips and fallback information icons at ${viewportName} width`);
+    check(Boolean(metrics.accessibleName), `Primary navigation must keep its accessible name at ${viewportName} width`);
+    check(metrics.linkCount > 0 && metrics.unnamedLinks === 0 && metrics.nonFocusableLinks === 0,
+      `Navigation links must retain page names and keyboard focus at ${viewportName} width`);
+    check(metrics.controlCount > 0 && metrics.invalidControls === 0,
+      `Native section labels, chevrons and toggle associations must remain intact at ${viewportName} width`);
+    check(Boolean(metrics.heading) && Boolean(metrics.title), `Page and document titles must remain present at ${viewportName} width`);
+    check(metrics.pageOverflow <= 1, `Navigation must not create page overflow at ${viewportName} width`);
     return metrics;
   };
   const screenshotPixels = async buffer => {
@@ -792,8 +782,12 @@ export default async (page, options = {}) => {
 
   await page.evaluate(() => localStorage.removeItem("denchco-kb-wiki-layout-width"));
   await page.setViewportSize({ width: 1256, height: 718 });
-  const initialScheme = await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
+  const initialScheme = appearance
+    ? (appearance.config.appearance === "dark" ? "slate" : "default")
+    : await page.locator(`${paletteSelector} input`).first().getAttribute("data-md-color-scheme");
   check(await page.locator("body").getAttribute("data-md-color-scheme") === initialScheme, "A fresh browser must start in the configured initial appearance");
+  const initialWidth = await page.locator("html").getAttribute("data-layout-width");
+  check(initialWidth === (appearance?.config.width ?? "wide"), "A fresh browser must start in Wide unless an explicit configured width overrides it");
   await inspectPaletteKeyboard(initialScheme, "desktop", "first load");
   await selectNativeScheme("default");
   const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
@@ -812,17 +806,27 @@ export default async (page, options = {}) => {
     desktopGoverningQuestion,
   );
   await goto(questionRoute);
-  const desktopDraftNavigation = await inspectDraftNavigation("desktop");
+  const desktopNavigation = await inspectNavigation("desktop");
   const desktopBootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
     header: Boolean(document.querySelector(".md-header__inner")),
     layoutScript: [...document.scripts].some(script => script.src.includes("/assets/layout-width.js")),
     layoutStylesheet: [...document.styleSheets].some(sheet => sheet.href?.includes("/assets/layout-width.css")),
+    logo: (() => {
+      const image = document.querySelector(".md-header__button.md-logo img");
+      return image ? { src: image.currentSrc || image.src, width: image.naturalWidth, height: image.naturalHeight } : null;
+    })(),
+    favicon: document.querySelector('link[rel="icon"]')?.href || "",
     href: location.href,
   }));
   if (!desktopBootstrap.control) {
     throw new Error(`Desktop runtime did not initialize: ${JSON.stringify(desktopBootstrap)}`);
   }
+  check(desktopBootstrap.logo?.src.endsWith("/assets/brand/denchco-wordmark.png")
+    && desktopBootstrap.logo.width === 1032 && desktopBootstrap.logo.height === 350,
+  "The Standard header must load its governed DenchCo wordmark");
+  check(desktopBootstrap.favicon.endsWith("/assets/brand/denchco-wordmark.png"),
+    "The Standard favicon must use its governed DenchCo wordmark");
   await page.waitForSelector(".layout-width-toggle", { state: "attached" });
   const widthControlDisplay = await page.locator(".layout-width-toggle").evaluate(
     element => getComputedStyle(element).display,
@@ -841,6 +845,7 @@ export default async (page, options = {}) => {
     const header = document.querySelector(".md-header");
     const search = document.querySelector(".md-search__button");
     return {
+      pageBackground: getComputedStyle(document.body).backgroundColor,
       mode: document.documentElement.dataset.layoutWidth,
       topic: rect(visibleTopic),
       content: rect(content),
@@ -849,6 +854,7 @@ export default async (page, options = {}) => {
       controlText: control?.textContent.trim() || "",
       controlPressed: control?.getAttribute("aria-pressed"),
       controlBackground: control ? getComputedStyle(control).backgroundColor : "",
+      controlBoxShadow: control ? getComputedStyle(control).boxShadow : "",
       headerBackground: header ? getComputedStyle(header).backgroundColor : "",
       headerColour: header ? getComputedStyle(header).color : "",
       searchBackground: search ? getComputedStyle(search).backgroundColor : "",
@@ -856,14 +862,20 @@ export default async (page, options = {}) => {
     };
   });
 
+  // Geometry is measured in both modes regardless of the consumer's initial choice.
+  if (await page.locator("html").getAttribute("data-layout-width") === "wide") {
+    await page.locator(".layout-width-toggle").click();
+    await page.waitForFunction(() => document.documentElement.dataset.layoutWidth === "standard");
+  }
   const standardHeader = await measureHeader();
-  check(standardHeader.mode === "standard", "Standard width must be the initial desktop mode");
+  check(standardHeader.mode === "standard", "Standard width must be active for its geometry measurement");
   check(standardHeader.controlPressed === "false", "Standard width control must expose aria-pressed=false");
   check(standardHeader.controlText === "Wide", "The desktop width control must have the visible label Wide");
-  check(standardHeader.headerBackground === "rgb(255, 255, 255)", "The production header must render white");
-  check(standardHeader.headerColour === "rgb(31, 41, 51)", "The production header must render DenchCo dark content");
-  check(standardHeader.searchBackground === "rgba(0, 0, 0, 0.05)", "The closed Search control must render neutral grey");
-  check(standardHeader.searchColour === "rgb(31, 41, 51)", "The closed Search control must render DenchCo dark content");
+  check(standardHeader.pageBackground === rgb(lightColors.background), "The light page must render its governed background");
+  check(standardHeader.headerBackground === rgb(lightColors.headerBackground), "The production header must render its configured light surface");
+  check(standardHeader.headerColour === rgb(lightColors.headerText), "The production header must render its configured readable text");
+  check(standardHeader.searchBackground === (appearance ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.05)"), "The closed Search control must use its configured surface");
+  check(standardHeader.searchColour === rgb(lightColors.headerText), "The closed Search control must render its configured readable text");
   check(
     standardHeader.topic && standardHeader.heading && closeTo(standardHeader.topic.left, standardHeader.heading.left),
     "The visible desktop title must align to the body-text left rail in Standard mode",
@@ -934,7 +946,7 @@ export default async (page, options = {}) => {
     "Wide mode must increase the central content width",
   );
   check(
-    wideHeader.controlBackground !== standardHeader.controlBackground,
+    wideHeader.controlBackground !== standardHeader.controlBackground || wideHeader.controlBoxShadow !== standardHeader.controlBoxShadow,
     "Wide selection must have a visible selected-state treatment",
   );
 
@@ -1042,12 +1054,12 @@ export default async (page, options = {}) => {
   check(mermaidProbe.edgeStrokeWidth === "1.75px", "Mermaid edges must render at 1.75px");
   check(mermaidProbe.emphasisStrokeWidth === "3px", "Emphasized Mermaid relationships must render at 3px");
   check(
-    mermaidProbe.edgeLabelFill === "rgb(246, 248, 249)" && mermaidProbe.edgeLabelFillOpacity === "1",
+    mermaidProbe.edgeLabelFill === rgb(lightColors.background) && mermaidProbe.edgeLabelFillOpacity === "1",
     "Mermaid edge labels must fully mask connecting lines with the governed diagram background",
   );
-  check(mermaidProbe.canonicalFill === "rgb(11, 114, 133)", "Canonical Mermaid nodes must use the active solid accent");
-  check(mermaidProbe.canonicalTextFill === "rgb(255, 255, 255)", "Canonical Mermaid labels must use accent-contrast text");
-  check(mermaidProbe.derivedFill === "rgb(255, 255, 255)", "Derived Mermaid nodes must use the surface fill");
+  check(mermaidProbe.canonicalFill === rgb(lightColors.accent), "Canonical Mermaid nodes must use the active solid accent");
+  check(mermaidProbe.canonicalTextFill === rgb(lightColors.accentContrast), "Canonical Mermaid labels must use accent-contrast text");
+  check(mermaidProbe.derivedFill === rgb(lightColors.surface), "Derived Mermaid nodes must use the surface fill");
   check(mermaidProbe.derivedDash.includes("4px") && mermaidProbe.derivedDash.includes("3px"), "Derived Mermaid nodes must use a dashed boundary");
   check(mermaidProbe.defaultNodeFills.length === 2, "Mermaid runtime probe must render two ordinary default nodes");
   check(new Set(mermaidProbe.defaultNodeFills).size === 1, "Ordinary Mermaid nodes must share one default fill");
@@ -1110,6 +1122,7 @@ export default async (page, options = {}) => {
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
+  const mobileNavigation = await inspectNavigation("mobile");
   const mobileGoverningQuestion = await inspectGoverningQuestion(
     "mobile",
     questionRoute,
@@ -1343,7 +1356,7 @@ export default async (page, options = {}) => {
 
   const prohibitedCdnHosts = ["unpkg.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"];
   const cdnRequests = requests.filter(requestUrl => prohibitedCdnHosts.some(host => requestUrl.includes(`//${host}/`)));
-  const localAssets = ["/assets/vendor/mermaid.min.js", "/assets/pen-circle.svg"];
+  const localAssets = ["/assets/vendor/mermaid.min.js"];
   if (graphEnabled) localAssets.push("/assets/vendor/vis-network.min.js", "/assets/vendor/3d-force-graph.min.js");
   for (const asset of localAssets) {
     check(requests.some(requestUrl => requestUrl.startsWith(baseUrl) && requestUrl.split(/[?#]/)[0].endsWith(asset)), `Browser contract did not observe local runtime ${asset}`);
@@ -1387,8 +1400,9 @@ export default async (page, options = {}) => {
         mobile: mobileGoverningQuestionRepetitions,
       },
     },
-    draftNavigation: {
-      desktop: desktopDraftNavigation,
+    navigation: {
+      desktop: desktopNavigation,
+      mobile: mobileNavigation,
     },
     sourceLinks: {
       desktop: desktopSourceLink,
@@ -1413,3 +1427,58 @@ export default async (page, options = {}) => {
     requestCount: requests.length,
   };
 }
+
+// Kept self-contained so the same DOM inspection supports focused browser checks.
+export const inspectSourceCitationElements = elements => {
+  const visible = element => element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
+    && !/rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(getComputedStyle(element).color);
+  const links = elements.filter(element => !element.querySelector("code, pre") && (
+    element.dataset.sourceId || /^(?:SRC-)?\d{3,}(?:: .+)?$/.test(element.textContent.trim())
+  ));
+  const probe = links[0];
+  const hiddenFixtures = [];
+  if (probe) {
+    const originalStyle = probe.getAttribute("style");
+    const originalParentStyle = probe.parentElement.getAttribute("style");
+    const inspectHidden = (name, element, property, value) => {
+      const saved = element.getAttribute("style");
+      // Probe the completed hidden state, not a theme transition frame.
+      element.setAttribute("style", `${saved ?? ""}; transition: none !important; ${property}: ${value} !important`);
+      const style = getComputedStyle(probe);
+      hiddenFixtures.push({ name, pass: !visible(probe), color: style.color,
+        opacity: style.opacity, parentOpacity: getComputedStyle(probe.parentElement).opacity,
+        visibility: style.visibility });
+      element.setAttribute("style", `${saved ?? ""}; transition: none !important`);
+      // Resolve the restored value before re-enabling native transitions.
+      getComputedStyle(element).getPropertyValue(property);
+      if (saved === null) element.removeAttribute("style"); else element.setAttribute("style", saved);
+    };
+    inspectHidden("citation opacity: 0", probe, "opacity", "0");
+    inspectHidden("citation visibility: hidden", probe, "visibility", "hidden");
+    inspectHidden("citation color: transparent", probe, "color", "transparent");
+    inspectHidden("parent opacity: 0", probe.parentElement, "opacity", "0");
+    if (originalStyle === null) probe.removeAttribute("style"); else probe.setAttribute("style", originalStyle);
+    if (originalParentStyle === null) probe.parentElement.removeAttribute("style"); else probe.parentElement.setAttribute("style", originalParentStyle);
+  }
+  return { hiddenFixtures, rows: links.map(element => {
+    element.focus();
+    const group = element.parentElement;
+    const box = group.getBoundingClientRect();
+    return {
+      id: element.dataset.sourceId || "",
+      label: element.textContent.trim(),
+      accessibleName: element.getAttribute("aria-label"),
+      href: element.href,
+      tabIndex: element.tabIndex,
+      focused: document.activeElement === element,
+      visible: visible(element),
+      before: getComputedStyle(element, "::before").content,
+      after: getComputedStyle(element, "::after").content,
+      superscript: group.tagName === "SUP" && getComputedStyle(group).verticalAlign === "super",
+      groupText: group.textContent.trim(),
+      groupExpected: [...group.querySelectorAll("a")].map(link => link.dataset.sourceId?.slice(4)).join(", "),
+      groupContained: box.width <= document.documentElement.clientWidth,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  }) };
+};

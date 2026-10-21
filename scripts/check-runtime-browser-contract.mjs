@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { chromium } from "@playwright/test";
 import runContract from "./runtime-browser-contract.playwright.js";
 import { resolveRuntimeBrowserConfiguration } from "./runtime-browser-contract-config.mjs";
@@ -29,7 +29,22 @@ try {
   console.error(`Runtime browser contract configuration failed: ${error.message}`);
   process.exit(1);
 }
-const { routes, sources, graph, sourceLinks, governingQuestion } = contractConfiguration;
+const { routes, sources, graph, sourceLinks, governingQuestion, appearance } = contractConfiguration;
+let citationAudit = { routes: [], citations: 0 };
+if (sourceLinks.required) {
+  fs.rmSync(path.join(root, "output/verification/citations.json"), { force: true });
+  try {
+    citationAudit = JSON.parse(execFileSync("uv", ["run", "--no-sync", "python", "scripts/check_rendered_source_citations.py", "--json", "--output", "output/verification/citations.json"], {
+      cwd: root,
+      env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" },
+      encoding: "utf8",
+    }));
+    if (!citationAudit.ok) throw new Error(citationAudit.errors.join("\n"));
+  } catch (error) {
+    console.error(`Built source citation accounting failed: ${error.stdout?.toString() || error.message}`);
+    process.exit(1);
+  }
+}
 
 const server = spawn(process.execPath, [serverProgram], {
   cwd: root,
@@ -69,6 +84,13 @@ try {
     throw new Error(`Runtime width control did not initialize: ${JSON.stringify(bootstrap)}`);
   }
   const result = await runContract(page, {
+    appearance,
+    citationRoutes: citationAudit.routes,
+    capture: async (name, bytes) => {
+      const directory = path.join(root, "output", "verification", "runtime");
+      fs.mkdirSync(directory, { recursive: true });
+      fs.writeFileSync(path.join(directory, `${name}.png`), bytes);
+    },
     governingQuestion: {
       applicable: governingQuestion.applicable,
       canonicalQuestion: governingQuestion.canonicalQuestion,
@@ -87,7 +109,7 @@ try {
     `${result.governingQuestion.repetitionRouteCount} governing-question repetition route${result.governingQuestion.repetitionRouteCount === 1 ? "" : "s"}, ` +
     `Mermaid ${result.typography.mermaid} = table ${result.typography.table}, ` +
     `${result.tables.mobile.length} mobile table scroll contract${result.tables.mobile.length === 1 ? "" : "s"}, ` +
-    `search "${result.search.query}" reached ${result.search.resultRoute}, pinned local runtimes only${graphSummary}.`,
+    `search "${result.search.query}" reached ${result.search.resultRoute}, ${citationAudit.citations} numeric citations across ${citationAudit.routes.length} routes, pinned local runtimes only${graphSummary}.`,
   );
 } catch (error) {
   failure = error;

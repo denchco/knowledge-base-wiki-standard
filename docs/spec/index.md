@@ -29,6 +29,7 @@ It incorporates five distinct foundations and governed choices. Each item links 
 ## Core principles
 
 - Canonical knowledge MUST remain readable without a renderer or MCP server.
+- Every development cycle MUST assess the continuing subject and report up to three grounded, prioritised content next steps, or an explicit no-update outcome, under `DKBWS-PROMPT-001`.
 - New Wiki setups MUST carry the [ASD-STE100-inspired 80% writing policy](writing-style.md) for future original English prose. Preserve meaning and exact source forms; the percentage is a house-style preference, not a compliance score.
 - Unknown OKF extension fields MUST survive round trips.
 - Evidence authority MUST be explicit.
@@ -43,8 +44,10 @@ It incorporates five distinct foundations and governed choices. Each item links 
 - Conformance inspection and validation MUST be read-only and emit stable machine diagnostics.
 - Consumer-to-Standard improvements MUST use tracked, machine-validated proposal records whose explicit decision, immutable-release inclusion, and later consumer adoption states cannot be inferred from GitHub issue state.
 - Development responses MUST route user-facing Human or LLM Wiki navigation through the verified live canonical Wiki origin rather than local or repository file links.
-- A displayed registered source identity in a Human Wiki MUST navigate to its exact internal source-register row.
+- A registered source citation in a current Human profile MUST render as a stable numeric superscript with its full accessible identity and exact internal source-register row target.
+- The Standard Production reference adapter MUST use Wide for fresh desktop readers unless an explicit local configuration selects another initial width. Saved reader choices take precedence.
 - A declared canonical governing question MUST be mapped once and rendered consistently at every verbatim reader-facing repetition in its bounded reader set.
+- Every applicable proof obligation MUST pass before a compound requirement passes. Missing browser evidence cannot be replaced by a passing source or build gate.
 - Every inherited requirement in a selected profile MUST be explicitly accounted for; conditional inapplicability is evidence, not silent omission.
 - Standard Production maintenance MUST close every file-changing development turn with a disclosed Jujutsu commit after verification and state inspection.
 
