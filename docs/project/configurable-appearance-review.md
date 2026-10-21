@@ -7,7 +7,7 @@ status: draft
 
 # Configurable appearance contribution review
 
-The reusable mechanism is reviewed and integrated locally for a verified technical handoff. Governed issue [#33](https://github.com/denchco/knowledge-base-wiki-standard/issues/33) is accepted as reusable under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) publishes that decision and its registry entry. The authoritative consumer record remains `standard-proposals/configurable-appearance-family.json` in Thirlwall; this review does not duplicate or replace it.
+The reusable mechanism is reviewed, integrated and included in immutable rc.6. Governed issue [#33](https://github.com/denchco/knowledge-base-wiki-standard/issues/33) is accepted as reusable under decision `b0b5e8021a5a93feb767e486699ec7c524955da6`. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) publishes that decision and its registry entry. The authoritative consumer record remains `standard-proposals/configurable-appearance-family.json` in Thirlwall; this review does not duplicate or replace it.
 
 ## Recorded origin
 
@@ -44,7 +44,7 @@ The saved candidate evidence was checked against the exact candidate, not assume
 
 The initial integration passed complete maintainer verification before the review repairs. That result did not expose the adoption defect. After repair, 26 focused unit and configuration tests passed, along with 13 real-renderer appearance cases. A fresh full-content pale-green/dark/wide build passed the complete browser contract, including source links, Mermaid, search, mobile containment and both graph views. Desktop and mobile fixture screenshots were inspected.
 
-The final handoff runs complete `npm run verify:workspace` on the repaired Standard tree, plus the read-only maintainer provenance check. Its JJ commit description records the final outcomes and local evidence digests. The current receipt and conformance report are generated under `output/verification/`; they are verification evidence, not canonical knowledge. The released Documentation snapshot still matches rc.5; no snapshot update or pin change is part of this contribution.
+The final handoff runs complete `npm run verify:workspace` on the repaired Standard tree, plus the read-only maintainer provenance check. Its JJ commit description records the final outcomes and local evidence digests. The current receipt and conformance report are generated under `output/verification/`; they are verification evidence, not canonical knowledge. At that technical handoff, the released Documentation snapshot still matched rc.5. Its later authorised rc.6 migration, protected deployment and public reader verification are now complete at Documentation revision `4df1493c737b355b25c7846f40bb13b997f100c3`; this contribution does not authorise other consumer pin changes.
 
 The actual Standard service is checked through `service:status` and the fail-closed `service:preview` handoff. Its exact contract passes with the existing pinned Standard toolchain. The earlier shell mismatch was resolved by using that toolchain; no service identity or registered endpoint was changed.
 
@@ -55,14 +55,14 @@ Read-only checks on 7 October 2026 confirmed a valid consumer record, matching p
 - Prepared payload SHA-256: `a2df6614797be42909b60d9756c344a76368ee4d350915e2064bc94116d8f117`.
 - Governed form SHA-256: `3624749c2915771b98dabb7ec93f7ae34618da7b914bd28d20a557abd86f4adf`.
 
-The owner approved the exact payload and delegated its final governed-form submission. Issue #33 matches the approved payload digest, and the published form matches the governed form digest. Its issue-linkage and accepted-decision records use separate consumer JJ commits. The Standard registry records reusable acceptance under `b0b5e8021a5a93feb767e486699ec7c524955da6`; release inclusion remains pending and adoption remains not considered.
+The owner approved the exact payload and delegated its final governed-form submission. Issue #33 matches the approved payload digest, and the published form matches the governed form digest. Its issue-linkage and accepted-decision records use separate consumer JJ commits. The Standard registry retains reusable acceptance under `b0b5e8021a5a93feb767e486699ec7c524955da6` and now records rc.6 inclusion. The originating record remains unchanged at release pending and adoption not considered.
 
-The completed [tracked proposal workflow](../llm-wiki/standard-proposals.md) preserves the exact preparation-time payload. Current read-only reconciliation compares the consumer record with the published acceptance registry. The original implementation, pin and review evidence remain unchanged.
+The completed [tracked proposal workflow](../llm-wiki/standard-proposals.md) preserves the exact preparation-time payload. The completed acceptance-phase reconciliation compared the consumer record with the then-published acceptance registry; it does not establish reconciliation against the later release ledger. The original implementation, pin and review evidence remain unchanged.
 
-Immutable release inclusion and any Thirlwall pin change require later, separate decisions. Technical integration does not authorise publication, release or consumer adoption.
+Immutable rc.6 inclusion is recorded in the later Standard registry. Thirlwall release reconciliation and any pin or adoption change remain separate governed transitions; Standard publication does not authorise them.
 
 | Parked transition | `blocked_by` | `reopen_when` | `last_checked` |
 |---|---|---|---|
-| Thirlwall adoption | No new immutable release or consumer adoption authority | The owner selects an exact released revision and authorises verified migration | 2026-10-20 |
+| Thirlwall adoption | No consumer adoption authority | The owner selects an exact released revision and authorises verified migration | 2026-10-21 |
 
 See [project status](status.md) for the current bounded priority.
