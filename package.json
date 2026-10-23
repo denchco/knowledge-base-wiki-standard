@@ -85,7 +85,7 @@
     "dompurify": "3.4.17",
     "esbuild": "0.28.2",
     "katex": "0.18.2",
-    "mermaid": "11.17.2",
+    "mermaid": "12.2.0",
     "vis-network": "10.1.2",
     "yaml": "2.9.0"
   },
