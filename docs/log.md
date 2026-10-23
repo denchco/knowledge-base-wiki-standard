@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-10-23
+
+- **Authorised sanitizer qualification:** Select exact DOMPurify `3.4.17` for the main Standard Wiki, retaining Mermaid `11.17.2`, KaTeX `0.18.2` and the reference toolchain. The frozen npm lock changes only the direct root pin and DOMPurify package entry. `npm ci` passes and the fresh npm audit reports zero findings on 23 October. Register the exact upstream release commit and the three advisories observed against `3.4.16`. [SRC-073](sources.md#src-073), [SRC-074](sources.md#src-074), [SRC-075](sources.md#src-075), [SRC-076](sources.md#src-076)
+- **Implementation and behaviour evidence:** Update embedded sanitizer guards, package/lock checks and negative source, bundle and lock fixtures together. All 11 focused runtime tests pass. Inert Chromium probes reproduce four affected behaviours on `3.4.16` and confirm their removal on `3.4.17`; ordinary SVG and unaffected controls pass on both. The current strict Mermaid call sites do not select the advisory modes. This inspection does not establish Wiki exploitability.
+- **Qualification boundary:** Reinstall the frozen npm lock, regenerate the graph and runtime assets, and run complete maintainer verification with read-only provenance. The generated receipt binds the final canonical inputs and all required gates. Historical release evidence remains historical; this local qualification does not publish a release, update Documentation or change other consumer pins.
+
 ## 2026-10-21
 
 - **Immutable math dependency release:** Publish `v0.1.0-rc.7` at `5de406bfee155993308cd789dc4eacae7e49f5de` after protected PR #40 and successful exact-revision post-merge Verify `39589261838`. Read back release `419462084` as non-draft and immutable, published at `2026-10-21T11:12:48Z`; inspected public assets match their reviewed names, sizes and hashes. Complete verification and the scoped KaTeX `0.18.2` qualification clear both remaining npm findings while retaining Mermaid `11.17.2`. Earlier releases and the proposal registry remain unchanged. [SRC-071](sources.md#src-071)

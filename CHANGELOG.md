@@ -2,6 +2,12 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
+## 2026-10-23 — local sanitizer qualification
+
+- Pin DOMPurify `3.4.17` for the Standard Production Mermaid runtime under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. Retain Mermaid `11.17.2`, KaTeX `0.18.2` and the other qualified renderer/toolchain versions.
+- Update embedded implementation guards and negative source, bundle and lock fixtures under `DKBWS-VERIFY-001`. Qualify the advisory fixes with inert differential Chromium probes, ordinary SVG controls, frozen installation, both dependency audits and the complete maintainer contract. The probes do not establish Wiki exploitability.
+- Migration: carry the direct pin, frozen lock, runtime builder, entry guard and tests together; run `npm ci`, regenerate runtime/graph assets and run complete selected-profile verification. Register fresh evidence and preserve dated release records. This local qualification does not change published releases or consumer pins.
+
 ## v0.1.0-rc.7 — 2026-10-21
 
 - Pin KaTeX `0.18.2` as an explicit compatibility exception for retained Mermaid `11.17.2` under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. A scoped override replaces the affected transitive `^0.16.47` dependency without selecting Mermaid 12's layout and browser changes. Keep DOMPurify `3.4.16` and the existing renderer/toolchain pins.
