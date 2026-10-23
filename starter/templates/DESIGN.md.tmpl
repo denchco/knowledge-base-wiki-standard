@@ -21,6 +21,8 @@ components:
 
 # Design Contract
 
+The reference theme, Wide and Search controls share a `1.6rem` height (32px at the renderer's default scale). Keep theme and mobile Search controls square, with `.3rem` padding around their native icons. Carry the shared sizing rules in `docs/assets/layout-width.css` and verify both themes at desktop and mobile widths.
+
 Use the pinned DenchCo visual adapter as the baseline, then record only deliberate target-specific token and interaction decisions here. Navigation and synthesis must follow the target's audience and governing question.
 
 Record how the confirmed accent generated its light, dark, visited, transparent, and contrast tokens. Verify at least 4.5:1 contrast for normal accent-coloured text and 3:1 for non-text interactive boundaries against their rendered backgrounds.

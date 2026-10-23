@@ -2,6 +2,12 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
+## Unreleased
+
+- Proposed reference-adapter correction under `DKBWS-DESIGN-001`: align the native theme button, Wide control and Search control at `1.6rem` (32px by default). Keep the theme and mobile Search buttons square and retain their native icons, focus and saved preferences. This originates in the Framer Knowledge Base's verified control-size correction.
+- Verification under `DKBWS-VERIFY-001`: real-renderer fixtures check equal heights, square icon controls and unclipped icons across configured and unconfigured appearances, desktop/mobile layouts, and preference restoration.
+- Migration: carry `docs/assets/layout-width.css` with the browser fixtures and design guidance, then run the complete selected-profile verification. No new dependency, colour treatment, storage key or source-content change is required. Existing consumer pins and adoption states remain unchanged.
+
 ## v0.1.0-rc.8 — 2026-10-23
 
 - Pin DOMPurify `3.4.17` for the Standard Production Mermaid runtime under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. Retain Mermaid `11.17.2`, KaTeX `0.18.2` and the other qualified renderer/toolchain versions.

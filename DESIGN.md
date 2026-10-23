@@ -67,6 +67,8 @@ shape:
   componentBorderWidth: "1px"
   technicalFrameBorderWidth: "1.75px"
   headerTitleContentRailOffset: "8.162rem"
+  headerControlSize: "1.6rem"
+  headerIconControlPadding: ".3rem"
   sourceRowRailWidth: ".25rem"
   accentRailWidth: ".3rem"
   layoutWidthControlContentRailOffset: "2rem"
@@ -225,6 +227,8 @@ A consumer using the manual adapter may replace the complete accent family in th
 Fresh desktop readers receive Wide layout. An explicit appearance configuration may select Standard initially; saved Standard or Wide choices take precedence. Missing, invalid or unavailable storage falls back to the configured width, or Wide without configuration. Mobile layouts remain contained and retain the saved desktop choice.
 
 The reference adapter offers native Zensical light (`default`) and dark (`slate`) palettes. Light remains the initial Standard appearance; a consumer may choose another initial palette and records that choice here. The native sun/moon control sits immediately before Wide, names the action it performs, retains keyboard focus and remains visible on mobile when Wide is hidden. Zensical owns the saved preference and its navigation/reload behaviour; do not add a competing storage key or appearance controller.
+
+The theme, Wide and Search controls share `headerControlSize`: `1.6rem` (32px at the renderer's default scale). The theme and mobile Search controls stay square. `headerIconControlPadding` is `.3rem`, retaining the native 20px icons without clipping. Browser fixtures check equal heights and square icons in both themes, before and after preference restoration, at desktop and mobile widths. This is a reference-adapter correction under `DKBWS-DESIGN-001`; consumer colour and surface treatments remain independent.
 
 For Zensical 0.0.59, reflect the resolved native body scheme into the corresponding radio's checked state on initialisation and scheme changes. This repairs keyboard entry after preference restoration without dispatching events, moving focus or writing preference storage. Verify the selected radio and visible focus before the first toggle interaction, including after reload and navigation in both appearances.
 
