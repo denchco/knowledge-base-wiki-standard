@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions, the rc.7 dependency follow-up and exact migration checks. Standard publication, Documentation migration and public reader verification are complete for the recorded revisions. Other consumer records, pins and adoption states remain unchanged.
+The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions, the rc.7 math dependency follow-up and the rc.8 sanitizer release. Documentation migration and public reader verification remain complete for its recorded rc.7 revision. The rc.8 publication leaves Documentation and other consumer records, pins and adoption states unchanged.
 
 ## Completed through `v0.1.0-rc.5`
 
@@ -44,6 +44,10 @@ Protected PR #38 and exact-revision post-merge Verify published the reader defau
 ## Completed in `v0.1.0-rc.7`
 
 Protected PR #40 and successful exact-revision post-merge Verify published the scoped KaTeX `0.18.2` compatibility exception for retained Mermaid `11.17.2`. Immutable rc.7 resolves to `5de406bfee155993308cd789dc4eacae7e49f5de`; complete verification and the zero-finding npm audit passed. Documentation adopted that exact release at `701b21a557636af6038566a7db7bff68764ff17a` and passed protected deployment and public reader/math checks. [STD-VAL-012](validation-queue.md) is resolved. Other consumer pins and proposal records remain unchanged. [SRC-071](sources.md#src-071), [SRC-072](sources.md#src-072)
+
+## Completed in `v0.1.0-rc.8`
+
+Protected PR #42 and successful exact-revision post-merge Verify `39932360257` published the qualified DOMPurify `3.4.17` patch. Immutable rc.8 resolves to `e4814a0715481edbba56189e34e93a3d76d88421`; its five public assets match the reviewed package and its lock audit reports zero findings at preparation. The release retains Mermaid `11.17.2`, KaTeX `0.18.2` and the existing reader contract. [STD-VAL-013](validation-queue.md) is resolved. Documentation remains pinned to rc.7; other consumer pins and the proposal registry remain unchanged. [SRC-077](sources.md#src-077)
 
 No further grounded content update is available.
 
