@@ -143,6 +143,25 @@ async function ready(page, scheme, width) {
   await page.waitForSelector(".layout-width-toggle", { state: "attached" });
   await page.waitForFunction(({ scheme, width }) => document.body.dataset.mdColorScheme === scheme && document.documentElement.dataset.layoutWidth === width, { scheme, width });
   assert.equal(await page.locator(`${paletteSelector} input:checked`).getAttribute("data-md-color-scheme"), scheme, "Native palette radio must reflect the resolved appearance");
+  await assertHeaderControlSizes(page);
+}
+
+async function assertHeaderControlSizes(page) {
+  const controls = await page.locator('.md-search__button, .layout-width-toggle, .md-header__option .md-header__button, .md-header__button[for="__search"]').evaluateAll(elements =>
+    elements.map(element => {
+      const bounds = element.getBoundingClientRect();
+      const icon = element.querySelector("svg")?.getBoundingClientRect();
+      return { label: element.getAttribute("title") || element.className, square: element.matches('.md-header__button'),
+        width: bounds.width, height: bounds.height,
+        iconContained: !icon || (icon.left >= bounds.left && icon.right <= bounds.right && icon.top >= bounds.top && icon.bottom <= bounds.bottom) };
+    }).filter(control => control.width > 0 && control.height > 0));
+  assert.ok(controls.length >= 2, "The visible header must include its theme and search controls");
+  for (const control of controls) {
+    assert.ok(Math.abs(control.height - controls[0].height) <= 0.5,
+      `Header controls must have equal heights: ${JSON.stringify(controls)}`);
+    if (control.square) assert.ok(Math.abs(control.width - control.height) <= 0.5, `${control.label} must remain square`);
+    assert.ok(control.iconContained, `${control.label} must contain its native icon without clipping`);
+  }
 }
 
 async function setScheme(page, scheme) {

@@ -2,6 +2,8 @@
 
 :root,
 body[data-md-color-scheme] {
+  --header-control-size: 1.6rem;
+  --header-icon-control-padding: 0.3rem;
   --header-title-content-rail-offset: 8.162rem;
   --layout-width-control-content-rail-offset: 2rem;
   --layout-width-control-inline-start: 0.25rem;
@@ -13,9 +15,23 @@ body[data-md-color-scheme] {
   --layout-width-control-selected-color: var(--accent-dark);
 }
 
+/* Match the native palette and mobile Search squares to Wide and Search. */
+.md-header .md-header__option .md-header__button,
+.md-header .md-header__button[for="__search"] {
+  box-sizing: border-box;
+  inline-size: var(--header-control-size);
+  block-size: var(--header-control-size);
+  padding: var(--header-icon-control-padding);
+}
+
+.md-header .md-search__button {
+  block-size: var(--header-control-size);
+}
+
 .layout-width-toggle {
   align-items: center;
   border-radius: var(--layout-width-control-radius);
+  block-size: var(--header-control-size);
   color: var(--layout-width-control-rest-color);
   cursor: pointer;
   display: none;
