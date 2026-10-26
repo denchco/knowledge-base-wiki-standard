@@ -225,6 +225,8 @@
     "scripts/okf-core.mjs",
     "scripts/package-wiki-plugin.mjs",
     "scripts/package-wiki-plugin.test.mjs",
+    "scripts/patch-design-linter.mjs",
+    "scripts/patch-design-linter.test.mjs",
     "scripts/patch-zensical-runtime.mjs",
     "scripts/patch-zensical-runtime.test.mjs",
     "scripts/prepare-local-zensical-config.mjs",

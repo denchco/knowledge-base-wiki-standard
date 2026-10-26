@@ -10,7 +10,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.70`, with guarded reference indexing |
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.17`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
-| Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
+| Design validation | Design-Governed capability | `@google/design.md==0.4.0`, scoped `zod==4.6.7` override and qualified embedded-runtime adapter |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
 | Deployment adapter | Not selected | No deployment CLI or credentials are required; add and qualify a locked adapter before publication to a hosting target |
@@ -110,6 +110,18 @@ The Zensical reference adapter is tested and supported at exactly `zensical==0.0
 - “Latest” is never a build input. Upgrades are deliberate changes with migration evidence.
 - Installing npm, Python, uv, Chromium, Jujutsu, or deployment CLIs may require network access; the built Human Wiki and its diagram/graph runtimes do not.
 
+## Design-linter and audit repair
+
+The proposed dependency repair locks `fast-uri==3.1.9`, `zod==4.6.7` and `filelock==4.2.4`. The Python resolver also requires `filelock>=4.2.4`. Other direct package and toolchain pins remain unchanged.
+
+`@google/design.md==0.4.0` embeds Zod 3.25.76 in both its CLI and library bundles. A package override alone leaves that embedded implementation in use. `scripts/patch-design-linter.mjs` replaces the exact embedded segment with an import of the locked Zod 4.6.7 dependency. It uses `prefault` to preserve the linter's nested configuration defaults.
+
+`npm ci` applies the adapter through `postinstall`; `design:lint` applies it before executing the existing lint command. The adapter checks the package version, both upstream and adapted bundle checksums, and Zod resolution from each entry point. Unknown versions or modified bundles fail closed. This is a scoped compatibility exception, not a claim that every Zod 3 consumer supports Zod 4.
+
+`npm run check:design-linter` verifies both installed entry points and exercises valid and invalid designs, CLI exit codes, missing defaults and malformed configuration. Both dependency audits remain mandatory. The checks do not suppress advisories or infer executed code from lock metadata alone.
+
+Migration carries both lockfiles, the Python constraint, scoped Zod override, install hook, adapter and fixtures together. Run frozen installs and complete selected-profile verification. Requalify any later linter or Zod version; remove the adapter only after verifying that an upstream release removes the affected embedded code. Existing consumer pins and immutable releases remain unchanged.
+
 ## Provenance compatibility note
 
 The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.45.1`. Git `2.41` is the minimum supported Git boundary because current Jujutsu Git interoperability no longer supports older Git versions. Qualification covered the read-only maintainer provenance probe, the repository's complete Standard Production verification contract, and real colocated initialization, root, Git-root, raw Git-SHA lookup, log-template, status, and commit operations. Jujutsu remains a pre-1.0 exact dependency: another version requires the same deliberate qualification and contract update rather than being inferred compatible from a range.
@@ -124,7 +136,7 @@ Migration carries the direct pin, frozen lock, runtime builder, embedded-version
 
 The rc.6 security qualification also selects uv `0.13.4` and locked `certifi==2026.10.19` after the Python security announcement on 20 October 2026. Both remove the affected certificate trust material from their respective distributions. The exact local/CI uv version and resolver bootstrap floor are updated together. Earlier resolver qualification below remains historical evidence, not current binary qualification. Migration reinstalls the selected uv binary, performs frozen dependency installation and reruns complete verification. [SRC-065](docs/sources.md#src-065), [SRC-066](docs/sources.md#src-066)
 
-The Mermaid core is built with exactly `esbuild==0.28.2` against direct, overridden `dompurify==3.4.17`. `fast-uri==3.1.8` is locked while Ajv remains `8.20.0`; the Python lock selects `urllib3==2.8.0` for its proxy TLS and streaming security fixes. `npm run check:runtime` reconstructs the bundle in memory and verifies embedded sanitizer identity, all observed build inputs, package/lock agreement, and output/metafile/SBOM hashes. The generated CycloneDX SBOM states that copied graph prebundles have opaque transitive coverage; npm audit alone does not inspect those embedded internals.
+The Mermaid core is built with exactly `esbuild==0.28.2` against direct, overridden `dompurify==3.4.17`. `fast-uri==3.1.9` is locked while Ajv remains `8.20.0`; the Python lock selects `urllib3==2.8.0` for its proxy TLS and streaming security fixes. `npm run check:runtime` reconstructs the bundle in memory and verifies embedded sanitizer identity, all observed build inputs, package/lock agreement, and output/metafile/SBOM hashes. The generated CycloneDX SBOM states that copied graph prebundles have opaque transitive coverage; npm audit alone does not inspect those embedded internals.
 
 The exact Node, npm, Python and uv reference binaries are checked by `npm run check:toolchain`; `.python-version` selects the reference interpreter. `tool.uv.required-version` is a resolver bootstrap floor (`>=0.13.4`) so Dependabot can propose lock changes using its supplied uv. This does not qualify another runtime: verification, direct build/serve/graph commands, and Python audits reject any uv other than `0.13.4` before project execution. Verification records this preflight in its receipt; scheduled security audits explicitly run the same check after frozen installation. Broader consumer Python minimums remain distinct from this tested reference. Ubuntu `24.04` selects the runner OS release, not an immutable VM image; hosted runner image updates and live vulnerability databases are outside bit-for-bit environment reproducibility.
 
