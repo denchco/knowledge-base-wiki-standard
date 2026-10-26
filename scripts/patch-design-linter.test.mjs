@@ -27,7 +27,8 @@ test("both installed entry points use the qualified external Zod; drift fails cl
 });
 
 test("programmatic lint keeps valid designs and rejects invalid colours and references", async () => {
-  const { lint } = await import("@google/design.md/linter");
+  // Resolve first: Graphify 0.9.70 treats a bare dynamic import as a corpus file.
+  const { lint } = await import(import.meta.resolve("@google/design.md/linter"));
   assert.equal(lint(valid).summary.errors, 0);
   const broken = lint(invalid);
   assert.ok(broken.summary.errors >= 2, JSON.stringify(broken.findings));
