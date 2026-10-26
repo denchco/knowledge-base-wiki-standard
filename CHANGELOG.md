@@ -2,6 +2,12 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
+## Unreleased — dependency audit repair
+
+- Propose the verified Framer dependency repair under `DKBWS-SEC-001`, `DKBWS-RENDER-001`, `DKBWS-DESIGN-001` and `DKBWS-VERIFY-001`: lock fast-uri `3.1.9`, Zod `4.6.7` and filelock `4.2.4`, retaining other qualified package and toolchain pins.
+- Replace embedded Zod 3 in both design.md `0.4.0` entry points through a checksum-checked adapter. Preserve nested configuration defaults and test valid/invalid designs, CLI exit codes and configuration rejection. Carry the complete closure in starter planning and the documentation snapshot allowlist.
+- Migration: reinstall frozen locks, retain the Python resolver constraint, scoped Zod override, install hook, adapter and fixtures, then run complete selected-profile verification. Origin: Framer implementation `298c7e3e0eb76152e3be327f536c59c00e126099`, pinned to Standard `4453ab8e6d7110793e8acb0b06c2a38c9b96f79d`. This PR proposes review; acceptance, immutable release and consumer adoption remain separate.
+
 ## v0.1.0-rc.8 — 2026-10-23
 
 - Pin DOMPurify `3.4.17` for the Standard Production Mermaid runtime under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. Retain Mermaid `11.17.2`, KaTeX `0.18.2` and the other qualified renderer/toolchain versions.

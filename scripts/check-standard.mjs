@@ -579,6 +579,9 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (actual !== expected) failures.push(`dependency ${dependency} must be exactly ${expected}; found ${actual ?? "unlisted"}`);
 }
 if (pkg.overrides?.["mermaid@11.17.2"]?.katex !== "$katex") failures.push("Mermaid must use the qualified exact KaTeX override");
+if (pkg.overrides?.["@google/design.md@0.4.0"]?.zod !== "4.6.7") failures.push("Design linter must use qualified Zod 4.6.7");
+if (pkg.scripts?.postinstall !== "node scripts/patch-design-linter.mjs") failures.push("Installation must replace the embedded design-linter Zod");
+if (!pkg.scripts?.check?.includes("check:design-linter")) failures.push("check must inspect the installed design-linter adapter and compatibility fixtures");
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
@@ -626,7 +629,7 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
 }
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
 if (domPurifyVersion !== "3.4.17") failures.push(`package-lock must resolve exactly DOMPurify 3.4.17; found ${domPurifyVersion ?? "unlisted"}`);
-if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.8") failures.push("package-lock must resolve fast-uri exactly 3.1.8");
+if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.9") failures.push("package-lock must resolve fast-uri exactly 3.1.9");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
 if (!pkg.scripts?.["conformance:test"]?.includes("runtime-bundle.test.mjs")) failures.push("conformance:test must include runtime sanitizer and bundle inspection fixtures");

@@ -303,6 +303,20 @@ entries:
     planning_only: true
     dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
     requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
+  - target: "scripts/patch-design-linter.mjs"
+    role: "design-linter-security-adapter"
+    classification: "adapt-from-release"
+    source: "scripts/patch-design-linter.mjs"
+    planning_only: true
+    dependency_closure: "exact design linter and Zod pins, scoped override, frozen lock, postinstall hook, checksum guards and compatibility fixtures"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-RENDER-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/patch-design-linter.test.mjs"
+    role: "design-linter-security-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/patch-design-linter.test.mjs"
+    planning_only: true
+    dependency_closure: "qualified installed linter entry points, Node test runner, YAML parser, target DESIGN.md and disposable verification output"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-RENDER-001", "DKBWS-VERIFY-001"]
   - target: ".node-version"
     role: "node-runtime-pin"
     classification: "adapt-from-release"
