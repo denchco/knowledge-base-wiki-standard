@@ -3,7 +3,17 @@ id: "denchco-subject-empty"
 description: "Allowlisted recipe for creating an independent, subject-specific knowledge-base repository."
 standard_source: "https://github.com/denchco/knowledge-base-wiki-standard"
 documentation: "https://denchco.github.io/knowledge-base-wiki-documentation/"
-revision_policy: "automatically-resolve-default-branch-head-to-commit"
+revision_policy: "automatically-resolve-latest-verified-immutable-release-to-commit"
+release_stack:
+  resolve_command: "npm run standard:stack -- resolve --json"
+  check_command: "npm run standard:stack -- check <wiki>"
+  channel_policy: "semantic-version-order-including-prereleases"
+  selection: "latest-published-nondraft-native-immutable-semantic-release"
+  verification: "exact-tag-to-SHA-and-latest-trusted-Verify-push-main-run-and-attempt-success"
+  fallback: "fail-closed-no-default-HEAD-or-older-release"
+  installation: "released-tool-pins-and-frozen-dependency-locks"
+  update_policy: "read-only-check-explicit-compatible-migration-full-verification"
+  qualification_scope: "dated-release-evidence-current-audits-still-required"
 repository_boundary: "independent-target"
 root_copy: "forbidden"
 content_policy: "subject-specific-create-fresh"
@@ -31,7 +41,7 @@ bootstrap:
 executable_scope:
   apply_supported: false
   portable_core: "Templates define the authoring boundary; validate the completed target with the CLI and schemas from the pinned standard release."
-  standard_production: "Planning only until an implementation agent supplies and verifies the complete consumer renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the pinned release. Standard-maintainer documentation-sync commands and verify:workspace are excluded unless the consumer independently declares and implements that capability."
+  standard_production: "Planning only until an implementation agent supplies and verifies the complete consumer renderer, script, schema, profile, runtime, lock, CI, and provenance dependency closure from the verified immutable release. Keep its tool pins and frozen locks; release selection does not waive current audits. Standard-maintainer documentation-sync commands and verify:workspace are excluded unless the consumer independently declares and implements that capability."
 
 classifications:
   reference_only:
@@ -301,7 +311,7 @@ entries:
     classification: "adapt-from-release"
     source: "package.json"
     planning_only: true
-    dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
+    dependency_closure: "all consumer scripts, schemas, profiles, assets, locks, and workflow inputs referenced by the adapted package contract, including the standard:stack wrapper and its tests; exclude Standard-maintainer sync:documentation:* and verify:workspace unless independently declared"
     requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-RUNTIME-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-002"]
   - target: ".node-version"
     role: "node-runtime-pin"
@@ -534,3 +544,31 @@ entries:
     planning_only: true
     dependency_closure: "every consumer command, script, schema, profile, lock, browser, and provenance mode invoked by the adapted workflow; exclude Standard-maintainer documentation synchronization unless independently declared"
     requirements: ["DKBWS-VERIFY-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-002", "DKBWS-UPDATE-002"]
+  - target: "scripts/standard-stack.mjs"
+    role: "immutable-release-stack-core"
+    classification: "adapt-from-release"
+    source: "scripts/standard-stack.mjs"
+    planning_only: true
+    dependency_closure: "exact source identity, native-immutable nondraft release and tag resolution, trusted exact-SHA Verify evidence, dated file digests, local manifest comparison, and GET-only transport; no install, pin write or migration"
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-UPDATE-001", "DKBWS-RELEASE-001"]
+  - target: "scripts/standard-stack-cli.mjs"
+    role: "immutable-release-stack-command"
+    classification: "adapt-from-release"
+    source: "scripts/standard-stack-cli.mjs"
+    planning_only: true
+    dependency_closure: "standard-stack.mjs, exact released dependencies, standard:stack package wrapper, report schema, and read-only resolve/check interface"
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-UPDATE-001"]
+  - target: "scripts/standard-stack.test.mjs"
+    role: "immutable-release-stack-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/standard-stack.test.mjs"
+    planning_only: true
+    dependency_closure: "core and CLI plus offline release ordering, tag identity, trusted CI, missing/failed evidence, frozen consumer pin, no-write and report-schema fixtures"
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-001"]
+  - target: "schema/standard-stack-report-v1.json"
+    role: "immutable-release-stack-report-schema"
+    classification: "adapt-from-release"
+    source: "schema/standard-stack-report-v1.json"
+    planning_only: true
+    dependency_closure: "release resolver/check reports, exact release and CI identities, observation time, scoped file digests and schema validation; this is not a full conformance receipt"
+    requirements: ["DKBWS-PROMPT-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-002"]

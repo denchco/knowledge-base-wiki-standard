@@ -29,7 +29,7 @@ const required = [
   "overrides/partials/nav-item.html", "docs/assets/service-identity.json",
   "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json", "schema/service-identity-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
-  "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
+  "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json", "schema/standard-stack-report-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
   "schema/documentation-sync-snapshot-v1.json",
   "schema/standard-proposal-record-v1.json", "schema/standard-proposal-registry-v1.json",
@@ -71,6 +71,7 @@ const required = [
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
   "scripts/standard-proposal-core.mjs", "scripts/standard-proposal-cli.mjs", "scripts/standard-proposal-cli.test.mjs",
+  "scripts/standard-stack.mjs", "scripts/standard-stack-cli.mjs", "scripts/standard-stack.test.mjs",
   "standard-proposals/README.md", "standard-proposals/registry.json", "standard-proposals/standard-change-form-v1.yml",
   "sync/documentation-sync-contract-v1.json"
 ];
@@ -527,7 +528,7 @@ if (/exactly three/i.test(prompt)) failures.push("prompt retains an unconditiona
 if (!prompt.includes("completion-first")) failures.push("prompt lacks completion-first handoff contract");
 for (const boundary of [
   "starter/starter.yaml",
-  "current default-branch HEAD",
+  "latest verified immutable release",
   "Do not ask the user to choose or supply a release tag or commit",
   "Never recursively copy the standard root",
   "URL-only invocation",
@@ -549,6 +550,8 @@ for (const boundary of [
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
 if (/\[immutable release tag or commit\]/i.test(prompt)) failures.push("prompt still requires a user-supplied standard revision");
+if (/Resolve the standard repository's current default-branch HEAD/.test(prompt)) failures.push("bootstrap must select a verified immutable release, not the development branch");
+if (starterManifest.revision_policy !== "automatically-resolve-latest-verified-immutable-release-to-commit") failures.push("starter revision policy must select the latest verified immutable release");
 if (/Topic and intended scope:|Selected profile:|Target Wiki URL:|Target deployment:/i.test(prompt)) {
   failures.push("prompt still exposes the removed field-based bootstrap");
 }
@@ -557,6 +560,8 @@ for (const phrase of ["Give this URL to an AI agent", "research topic seed", "su
 }
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+if (pkg.scripts?.["standard:stack"] !== "node scripts/standard-stack-cli.mjs") failures.push("read-only immutable stack resolver is missing");
+if (!pkg.scripts?.["conformance:test"]?.includes("scripts/standard-stack.test.mjs")) failures.push("immutable stack fixtures are outside complete verification");
 if (pkg.scripts?.["response:next-steps:check"] !== "node scripts/development-next-steps.mjs") failures.push("captured next-step format checker is missing");
 if (!pkg.scripts?.["conformance:test"]?.includes("scripts/development-next-steps.test.mjs")) failures.push("next-step fixtures are outside complete verification");
 const licence = readFileSync("LICENSE", "utf8");

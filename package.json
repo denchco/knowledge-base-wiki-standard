@@ -43,7 +43,7 @@
     "sync:documentation:check": "node scripts/sync-documentation-snapshot.mjs --check",
     "sync:documentation:apply": "node scripts/sync-documentation-snapshot.mjs --apply",
     "sync:documentation:test": "node --test scripts/sync-documentation-snapshot.test.mjs",
-    "conformance:test": "node --test scripts/check-reference-toolchain.test.mjs scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/check-governing-question-repetitions.test.mjs scripts/dev-service.test.mjs scripts/development-response-links.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/link-source-citations.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/standard-proposal-cli.test.mjs scripts/sync-documentation-snapshot.test.mjs scripts/runtime-bundle.test.mjs scripts/codex-stop-hook.test.mjs scripts/publish-llms.test.mjs scripts/package-wiki-plugin.test.mjs scripts/patch-zensical-runtime.test.mjs scripts/wiki-appearance.test.mjs scripts/prepare-wiki-appearance.test.mjs scripts/development-next-steps.test.mjs",
+    "conformance:test": "node --test scripts/check-reference-toolchain.test.mjs scripts/conformance-cli.test.mjs scripts/check-adoption-audits.test.mjs scripts/check-governing-question-repetitions.test.mjs scripts/dev-service.test.mjs scripts/development-response-links.test.mjs scripts/html-script-json.test.mjs scripts/jj-phase.test.mjs scripts/link-source-citations.test.mjs scripts/runtime-browser-contract-config.test.mjs scripts/standard-proposal-cli.test.mjs scripts/sync-documentation-snapshot.test.mjs scripts/runtime-bundle.test.mjs scripts/codex-stop-hook.test.mjs scripts/publish-llms.test.mjs scripts/package-wiki-plugin.test.mjs scripts/patch-zensical-runtime.test.mjs scripts/wiki-appearance.test.mjs scripts/prepare-wiki-appearance.test.mjs scripts/development-next-steps.test.mjs scripts/standard-stack.test.mjs",
     "check": "npm run check:toolchain && node scripts/check-standard.mjs && npm run standard:proposal -- check --all && npm run check:canonical-content && npm run check:governing-question && npm run check:source-links && npm run check:graphify-inputs && npm run check:adoption-audits && npm run conformance:test && npm run check:schema-artifacts && npm run check:provenance && npm run check:renderer && npm run check:runtime && npm run audit:node && npm run audit:python && npm run design:lint && npm run check:visual-shape",
     "verify": "node scripts/verify.mjs",
     "verify:workspace": "npm run verify && npm run sync:documentation:check",
@@ -68,7 +68,8 @@
     "prepare:appearance": "node scripts/prepare-wiki-appearance.mjs",
     "check:appearance-browser": "node scripts/check-wiki-appearance-browser.mjs",
     "response:next-steps:check": "node scripts/development-next-steps.mjs",
-    "check:graphify-inputs": "npm run check:toolchain && uv run --no-sync python -I -B scripts/graphify-update.py --check && uv run --no-sync python -I -B scripts/check-graphify-inputs.test.py"
+    "check:graphify-inputs": "npm run check:toolchain && uv run --no-sync python -I -B scripts/graphify-update.py --check && uv run --no-sync python -I -B scripts/check-graphify-inputs.test.py",
+    "standard:stack": "node scripts/standard-stack-cli.mjs"
   },
   "codexDevServer": {
     "serviceId": "denchco-kb-wiki-standard",

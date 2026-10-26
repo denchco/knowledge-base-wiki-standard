@@ -10,6 +10,7 @@ extra_javascript = ["assets/vendor/mermaid.min.js", "assets/mermaid-adapter.js",
 nav = [
   {"Start here" = [
     {"Home" = "index.md"},
+    {"Build and update a Wiki" = "guides/first-wiki.md"},
     {"Architecture" = "architecture.md"},
     {"Roadmap" = "roadmap.md"}
   ]},

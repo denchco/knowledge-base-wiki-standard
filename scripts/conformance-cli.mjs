@@ -16,6 +16,7 @@ import {
   lifecycleDiff,
   lifecycleText,
   upgradePlan,
+  validateInitOptions,
 } from "./conformance-lifecycle.mjs";
 
 const HELP = `DenchCo Knowledge Base Wiki Standard conformance CLI
@@ -32,7 +33,7 @@ Commands:
   inspect      Read a repository or bare OKF bundle and report its structure.
   validate     Run read-only OKF v0.2 and DenchCo manifest validation.
   export-okf   Emit a deterministic, lossless JSON rendition to stdout.
-  diff         Compare a consumer declaration with this candidate and profile.
+  diff         Compare a consumer with the latest verified immutable release.
   upgrade      Emit a conservative review/patch plan; requires --dry-run.
   init         Emit a scaffold plan from the canonical prompt; requires --dry-run.
 
@@ -51,7 +52,8 @@ Options:
   --topic <text>     Supply topic, audience, question, and outcome context.
   --accent <hex>     Confirm or override the inferred/default accent colour.
   --standard-revision <revision>
-                     Override the automatically resolved standard commit for init.
+                     Explicit offline historical/development candidate for lifecycle
+                     planning; unverified and never automatic production bootstrap.
   --wiki-url <url>   Override automatic conflict-free loopback URL resolution.
   --deployment <id> Override the default no-deployment state.
   -h, --help         Show this help.
@@ -63,7 +65,10 @@ Exit codes:
 
 The CLI never modifies the target. export-okf writes only to stdout; redirect it
 to a new artifact if desired. upgrade and init have no apply mode in this
-candidate. Their dry-run plans preserve deviations and existing-file collisions.`;
+candidate. Their dry-run plans preserve deviations and existing-file collisions.
+Default lifecycle planning reads GitHub release and exact-revision Verify evidence.
+The selected commit must be available locally; a missing commit fails without a
+HEAD fallback. Explicit --standard-revision planning stays offline and unverified.`;
 
 function parseArguments(argv) {
   if (argv.length === 0 || argv.includes("-h") || argv.includes("--help")) {
@@ -122,7 +127,7 @@ function json(value, compact) {
   return JSON.stringify(value, null, compact ? 0 : 2);
 }
 
-export function run(argv = process.argv.slice(2)) {
+export async function run(argv = process.argv.slice(2), dependencies = {}) {
   const options = parseArguments(argv);
   if (options.help) {
     process.stdout.write(`${HELP}\n`);
@@ -140,6 +145,14 @@ export function run(argv = process.argv.slice(2)) {
   }
 
   if (["diff", "upgrade", "init"].includes(options.command)) {
+    if (options.command === "init") validateInitOptions(options);
+    if (options.command === "upgrade" && options.dryRun !== true) {
+      throw new CliUsageError("`upgrade` is planning-only in this candidate and requires --dry-run.");
+    }
+    if (!options.standardRevision) {
+      const resolve = dependencies.resolveStandardStack ?? (await import("./standard-stack.mjs")).resolveStandardStack;
+      options.resolvedStack = await resolve();
+    }
     const result = options.command === "diff"
       ? lifecycleDiff(options)
       : options.command === "upgrade"
@@ -160,7 +173,7 @@ export function run(argv = process.argv.slice(2)) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   try {
-    process.exitCode = run();
+    process.exitCode = await run();
   } catch (error) {
     if (error instanceof CliUsageError) {
       process.stderr.write(`Usage error: ${error.message}\n\n${HELP}\n`);

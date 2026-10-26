@@ -38,6 +38,8 @@ import {
 } from "./profile-catalogue.mjs";
 import { checkProvenance } from "./check-provenance.mjs";
 import { inspectOkfBundle, isDateTime, losslessExport } from "./okf-core.mjs";
+import { initPlan, lifecycleDiff, upgradePlan } from "./conformance-lifecycle.mjs";
+import { STACK_FILES, STACK_REPORT_SCHEMA } from "./standard-stack.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = path.join(ROOT, "scripts/conformance-cli.mjs");
@@ -52,6 +54,7 @@ const OLD_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-old");
 const RC3_CONSUMER = path.join(ROOT, "fixtures/lifecycle/consumer-rc3");
 const STARTER_PATH = path.join(ROOT, "starter/starter.yaml");
 const LIFECYCLE_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/lifecycle-plan-v1.json"), "utf8"));
+const STACK_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/standard-stack-report-v1.json"), "utf8"));
 const MANIFEST_SCHEMA = JSON.parse(readFileSync(path.join(ROOT, "schema/manifest-v1.json"), "utf8"));
 const OKF_SCHEMA_SOURCE = readFileSync(path.join(ROOT, "schema/okf-v0.2-frontmatter.json"), "utf8");
 const REPORT_SCHEMA_SOURCE = readFileSync(path.join(ROOT, "schema/conformance-report-v1.json"), "utf8");
@@ -59,8 +62,14 @@ const RECEIPT_SCHEMA_SOURCE = readFileSync(path.join(ROOT, "schema/verification-
 const OKF_SCHEMA = JSON.parse(OKF_SCHEMA_SOURCE);
 const REPORT_SCHEMA = JSON.parse(REPORT_SCHEMA_SOURCE);
 const RECEIPT_SCHEMA = JSON.parse(RECEIPT_SCHEMA_SOURCE);
+const FIXTURE_REVISION = spawnSync("git", ["rev-parse", "HEAD"], { cwd: ROOT, encoding: "utf8" }).stdout.trim();
 
 function run(...args) {
+  // Historical/source fixtures are explicitly offline. Live default selection
+  // is tested below through an injected resolver, never by a network call.
+  if (["diff", "upgrade", "init"].includes(args[0]) && !args.includes("--standard-revision")) {
+    args.push("--standard-revision", FIXTURE_REVISION);
+  }
   return spawnSync(process.execPath, [CLI, ...args], {
     cwd: ROOT,
     encoding: "utf8",
@@ -126,7 +135,7 @@ function withCurrentLifecycleRelease(callback, { parentRevision = null } = {}) {
     for (const relativePath of [
       ".wiki-standard.yaml", "profiles", "starter", "prompts/instantiate-wiki.md",
       "docs/spec/requirements.md", "scripts/conformance-cli.mjs",
-      "scripts/conformance-lifecycle.mjs", "scripts/okf-core.mjs", "scripts/profile-catalogue.mjs",
+      "scripts/conformance-lifecycle.mjs", "scripts/okf-core.mjs", "scripts/profile-catalogue.mjs", "scripts/standard-stack.mjs",
     ]) {
       const destination = path.join(releaseRoot, relativePath);
       mkdirSync(path.dirname(destination), { recursive: true });
@@ -145,10 +154,11 @@ function withCurrentLifecycleRelease(callback, { parentRevision = null } = {}) {
       assert.equal(result.status, 0, result.stderr || result.stdout);
     }
     symlinkSync(path.join(ROOT, "node_modules"), path.join(releaseRoot, "node_modules"), "dir");
+    const explicitRevision = spawnSync("git", ["rev-parse", "HEAD"], { cwd: releaseRoot, encoding: "utf8" }).stdout.trim();
     return callback({
       fixtureRoot,
       releaseRoot,
-      runPlan: (...args) => spawnSync(process.execPath, [path.join(releaseRoot, "scripts/conformance-cli.mjs"), ...args], {
+      runPlan: (...args) => spawnSync(process.execPath, [path.join(releaseRoot, "scripts/conformance-cli.mjs"), ...args, "--standard-revision", explicitRevision], {
         cwd: releaseRoot,
         encoding: "utf8",
       }),
@@ -781,6 +791,200 @@ test("subject-empty starter has an allowlisted, non-executable consumer boundary
   }
 });
 
+function resolvedStackFixture(tag = "v0.1.0-rc.8") {
+  const git = args => {
+    const result = spawnSync("git", args, { cwd: ROOT, encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout;
+  };
+  const revision = git(["rev-parse", `${tag}^{commit}`]).trim();
+  const source = "https://github.com/denchco/knowledge-base-wiki-standard";
+  return {
+    $schema: STACK_REPORT_SCHEMA, schemaVersion: "1.0", operation: "resolve", selection: "latest-verified-immutable",
+    source, observedAt: "2026-10-26T00:00:00Z", readOnly: true, writesPerformed: false,
+    currentVulnerabilityClearance: "not-checked",
+    stack: {
+      tag, revision,
+      qualificationScope: "dated-release-verification",
+      fileEvidenceScope: "selected-stack-files; full revision binds all release source",
+      release: { id: 1, tag, publishedAt: "2026-10-23T00:00:00Z", url: `${source}/releases/tag/${tag}`, draft: false, immutable: true },
+      qualification: { workflowPath: ".github/workflows/verify.yml", workflowId: 1, runId: 2, attempt: 1,
+        event: "push", headBranch: "main", headSha: revision, status: "completed", conclusion: "success",
+        updatedAt: "2026-10-23T00:00:00Z", url: `${source}/actions/runs/2` },
+      files: STACK_FILES.map(relative => {
+        const bytes = Buffer.from(git(["show", `${revision}:${relative}`]));
+        return { path: relative, gitBlob: git(["rev-parse", `${revision}:${relative}`]).trim(),
+          sha256: createHash("sha256").update(bytes).digest("hex"), bytes: bytes.length };
+      }),
+    },
+  };
+}
+
+function runWithResolvedStack(args, resolution) {
+  return spawnSync(process.execPath, ["--input-type=module", "-e", `
+    import { run } from ${JSON.stringify(CLI)};
+    process.exitCode = await run(${JSON.stringify(args)}, { resolveStandardStack: async () => (${JSON.stringify(resolution)}) });
+  `], { cwd: ROOT, encoding: "utf8" });
+}
+
+test("offline lifecycle core refuses a missing verified default without falling back to checkout HEAD", () => {
+  const target = path.join(os.tmpdir(), "denchco-no-implicit-head-wiki");
+  for (const action of [
+    () => initPlan({ target, dryRun: true }),
+    () => lifecycleDiff({ target: OLD_CONSUMER }),
+    () => upgradePlan({ target: OLD_CONSUMER, dryRun: true }),
+  ]) assert.throws(action, /requires a resolved latest verified immutable Standard release/);
+  assert.equal(existsSync(target), false);
+});
+
+test("default CLI init carries the resolver's exact release, lock evidence and tag without target mutation", () => {
+  const resolution = resolvedStackFixture();
+  const target = path.join(os.tmpdir(), "denchco-resolved-release-wiki");
+  const result = runWithResolvedStack(["init", target, "--dry-run", "--blank", "--title", "Release fixture",
+    "--accent", "#0b7285", "--wiki-url", "https://example.test/release/", "--profile", "portable-core", "--json"], resolution);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const plan = JSON.parse(result.stdout);
+  assert.equal(plan.candidate.standard.revision, resolution.stack.revision);
+  assert.equal(plan.input.standardReleaseTag, resolution.stack.tag);
+  assert.equal(plan.proposedManifest.capabilities.standard_release_tag, resolution.stack.tag);
+  assert.equal(plan.proposedManifest.standard.revision, resolution.stack.revision);
+  assert.equal(plan.candidate.selection.bootstrapEligible, true);
+  assert.equal(plan.candidate.selection.currentVulnerabilityClearance, "not-checked");
+  assert.deepEqual(plan.candidate.selection.evidence.stack.files, resolution.stack.files);
+  assert.equal(plan.summary.readyForRendering, true);
+  const validate = new Ajv2020({ strict: true, strictRequired: false }).addSchema(STACK_SCHEMA).compile(LIFECYCLE_SCHEMA);
+  assert.equal(validate(plan), true, JSON.stringify(validate.errors));
+  const incompletePlan = structuredClone(plan);
+  delete incompletePlan.candidate.selection.evidence.stack.release.publishedAt;
+  assert.equal(validate(incompletePlan), false, "lifecycle schema must require complete embedded release evidence");
+  assert.equal(existsSync(target), false);
+});
+
+test("a failed default resolver cannot produce a checkout-HEAD bootstrap plan", () => {
+  const target = path.join(os.tmpdir(), "denchco-failed-resolver-wiki");
+  const args = ["init", target, "--dry-run", "--blank", "--json"];
+  const result = spawnSync(process.execPath, ["--input-type=module", "-e", `
+    import { run } from ${JSON.stringify(CLI)};
+    await run(${JSON.stringify(args)}, { resolveStandardStack: async () => { throw new Error("fixture resolver unavailable"); } });
+  `], { cwd: ROOT, encoding: "utf8" });
+  assert.notEqual(result.status, 0);
+  assert.equal(result.stdout, "");
+  assert.match(result.stderr, /fixture resolver unavailable/);
+  assert.equal(existsSync(target), false);
+});
+
+test("default selection refuses stale qualification, mutable releases and mismatched lock evidence", () => {
+  const resolution = resolvedStackFixture();
+  const options = { target: path.join(os.tmpdir(), "denchco-rejected-release-wiki"), dryRun: true };
+  for (const mutate of [
+    report => { report.stack.release.immutable = false; },
+    report => { report.stack.release.draft = true; },
+    report => { report.stack.release.tag = "v0.1.0-rc.7"; },
+    report => { report.stack.qualification.headSha = "f".repeat(40); },
+    report => { report.stack.qualification.conclusion = "failure"; },
+    report => { report.stack.qualification.event = "pull_request"; },
+    report => { report.stack.qualification.workflowPath = ".github/workflows/unrelated.yml"; },
+    report => { report.stack.files = report.stack.files.filter(item => item.path !== "uv.lock"); },
+  ]) {
+    const bad = structuredClone(resolution);
+    mutate(bad);
+    assert.throws(() => initPlan({ ...options, resolvedStack: bad }), /requires a resolved latest verified immutable/);
+  }
+  const staleLock = structuredClone(resolution);
+  staleLock.stack.files.find(item => item.path === "package-lock.json").sha256 = "0".repeat(64);
+  assert.throws(() => initPlan({ ...options, resolvedStack: staleLock }), /differs from selected immutable revision: package-lock.json/);
+  const wrongSource = structuredClone(resolution);
+  wrongSource.source = "https://github.com/another/standard";
+  wrongSource.stack.release.url = `${wrongSource.source}/releases/tag/${wrongSource.stack.tag}`;
+  wrongSource.stack.qualification.url = `${wrongSource.source}/actions/runs/${wrongSource.stack.qualification.runId}`;
+  assert.throws(() => initPlan({ ...options, resolvedStack: wrongSource }), /source differs/);
+  const absent = structuredClone(resolution);
+  absent.stack.revision = absent.stack.qualification.headSha = "f".repeat(40);
+  assert.throws(() => initPlan({ ...options, resolvedStack: absent }), /Fetch that exact immutable revision/);
+  assert.equal(existsSync(options.target), false);
+});
+
+test("default selection refuses incomplete, undated or inconsistent release evidence before planning", () => {
+  const resolution = resolvedStackFixture();
+  const options = { target: path.join(os.tmpdir(), "denchco-incomplete-release-wiki"), dryRun: true };
+  const missingFields = [
+    ["$schema"], ["schemaVersion"], ["observedAt"], ["currentVulnerabilityClearance"],
+    ["stack", "qualificationScope"], ["stack", "fileEvidenceScope"],
+    ["stack", "release", "id"], ["stack", "release", "publishedAt"], ["stack", "release", "url"],
+    ["stack", "qualification", "workflowId"], ["stack", "qualification", "runId"],
+    ["stack", "qualification", "attempt"], ["stack", "qualification", "updatedAt"], ["stack", "qualification", "url"],
+  ];
+  for (const fields of missingFields) {
+    const bad = structuredClone(resolution);
+    const parent = fields.slice(0, -1).reduce((value, key) => value[key], bad);
+    delete parent[fields.at(-1)];
+    assert.throws(() => initPlan({ ...options, resolvedStack: bad }), /complete dated schema-valid evidence/, fields.join("."));
+  }
+  for (const mutate of [
+    report => { report.observedAt = "2026-02-30T00:00:00Z"; },
+    report => { report.stack.release.publishedAt = "2026-02-30T00:00:00Z"; },
+    report => { report.stack.qualification.updatedAt = "2026-02-30T00:00:00Z"; },
+    report => { report.observedAt = "2026-10-22T00:00:00Z"; },
+    report => { report.stack.qualification.updatedAt = "2026-10-27T00:00:00Z"; },
+    report => { report.stack.release.url = "https://github.com/another/standard/releases/tag/v0.1.0-rc.8"; },
+    report => { report.stack.release.url = `${report.source}/releases/tag/v0.1.0-rc.7`; },
+    report => { report.stack.qualification.url = "https://github.com/another/standard/actions/runs/2"; },
+    report => { report.stack.qualification.url = `${report.source}/actions/runs/3`; },
+    report => { report.stack.files[0] = { ...report.stack.files[1], bytes: 42 }; },
+  ]) {
+    const bad = structuredClone(resolution);
+    mutate(bad);
+    assert.throws(() => initPlan({ ...options, resolvedStack: bad }), /complete dated schema-valid evidence/);
+  }
+  assert.equal(existsSync(options.target), false);
+});
+
+test("explicit historical init stays offline and visibly ineligible for automatic bootstrap", () => {
+  const target = path.join(os.tmpdir(), "denchco-explicit-historical-wiki");
+  const plan = initPlan({ target, dryRun: true, standardRevision: "v0.1.0-rc.7", blank: true,
+    title: "Historical review", accent: "#0b7285", wikiUrl: "https://example.test/historical/" });
+  assert.equal(plan.candidate.selection.mode, "explicit-unverified");
+  assert.equal(plan.candidate.selection.evidence, null);
+  assert.equal(plan.candidate.selection.bootstrapEligible, false);
+  assert.equal(plan.summary.readyForRendering, false);
+  assert.equal(plan.proposedManifest.capabilities.standard_release_tag, "v0.1.0-rc.7");
+  assert.equal(plan.candidate.standard.revision, resolvedStackFixture("v0.1.0-rc.7").stack.revision);
+  assert.equal(plan.proposedManifest.standard.revision, plan.candidate.standard.revision);
+  assert.equal(existsSync(target), false);
+});
+
+test("release planning preserves consumer extensions and deviations and refuses downgrade", () => {
+  const fixture = mkdtempSync(path.join(os.tmpdir(), "denchco-release-preservation-"));
+  try {
+    cpSync(POSITIVE, fixture, { recursive: true });
+    const manifestPath = path.join(fixture, ".wiki-standard.yaml");
+    const manifest = parseDocument(readFileSync(manifestPath, "utf8")).toJS();
+    const latest = resolvedStackFixture();
+    manifest.standard.revision = latest.stack.revision;
+    manifest.capabilities.standard_release_tag = latest.stack.tag;
+    manifest.capabilities.local_extension = { retain: ["approved", "exact"] };
+    manifest.roles.local_record = "knowledge/local.md";
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+    const before = treeHash(fixture);
+    const plan = initPlan({ target: fixture, dryRun: true, resolvedStack: latest });
+    assert.deepEqual(plan.proposedManifest.deviations, manifest.deviations);
+    assert.deepEqual(plan.proposedManifest.capabilities.local_extension, manifest.capabilities.local_extension);
+    assert.equal(plan.proposedManifest.roles.local_record, manifest.roles.local_record);
+    assert.equal(plan.proposedManifest.roles.human_wiki, manifest.roles.human_wiki);
+    const downgrade = lifecycleDiff({ target: fixture, resolvedStack: resolvedStackFixture("v0.1.0-rc.7") });
+    assert.equal(downgrade.summary.revisionState, "consumer-newer");
+    assert(downgrade.changes.some(change => change.id === "standard-revision-review" && change.blocking));
+    assert.equal(downgrade.summary.safeToPlanUpgrade, false);
+    const mismatched = structuredClone(manifest);
+    mismatched.capabilities.standard_release_tag = "v0.1.0-rc.7";
+    writeFileSync(manifestPath, JSON.stringify(mismatched));
+    const mismatch = lifecycleDiff({ target: fixture, resolvedStack: latest });
+    assert(mismatch.changes.some(change => change.id === "standard-release-tag-review" && change.blocking));
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+    assert.equal(treeHash(fixture), before);
+  } finally { rmSync(fixture, { recursive: true, force: true }); }
+});
+
 test("lifecycle diff compares the consumer version and selected profile without writing", () => {
   const before = treeHash(OLD_CONSUMER);
   const result = run("diff", OLD_CONSUMER, "--date", "2026-08-03", "--json");
@@ -1092,7 +1296,8 @@ test("current init plans propagate the authoring policy for every profile withou
         collision: false,
       }, profile);
       assert.equal(plan.candidate.starter.bootstrap.defaults.authoring_policy, "denchco-asd-ste100-inspired-80-percent");
-      assert.equal(plan.summary.readyForRendering, true);
+      assert.equal(plan.summary.readyForRendering, false, "explicit development fixtures cannot authorize automatic production bootstrap");
+      assert.equal(plan.candidate.selection.mode, "explicit-unverified");
       assert.equal(existsSync(target), false, "policy planning must not write a Wiki or assert prose compliance");
       assert.equal(plan.proposedManifest.capabilities.authoring_style, undefined, "the bootstrap default is not a linguistic conformance capability");
     }

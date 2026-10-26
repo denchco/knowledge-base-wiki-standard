@@ -42,6 +42,8 @@ The repeatable commands are:
 | `npm run check:graphify-inputs` | Checks the guarded indexing boundary and runs benign-input, unsupported-input and symlink rejection fixtures. |
 | `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. |
 | `npm run build` | Regenerates the graph publication and then performs the strict site build. |
+| `npm run standard:stack -- resolve --json` | Reads the latest immutable release, exact tag/commit, trusted Verify evidence and selected stack file hashes. Emits a dated report; changes no repository. |
+| `npm run standard:stack -- check <wiki> --json` | Reads the installed manifest and compares its frozen revision with the verified release. Reports availability without changing pins, installing dependencies or migrating content. |
 | `npm run check` | Runs source/content, tracked Standard-proposal, canonical governing-question consistency, exact reader-to-source-row links, adoption, lifecycle, Draft 2020-12 artifact, provenance, npm/Python vulnerability, design, and visual-contract checks without starting a server or making remote writes. |
 | `npm run check:governing-question` | Checks the manifest-mapped canonical question and every exact repetition in its bounded reader-source set; subject-empty or non-selected profiles report a deliberate not-applicable result. |
 | `npm run response:next-steps:check -- --input <draft>` | Checks a captured development-cycle response for one to three ordered next steps with a proposed update, purpose and completion condition, or the explicit no-update outcome; grounding remains an agent review. |
@@ -133,3 +135,11 @@ The [uv version constraint](https://docs.astral.sh/uv/reference/settings/#requir
 Weekly scheduled audits check the installed locks and generated runtime evidence. Dependabot opens reviewable pull requests for npm, uv and Actions; it has no merge or publication authority. Dependency Review rejects moderate-or-higher new vulnerabilities on Standard pull requests.
 
 Snapshot checks compare Documentation's declared release tag and full commit by default, independently of development main. `--development` explicitly compares mutable sources. `--standard-revision <full-commit>` selects exact candidate bytes without claiming release status. Only the exact published release commit is adopted as the Documentation release pin.
+
+## Immutable stack selection
+
+Each released source revision binds the full tested toolchain, locks, configuration and verification implementation. Initialisation selects the latest verified immutable release and records both its tag and full commit. Install its frozen dependency graph; do not resolve each package independently to its newest version. New compatible changes require a new release.
+
+The read-only stack commands use the existing Node runtime and GitHub HTTPS API. They add no npm dependency or required GitHub CLI. An optional API credential changes access, not release qualification. Missing, inconsistent or unavailable remote evidence fails selection instead of falling back to the development branch. The report hashes selected exact-revision stack files; the commit identifies the complete source tree. These hashes do not authorize copying the Standard's subject corpus.
+
+An existing Wiki keeps its stack during update checks. Only an authorised, reviewable migration may change it, after adapting the full relevant dependency closure and passing target checks. Historical release verification does not claim that today's advisory database is clear. Current audit failures remain blocking even when the installed release passed at publication. The 26 October checks report failures for fast-uri and the design validator’s bundled Zod in Node tooling, and filelock in the Python audit-tool cache chain. The validation queue records their qualification boundary. [SRC-079](docs/sources.md#src-079), [SRC-081](docs/sources.md#src-081)

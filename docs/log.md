@@ -7,6 +7,15 @@ status: draft
 
 # Research and change log
 
+## 2026-10-26 — Frozen stack selection
+
+- Implement the owner's clarified lifecycle: a first build selects the latest verified immutable release; an existing Wiki checks for newer releases without changing its installed stack. Each release binds exact source, locks, tools, configuration and checks.
+- Replace automatic default-branch selection with a read-only release resolver and exact tag/commit/workflow evidence. Preserve explicit historical and development dry-run plans with an unverified-selection label. Keep migration and target verification separate from an availability check.
+- Live read-only resolution selects `v0.1.0-rc.8` at `e4814a0715481edbba56189e34e93a3d76d88421` and binds successful exact-revision Verify `39932360257`. The existing Documentation check reports the same revision. The default first-build plan selects that revision and creates no target directory. These observations do not clear current dependency findings.
+- Update the normative requirements, prompt, starter closure, human guide, schema and regression coverage together. The reference fixture suite stays offline. The existing `STD-VAL-014` dependency-audit failure remains a release blocker; no current release, Documentation snapshot or other consumer pin changes in this candidate. [SRC-080](sources.md#src-080)
+
+- Qualification observations: all 236 Node tests, strict build and 16-schema validation pass. Full verification stops at the existing npm audit failure. A separate Python audit adds three filelock findings to `STD-VAL-014`; the reported fixed version has not been selected. The frozen-stack implementation does not publish a new release or change a consumer pin. [SRC-079](sources.md#src-079), [SRC-081](sources.md#src-081)
+
 ## 2026-10-26 — Documentation rc.8 deployment
 
 - **Documentation adoption and public proof:** Record the separately authorised migration through protected PR #40 at `6e47505624731e52dcaa5abe058190f4c1c75548`. The manifest and clean snapshot pin exact rc.8 Standard revision `e4814a0715481edbba56189e34e93a3d76d88421`. Complete local maintainer verification passed. Exact-merge Verify `39982006293` and Pages `39982662370` succeeded; deployment completed at `2026-10-23T15:58:51Z`. Public proof at `2026-10-26T06:57:53.914Z` confirms the same revision, exact DOMPurify `3.4.17` runtime bytes, released schemas, graph identity, reader and math contracts, and public projection controls. Close the Documentation follow-up without changing the immutable Standard release, earlier records, proposal registry or other consumer pins. [SRC-078](sources.md#src-078)

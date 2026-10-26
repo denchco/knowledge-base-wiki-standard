@@ -2,6 +2,14 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
+## Unreleased — Frozen Standard stack lifecycle — 2026-10-26
+
+- Change the `DKBWS-PROMPT-001` first-build default from default-branch HEAD to the latest published, non-draft, native-immutable release. Order eligible semantic versions with prereleases such as `rc.8` included. Require exact tag-to-SHA resolution and successful trusted `Verify` push/main evidence at that SHA; missing or failed evidence does not fall back to another source.
+- Extend `DKBWS-RELEASE-001` to bind each release’s tool pins, dependency locks, configuration contracts and verification implementation as one frozen stack. Improvements require a new verified immutable release. Historical qualification remains date-bound; current audit failures are not waived.
+- Extend `DKBWS-UPDATE-001` with read-only release resolution and existing-Wiki comparison through `standard:stack`. Availability never installs dependencies, changes pins or migrates files. Explicit migration preserves unknown fields and deviations, checks compatibility and runs complete selected-profile verification.
+- Verification: add release/tag/trusted-CI and read-only command fixtures, a versioned report schema, and initializer/source parity checks. Carry the command, core, schema, tests and package hook through the starter adaptation boundary.
+- Migration: adopt the revised prompt and initializer only through a new released stack. Existing pins, dependency locks, immutable releases and consumer content remain unchanged. Explicit historical/development `--standard-revision` plans remain available with unverified release-selection status. Add a plain-language first-wiki guide to the Standard release source; the companion Wiki receives it only through separately authorised release adoption.
+
 ## v0.1.0-rc.8 — 2026-10-23
 
 - Pin DOMPurify `3.4.17` for the Standard Production Mermaid runtime under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. Retain Mermaid `11.17.2`, KaTeX `0.18.2` and the other qualified renderer/toolchain versions.
