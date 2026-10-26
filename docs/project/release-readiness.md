@@ -82,3 +82,25 @@ The owner authorised protected publication of the qualified DOMPurify patch on 2
 The release selects exact DOMPurify `3.4.17`, retaining Mermaid `11.17.2` and KaTeX `0.18.2`. The runtime metafile and CycloneDX inventory bind the exact sanitizer source, version and integrity to the package lock. The public qualification records a fresh zero-finding npm audit of that lock. The earlier inert differential probes cover four affected behaviours and ordinary SVG controls; they do not establish Wiki exploitability or general sanitizer safety. [SRC-073](../sources.md#src-073), [SRC-074](../sources.md#src-074), [SRC-075](../sources.md#src-075), [SRC-076](../sources.md#src-076)
 
 Migration requires the direct pin, frozen lock, runtime builder, entry guard and regression fixtures together. Reinstall with `npm ci`, regenerate runtime and graph assets, and run complete selected-profile verification. Earlier immutable releases and the proposal registry retain their recorded state. Documentation remains at its recorded rc.7 revision; this publication performs no consumer migration, pin change or deployment.
+
+## rc.8 Documentation adoption after separate authorisation
+
+The owner subsequently authorised Documentation migration, protected publication and public-site proof. The historical migration and deployment are separate from the Standard publication above, which left all consumer pins unchanged. The current tooling-audit failure is recorded below. Documentation adopted the exact immutable rc.8 revision `e4814a0715481edbba56189e34e93a3d76d88421`. Its clean 283-file snapshot has digest `7a4e80f69656660502ec08a1474e24b3ecf4671396037d047f318d4943f69d10`. The Standard release, proposal registry and other consumer pins retain their recorded state. [SRC-078](../sources.md#src-078)
+
+| Evidence | Recorded result |
+|---|---|
+| Local qualification | Complete Documentation maintainer verification and the separate read-only provenance check passed before the 23 October migration commit. This is historical evidence, not a current full-verification pass. |
+| Protected migration | PR #40 merged at `6e47505624731e52dcaa5abe058190f4c1c75548` after required `verify` and `standard-snapshot` checks passed. |
+| Exact-merge Verify | Run `39982006293`, attempt `1`, completed successfully for push/main at the exact Documentation merge. |
+| Protected Pages | Run `39982662370`, attempt `1`, completed successfully for that same revision; deployment `7282734010` completed at `2026-10-23T15:58:51Z`. |
+| Public readback | Observed at `2026-10-26T06:57:53.914Z`; public-proof artifact SHA-256 `92b105f86690cb6f600aedfebb33418c7dfb3f2508572cf15cf44bd21f304b64`. |
+
+The actual public runtime bytes match the exact Documentation rebuild. The rebuilt Mermaid runtime metadata and CycloneDX inventory identify one DOMPurify `3.4.17` implementation with retained Mermaid `11.17.2` and KaTeX `0.18.2`. The public reference declaration identifies the exact release and snapshot digest. Public graph identity binds the Documentation revision; every published schema matches the released snapshot bytes.
+
+Public browser verification passed the reader defaults, saved width and palette choices, status-free navigation, mobile keyboard source-row navigation and numeric citations. Native MathML passed at desktop and mobile widths; untrusted math commands remained inert and made no external requests. Public artifact checks retained the governed branding and tested the declared omissions across published routes, Markdown alternatives, discovery, search and graph content. These observations establish this deployment at the recorded time, not continuous availability or general sanitizer safety. [SRC-078](../sources.md#src-078)
+
+### Current verification failure observed on 26 October
+
+The saved post-merge Documentation full-verification attempt failed in `check` at the npm audit gate. The failure was read back on 26 October; the readback does not establish that run’s date. Subsequent gates are not proved by that attempt. Fresh audits of both current locks on 26 October independently return exit 1, with one moderate and two high package findings. The recorded successful 23 October Verify and Pages runs remain historical deployment evidence. The public browser proof above is a separate check and does not clear the failing tooling gate. [SRC-079](../sources.md#src-079)
+
+The scoped follow-up is fast-uri `3.1.8` and the Zod `3.25.76` implementation embedded in the design validator. Fast-uri `3.1.9` fits Ajv’s existing range but still requires qualification. The reviewed Zod fix is outside the validator’s declared range, and changing only the npm lock cannot replace its bundled bytes. Keep the audit gate intact, qualify a compatible correction and run complete verification. This record does not apply a dependency update, rewrite an immutable release or change another consumer’s pin. [STD-VAL-014](../validation-queue.md) remains open.

@@ -7,7 +7,7 @@ status: draft
 
 # Roadmap
 
-The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions, the rc.7 math dependency follow-up and the rc.8 sanitizer release. Documentation migration and public reader verification remain complete for its recorded rc.7 revision. The rc.8 publication leaves Documentation and other consumer records, pins and adoption states unchanged.
+The [current release record](project/release-readiness.md) tracks rc.6 integrations, accepted contribution decisions, the rc.7 math dependency follow-up and the rc.8 sanitizer release. Documentation later adopted rc.8 and completed its separately recorded deployment and public proof. The original rc.8 publication itself left consumer pins unchanged. Current tooling-audit findings remain open in `STD-VAL-014`; other consumer records, pins and adoption states remain unchanged.
 
 ## Completed through `v0.1.0-rc.5`
 
@@ -47,8 +47,8 @@ Protected PR #40 and successful exact-revision post-merge Verify published the s
 
 ## Completed in `v0.1.0-rc.8`
 
-Protected PR #42 and successful exact-revision post-merge Verify `39932360257` published the qualified DOMPurify `3.4.17` patch. Immutable rc.8 resolves to `e4814a0715481edbba56189e34e93a3d76d88421`; its five public assets match the reviewed package and its lock audit reports zero findings at preparation. The release retains Mermaid `11.17.2`, KaTeX `0.18.2` and the existing reader contract. [STD-VAL-013](validation-queue.md) is resolved. Documentation remains pinned to rc.7; other consumer pins and the proposal registry remain unchanged. [SRC-077](sources.md#src-077)
+Protected PR #42 and successful exact-revision post-merge Verify `39932360257` published the qualified DOMPurify `3.4.17` patch. Immutable rc.8 resolves to `e4814a0715481edbba56189e34e93a3d76d88421`; its five public assets match the reviewed package and its lock audit reports zero findings at preparation. The release retains Mermaid `11.17.2`, KaTeX `0.18.2` and the existing reader contract. [STD-VAL-013](validation-queue.md) is resolved. Documentation later adopted that exact release through protected PR #40 at `6e47505624731e52dcaa5abe058190f4c1c75548`. Exact-merge Verify and Pages succeeded, followed by public runtime, reader and projection-boundary proof at `2026-10-26T06:57:53.914Z`. Other consumer pins and the proposal registry remain unchanged. [SRC-077](sources.md#src-077), [SRC-078](sources.md#src-078)
 
-No further grounded content update is available.
+The rc.8 migration is complete, but current dependency verification fails. The fresh 26 October audits and saved post-merge failure are recorded in [STD-VAL-014](validation-queue.md). The one active follow-up is to qualify minimal fast-uri and design-validator corrections, including embedded Zod bytes, and pass both audits and complete verification. Earlier publication evidence remains historical. [SRC-079](sources.md#src-079)
 
 Future compatibility fixtures require a reproduced consumer gap or evidenced upstream change. Absolute interception of uncaptured responses remains unproven; the supported Stop adapter supplies one bounded corrective continuation after local review and trust. A dedicated Standard MCP remains deferred until a consumer identifies a named task not served by the files, CLI, skill/plugin, Git, and optional read-only repository integration.

@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-10-26 — Documentation rc.8 deployment
+
+- **Documentation adoption and public proof:** Record the separately authorised migration through protected PR #40 at `6e47505624731e52dcaa5abe058190f4c1c75548`. The manifest and clean snapshot pin exact rc.8 Standard revision `e4814a0715481edbba56189e34e93a3d76d88421`. Complete local maintainer verification passed. Exact-merge Verify `39982006293` and Pages `39982662370` succeeded; deployment completed at `2026-10-23T15:58:51Z`. Public proof at `2026-10-26T06:57:53.914Z` confirms the same revision, exact DOMPurify `3.4.17` runtime bytes, released schemas, graph identity, reader and math contracts, and public projection controls. Close the Documentation follow-up without changing the immutable Standard release, earlier records, proposal registry or other consumer pins. [SRC-078](sources.md#src-078)
+
+- **Current tooling audit failure — observed 26 October:** Preserve the successful 23 October migration checks and deployment as dated evidence. Read back the saved post-merge full-verification failure at npm audit; do not assign this readback date to the full run. Fresh Standard and Documentation audits at `2026-10-26T06:53:45.857580+00:00` and `2026-10-26T06:53:46.896098+00:00` return exit 1. They report three affected package rows: fast-uri moderate, Zod high and its `@google/design.md` parent high. Open `STD-VAL-014` for one scoped dependency qualification. DOMPurify `3.4.17` remains selected; public browser success does not waive the failed tooling gate. [SRC-079](sources.md#src-079)
+
 ## 2026-10-23
 
 - **Immutable sanitizer release:** Publish `v0.1.0-rc.8` at `e4814a0715481edbba56189e34e93a3d76d88421` through protected PR #42 after successful exact-revision post-merge Verify `39932360257`. Read back release `421678175` as non-draft and immutable, published at `2026-10-23T09:51:15Z`; all five downloaded public assets match the reviewed names, sizes and hashes. The release retains Mermaid `11.17.2` and KaTeX `0.18.2` with exact DOMPurify `3.4.17`. Its public qualification records a fresh zero-finding npm audit of the release lock. Close the publication priority and `STD-VAL-013`. Earlier releases, the proposal registry, Documentation and other consumer pins remain unchanged. [SRC-077](sources.md#src-077)
