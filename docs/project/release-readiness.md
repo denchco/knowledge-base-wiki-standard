@@ -103,4 +103,25 @@ Public browser verification passed the reader defaults, saved width and palette 
 
 The saved post-merge Documentation full-verification attempt failed in `check` at the npm audit gate. The failure was read back on 26 October; the readback does not establish that run’s date. Subsequent gates are not proved by that attempt. Fresh audits of both current locks on 26 October independently return exit 1, with one moderate and two high package findings. The recorded successful 23 October Verify and Pages runs remain historical deployment evidence. The public browser proof above is a separate check and does not clear the failing tooling gate. [SRC-079](../sources.md#src-079)
 
-The scoped follow-up is fast-uri `3.1.8` and the Zod `3.25.76` implementation embedded in the design validator. Fast-uri `3.1.9` fits Ajv’s existing range but still requires qualification. The reviewed Zod fix is outside the validator’s declared range, and changing only the npm lock cannot replace its bundled bytes. Keep the audit gate intact, qualify a compatible correction and run complete verification. This record does not apply a dependency update, rewrite an immutable release or change another consumer’s pin. [STD-VAL-014](../validation-queue.md) remains open.
+At that checkpoint, fast-uri `3.1.9` still required qualification, and the reviewed Zod fix lay outside the validator's declared range. Changing only the npm lock could not replace its embedded Zod `3.25.76` bytes. The later candidate below records the repair without rewriting this failed attempt or the earlier deployment. [STD-VAL-014](../validation-queue.md) remains open.
+
+## rc.9 frozen-stack and tooling candidate
+
+Protected PR #50 combines the frozen-stack lifecycle with the owner-authorised tooling repairs. Planned `v0.1.0-rc.9` has no recorded release revision yet. Full maintainer verification, protected merge and exact-revision Verify, native immutable publication and asset readback remain pending. The authorised Documentation migration follows that exact release; its protected deployment and public proof are separate stages. Other Wikis retain their existing pins.
+
+| Candidate change | Applicable requirements | Evidence available |
+|---|---|---|
+| First builds select the latest verified immutable stack; existing Wikis check availability without mutation | `DKBWS-PROMPT-001`, `DKBWS-UPDATE-001`, `DKBWS-RELEASE-001` | Offline identity/failure fixtures and live read-only rc.8 resolution; explicit historical/development plans remain unverified selections. [SRC-080](../sources.md#src-080) |
+| fast-uri `3.1.9` with retained Ajv `8.20.0` | `DKBWS-SEC-001`, `DKBWS-VERIFY-001` | Six inert URI and local schema-resolution fixtures, including old-version controls. [SRC-082](../sources.md#src-082) |
+| Sourced design validator `0.4.0-denchco.1` with exact Zod `4.6.6` | `DKBWS-DESIGN-001`, `DKBWS-SEC-001`, `DKBWS-VERIFY-001` | Eleven tests, all nine upstream fixture baselines, retained eleven rules, source provenance and checks on all 95 compiled Zod inputs; stale labelled bytes fail. [SRC-083](../sources.md#src-083) |
+| filelock `4.2.1` and msgpack `1.2.3` | `DKBWS-SEC-001`, `DKBWS-VERIFY-001` | Five tests of exact installed versions, actual cache calls, process exclusion and bounded malformed decoding; retained pip-audit, CacheControl, Graphify and Zensical. [SRC-084](../sources.md#src-084), [SRC-085](../sources.md#src-085) |
+| Fresh Standard dependency audits | `DKBWS-SEC-001` | Zero npm and installed-Python findings on 27 October; 67 Python packages checked. Complete verification is not yet established. [SRC-086](../sources.md#src-086) |
+
+### Migration impact and remaining gates
+
+1. Carry the release resolver, report schema, revised prompt, initializer and relevant starter closure from the selected release. Record the release tag and full commit. Update checks never install or migrate.
+2. Carry both frozen locks and the complete local design package, licence, provenance, Zod input proof, wrapper, tests and command wiring. A lock-only override cannot repair the old opaque bundle. Reinstall with `npm ci` and `uv sync --frozen` using the exact qualified toolchain.
+3. Regenerate declared runtime and graph outputs, then pass complete Standard verification and read-only maintainer provenance before publication. Retain DOMPurify `3.4.17`, Mermaid `11.17.2`, KaTeX `0.18.2`, Zensical `0.0.59` and Graphify `0.9.70`.
+4. After exact-merge Verify and immutable release readback pass, adopt the exact release in Documentation. Refresh its allowed snapshot and project-owned tooling, run complete target verification, then prove the protected deployment and actual public site.
+
+Filelock 4 changes `SoftReadWriteLock`'s disk protocol. The inspected pip-audit cache does not use it; compatibility evidence covers its actual atomic cache path and ordinary `FileLock`. The design migration retains recoverable malformed-YAML warnings and the current `DESIGN.md` result of zero errors, one warning and one information finding. No broader lock-mode, arbitrary-input or general vulnerability-clearance claim follows from these tests. [SRC-083](../sources.md#src-083), [SRC-084](../sources.md#src-084), [SRC-086](../sources.md#src-086)

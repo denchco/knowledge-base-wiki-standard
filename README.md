@@ -78,7 +78,7 @@ A subject-empty start creates the structure without inventing research claims, e
 
 ## Keep an existing Wiki on its released stack
 
-The frozen-stack checker described here is an unreleased Standard change. Current `v0.1.0-rc.8` consumers do not contain it automatically; it must be included in a new verified immutable release before consumer adoption.
+The frozen-stack commands described here require `v0.1.0-rc.9` or later. Existing Wikis receive them through a verified release migration.
 
 Your Wiki keeps its selected release until you authorise a migration. Ask the agent to run:
 

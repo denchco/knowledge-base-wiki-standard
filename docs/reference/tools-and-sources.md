@@ -15,11 +15,14 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Portable format | [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/ad30107c31c06aec8a7d5636e0d1058118604e6f/SPEC.md) and the [DenchCo portability boundary](#portable-okf-v02) |
 | Human renderer | [Zensical](https://zensical.org/docs/) and the [DenchCo reference implementation](#human-reference-implementation) |
 | Visual contract | [Google DESIGN.md](https://github.com/google-labs-code/design.md) plus the canonical [DenchCo design contract](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md) |
+| Design validation | Local Apache-2.0 adaptation of Google `design.md` `0.4.0`, with the original eleven rules and verified Zod `4.6.6` source inputs; candidate qualification in [SRC-083](../sources.md#src-083) |
 | Codex discovery | `AGENTS.md`, `.agents/skills/`, and `llms.txt` |
 | Claude Code discovery | `CLAUDE.md` importing `AGENTS.md`, plus `.claude/skills/` |
 | Follow-up state | `docs/project/status.md` for zero to three active priorities; validation queue fields for parked work and reopen triggers |
 | Development-response navigation | Configured canonical Human Wiki origin plus `npm run response:links:check -- --base-url <canonical-url> --managed-live` for Markdown, HTML, plain-GFM, exact managed-identity, and per-route HTTP checks; uncaptured pre-send interception still requires a host hook |
 | Validation runtime | Node `24.20.0`, enforced identically in the maintainer workspace, package contract, and CI |
+| Schema URI resolution | Ajv `8.20.0` with locked fast-uri `3.1.9`; six focused compatibility and security fixtures in the rc.9 candidate |
+| Python audit cache | pip-audit `2.10.1`, CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3`; five focused actual-call-path fixtures |
 | Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.70` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0` |
 | Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.4.17`, served locally |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
@@ -57,5 +60,7 @@ The [Human and LLM Wiki products](../architecture.md#human-and-llm-products) are
 ## Human reference implementation
 
 The [Standard Production profile](../spec/profiles.md#profiles) selects exactly [Zensical](https://zensical.org/docs/) `0.0.59` to render the Human Wiki with the DenchCo visual profile, repository-local diagram and graph assets, and built-output browser checks. [Google DESIGN.md](https://github.com/google-labs-code/design.md) supplies an agent-readable design-contract format; the actual colours, shapes, layout, accessibility rules, and adapter decisions are governed by the canonical [DenchCo `DESIGN.md`](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md). Exact pins and the offline/runtime boundary are recorded in [Dependencies](../spec/dependencies.md).
+
+The rc.9 tooling candidate passes 22 focused tests and fresh Standard Node/Python audits. The design adaptation preserves the nine upstream fixture results and checks actual dependency bytes before compilation. Complete verification, protected release and authorised Documentation adoption remain pending. These dated results do not change an existing Wiki's installed stack. [SRC-082](../sources.md#src-082), [SRC-083](../sources.md#src-083), [SRC-084](../sources.md#src-084), [SRC-085](../sources.md#src-085), [SRC-086](../sources.md#src-086)
 
 See the root dependency contract and source register for versions and authority.

@@ -4,6 +4,8 @@ import YAML from "yaml";
 import { checkHandoffInstructions } from "./development-next-steps.mjs";
 
 const required = [
+  "scripts/design-validator.mjs", "scripts/design-validator.test.mjs", "scripts/check-tooling-dependencies.test.mjs", "scripts/check-python-tooling.test.py",
+  "tools/design-md/package.json", "tools/design-md/upstream-provenance.json", "tools/design-md/zod-4.6.6-inputs.json", "tools/design-md/upstream/LICENSE",
   "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "AUTHORING.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
   ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/standard-change.yml",
   ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
@@ -568,7 +570,7 @@ const licence = readFileSync("LICENSE", "utf8");
 if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failures.push("LICENSE must identify MIT and copyright Andrew Dench");
 if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);
 const exactNodePins = {
-  "@google/design.md": "0.4.0",
+  "@denchco/design-md-validator": "file:tools/design-md",
   "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
@@ -585,6 +587,13 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
 }
 if (pkg.overrides?.["mermaid@11.17.2"]?.katex !== "$katex") failures.push("Mermaid must use the qualified exact KaTeX override");
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
+if (pkg.devDependencies?.["@google/design.md"]) failures.push("the unqualified bundled design.md executable must not be installed");
+if (pkg.scripts?.["design:lint"] !== "node scripts/design-validator.mjs lint DESIGN.md") failures.push("design:lint must use the qualified source adapter");
+for (const test of ["scripts/design-validator.test.mjs", "scripts/check-tooling-dependencies.test.mjs"]) {
+  if (!pkg.scripts?.["conformance:test"]?.includes(test)) failures.push(`complete verification omits ${test}`);
+}
+if (!pkg.scripts?.check?.includes("check:python-tooling") || !pkg.scripts?.["check:python-tooling"]?.includes("scripts/check-python-tooling.test.py")) failures.push("complete verification omits Python tooling qualification");
+
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
 }
@@ -629,9 +638,10 @@ if (lockRoot.license !== pkg.license) failures.push("package-lock licence does n
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
+if (packageLock.packages?.["node_modules/@google/design.md"]) failures.push("the lock retains the unqualified bundled design.md executable");
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
 if (domPurifyVersion !== "3.4.17") failures.push(`package-lock must resolve exactly DOMPurify 3.4.17; found ${domPurifyVersion ?? "unlisted"}`);
-if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.8") failures.push("package-lock must resolve fast-uri exactly 3.1.8");
+if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.9") failures.push("package-lock must resolve fast-uri exactly 3.1.9");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
 if (!pkg.scripts?.["conformance:test"]?.includes("runtime-bundle.test.mjs")) failures.push("conformance:test must include runtime sanitizer and bundle inspection fixtures");
@@ -675,6 +685,8 @@ for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conform
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits canonical path ${file}`);
 }
 for (const file of [
+  ...sourceFiles(["tools/design-md"], /./).filter((file) => !file.includes("/node_modules/")),
+  "scripts/design-validator.mjs", "scripts/design-validator.test.mjs", "scripts/check-python-tooling.test.py", "scripts/check-tooling-dependencies.test.mjs",
   ".github/ISSUE_TEMPLATE/config.yml",
   ".github/ISSUE_TEMPLATE/standard-change.yml",
   "docs/llm-wiki/standard-proposals.md",

@@ -7,6 +7,14 @@ status: draft
 
 # Research and change log
 
+## 2026-10-27 — rc.9 tooling repair candidate
+
+- **Authorised scope:** Prepare the four tooling repairs with the frozen-stack lifecycle in protected PR #50. The owner authorised complete verification, a new immutable Standard release and subsequent protected Documentation adoption/deployment. Other Wikis retain their pins. These later stages are pending at this evidence checkpoint.
+- **Node tooling:** Select fast-uri `3.1.9` with retained Ajv `8.20.0`. Replace the opaque design validator with a local Apache-2.0 source adaptation at exact upstream commit `9bf8eae67128b6cc55ad9bf86665767deb4c11cd`. Preserve its parser, model and eleven rules; apply two documented Zod 4 compatibility changes. Verify and compile 95 actual Zod `4.6.6` source inputs from the integrity-checked npm archive. [SRC-082](sources.md#src-082), [SRC-083](sources.md#src-083)
+- **Python tooling:** Change only filelock `3.32.2` to `4.2.1` and msgpack `1.2.1` to `1.2.3` in the frozen Python package graph. Retain pip-audit, CacheControl, Graphify and Zensical. Inspect the actual cache call paths and record the filelock major-version boundary. A small isolated C-extension comparison reproduces msgpack's rejected-map retention on `1.2.1` and confirms its removal on `1.2.3`. [SRC-084](sources.md#src-084), [SRC-085](sources.md#src-085)
+- **Focused evidence:** Eleven design, six URI/Ajv and five Python tests pass. Independently reproduce all nine old design-bundle fixture results and verify the upstream file identities. Root `DESIGN.md` keeps zero errors, one warning and one information finding. Frozen installation, Python dependency consistency and fresh Node/Python audits pass; both audits report zero findings on 27 October. [SRC-086](sources.md#src-086)
+- **Remaining boundary:** Prepare rc.9 release notes and migration instructions without claiming full verification, publication or Documentation deployment. Keep `STD-VAL-014` open until those exact stages pass. Preserve the earlier failures and successful deployments as dated evidence.
+
 ## 2026-10-26 — Frozen stack selection
 
 - Implement the owner's clarified lifecycle: a first build selects the latest verified immutable release; an existing Wiki checks for newer releases without changing its installed stack. Each release binds exact source, locks, tools, configuration and checks.

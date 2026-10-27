@@ -7,7 +7,7 @@ status: draft
 
 # Your first Wiki and its released stack
 
-This guide accompanies the unreleased frozen-stack change prepared on 26 October 2026. The new stack commands are not included in `v0.1.0-rc.8`. They become a supported consumer capability only through a new verified immutable release and its authorised adoption.
+The commands in this guide require Standard `v0.1.0-rc.9` or later. Existing Wikis receive them through an authorised migration to that verified immutable release.
 
 Give an implementation agent the Standard repository URL:
 

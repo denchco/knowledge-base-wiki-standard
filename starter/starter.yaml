@@ -572,3 +572,38 @@ entries:
     planning_only: true
     dependency_closure: "release resolver/check reports, exact release and CI identities, observation time, scoped file digests and schema validation; this is not a full conformance receipt"
     requirements: ["DKBWS-PROMPT-001", "DKBWS-UPDATE-001", "DKBWS-VERIFY-002"]
+  - target: "tools/design-md/"
+    role: "design-validator-source-package"
+    classification: "adapt-from-release"
+    source: "tools/design-md/"
+    planning_only: true
+    dependency_closure: "complete reviewed source package, upstream licence and copyright notices, source and Zod implementation hash records, fixtures and exact local dependency manifest; exclude node_modules and generated cache"
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/design-validator.mjs"
+    role: "design-validator-wrapper"
+    classification: "adapt-from-release"
+    source: "scripts/design-validator.mjs"
+    planning_only: true
+    dependency_closure: "released tools/design-md source, exact npm and Python locks, package verification commands and qualified toolchain"
+    requirements: ["DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/design-validator.test.mjs"
+    role: "design-validator-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/design-validator.test.mjs"
+    planning_only: true
+    dependency_closure: "released tools/design-md source, exact npm and Python locks, package verification commands and qualified toolchain"
+    requirements: ["DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-tooling-dependencies.test.mjs"
+    role: "node-tooling-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-tooling-dependencies.test.mjs"
+    planning_only: true
+    dependency_closure: "released tools/design-md source, exact npm and Python locks, package verification commands and qualified toolchain"
+    requirements: ["DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+  - target: "scripts/check-python-tooling.test.py"
+    role: "python-tooling-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/check-python-tooling.test.py"
+    planning_only: true
+    dependency_closure: "released tools/design-md source, exact npm and Python locks, package verification commands and qualified toolchain"
+    requirements: ["DKBWS-SEC-001", "DKBWS-VERIFY-001"]

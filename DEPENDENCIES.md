@@ -5,12 +5,12 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Class | Required for | Dependencies |
 |---|---|---|
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
-| Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
-| Reference renderer | Human Wiki | Python `3.12.14` and uv `0.13.4` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1` |
+| Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0` with locked `fast-uri==3.1.9`; exactly pinned `yaml==2.9.0` |
+| Reference renderer | Human Wiki | Python `3.12.14` and uv `0.13.4` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain |
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.70`, with guarded reference indexing |
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.17`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
-| Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
+| Design validation | Design-Governed capability | local `@denchco/design-md-validator==0.4.0-denchco.1` from reviewed Google `design.md` `0.4.0` source, built with exact Zod `4.6.6` and `esbuild==0.28.2`; source, licence and dependency proofs under `tools/design-md/` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
 | Deployment adapter | Not selected | No deployment CLI or credentials are required; add and qualify a locked adapter before publication to a hosting target |
@@ -56,6 +56,9 @@ The repeatable commands are:
 | `npm run conformance:full-report -- --target . --receipt output/verification/receipt.json` | Consumes an explicit schema-valid verification receipt and emits the selected-profile report; every required proof obligation must be present and passing; absent proof remains `not-checked`. |
 | `npm run audit:node` | Audits the exact npm lock graph and fails moderate, high, or critical known vulnerabilities. |
 | `npm run audit:python` | Audits the locally installed environment reconstructed from `uv.lock`; run after `uv sync --frozen`. |
+| `npm run check:python-tooling` | Checks exact cache-chain versions, actual pip-audit/CacheControl calls, file-lock exclusion and bounded malformed-msgpack rejection. |
+| `npm run design:lint` | Validates reviewed source and actual Zod input bytes, builds the lint API into ignored cache output, and reports findings without changing `DESIGN.md`. |
+| `node scripts/design-validator.mjs identity --json` | Rebuilds in memory and reports source, lock, compiler-input and generated-module hashes without writing files; it does not run a vulnerability audit. |
 | `npm run verify` | Snapshots every tracked and unignored canonical file, runs build/check/Graphify/browser gates, and fails any canonical mutation while permitting only declared ignored derived outputs. |
 | `npm run service:register` | Serializes shared-register and live-listener checks under an exclusive bounded lock, atomically reserves the configured service ID and loopback endpoint, and refuses conflicts without stopping another service. |
 | `npm run service:start` | Registers, installs, and loads the macOS user LaunchAgent, then waits for the exact static service identity marker. |
@@ -103,6 +106,18 @@ Migration requires the wrapper, its fixtures, the exact frozen lock, package com
 
 The Zensical reference adapter is tested and supported at exactly `zensical==0.0.59`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
 
+## Candidate tooling qualification
+
+The rc.9 candidate selects fast-uri `3.1.9` within Ajv `8.20.0`'s existing dependency range. Six focused tests cover the four registered URI advisories, the actual Ajv resolver and local Draft 2020-12 references. Inert differential controls distinguish the fixes from `3.1.8`; no tested URI is fetched or executed. [SRC-082](docs/sources.md#src-082)
+
+The local design checker retains Google's parser, model and eleven lint rules at commit `9bf8eae67128b6cc55ad9bf86665767deb4c11cd`. Its two Zod 4 adaptations preserve nested defaults and explicit string-key records. Eleven tests retain all nine upstream fixture results, malformed-input diagnostics and read-only CLI behaviour. The build checks 95 Zod source files against hashes from the integrity-verified `4.6.6` npm archive, then compiles those checked bytes. A stale implementation fails even when its package label still says `4.6.6`. The old opaque npm bundle is no longer used. The Apache-2.0 licence and upstream notices remain with the copied source. [SRC-083](docs/sources.md#src-083)
+
+The Python lock changes only filelock `3.32.2` to `4.2.1` and msgpack `1.2.1` to `1.2.3`. It retains pip-audit `2.10.1`, CacheControl `0.14.4`, Graphify `0.9.70` and Zensical `0.0.59`. Five focused tests cover actual cache serialization, atomic writes, `Vary`, deletion, ordinary `FileLock` exclusion and bounded rejected-map memory retention. The inspected pip-audit cache uses atomic replacement; it does not acquire filelock's reader/writer locks. Filelock 4 changes the `SoftReadWriteLock` disk protocol, but that mode is outside these call paths. This qualification does not establish cross-version compatibility for other lock modes or arbitrary msgpack streaming use. [SRC-084](docs/sources.md#src-084), [SRC-085](docs/sources.md#src-085)
+
+All 22 focused tests pass. Fresh Standard npm and installed-Python audits on 27 October report zero findings. These are dated local results; complete verification, protected rc.9 publication and the authorised Documentation migration remain pending under `STD-VAL-014`. The reference browser stack remains DOMPurify `3.4.17`, Mermaid `11.17.2` and KaTeX `0.18.2`. [SRC-086](docs/sources.md#src-086)
+
+Migration carries the frozen locks, local design source and provenance, input-hash proof, wrapper, fixtures and package commands together. Run `npm ci` and `uv sync --frozen`, regenerate declared outputs, then run complete selected-profile verification. A Zod lock override cannot replace the earlier embedded bundle. Existing releases and other consumer pins remain unchanged.
+
 ## Reproducibility rules
 
 - Exact production/runtime pins live in `.node-version`, `package.json`, `pyproject.toml`, and `package-lock.json`; `.npmrc` makes the Node engine fail closed during npm installation.
@@ -142,4 +157,4 @@ Each released source revision binds the full tested toolchain, locks, configurat
 
 The read-only stack commands use the existing Node runtime and GitHub HTTPS API. They add no npm dependency or required GitHub CLI. An optional API credential changes access, not release qualification. Missing, inconsistent or unavailable remote evidence fails selection instead of falling back to the development branch. The report hashes selected exact-revision stack files; the commit identifies the complete source tree. These hashes do not authorize copying the Standard's subject corpus.
 
-An existing Wiki keeps its stack during update checks. Only an authorised, reviewable migration may change it, after adapting the full relevant dependency closure and passing target checks. Historical release verification does not claim that today's advisory database is clear. Current audit failures remain blocking even when the installed release passed at publication. The 26 October checks report failures for fast-uri and the design validator’s bundled Zod in Node tooling, and filelock in the Python audit-tool cache chain. The validation queue records their qualification boundary. [SRC-079](docs/sources.md#src-079), [SRC-081](docs/sources.md#src-081)
+An existing Wiki keeps its stack during update checks. Only an authorised, reviewable migration may change it, after adapting the full relevant dependency closure and passing target checks. Historical release verification does not claim that today's advisory database is clear. The 26 October audit failures remain historical evidence. The rc.9 candidate repairs those tooling findings and the later msgpack finding; its focused checks and fresh audits pass. Complete release and target verification remain separate requirements in the validation queue. [SRC-079](docs/sources.md#src-079), [SRC-081](docs/sources.md#src-081), [SRC-085](docs/sources.md#src-085), [SRC-086](docs/sources.md#src-086)
