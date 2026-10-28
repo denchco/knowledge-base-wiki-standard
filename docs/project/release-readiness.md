@@ -85,7 +85,7 @@ Migration requires the direct pin, frozen lock, runtime builder, entry guard and
 
 ## rc.8 Documentation adoption after separate authorisation
 
-The owner subsequently authorised Documentation migration, protected publication and public-site proof. The historical migration and deployment are separate from the Standard publication above, which left all consumer pins unchanged. The current tooling-audit failure is recorded below. Documentation adopted the exact immutable rc.8 revision `e4814a0715481edbba56189e34e93a3d76d88421`. Its clean 283-file snapshot has digest `7a4e80f69656660502ec08a1474e24b3ecf4671396037d047f318d4943f69d10`. The Standard release, proposal registry and other consumer pins retain their recorded state. [SRC-078](../sources.md#src-078)
+The owner subsequently authorised Documentation migration, protected publication and public-site proof. The historical migration and deployment are separate from the Standard publication above, which left all consumer pins unchanged. The later tooling-audit failure is recorded below. Documentation adopted the exact immutable rc.8 revision `e4814a0715481edbba56189e34e93a3d76d88421`. Its clean 283-file snapshot has digest `7a4e80f69656660502ec08a1474e24b3ecf4671396037d047f318d4943f69d10`. The Standard release, proposal registry and other consumer pins retain their recorded state. [SRC-078](../sources.md#src-078)
 
 | Evidence | Recorded result |
 |---|---|
