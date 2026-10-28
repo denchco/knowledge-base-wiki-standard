@@ -32,6 +32,30 @@ test("reviewed source inventory and deterministic build bind the actual patched 
   assert.deepEqual(second.receipt, build.receipt);
 });
 
+test("historical upstream package metadata stays byte-identical and cannot become an active manifest", () => {
+  const { provenance } = checkDesignValidatorSources();
+  const entry = provenance.files.find(file => file.upstreamPath === "packages/cli/package.json");
+  assert.equal(entry.path, "upstream/packages/cli/package.json.upstream");
+  const bytes = fs.readFileSync(path.join(DESIGN_VALIDATOR_ROOT, entry.path));
+  assert.equal(sha(bytes), "9cd26dae8342295b88dad6df3432f732f38c215f401f49af61068211cf2015b9");
+  assert.equal(entry.sha256, entry.upstreamSha256);
+  assert.equal(createHash("sha1").update(Buffer.concat([Buffer.from(`blob ${bytes.length}\0`), bytes])).digest("hex"), entry.gitBlob);
+  assert.equal(entry.gitBlob, "1d964075cc16b1b21038edf4759f2f46fce86ad3");
+  assert.deepEqual(entry.changes, []);
+  assert.equal(JSON.parse(bytes).dependencies.zod, "^3.24.0", "Historical dependency declaration must not be rewritten");
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "design-manifest-test-"));
+  try {
+    fs.cpSync(DESIGN_VALIDATOR_ROOT, directory, { recursive: true, filter: source => !source.split(path.sep).includes("node_modules") });
+    const active = "upstream/packages/cli/package.json";
+    fs.renameSync(path.join(directory, entry.path), path.join(directory, active));
+    entry.path = active;
+    fs.writeFileSync(path.join(directory, "upstream-provenance.json"), JSON.stringify(provenance));
+    // Even matching file hashes and a complete provenance inventory cannot make
+    // historical dependency metadata an active installable nested package.
+    assert.throws(() => checkDesignValidatorSources(directory), /must not be an active package\.json/);
+  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
 test("stale Zod implementation bytes fail even when package metadata still claims 4.6.6", () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "design-zod-test-"));
   try {

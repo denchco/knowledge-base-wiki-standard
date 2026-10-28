@@ -301,7 +301,7 @@
     "tools/design-md/package.json",
     "tools/design-md/upstream-provenance.json",
     "tools/design-md/upstream/LICENSE",
-    "tools/design-md/upstream/packages/cli/package.json",
+    "tools/design-md/upstream/packages/cli/package.json.upstream",
     "tools/design-md/upstream/packages/cli/src/linter/fixtures/ALPINE_OBSERVATORY.md",
     "tools/design-md/upstream/packages/cli/src/linter/fixtures/CARTOGRAPHERS_ATLAS.md",
     "tools/design-md/upstream/packages/cli/src/linter/fixtures/DESIGN-test.md",

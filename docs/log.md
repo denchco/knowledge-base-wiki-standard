@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-10-27 — Upstream metadata packaging correction
+
+- **CI diagnostic:** Dependency Review run `40604832852` flags the original Zod range in the retained upstream package manifest. The active adapter already uses exact Zod `4.6.6`; the earlier zero-audit results remain dated evidence.
+- **Correction and migration:** Rename only that metadata file to `package.json.upstream`. Preserve its bytes, original path and hashes. Add a guard and negative fixture that reject an active nested manifest even when provenance is updated to match. Consumers adopting the adapter must remove the former nested manifest.
+- **Focused result:** All 12 design tests pass, bringing the focused total to 23 with the six URI/Ajv and five Python tests. All 288 compiler inputs, active locks and compiled module bytes remain unchanged. No audit exemption is introduced. Renewed full verification, protected CI, publication and Documentation adoption remain pending. [SRC-087](sources.md#src-087)
+
 ## 2026-10-27 — rc.9 tooling repair candidate
 
 - **Authorised scope:** Prepare the four tooling repairs with the frozen-stack lifecycle in protected PR #50. The owner authorised complete verification, a new immutable Standard release and subsequent protected Documentation adoption/deployment. Other Wikis retain their pins. These later stages are pending at this evidence checkpoint.

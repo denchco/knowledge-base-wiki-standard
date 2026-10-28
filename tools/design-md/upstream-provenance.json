@@ -24,7 +24,7 @@
       "changes": []
     },
     {
-      "path": "upstream/packages/cli/package.json",
+      "path": "upstream/packages/cli/package.json.upstream",
       "upstreamPath": "packages/cli/package.json",
       "upstreamSha256": "9cd26dae8342295b88dad6df3432f732f38c215f401f49af61068211cf2015b9",
       "sha256": "9cd26dae8342295b88dad6df3432f732f38c215f401f49af61068211cf2015b9",

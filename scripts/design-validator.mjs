@@ -34,6 +34,13 @@ export function checkDesignValidatorSources(packageRoot = DESIGN_VALIDATOR_ROOT)
     && provenance.license === "Apache-2.0", "Design validator upstream identity does not match the reviewed source.");
   invariant(JSON.stringify(pkg.dependencies) === JSON.stringify(provenance.dependencies)
     && pkg.dependencies.zod === ZOD_VERSION, "Design validator dependency pins differ from the reviewed provenance.");
+  const files = sourceFiles(path.join(packageRoot, "upstream"));
+  invariant(files.every(file => path.basename(file).toLowerCase() !== "package.json"),
+    "Historical upstream metadata must not be an active package.json manifest.");
+  const upstreamManifest = provenance.files.filter(entry => entry.upstreamPath === "packages/cli/package.json");
+  invariant(upstreamManifest.length === 1 && upstreamManifest[0].path === "upstream/packages/cli/package.json.upstream"
+    && upstreamManifest[0].changes.length === 0 && upstreamManifest[0].sha256 === upstreamManifest[0].upstreamSha256,
+  "Original upstream package metadata must remain unchanged in its noninstallable archive.");
   const seen = new Set();
   for (const entry of provenance.files) {
     invariant(typeof entry.path === "string" && entry.path.startsWith("upstream/")
@@ -48,7 +55,7 @@ export function checkDesignValidatorSources(packageRoot = DESIGN_VALIDATOR_ROOT)
     invariant(entry.changes.length > 0 || entry.sha256 === entry.upstreamSha256,
       `Unrecorded upstream source modification: ${entry.path}`);
   }
-  invariant(JSON.stringify(sourceFiles(path.join(packageRoot, "upstream")).map(file => path.relative(packageRoot, file).split(path.sep).join("/")).sort())
+  invariant(JSON.stringify(files.map(file => path.relative(packageRoot, file).split(path.sep).join("/")).sort())
     === JSON.stringify([...seen].sort()), "Design validator source inventory is incomplete.");
   return { provenance, pkg };
 }

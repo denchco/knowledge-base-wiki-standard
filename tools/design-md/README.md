@@ -6,6 +6,8 @@ The upstream npm artifact bundles Zod 3.25.76. A lockfile override cannot replac
 
 `upstream-provenance.json` records the exact source revision, original Git blobs, original SHA-256 hashes, local hashes and changes. The wrapper checks every retained source file and dependency pin before building. It rejects unrecorded source files. The generated module, spec configuration and build receipt go only to `.cache/design-validator/`. Each build receipt identifies its actual dependency versions and hashes every compiler input. The wrapper rejects Zod 3 inputs and any Zod version other than 4.6.6. No generated executable bundle is committed.
 
+The original upstream package manifest is retained byte for byte as `upstream/packages/cli/package.json.upstream`. Its original path and hashes remain in the provenance record. This historical evidence is not an installable package manifest. The wrapper rejects any active `package.json` under `upstream/`. The local `tools/design-md/package.json` defines the adapter's exact dependencies.
+
 `zod-4.6.6-inputs.json` pins the 95 Zod source files reached by this build. Each file was checked against the official npm archive after its SHA-512 matched the lockfile integrity value. The compiler receives these checked bytes. Stale implementation bytes fail even if a package metadata label still says 4.6.6.
 
 Run the qualified repository commands:
