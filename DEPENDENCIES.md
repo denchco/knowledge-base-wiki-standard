@@ -5,12 +5,12 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Class | Required for | Dependencies |
 |---|---|---|
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
-| Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0`; exactly pinned `yaml==2.9.0` |
-| Reference renderer | Human Wiki | Python `3.12.14` and uv `0.13.4` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1` |
+| Standard validation | Conformance | exactly Node.js `24.20.0`, enforced by `.node-version`, the package engine, npm `engine-strict`, the runtime check, and CI; Draft 2020-12 validation through `ajv==8.20.0` with locked `fast-uri==3.1.9`; exactly pinned `yaml==2.9.0` |
+| Reference renderer | Human Wiki | Python `3.12.14` and uv `0.13.4` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain |
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.70`, with guarded reference indexing |
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.17`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
-| Design validation | Design-Governed capability | `@google/design.md==0.4.0` |
+| Design validation | Design-Governed capability | local `@denchco/design-md-validator==0.4.0-denchco.1` from reviewed Google `design.md` `0.4.0` source, built with exact Zod `4.6.6` and `esbuild==0.28.2`; source, licence and dependency proofs under `tools/design-md/` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
 | Deployment adapter | Not selected | No deployment CLI or credentials are required; add and qualify a locked adapter before publication to a hosting target |
@@ -42,6 +42,8 @@ The repeatable commands are:
 | `npm run check:graphify-inputs` | Checks the guarded indexing boundary and runs benign-input, unsupported-input and symlink rejection fixtures. |
 | `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. |
 | `npm run build` | Regenerates the graph publication and then performs the strict site build. |
+| `npm run standard:stack -- resolve --json` | Reads the latest immutable release, exact tag/commit, trusted Verify evidence and selected stack file hashes. Emits a dated report; changes no repository. |
+| `npm run standard:stack -- check <wiki> --json` | Reads the installed manifest and compares its frozen revision with the verified release. Reports availability without changing pins, installing dependencies or migrating content. |
 | `npm run check` | Runs source/content, tracked Standard-proposal, canonical governing-question consistency, exact reader-to-source-row links, adoption, lifecycle, Draft 2020-12 artifact, provenance, npm/Python vulnerability, design, and visual-contract checks without starting a server or making remote writes. |
 | `npm run check:governing-question` | Checks the manifest-mapped canonical question and every exact repetition in its bounded reader-source set; subject-empty or non-selected profiles report a deliberate not-applicable result. |
 | `npm run response:next-steps:check -- --input <draft>` | Checks a captured development-cycle response for one to three ordered next steps with a proposed update, purpose and completion condition, or the explicit no-update outcome; grounding remains an agent review. |
@@ -54,6 +56,9 @@ The repeatable commands are:
 | `npm run conformance:full-report -- --target . --receipt output/verification/receipt.json` | Consumes an explicit schema-valid verification receipt and emits the selected-profile report; every required proof obligation must be present and passing; absent proof remains `not-checked`. |
 | `npm run audit:node` | Audits the exact npm lock graph and fails moderate, high, or critical known vulnerabilities. |
 | `npm run audit:python` | Audits the locally installed environment reconstructed from `uv.lock`; run after `uv sync --frozen`. |
+| `npm run check:python-tooling` | Checks exact cache-chain versions, actual pip-audit/CacheControl calls, file-lock exclusion and bounded malformed-msgpack rejection. |
+| `npm run design:lint` | Validates reviewed source and actual Zod input bytes, builds the lint API into ignored cache output, and reports findings without changing `DESIGN.md`. |
+| `node scripts/design-validator.mjs identity --json` | Rebuilds in memory and reports source, lock, compiler-input and generated-module hashes without writing files; it does not run a vulnerability audit. |
 | `npm run verify` | Snapshots every tracked and unignored canonical file, runs build/check/Graphify/browser gates, and fails any canonical mutation while permitting only declared ignored derived outputs. |
 | `npm run service:register` | Serializes shared-register and live-listener checks under an exclusive bounded lock, atomically reserves the configured service ID and loopback endpoint, and refuses conflicts without stopping another service. |
 | `npm run service:start` | Registers, installs, and loads the macOS user LaunchAgent, then waits for the exact static service identity marker. |
@@ -101,6 +106,20 @@ Migration requires the wrapper, its fixtures, the exact frozen lock, package com
 
 The Zensical reference adapter is tested and supported at exactly `zensical==0.0.59`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
 
+## Candidate tooling qualification
+
+The rc.9 candidate selects fast-uri `3.1.9` within Ajv `8.20.0`'s existing dependency range. Six focused tests cover the four registered URI advisories, the actual Ajv resolver and local Draft 2020-12 references. Inert differential controls distinguish the fixes from `3.1.8`; no tested URI is fetched or executed. [SRC-082](docs/sources.md#src-082)
+
+The local design checker retains Google's parser, model and eleven lint rules at commit `9bf8eae67128b6cc55ad9bf86665767deb4c11cd`. Its two Zod 4 adaptations preserve nested defaults and explicit string-key records. Twelve tests retain all nine upstream fixture results, malformed-input diagnostics and read-only CLI behaviour, and check the upstream metadata archive. The build checks 95 Zod source files against hashes from the integrity-verified `4.6.6` npm archive, then compiles those checked bytes. A stale implementation fails even when its package label still says `4.6.6`. The old opaque npm bundle is no longer used. The Apache-2.0 licence and upstream notices remain with the copied source. [SRC-083](docs/sources.md#src-083), [SRC-087](docs/sources.md#src-087)
+
+GitHub Dependency Review flagged the retained upstream manifest's historical Zod range. Its unchanged bytes now reside in `tools/design-md/upstream/packages/cli/package.json.upstream`, with the original path and hashes in provenance. The wrapper rejects any active `package.json` under `upstream/`, including one added to the provenance inventory. The active adapter manifest retains exact Zod `4.6.6`; all 288 compiler inputs and the compiled module remain unchanged. No audit rule is waived. [SRC-087](docs/sources.md#src-087)
+
+The Python lock changes only filelock `3.32.2` to `4.2.1` and msgpack `1.2.1` to `1.2.3`. It retains pip-audit `2.10.1`, CacheControl `0.14.4`, Graphify `0.9.70` and Zensical `0.0.59`. Five focused tests cover actual cache serialization, atomic writes, `Vary`, deletion, ordinary `FileLock` exclusion and bounded rejected-map memory retention. The inspected pip-audit cache uses atomic replacement; it does not acquire filelock's reader/writer locks. Filelock 4 changes the `SoftReadWriteLock` disk protocol, but that mode is outside these call paths. This qualification does not establish cross-version compatibility for other lock modes or arbitrary msgpack streaming use. [SRC-084](docs/sources.md#src-084), [SRC-085](docs/sources.md#src-085)
+
+All 23 focused tests pass after the archive guard was added. Fresh Standard npm and installed-Python audits on 27 October report zero findings. These are dated local results; complete verification, protected rc.9 publication and the authorised Documentation migration remain pending under `STD-VAL-014`. The reference browser stack remains DOMPurify `3.4.17`, Mermaid `11.17.2` and KaTeX `0.18.2`. [SRC-086](docs/sources.md#src-086), [SRC-087](docs/sources.md#src-087)
+
+Migration carries the frozen locks, local design source and provenance, archived upstream manifest, input-hash proof, wrapper, fixtures and package commands together. Remove the former nested `upstream/packages/cli/package.json` when adopting the archive path. Run `npm ci` and `uv sync --frozen`, regenerate declared outputs, then run complete selected-profile verification. A Zod lock override cannot replace the earlier embedded bundle. Existing releases and other consumer pins remain unchanged.
+
 ## Reproducibility rules
 
 - Exact production/runtime pins live in `.node-version`, `package.json`, `pyproject.toml`, and `package-lock.json`; `.npmrc` makes the Node engine fail closed during npm installation.
@@ -133,3 +152,11 @@ The [uv version constraint](https://docs.astral.sh/uv/reference/settings/#requir
 Weekly scheduled audits check the installed locks and generated runtime evidence. Dependabot opens reviewable pull requests for npm, uv and Actions; it has no merge or publication authority. Dependency Review rejects moderate-or-higher new vulnerabilities on Standard pull requests.
 
 Snapshot checks compare Documentation's declared release tag and full commit by default, independently of development main. `--development` explicitly compares mutable sources. `--standard-revision <full-commit>` selects exact candidate bytes without claiming release status. Only the exact published release commit is adopted as the Documentation release pin.
+
+## Immutable stack selection
+
+Each released source revision binds the full tested toolchain, locks, configuration and verification implementation. Initialisation selects the latest verified immutable release and records both its tag and full commit. Install its frozen dependency graph; do not resolve each package independently to its newest version. New compatible changes require a new release.
+
+The read-only stack commands use the existing Node runtime and GitHub HTTPS API. They add no npm dependency or required GitHub CLI. An optional API credential changes access, not release qualification. Missing, inconsistent or unavailable remote evidence fails selection instead of falling back to the development branch. The report hashes selected exact-revision stack files; the commit identifies the complete source tree. These hashes do not authorize copying the Standard's subject corpus.
+
+An existing Wiki keeps its stack during update checks. Only an authorised, reviewable migration may change it, after adapting the full relevant dependency closure and passing target checks. Historical release verification does not claim that today's advisory database is clear. The 26 October audit failures remain historical evidence. The rc.9 candidate repairs those tooling findings and the later msgpack finding; its focused checks and fresh audits pass. Complete release and target verification remain separate requirements in the validation queue. [SRC-079](docs/sources.md#src-079), [SRC-081](docs/sources.md#src-081), [SRC-085](docs/sources.md#src-085), [SRC-086](docs/sources.md#src-086)

@@ -9,10 +9,12 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 
 import { parseDocument } from "yaml";
+import Ajv2020 from "ajv/dist/2020.js";
 
 import {
   CliUsageError,
   inspectProject,
+  isDateTime,
   publicReport,
   standardRoot,
 } from "./okf-core.mjs";
@@ -21,12 +23,14 @@ import {
   loadRequirementCatalogue,
   ProfileLoadError,
 } from "./profile-catalogue.mjs";
+import { parseReleaseVersion, STACK_FILES } from "./standard-stack.mjs";
 
 const LIFECYCLE_SCHEMA = "https://denchco.github.io/knowledge-base-wiki-documentation/schema/lifecycle-plan-v1.json";
 const LIFECYCLE_VERSION = "1.0";
 const STANDARD_ROOT = standardRoot();
 const STARTER_PATH = "starter/starter.yaml";
 const DEFAULT_ACCENT = "#0b7285";
+let validateStackReport;
 const REQUIRED_PRODUCTION_ROLES = {
   okf_bundle: "knowledge",
   source_register: "docs/sources.md",
@@ -37,18 +41,6 @@ const REQUIRED_PRODUCTION_ROLES = {
   llm_wiki: "docs/llm-wiki/index.md",
   design_contract: "DESIGN.md",
 };
-
-function automaticStandardRevision() {
-  try {
-    return stripFinalLineEnding(execFileSync("git", ["rev-parse", "HEAD"], {
-      cwd: STANDARD_ROOT,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }));
-  } catch {
-    throw new CliUsageError("Cannot resolve the standard checkout to an immutable commit SHA; use --standard-revision only as an explicit override.");
-  }
-}
 
 function stripFinalLineEnding(value) {
   return value.endsWith("\r\n")
@@ -78,14 +70,73 @@ function parseYaml(source, label) {
   return { source, data, sha256: sha256(source) };
 }
 
-function candidateState(profileId, requestedRevision = null) {
-  const revision = requestedRevision ?? automaticStandardRevision();
+function candidateSelection(options) {
+  if (options.standardRevision && options.resolvedStack) {
+    throw new CliUsageError("Choose a verified release selection or an explicit --standard-revision, not both.");
+  }
+  if (options.standardRevision) {
+    return {
+      mode: "explicit-unverified",
+      revision: options.standardRevision,
+      releaseTag: parseReleaseVersion(options.standardRevision) ? options.standardRevision : null,
+      bootstrapEligible: false,
+      currentVulnerabilityClearance: "not-checked",
+      evidence: null,
+    };
+  }
+  const report = options.resolvedStack;
+  // Compile only when selecting a verified release. Explicit historical plans
+  // stay offline and do not depend on the newer release-report schema.
+  if (report && !validateStackReport) {
+    const schema = JSON.parse(readFileSync(path.join(STANDARD_ROOT, "schema/standard-stack-report-v1.json"), "utf8"));
+    validateStackReport = new Ajv2020({ strict: true, strictRequired: false, allErrors: true }).compile(schema);
+  }
+  const reject = () => {
+    throw new CliUsageError("Default lifecycle planning requires a resolved latest verified immutable Standard release with complete dated schema-valid evidence and matching release and verification identities. Use the CLI's live resolver, or supply --standard-revision for an explicit unverified historical/development dry-run; checkout HEAD is never a default.");
+  };
+  if (!report || !validateStackReport(report)) reject();
+  const stack = report?.stack;
+  const release = stack?.release;
+  const qualification = stack?.qualification;
+  if (report.operation !== "resolve" || !parseReleaseVersion(stack.tag)
+    || release.tag !== stack.tag || release.url !== `${report.source}/releases/tag/${stack.tag}`
+    || qualification.headSha !== stack.revision || qualification.url !== `${report.source}/actions/runs/${qualification.runId}`
+    || ![report.observedAt, release.publishedAt, qualification.updatedAt].every(isDateTime)
+    || Date.parse(release.publishedAt) > Date.parse(report.observedAt)
+    || Date.parse(qualification.updatedAt) > Date.parse(report.observedAt)
+    || !STACK_FILES.every(file => stack.files.some(item => item.path === file))) reject();
+  return {
+    mode: "latest-verified-immutable", revision: stack.revision, releaseTag: stack.tag,
+    bootstrapEligible: true, currentVulnerabilityClearance: "not-checked", evidence: report,
+  };
+}
+
+function candidateState(profileId, options = {}) {
+  const selection = candidateSelection(options);
+  const revision = selection.revision;
   const commit = resolveStandardRevision(revision);
   if (!commit) {
-    throw new CliUsageError(`Cannot resolve Standard revision ${JSON.stringify(revision)} to an immutable commit.`);
+    throw new CliUsageError(`Cannot resolve selected Standard revision ${JSON.stringify(revision)} locally. Fetch that exact immutable revision before planning; no checkout HEAD fallback is permitted.`);
   }
+  selection.revision = commit;
   const readSource = (relativePath) => gitSource(commit, relativePath);
   const manifest = parseYaml(readSource(".wiki-standard.yaml"), `${commit}:.wiki-standard.yaml`);
+  if (selection.evidence) {
+    if (manifest.data.standard?.source !== selection.evidence.source) throw new CliUsageError("Verified release source differs from its committed Standard manifest.");
+    const observedPaths = new Set();
+    for (const file of selection.evidence.stack.files) {
+      if (typeof file.path !== "string" || path.isAbsolute(file.path) || file.path.includes("\\")
+        || file.path.split("/").some(segment => !segment || segment === "." || segment === "..") || observedPaths.has(file.path)) {
+        throw new CliUsageError("Verified stack evidence contains duplicate or nonportable file paths.");
+      }
+      observedPaths.add(file.path);
+      const bytes = Buffer.from(readSource(file.path));
+      if (file.bytes !== bytes.length || file.sha256 !== sha256(bytes)
+        || file.gitBlob !== gitText(["rev-parse", `${commit}:${file.path}`])) {
+        throw new CliUsageError(`Verified stack evidence differs from selected immutable revision: ${file.path}`);
+      }
+    }
+  }
   let requirements;
   let profile;
   try {
@@ -106,6 +157,7 @@ function candidateState(profileId, requestedRevision = null) {
       ...manifest.data.standard,
       revision: commit,
     },
+    selection,
     okfVersion: manifest.data.okf_version,
     manifest: {
       path: ".wiki-standard.yaml",
@@ -264,7 +316,7 @@ export function lifecycleDiff(options = {}) {
   const inspection = inspectProject({ ...options, command: "inspect" });
   const consumer = inspection.manifest.data;
   const selectedProfile = options.profile ?? consumer?.profile ?? "standard-production";
-  const candidate = candidateState(selectedProfile);
+  const candidate = candidateState(selectedProfile, options);
   const changes = [];
   const versionState = consumer
     ? versionRelation(consumer.standard?.version, candidate.standard.version)
@@ -340,6 +392,12 @@ export function lifecycleDiff(options = {}) {
     }
 
     if (sameStandardIdentity) {
+      if (candidate.selection.bootstrapEligible && consumer.capabilities?.standard_release_tag !== candidate.selection.releaseTag) {
+        changes.push(diffChange("standard-release-tag-review", "manual", "/capabilities/standard_release_tag",
+          consumer.capabilities?.standard_release_tag, candidate.selection.releaseTag,
+          "Adoption must record the selected immutable release tag together with its full revision after stack verification and review.",
+          { blocking: true, requirement: "DKBWS-UPDATE-001" }));
+      }
       const declaredRevision = consumer.standard?.revision;
       if (typeof declaredRevision !== "string" || declaredRevision.length === 0) {
         comparedRevisionState = "missing";
@@ -548,6 +606,7 @@ export function lifecycleDiff(options = {}) {
     evaluationDate: inspection.evaluationDate,
     candidate: {
       standard: candidate.standard,
+      selection: candidate.selection,
       okfVersion: candidate.okfVersion,
       profile: candidate.profile,
       manifest: candidate.manifest,
@@ -690,6 +749,7 @@ function plannedLayout(profile, starter) {
 }
 
 function proposedManifest(candidate, profile, starter, options = {}) {
+  const existing = options.existingManifest ?? {};
   const roles = selectedRoleBaseline(profile);
   const authoringEntry = plannedLayout(profile, starter).find((entry) => entry.role === "authoring_policy");
   if (authoringEntry) roles.authoring_policy = options.existingAuthoringPolicy ?? authoringEntry.target;
@@ -699,10 +759,19 @@ function proposedManifest(candidate, profile, starter, options = {}) {
   ]));
   if (options.wikiUrl) capabilities.human_wiki_url = options.wikiUrl;
   if (options.deployment) capabilities.deployment = options.deployment === "none" ? false : options.deployment;
-  const revision = options.standardRevision ?? candidate.standard.revision;
+  if (candidate.selection.releaseTag) capabilities.standard_release_tag = candidate.selection.releaseTag;
+  const proposedCapabilities = {
+    ...capabilities, ...existing.capabilities,
+    ...(options.wikiUrl ? { human_wiki_url: options.wikiUrl } : {}),
+  };
+  if (candidate.selection.releaseTag) proposedCapabilities.standard_release_tag = candidate.selection.releaseTag;
+  else delete proposedCapabilities.standard_release_tag;
+  const revision = candidate.standard.revision;
   return {
-    schema: "https://denchco.github.io/knowledge-base-wiki-documentation/schema/manifest-v1.json",
+    ...existing,
+    schema: existing.schema ?? "https://denchco.github.io/knowledge-base-wiki-documentation/schema/manifest-v1.json",
     standard: {
+      ...existing.standard,
       name: candidate.standard.name,
       version: candidate.standard.version,
       source: starter.standard_source,
@@ -710,13 +779,13 @@ function proposedManifest(candidate, profile, starter, options = {}) {
     },
     profile: profile.id,
     okf_version: candidate.okfVersion,
-    roles,
-    capabilities,
-    deviations: [],
+    roles: { ...roles, ...existing.roles },
+    capabilities: proposedCapabilities,
+    deviations: existing.deviations ?? [],
   };
 }
 
-export function initPlan(options = {}) {
+export function validateInitOptions(options = {}) {
   if (options.dryRun !== true) {
     throw new CliUsageError("`init` is planning-only in this candidate and requires --dry-run.");
   }
@@ -730,18 +799,28 @@ export function initPlan(options = {}) {
   if (target === STANDARD_ROOT) {
     throw new CliUsageError("`init --dry-run` target must be an independent repository path, not the standard repository root.");
   }
-  const profileId = options.profile ?? "standard-production";
-  const candidate = candidateState(profileId, options.standardRevision);
+  return target;
+}
+
+export function initPlan(options = {}) {
+  const target = validateInitOptions(options);
+  const targetManifestPath = path.join(target, ".wiki-standard.yaml");
+  const existingManifest = existsSync(targetManifestPath)
+    ? parseYaml(readFileSync(targetManifestPath, "utf8"), targetManifestPath).data : null;
+  const profileId = options.profile ?? existingManifest?.profile ?? "standard-production";
+  const candidate = candidateState(profileId, options);
   const standardRevision = candidate.standard.revision;
   const starter = starterContract(candidate.standard.revision);
+  if (starter.data.standard_source !== candidate.standard.source) {
+    throw new CliUsageError("The selected starter and Standard manifest disagree on their source repository.");
+  }
   const inventory = targetInventory(target);
   if (inventory.type === "file") throw new CliUsageError("`init --dry-run` target must be a directory path or an absent path.");
   const promptSource = gitSource(candidate.standard.revision, "prompts/instantiate-wiki.md");
   const selectedEntries = plannedLayout(candidate.profile, starter.data);
   let existingAuthoringPolicy;
-  const targetManifestPath = path.join(target, ".wiki-standard.yaml");
-  if (selectedEntries.some((entry) => entry.role === "authoring_policy") && existsSync(targetManifestPath)) {
-    const targetManifest = parseYaml(readFileSync(targetManifestPath, "utf8"), targetManifestPath).data;
+  if (selectedEntries.some((entry) => entry.role === "authoring_policy") && existingManifest) {
+    const targetManifest = existingManifest;
     if (targetManifest.roles !== undefined && (!targetManifest.roles || typeof targetManifest.roles !== "object" || Array.isArray(targetManifest.roles))) {
       throw new CliUsageError("Existing target manifest roles must be a mapping; preserve and review it before initialization planning.");
     }
@@ -823,12 +902,14 @@ export function initPlan(options = {}) {
       proposedAccent: options.accent ?? DEFAULT_ACCENT,
       profile: profileId,
       standardRevision,
+      standardReleaseTag: candidate.selection.releaseTag,
       wikiUrl,
       wikiUrlResolution: options.wikiUrl ? "explicit-override" : "implementation-auto-reserve-conflict-free-loopback",
       deployment,
     },
     candidate: {
       standard: candidate.standard,
+      selection: candidate.selection,
       okfVersion: candidate.okfVersion,
       profile: candidate.profile,
       prompt: {
@@ -853,7 +934,7 @@ export function initPlan(options = {}) {
         documentation: starter.data.documentation,
       },
     },
-    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision, deployment, existingAuthoringPolicy }),
+    proposedManifest: proposedManifest(candidate, candidate.profile, starter.data, { ...options, standardRevision, deployment, existingAuthoringPolicy, existingManifest }),
     layout,
     stages,
     unresolvedInputs,
@@ -876,6 +957,9 @@ export function initPlan(options = {}) {
       rootCopy: starter.data.root_copy,
       deployment: starter.data.deployment_policy,
       externalActions: "No GitHub, deployment, service, Git, or Jujutsu mutation is authorized by init planning.",
+      standardSelection: candidate.selection.bootstrapEligible
+        ? "The latest immutable release and exact-revision Verify evidence were resolved read-only. This dated proof is not current vulnerability clearance."
+        : "Explicit historical/development dry-run only. Release status and qualification are unverified; this plan is not an automatic production bootstrap.",
     },
     summary: {
       proposedPaths: layout.length,
@@ -883,7 +967,7 @@ export function initPlan(options = {}) {
       unresolvedInputs: unresolvedInputs.length,
       readyForImplementationReview: unresolvedInputs.length === 0,
       pendingAutomaticResolutions: automaticResolutions.length,
-      readyForRendering: unresolvedInputs.length === 0 && automaticResolutions.length === 0,
+      readyForRendering: candidate.selection.bootstrapEligible && unresolvedInputs.length === 0 && automaticResolutions.length === 0,
     },
   };
 }
@@ -893,6 +977,7 @@ export function lifecycleText(value) {
     const lines = [
       `Lifecycle diff: ${value.consumer.standard?.version ?? "no manifest"} → ${value.candidate.standard.version}`,
       `Target: ${value.target}`,
+      `Standard selection: ${value.candidate.selection.mode} · ${value.candidate.selection.releaseTag ?? "no verified tag"} · ${value.candidate.standard.revision}`,
       `Result: ${value.summary.changes} changes · ${value.summary.automatic} plan-safe · ${value.summary.blocking} blocking`,
     ];
     for (const change of value.changes) {
@@ -904,6 +989,7 @@ export function lifecycleText(value) {
     return [
       `Upgrade dry-run: ${value.consumer.standard?.version ?? "unknown"} → ${value.candidate.standard.version}`,
       `Target: ${value.target}`,
+      `Standard selection: ${value.candidate.selection.mode} · ${value.candidate.selection.releaseTag ?? "no verified tag"} · ${value.candidate.standard.revision}`,
       `Writes performed: ${value.writesPerformed}`,
       `Patch operations: ${value.summary.operations} · manual actions: ${value.summary.manualActions} · blocking: ${value.summary.blocking}`,
       "No apply command exists in this candidate; review the JSON patch plan before any separate implementation.",
@@ -912,6 +998,7 @@ export function lifecycleText(value) {
   return [
     `Init dry-run: ${value.input.title ?? "untitled"} · profile ${value.input.profile}`,
     `Target: ${value.target} (${value.targetState.type})`,
+    `Standard selection: ${value.candidate.selection.mode} · ${value.candidate.selection.releaseTag ?? "no verified tag"} · ${value.candidate.standard.revision}`,
     `Writes performed: ${value.writesPerformed}`,
     `Proposed paths: ${value.summary.proposedPaths} · collisions preserved: ${value.summary.collisions} · unresolved inputs: ${value.summary.unresolvedInputs}`,
     value.clarificationProtocol.nextQuestion ?? "No material clarification is currently identified.",

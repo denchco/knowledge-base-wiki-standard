@@ -6,7 +6,7 @@ Use `starter.yaml` as the machine-readable boundary. A Codex instance should:
 
 1. accept the standard repository URL as the complete bootstrap invocation;
 2. ask first for a research topic seed or a subject-empty local initialization, then inspect before asking follow-ups;
-3. resolve the standard repository's current default-branch HEAD automatically and inspect that exact commit;
+3. resolve the latest published, non-draft, native-immutable release with `npm run standard:stack -- resolve --json`, verify its exact tag/SHA and trusted successful `Verify` push/main evidence, then inspect that released commit;
 4. infer routine local defaults, state and confirm the accent hex, and render only the listed templates into a separate target repository;
 5. render the target's `AUTHORING.md` policy and author its `docs/` and `knowledge/` content from its own topic and sources, or preserve an explicit awaiting-seed state without invented claims;
 6. adapt only the explicitly classified implementation files needed by the selected profile; and
@@ -26,8 +26,16 @@ Do not recursively copy the repository root. Do not publish the standard's refer
 
 There is no apply command in this candidate. The templates define a deterministic content boundary, not a secretly incomplete runnable scaffold. Portable Core targets validate with the CLI and schemas from the pinned release. Standard Production additionally requires an implementation agent to supply and verify the complete consumer renderer, scripts, schemas, profiles, runtime assets, locks, CI, and provenance closure selected from that release. Standard-maintainer documentation-sync commands and `verify:workspace` stay out unless the consumer independently declares that capability. Reserved verification paths hold a verification-receipt-v1 artifact and the paired conformance report; project-only summaries use a different path.
 
+## Frozen release stack
+
+The release fixes the tool versions, dependency locks, configuration contracts and verification implementation used for the first build. Install its frozen locks, including `npm ci` and `uv sync --frozen`. Target-owned content, confirmed appearance and documented deviations remain independent. New improvements require a new verified immutable release.
+
+Semantic version ordering includes prereleases such as `rc.8`. Selection fails when the newest eligible release lacks exact successful evidence; it does not substitute `main` or an older release. Explicit historical/development `--standard-revision` plans remain unverified release selections.
+
+Carry `standard-stack.mjs`, `standard-stack-cli.mjs`, `standard-stack.test.mjs`, `standard-stack-report-v1.json` and the `standard:stack` package command together. Existing Wikis run `npm run standard:stack -- check <wiki>` to inspect release availability. This command never installs, changes pins or migrates files. An authorised migration checks compatibility and deviations, preserves unknown fields, and passes complete selected-profile verification. A dated release pass does not clear newly reported vulnerabilities or waive current audits.
+
 ## Appearance adapter candidate
 
 The local candidate includes a versioned appearance input template and reusable generator. Render the confirmed accent into `config/wiki-appearance.json`; honour explicit reader-default instructions for `appearance` and `width`. New Wikis start with light appearance and Wide desktop width, including when the appearance configuration is absent. An explicit configured Standard default and valid saved reader choices take precedence. Missing, invalid or unavailable storage uses the configured width or Wide when no width is configured. Mobile keeps its contained layout and hidden width control without changing the saved desktop choice. Existing consumers adopt this default through a reviewed migration; their pins remain unchanged.
 
-Carry `scripts/wiki-appearance.mjs`, `scripts/prepare-wiki-appearance.mjs`, the versioned schema, configured width fallback, graph integration and their tests together. Run `prepare:appearance` before Zensical, build from `zensical.appearance.toml`, and use that input in live-config preparation. Ignore `zensical.appearance.toml` and `docs/assets/appearance/`, and declare them as derived verification outputs. Run the appearance unit and real-renderer browser checks as part of complete verification. This adapter does not make the overall starter an apply command or establish acceptance of the pending proposal.
+Carry `scripts/wiki-appearance.mjs`, `scripts/prepare-wiki-appearance.mjs`, the versioned schema, configured width fallback, graph integration and their tests together. Run `prepare:appearance` before Zensical, build from `zensical.appearance.toml`, and use that input in live-config preparation. Ignore `zensical.appearance.toml` and `docs/assets/appearance/`, and declare them as derived verification outputs. Run the appearance unit and real-renderer browser checks as part of complete verification. This adapter does not make the overall starter an apply command. Its release and later consumer adoption remain separate recorded events.

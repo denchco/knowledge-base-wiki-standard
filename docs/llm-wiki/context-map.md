@@ -12,10 +12,10 @@ For appearance work, read `DESIGN.md` and the native Zensical palette configurat
 | Task | Required context | Add when needed |
 |---|---|---|
 | Explain the standard | Specification, requirements, profiles | Sources and evidence matrix |
-| Instantiate a wiki | Repository URL, canonical prompt, starter bootstrap contract, automatically resolved immutable revision | Supplied research seed, existing target, conditional source risks, accent decision |
+| Instantiate a wiki | Repository URL, canonical prompt, starter bootstrap contract, latest verified immutable release and exact revision | Supplied research seed, existing target, conditional source risks, accent decision |
 | Audit conformance | Manifest, requirements, conformance page | Fixtures and project deviations |
 | Change visual behaviour | `DESIGN.md`, Zensical adapter | Browser fixtures and local precedent |
-| Upgrade the standard | Current manifest, canonical source, immutable consumer/candidate revisions, migration notes | Pinned profile/catalogue diff, changelog, and changed fixtures |
+| Upgrade the standard | Current manifest, read-only stack update report, canonical source, immutable consumer/candidate revisions, migration notes | Pinned profile/catalogue diff, changelog, and changed fixtures |
 | Write new prose | Mapped `AUTHORING.md`, [writing policy](../spec/writing-style.md), reader task and source evidence | Existing glossary, exact quotations or identifiers, material style variations and stricter local rules; 80% is a pragmatic preference, not a score |
 | Research a concept | Source register, evidence matrix, relevant canonical page | Validation queue and Graphify |
 | Prepare a development response | Manifest capability, canonical Human Wiki URL, and captured response draft | Markdown/HTML/plain-GFM link forms; `--managed-live` exact service identity and route HTTP; host pre-send hook for an uncaptured response |

@@ -54,7 +54,8 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 
 ## What happens automatically
 
-- The current default branch is resolved to an exact commit and that immutable revision is recorded in your wiki.
+- The latest published, non-draft, native-immutable release is verified, and its exact tag and commit are recorded in your wiki. Numeric `rc` prereleases remain eligible under the default channel.
+- That release supplies one frozen stack: tool versions, dependency locks, configuration contracts and checks. Newer dependencies are not installed silently.
 - `standard-production` is selected unless the evidence calls for another profile.
 - A separate local project folder and a conflict-free local Wiki address are chosen.
 - A title, audience, reader task, intended outcome, and source boundary are inferred where the material supports them.
@@ -75,9 +76,23 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 
 A subject-empty start creates the structure without inventing research claims, evidence, concepts, or a governing question.
 
+## Keep an existing Wiki on its released stack
+
+The frozen-stack commands described here require `v0.1.0-rc.9` or later. Existing Wikis receive them through a verified release migration.
+
+Your Wiki keeps its selected release until you authorise a migration. Ask the agent to run:
+
+```sh
+npm run standard:stack -- check /path/to/wiki
+```
+
+The check reports release availability without installing anything, changing your pin or editing content. A migration compares compatibility, preserves local choices and unknown fields, and runs complete verification. Improvements are published as a new immutable release. The original release stays intact.
+
+A release’s passing checks describe the date it was qualified. Current security audits still apply; a new finding is reported rather than silently changing your dependencies.
+
 ## Documentation
 
-Use the [first-wiki guide](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) for a plain-language walkthrough, or browse the full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) for examples and explanations.
+The released [first-wiki guide](docs/guides/first-wiki.md) explains the frozen stack and migration boundary. The public [getting-started walkthrough](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) and full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) reflect the companion Wiki’s separately adopted release.
 
 This repository defines and verifies the Standard. The Documentation explains how to use it.
 
@@ -96,7 +111,7 @@ Only this repository's released specification, schemas, and profile definitions 
 <details>
 <summary><strong>Candidate status</strong></summary>
 
-The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, `v0.1.0-rc.3`, `v0.1.0-rc.4`, `v0.1.0-rc.5`, and `v0.1.0-rc.6` are identified by their exact CI-green release commits; the repository's current default branch may contain verified unreleased improvements.
+The implementation version is `0.1.0-candidate`. Immutable prereleases through `v0.1.0-rc.8` have exact verified release commits. The default branch may contain unreleased improvements; it is not the default stack for a new Wiki. `npm run standard:stack -- resolve --json` selects and verifies the current eligible release.
 
 The npm package uses `0.1.0-candidate`. Python project metadata represents the candidate as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 
@@ -179,6 +194,8 @@ Canonical entry points:
 The lifecycle CLI is read-only or planning-only in this candidate:
 
 ```sh
+npm run standard:stack -- resolve --json
+npm run standard:stack -- check /path/to/consumer --json
 npm run conformance:inspect -- . --json
 npm run conformance:validate -- . --strict --json
 npm run conformance:export-okf -- .
@@ -188,7 +205,7 @@ npm run conformance:init-plan -- /path/to/new-wiki --profile standard-production
 npm run standard:proposal -- check --all
 ```
 
-`upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files.
+`upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files. Default initialization uses the verified release stack. An explicit offline or development `--standard-revision` plan can inspect other source, but does not prove release eligibility or production readiness.
 
 </details>
 

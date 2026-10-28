@@ -120,7 +120,14 @@ const lifecycleCases = [
     ],
   },
 ];
+// Schema fixtures exercise immutable local history offline. They do not claim
+// that the development checkout is an approved release for a new Wiki.
+const fixtureRevision = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
+if (fixtureRevision.status !== 0 || !/^[a-f0-9]{40}$/.test(fixtureRevision.stdout.trim())) {
+  throw new Error("Cannot resolve the immutable local revision for offline lifecycle schema fixtures");
+}
 for (const lifecycleCase of lifecycleCases) {
+  lifecycleCase.args.push("--standard-revision", fixtureRevision.stdout.trim());
   const artifact = runJson(
     lifecycleCase.args,
     lifecycleCase.label,

@@ -4,6 +4,8 @@ import YAML from "yaml";
 import { checkHandoffInstructions } from "./development-next-steps.mjs";
 
 const required = [
+  "scripts/design-validator.mjs", "scripts/design-validator.test.mjs", "scripts/check-tooling-dependencies.test.mjs", "scripts/check-python-tooling.test.py",
+  "tools/design-md/package.json", "tools/design-md/upstream-provenance.json", "tools/design-md/zod-4.6.6-inputs.json", "tools/design-md/upstream/LICENSE",
   "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "AUTHORING.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
   ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/standard-change.yml",
   ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
@@ -29,7 +31,7 @@ const required = [
   "overrides/partials/nav-item.html", "docs/assets/service-identity.json",
   "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json", "schema/service-identity-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
-  "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
+  "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json", "schema/standard-stack-report-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
   "schema/documentation-sync-snapshot-v1.json",
   "schema/standard-proposal-record-v1.json", "schema/standard-proposal-registry-v1.json",
@@ -71,6 +73,7 @@ const required = [
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
   "scripts/standard-proposal-core.mjs", "scripts/standard-proposal-cli.mjs", "scripts/standard-proposal-cli.test.mjs",
+  "scripts/standard-stack.mjs", "scripts/standard-stack-cli.mjs", "scripts/standard-stack.test.mjs",
   "standard-proposals/README.md", "standard-proposals/registry.json", "standard-proposals/standard-change-form-v1.yml",
   "sync/documentation-sync-contract-v1.json"
 ];
@@ -527,7 +530,7 @@ if (/exactly three/i.test(prompt)) failures.push("prompt retains an unconditiona
 if (!prompt.includes("completion-first")) failures.push("prompt lacks completion-first handoff contract");
 for (const boundary of [
   "starter/starter.yaml",
-  "current default-branch HEAD",
+  "latest verified immutable release",
   "Do not ask the user to choose or supply a release tag or commit",
   "Never recursively copy the standard root",
   "URL-only invocation",
@@ -549,6 +552,8 @@ for (const boundary of [
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
 if (/\[immutable release tag or commit\]/i.test(prompt)) failures.push("prompt still requires a user-supplied standard revision");
+if (/Resolve the standard repository's current default-branch HEAD/.test(prompt)) failures.push("bootstrap must select a verified immutable release, not the development branch");
+if (starterManifest.revision_policy !== "automatically-resolve-latest-verified-immutable-release-to-commit") failures.push("starter revision policy must select the latest verified immutable release");
 if (/Topic and intended scope:|Selected profile:|Target Wiki URL:|Target deployment:/i.test(prompt)) {
   failures.push("prompt still exposes the removed field-based bootstrap");
 }
@@ -557,13 +562,15 @@ for (const phrase of ["Give this URL to an AI agent", "research topic seed", "su
 }
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+if (pkg.scripts?.["standard:stack"] !== "node scripts/standard-stack-cli.mjs") failures.push("read-only immutable stack resolver is missing");
+if (!pkg.scripts?.["conformance:test"]?.includes("scripts/standard-stack.test.mjs")) failures.push("immutable stack fixtures are outside complete verification");
 if (pkg.scripts?.["response:next-steps:check"] !== "node scripts/development-next-steps.mjs") failures.push("captured next-step format checker is missing");
 if (!pkg.scripts?.["conformance:test"]?.includes("scripts/development-next-steps.test.mjs")) failures.push("next-step fixtures are outside complete verification");
 const licence = readFileSync("LICENSE", "utf8");
 if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failures.push("LICENSE must identify MIT and copyright Andrew Dench");
 if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);
 const exactNodePins = {
-  "@google/design.md": "0.4.0",
+  "@denchco/design-md-validator": "file:tools/design-md",
   "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
@@ -580,6 +587,13 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
 }
 if (pkg.overrides?.["mermaid@11.17.2"]?.katex !== "$katex") failures.push("Mermaid must use the qualified exact KaTeX override");
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
+if (pkg.devDependencies?.["@google/design.md"]) failures.push("the unqualified bundled design.md executable must not be installed");
+if (pkg.scripts?.["design:lint"] !== "node scripts/design-validator.mjs lint DESIGN.md") failures.push("design:lint must use the qualified source adapter");
+for (const test of ["scripts/design-validator.test.mjs", "scripts/check-tooling-dependencies.test.mjs"]) {
+  if (!pkg.scripts?.["conformance:test"]?.includes(test)) failures.push(`complete verification omits ${test}`);
+}
+if (!pkg.scripts?.check?.includes("check:python-tooling") || !pkg.scripts?.["check:python-tooling"]?.includes("scripts/check-python-tooling.test.py")) failures.push("complete verification omits Python tooling qualification");
+
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
 }
@@ -624,9 +638,10 @@ if (lockRoot.license !== pkg.license) failures.push("package-lock licence does n
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
+if (packageLock.packages?.["node_modules/@google/design.md"]) failures.push("the lock retains the unqualified bundled design.md executable");
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
 if (domPurifyVersion !== "3.4.17") failures.push(`package-lock must resolve exactly DOMPurify 3.4.17; found ${domPurifyVersion ?? "unlisted"}`);
-if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.8") failures.push("package-lock must resolve fast-uri exactly 3.1.8");
+if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.9") failures.push("package-lock must resolve fast-uri exactly 3.1.9");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
 if (!pkg.scripts?.["conformance:test"]?.includes("runtime-bundle.test.mjs")) failures.push("conformance:test must include runtime sanitizer and bundle inspection fixtures");
@@ -670,6 +685,8 @@ for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conform
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits canonical path ${file}`);
 }
 for (const file of [
+  ...sourceFiles(["tools/design-md"], /./).filter((file) => !file.includes("/node_modules/")),
+  "scripts/design-validator.mjs", "scripts/design-validator.test.mjs", "scripts/check-python-tooling.test.py", "scripts/check-tooling-dependencies.test.mjs",
   ".github/ISSUE_TEMPLATE/config.yml",
   ".github/ISSUE_TEMPLATE/standard-change.yml",
   "docs/llm-wiki/standard-proposals.md",

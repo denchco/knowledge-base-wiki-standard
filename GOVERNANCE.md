@@ -27,3 +27,13 @@ Before `1.0.0`, candidate prereleases may change or retire conformance requireme
 From `1.0.0`, deprecation begins in a minor release. Removal or a change that invalidates a previously conforming implementation requires a major release. Security corrections may accelerate deprecation but must remain documented.
 
 Local projects never track `main` as their conformance pin. They consume immutable releases and receive reviewable migration patches or pull requests. A proposal, accepted decision, or release-available result never changes a consumer pin automatically.
+
+## Immutable release stacks
+
+Each Standard release binds its exact source revision, tool pins, dependency locks, configuration contracts and verification implementation. Improvements require a new verified immutable release. Existing releases remain unchanged, including when later audit evidence reports a vulnerability.
+
+For a first build, `DKBWS-PROMPT-001` selects the latest published, non-draft release with native immutability. Semantic version ordering includes prereleases such as `rc.8`. Selection proves exact tag-to-SHA resolution and successful trusted `Verify` evidence for push/main at that SHA. The latest applicable run and attempt must succeed. Missing or unsuccessful evidence blocks selection; it does not authorise fallback to `main` or an older release.
+
+Under `DKBWS-UPDATE-001`, `npm run standard:stack -- check <wiki>` is a read-only availability and identity check. A newer release never changes an existing Wiki's pin, locks, configuration or content. Migration requires explicit authority, a compatible reviewed patch, preserved unknown fields and deviations, and complete verification. Install the selected release's dependencies from frozen locks.
+
+Under `DKBWS-RELEASE-001`, qualification records its date, exact release and CI evidence. It does not promise continued vulnerability clearance. Current required audits and verification still apply. An explicit historical or development revision may support an offline plan; without verified release evidence, it is not a default production stack.

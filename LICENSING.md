@@ -17,5 +17,6 @@ The MIT licence does not transfer ownership of the DenchCo name or presentation 
 | Asset | Source | Licence | Use |
 |---|---|---|---|
 | `overrides/partials/nav-item.html` and its starter template | Zensical `0.0.59` distribution, `templates/partials/nav-item.html` | MIT; complete upstream notice retained in each template | Native navigation with status rendering removed |
+| `tools/design-md/upstream/` | Google DESIGN.md `0.4.0`, exact commit `9bf8eae67128b6cc55ad9bf86665767deb4c11cd` | Apache-2.0; upstream licence and source notices retained | Readable lint-source adaptation with two documented Zod 4 compatibility edits; original identities and local hashes are recorded |
 
 Pen Circle is no longer bundled in the active reference adapter. Its original source and licence remain registered as historical evidence in [the source register](docs/sources.md#src-017).

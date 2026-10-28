@@ -7,6 +7,35 @@ status: draft
 
 # Research and change log
 
+## 2026-10-27 — Upstream metadata packaging correction
+
+- **CI diagnostic:** Dependency Review run `40604832852` flags the original Zod range in the retained upstream package manifest. The active adapter already uses exact Zod `4.6.6`; the earlier zero-audit results remain dated evidence.
+- **Correction and migration:** Rename only that metadata file to `package.json.upstream`. Preserve its bytes, original path and hashes. Add a guard and negative fixture that reject an active nested manifest even when provenance is updated to match. Consumers adopting the adapter must remove the former nested manifest.
+- **Focused result:** All 12 design tests pass, bringing the focused total to 23 with the six URI/Ajv and five Python tests. All 288 compiler inputs, active locks and compiled module bytes remain unchanged. No audit exemption is introduced. Renewed full verification, protected CI, publication and Documentation adoption remain pending. [SRC-087](sources.md#src-087)
+
+## 2026-10-27 — rc.9 tooling repair candidate
+
+- **Authorised scope:** Prepare the four tooling repairs with the frozen-stack lifecycle in protected PR #50. The owner authorised complete verification, a new immutable Standard release and subsequent protected Documentation adoption/deployment. Other Wikis retain their pins. These later stages are pending at this evidence checkpoint.
+- **Node tooling:** Select fast-uri `3.1.9` with retained Ajv `8.20.0`. Replace the opaque design validator with a local Apache-2.0 source adaptation at exact upstream commit `9bf8eae67128b6cc55ad9bf86665767deb4c11cd`. Preserve its parser, model and eleven rules; apply two documented Zod 4 compatibility changes. Verify and compile 95 actual Zod `4.6.6` source inputs from the integrity-checked npm archive. [SRC-082](sources.md#src-082), [SRC-083](sources.md#src-083)
+- **Python tooling:** Change only filelock `3.32.2` to `4.2.1` and msgpack `1.2.1` to `1.2.3` in the frozen Python package graph. Retain pip-audit, CacheControl, Graphify and Zensical. Inspect the actual cache call paths and record the filelock major-version boundary. A small isolated C-extension comparison reproduces msgpack's rejected-map retention on `1.2.1` and confirms its removal on `1.2.3`. [SRC-084](sources.md#src-084), [SRC-085](sources.md#src-085)
+- **Focused evidence:** Eleven design, six URI/Ajv and five Python tests pass. Independently reproduce all nine old design-bundle fixture results and verify the upstream file identities. Root `DESIGN.md` keeps zero errors, one warning and one information finding. Frozen installation, Python dependency consistency and fresh Node/Python audits pass; both audits report zero findings on 27 October. [SRC-086](sources.md#src-086)
+- **Remaining boundary:** Prepare rc.9 release notes and migration instructions without claiming full verification, publication or Documentation deployment. Keep `STD-VAL-014` open until those exact stages pass. Preserve the earlier failures and successful deployments as dated evidence.
+
+## 2026-10-26 — Frozen stack selection
+
+- Implement the owner's clarified lifecycle: a first build selects the latest verified immutable release; an existing Wiki checks for newer releases without changing its installed stack. Each release binds exact source, locks, tools, configuration and checks.
+- Replace automatic default-branch selection with a read-only release resolver and exact tag/commit/workflow evidence. Preserve explicit historical and development dry-run plans with an unverified-selection label. Keep migration and target verification separate from an availability check.
+- Live read-only resolution selects `v0.1.0-rc.8` at `e4814a0715481edbba56189e34e93a3d76d88421` and binds successful exact-revision Verify `39932360257`. The existing Documentation check reports the same revision. The default first-build plan selects that revision and creates no target directory. These observations do not clear current dependency findings.
+- Update the normative requirements, prompt, starter closure, human guide, schema and regression coverage together. The reference fixture suite stays offline. The existing `STD-VAL-014` dependency-audit failure remains a release blocker; no current release, Documentation snapshot or other consumer pin changes in this candidate. [SRC-080](sources.md#src-080)
+
+- Qualification observations: all 236 Node tests, strict build and 16-schema validation pass. Full verification stops at the existing npm audit failure. A separate Python audit adds three filelock findings to `STD-VAL-014`; the reported fixed version has not been selected. The frozen-stack implementation does not publish a new release or change a consumer pin. [SRC-079](sources.md#src-079), [SRC-081](sources.md#src-081)
+
+## 2026-10-26 — Documentation rc.8 deployment
+
+- **Documentation adoption and public proof:** Record the separately authorised migration through protected PR #40 at `6e47505624731e52dcaa5abe058190f4c1c75548`. The manifest and clean snapshot pin exact rc.8 Standard revision `e4814a0715481edbba56189e34e93a3d76d88421`. Complete local maintainer verification passed. Exact-merge Verify `39982006293` and Pages `39982662370` succeeded; deployment completed at `2026-10-23T15:58:51Z`. Public proof at `2026-10-26T06:57:53.914Z` confirms the same revision, exact DOMPurify `3.4.17` runtime bytes, released schemas, graph identity, reader and math contracts, and public projection controls. Close the Documentation follow-up without changing the immutable Standard release, earlier records, proposal registry or other consumer pins. [SRC-078](sources.md#src-078)
+
+- **Current tooling audit failure — observed 26 October:** Preserve the successful 23 October migration checks and deployment as dated evidence. Read back the saved post-merge full-verification failure at npm audit; do not assign this readback date to the full run. Fresh Standard and Documentation audits at `2026-10-26T06:53:45.857580+00:00` and `2026-10-26T06:53:46.896098+00:00` return exit 1. They report three affected package rows: fast-uri moderate, Zod high and its `@google/design.md` parent high. Open `STD-VAL-014` for one scoped dependency qualification. DOMPurify `3.4.17` remains selected; public browser success does not waive the failed tooling gate. [SRC-079](sources.md#src-079)
+
 ## 2026-10-23
 
 - **Immutable sanitizer release:** Publish `v0.1.0-rc.8` at `e4814a0715481edbba56189e34e93a3d76d88421` through protected PR #42 after successful exact-revision post-merge Verify `39932360257`. Read back release `421678175` as non-draft and immutable, published at `2026-10-23T09:51:15Z`; all five downloaded public assets match the reviewed names, sizes and hashes. The release retains Mermaid `11.17.2` and KaTeX `0.18.2` with exact DOMPurify `3.4.17`. Its public qualification records a fresh zero-finding npm audit of the release lock. Close the publication priority and `STD-VAL-013`. Earlier releases, the proposal registry, Documentation and other consumer pins remain unchanged. [SRC-077](sources.md#src-077)

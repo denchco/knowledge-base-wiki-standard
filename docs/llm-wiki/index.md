@@ -23,6 +23,12 @@ Use the [Graphify workflow](graphify.md) for query-first discovery, the six requ
 
 The [optional Codex adapter](codex-adapter.md) packages the shared workflow and a locally trusted Stop guardrail. [Web discovery](web-discovery.md) explains the path-scoped llms.txt and derived Markdown alternatives for reading the Wiki through HTTP.
 
+## Select and retain a released stack
+
+For a first build, follow the [first-wiki guide](../guides/first-wiki.md) and canonical instantiation prompt. Run `npm run standard:stack -- resolve --json`. Use its verified published, non-draft, native-immutable release and exact SHA, including numeric `rc` prereleases under the default channel. Require exact tag resolution and successful trusted `Verify` push/main evidence; do not substitute default-branch HEAD or an older release when proof fails. Read the selected source and install its exact tools and frozen locks.
+
+For an existing Wiki, run `npm run standard:stack -- check <wiki>`. This only reads release availability and identity. It never installs, changes the pin or migrates content. A user-authorised migration checks compatibility, preserves unknown fields and deviations, and runs full selected-profile verification. Improvements require a new immutable release. Historical qualification is date-bound and does not waive current audits. Explicit historical/development revision plans remain unverified release selections.
+
 ## Operating model
 
 - **Ingest**: register the source, preserve raw identity, add its stable exact-row anchor, update relevant concepts and evidence, add links, and record the change.
