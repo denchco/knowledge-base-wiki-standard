@@ -78,7 +78,7 @@ A subject-empty start creates the structure without inventing research claims, e
 
 ## Keep an existing Wiki on its released stack
 
-The frozen-stack commands described here require `v0.1.0-rc.9` or later. Existing Wikis receive them through a verified release migration.
+The frozen-stack commands are released in [v0.1.0-rc.9](https://github.com/denchco/knowledge-base-wiki-standard/releases/tag/v0.1.0-rc.9) at `8800e139d73fd58ee1bd756d3e5497f62ed678e4`. Existing Wikis receive them through a verified release migration.
 
 Your Wiki keeps its selected release until you authorise a migration. Ask the agent to run:
 
@@ -92,7 +92,7 @@ A release’s passing checks describe the date it was qualified. Current securit
 
 ## Documentation
 
-The released [first-wiki guide](docs/guides/first-wiki.md) explains the frozen stack and migration boundary. The public [getting-started walkthrough](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) and full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) reflect the companion Wiki’s separately adopted release.
+The released [first-wiki guide](docs/guides/first-wiki.md) explains the frozen stack and migration boundary. The public [first-wiki guide](https://denchco.github.io/knowledge-base-wiki-documentation/guides/first-wiki/), [getting-started walkthrough](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) and full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) carry the separately adopted rc.9 release. Protected deployment and public verification bind Documentation `25d72256aa29abd6039095e1fbca3c2363d234e8`. [SRC-089](docs/sources.md#src-089)
 
 This repository defines and verifies the Standard. The Documentation explains how to use it.
 
