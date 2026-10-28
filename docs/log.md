@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-10-28 — rc.9 publication and Documentation adoption
+
+- **Standard:** Protected PR #50 publishes `8800e139d73fd58ee1bd756d3e5497f62ed678e4` after qualified head `fbe0816ec00c4a7a720cc6be3096b88ebbc49c63` passes complete maintainer verification and protected checks. Exact-merge Verify `40606700715` passes. Read back release `426128023` as non-draft and immutable, with all five asset comparisons and eight prior release metadata comparisons passing. The public qualification binds both clean audits to the release locks. [SRC-088](sources.md#src-088)
+- **Documentation:** Protected PR #45 adopts the exact release at `25d72256aa29abd6039095e1fbca3c2363d234e8`, including repaired project-owned tooling and frozen-stack guidance. Complete local verification, exact-merge Verify `40609554287` and Pages `40610127257` pass. Deployment `7374030996` completes at `2026-10-28T00:40:19Z`; public proof at `2026-10-28T00:44:32.106Z` checks runtime bytes, schemas, graph, citations, reader/math behaviour, omissions and the first-wiki guide. [SRC-089](sources.md#src-089)
+- **Closure:** Resolve `STD-VAL-014` for the exact recorded revisions and remove the two completed priorities. Preserve [SRC-079](sources.md#src-079) through [SRC-087](sources.md#src-087), previous releases, proposal registry states and other consumer pins. No further grounded content update is available.
+
 ## 2026-10-27 — Upstream metadata packaging correction
 
 - **CI diagnostic:** Dependency Review run `40604832852` flags the original Zod range in the retained upstream package manifest. The active adapter already uses exact Zod `4.6.6`; the earlier zero-audit results remain dated evidence.
