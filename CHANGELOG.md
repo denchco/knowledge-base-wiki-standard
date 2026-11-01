@@ -2,6 +2,12 @@
 
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
+## Unreleased — shared header candidate
+
+- Propose reusable `DKBWS-DESIGN-002` for Standard Production: `1.6rem` controls, `.4rem` rounding, square icon actions, unframed logos, opaque semantic states, fixed light/dark brown hover and actual SVG centring. Preserve branding, native visibility, keyboard operation, search, saved width and appearance choices.
+- Adapt the exact five-file final consumer tree with sanitised provenance and retained private intake. Update shared appearance/keyboard adapters, the new-Wiki starter and design guidance together. Add both-engine browser and negative fixtures plus explicit complete-proof accounting under `DKBWS-VERIFY-001` and `DKBWS-VERIFY-002`.
+- Migration: carry the complete adapter, fixture, browser, CI and receipt closure from an accepted containing immutable release, then run the target's complete contract. This draft establishes no acceptance, release or consumer adoption. Separate private rollout plans retain repository/protection prerequisites and existing pins. See the [promotion record](docs/project/header-controls-review.md) and [migration guide](docs/reference/header-controls-migration.md). [SRC-090](docs/sources.md#src-090), [SRC-091](docs/sources.md#src-091)
+
 ## v0.1.0-rc.9 — 2026-10-28
 
 - Change the `DKBWS-PROMPT-001` first-build default from default-branch HEAD to the latest published, non-draft, native-immutable release. Order eligible semantic versions with prereleases such as `rc.8` included. Require exact tag-to-SHA resolution and successful trusted `Verify` push/main evidence at that SHA; missing or failed evidence does not fall back to another source.

@@ -55,6 +55,8 @@ nav = [
     {"Appearance contribution review" = "project/configurable-appearance-review.md"},
     {"Navigation status migration" = "reference/navigation-status-migration.md"},
     {"Reader defaults migration" = "reference/reader-defaults-migration.md"},
+    {"Header controls migration" = "reference/header-controls-migration.md"},
+    {"Header promotion review" = "project/header-controls-review.md"},
     {"Release preparation" = "project/release-readiness.md"}
   ]}
 ]

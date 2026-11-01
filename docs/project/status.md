@@ -11,6 +11,7 @@ status: draft
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
 | Evidence governance | Implemented candidate with stable numeric superscript citations, full accessible identities, exact row anchors, explanatory-note preservation, registered named-authority URLs and all-page output validation |
+| Shared header controls | Reusable draft candidate under `DKBWS-DESIGN-002`, with semantic opaque states, matched geometry, native keyboard preservation and both-engine proof gates. [Promotion review](header-controls-review.md); acceptance, containing release and consumer adoption remain separate and pending. |
 | Human Zensical wiki | Governed reference runtime with Wide as the unconfigured fresh-desktop default, saved reader preferences, strict build, local assets, status-free navigation with retained lifecycle metadata, titles and controls, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
 | Writing policy | ASD-STE100-inspired 80% default under `DKBWS-PROMPT-001`, carried by the mapped authoring policy, prompt, starter and shared instructions; prospective application, protected content and no computed compliance claim |
 | Operational LLM Wiki | Implemented with shared Codex/Claude authority, read order, maintenance, Graphify fallback, completion/cycle guards, and canonical live-URL response navigation |
@@ -56,7 +57,7 @@ The separate Standard Python audit on 26 October also returned exit 1 for three 
 
 The owner-authorised rc.9 pass is complete. Protected PR #50 published the qualified frozen-stack lifecycle and four tooling repairs at `8800e139d73fd58ee1bd756d3e5497f62ed678e4`. All 23 focused tests, complete Standard maintainer verification, exact-merge Verify `40606700715` and immutable release readback pass. The release records zero npm and installed-Python findings at the stated audit times. Documentation adopted rc.9 through protected PR #45 at `25d72256aa29abd6039095e1fbca3c2363d234e8`, then passed complete local verification, exact-merge Verify `40609554287`, Pages `40610127257` and public proof at `2026-10-28T00:44:32.106Z`. `STD-VAL-014` is resolved for these exact revisions. Historical failures and earlier release evidence remain unchanged. [SRC-087](../sources.md#src-087), [SRC-088](../sources.md#src-088), [SRC-089](../sources.md#src-089)
 
-No further grounded content update is available.
+1. **Proposed update:** Review and accept the shared header candidate through its governed intake and draft implementation PR. **Why it matters:** New Wikis need one verified, accessible header contract with a clear consumer origin. **Done when:** The approved issue, explicit classification decision and exact complete verification support the reviewed implementation; acceptance is recorded separately from release and adoption.
 
 The completed scope carries the released first-wiki guidance into Documentation. Other Wikis and originating proposal records retain their independently governed states.
 
@@ -66,7 +67,7 @@ The [reader-defaults migration](../reference/reader-defaults-migration.md) cover
 
 | Parked work | `blocked_by` | `reopen_when` | `last_checked` |
 |---|---|---|---|
-| Other consumer adoption | No authority to change their pins in this publication or Documentation migration | A project owner selects an exact released revision and authorises its migration | 2026-10-26 |
+| Shared-header consumer adoption | No accepted immutable release contains the candidate; repository and branch-protection readiness varies by target | A verified accepted containing release exists and the target has the required protected PR workflow | 2026-11-01 |
 
 The [three-contribution intake review](proposal-intake-review.md) confirms the immutable origins, exact payloads and acceptance scope. The owner authorised completing intake and acceptance, approved all three exact payloads, and delegated their final governed-form submission. The originating records now contain those approvals. Issues #32, #33 and #34 exactly match those payloads. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc` with decision `b0b5e8021a5a93feb767e486699ec7c524955da6`: numeric citations are preferred; appearance configuration and content-first handoffs are reusable. All three consumer records reconciled with the published acceptance registry before rc.6 publication. Their issue-linkage and acceptance phases remain separate commits. The later Standard ledger records rc.6 inclusion, while the untouched originating records still show release pending and adoption not considered. Their earlier reconciliation does not prove they are current against the new release ledger. This scoped delegation does not change the general manual-submission rule. Completed technical reviews are not repeated as separate priorities.
 

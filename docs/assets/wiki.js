@@ -137,6 +137,7 @@
       const shadow = candidate.shadowRoot;
       if (!shadow?.querySelector('input[role="combobox"]')) continue;
       found = true;
+      observeSearchState(shadow);
       if (shadow.getElementById(SEARCH_ACCENT_STYLE_ID)) continue;
       const style = document.createElement("style");
       style.id = SEARCH_ACCENT_STYLE_ID;
@@ -183,8 +184,87 @@
     reflectNativePalette();
   }
 
+  // Keep the native drawer/search controllers. Their mobile labels need a
+  // keyboard entry point; keyboard activation delegates to their normal click.
+  const headerActionBindings = new WeakSet();
+  const observedSearchRoots = new WeakSet();
+  let observedHeader = null;
+  let keyboardHeaderAction = null;
+  function nativeSearchState() {
+    for (const host of document.querySelectorAll("body > div")) {
+      const panel = host.shadowRoot?.querySelector('input[role="combobox"]')?.closest(".l");
+      if (panel) return { host, expanded: getComputedStyle(panel).pointerEvents !== "none" };
+    }
+    return { host: null, expanded: false };
+  }
+  function observeSearchState(shadow) {
+    if (observedSearchRoots.has(shadow)) return;
+    observedSearchRoots.add(shadow);
+    new MutationObserver(reflectHeaderActions).observe(shadow, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
+  }
+  const headerActionVisible = element => {
+    const style = getComputedStyle(element), box = element.getBoundingClientRect();
+    return !element.hidden && style.display !== "none" && style.visibility !== "hidden" && box.width > 0 && box.height > 0;
+  };
+  function reflectHeaderActions() {
+    for (const label of document.querySelectorAll('.md-header label[for="__drawer"], .md-header label[for="__search"]')) {
+      const input = document.getElementById(label.htmlFor);
+      if (!input) continue;
+      const search = label.htmlFor === "__search" ? nativeSearchState() : null;
+      const panel = search ? search.host : document.querySelector(".md-sidebar--primary");
+      if (panel) {
+        if (!panel.id) panel.id = `${label.htmlFor}_panel`;
+        label.setAttribute("aria-controls", panel.id);
+      }
+      label.setAttribute("role", "button");
+      label.tabIndex = headerActionVisible(label) ? 0 : -1;
+      label.setAttribute("aria-expanded", String(search ? search.expanded : input.checked));
+      if (headerActionBindings.has(label)) continue;
+      headerActionBindings.add(label);
+      label.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.repeat || !headerActionVisible(label)) return;
+        const expanded = label.getAttribute("aria-expanded") === "true";
+        label.click();
+        keyboardHeaderAction = expanded ? null : label;
+        requestAnimationFrame(reflectHeaderActions);
+      });
+    }
+    if (keyboardHeaderAction && (!keyboardHeaderAction.isConnected || keyboardHeaderAction.getAttribute("aria-expanded") === "false")) keyboardHeaderAction = null;
+  }
+  const headerResizeObserver = new ResizeObserver(reflectHeaderActions);
+  function observeHeaderActions() {
+    const header = document.querySelector(".md-header");
+    if (header !== observedHeader) {
+      headerResizeObserver.disconnect();
+      observedHeader = header;
+      if (header) headerResizeObserver.observe(header);
+    }
+    reflectHeaderActions();
+  }
+  document.addEventListener("change", reflectHeaderActions);
+  document.addEventListener("click", () => requestAnimationFrame(reflectHeaderActions));
+  window.addEventListener("resize", reflectHeaderActions);
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape" || !keyboardHeaderAction) return;
+    const label = keyboardHeaderAction;
+    keyboardHeaderAction = null;
+    requestAnimationFrame(() => {
+      if (!label.isConnected || !headerActionVisible(label)) return;
+      const input = document.getElementById(label.htmlFor);
+      // Some native drawer variants have no Escape handler. A click uses the
+      // same native close path; never maintain a second expanded-state store.
+      if (label.htmlFor === "__drawer" && input?.checked) label.click();
+      reflectHeaderActions();
+      if (label.getAttribute("aria-expanded") === "false") label.focus();
+    });
+  });
+
   const boot = () => {
     observeNativePalette();
+    observeHeaderActions();
     document.querySelectorAll("[data-graph-view]").forEach(render);
     scheduleSearchAccent();
   };

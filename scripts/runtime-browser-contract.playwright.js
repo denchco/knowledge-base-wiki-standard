@@ -1,3 +1,5 @@
+import { inspectHeaderControls } from "./header-browser-contract.mjs";
+
 export default async (page, options = {}) => {
   const configuration = await page.evaluate(() => {
     const current = new URL(location.href);
@@ -867,6 +869,7 @@ export default async (page, options = {}) => {
     await page.locator(".layout-width-toggle").click();
     await page.waitForFunction(() => document.documentElement.dataset.layoutWidth === "standard");
   }
+  const standardHeaderControls = await inspectHeaderControls(page, { scheme: "default", label: "Standard header", hover: false });
   const standardHeader = await measureHeader();
   check(standardHeader.mode === "standard", "Standard width must be active for its geometry measurement");
   check(standardHeader.controlPressed === "false", "Standard width control must expose aria-pressed=false");
@@ -874,7 +877,7 @@ export default async (page, options = {}) => {
   check(standardHeader.pageBackground === rgb(lightColors.background), "The light page must render its governed background");
   check(standardHeader.headerBackground === rgb(lightColors.headerBackground), "The production header must render its configured light surface");
   check(standardHeader.headerColour === rgb(lightColors.headerText), "The production header must render its configured readable text");
-  check(standardHeader.searchBackground === (appearance ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.05)"), "The closed Search control must use its configured surface");
+  check(standardHeader.searchBackground === standardHeaderControls.snapshot.tokens["header-control-surface"], "The closed Search control must use its opaque semantic surface");
   check(standardHeader.searchColour === rgb(lightColors.headerText), "The closed Search control must render its configured readable text");
   check(
     standardHeader.topic && standardHeader.heading && closeTo(standardHeader.topic.left, standardHeader.heading.left),
@@ -930,7 +933,9 @@ export default async (page, options = {}) => {
 
   await page.locator(".layout-width-toggle").click();
   await page.waitForFunction(() => document.documentElement.dataset.layoutWidth === "wide");
+  const wideHeaderControls = await inspectHeaderControls(page, { scheme: "default", label: "Wide header", hover: false });
   const wideHeader = await measureHeader();
+  check(wideHeader.controlBackground === wideHeaderControls.snapshot.tokens["header-selected"], "Wide at rest must use its opaque selected semantic surface");
   check(wideHeader.mode === "wide", "The width control must activate Wide mode");
   check(wideHeader.controlPressed === "true", "Wide mode must expose aria-pressed=true");
   check(
@@ -1275,6 +1280,7 @@ export default async (page, options = {}) => {
       const navigated = await inspectPaletteKeyboard(scheme, viewport.name, "document navigation");
       const governing = await inspectGoverningQuestion(label, questionRoute,
         questionRouteIsGovernedRepetition ? canonicalGoverningQuestion : null, questionRouteRepetitionCount);
+      const headerControls = await inspectHeaderControls(page, { scheme, label });
       const content = await inspectThemeContrast(page, [".md-header", ".md-search__button", ".md-content__inner h1", ".md-typeset > p", ".md-typeset blockquote.governing-question p", ".md-typeset a"]);
       checkThemeContrast(content, `${label} header and content`);
       check(content.bodyBackground === content.tokens.background, `${label} body must paint its active background token`);
@@ -1352,7 +1358,7 @@ export default async (page, options = {}) => {
         themedGraphs[view.name] = graph;
       }
       paletteMetrics[viewport.name][scheme] = { restored, navigated, persistedReload: true, persistedNavigation: true,
-        governing, content, table, mobileScroll, diagram, search, graph: themedGraphs };
+        governing, headerControls, content, table, mobileScroll, diagram, search, graph: themedGraphs };
     }
   }
 

@@ -9,7 +9,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Reference renderer | Human Wiki | Python `3.12.14` and uv `0.13.4` for the reference build (consumer minimum Python 3.12+), exactly pinned `zensical==0.0.59`; installed-lock audit through `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain |
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.70`, with guarded reference indexing |
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.17`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
-| Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium binary |
+| Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium and WebKit binaries |
 | Design validation | Design-Governed capability | local `@denchco/design-md-validator==0.4.0-denchco.1` from reviewed Google `design.md` `0.4.0` source, built with exact Zod `4.6.6` and `esbuild==0.28.2`; source, licence and dependency proofs under `tools/design-md/` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
 | Persistent macOS runtime | `macos-launchd` adapter | Node.js, `launchctl`; generated user LaunchAgent, no sudo |
@@ -30,8 +30,8 @@ npm run browser:install
 
 - `npm ci` installs the exact Node dependency graph in `package-lock.json`.
 - `uv sync --frozen` installs the exact Python dependency graph in `uv.lock`.
-- `npm run browser:install` installs the Chromium revision matched to the pinned Playwright package. It is required for `npm run verify`, but not for reading or building Markdown.
-- Linux CI uses `npm run browser:install:ci` to install Chromium and its operating-system libraries.
+- `npm run browser:install` installs the Chromium and WebKit revisions matched to the pinned Playwright package. It is required for `npm run verify`, but not for reading or building Markdown.
+- Linux CI uses `npm run browser:install:ci` to install both browser engines and their operating-system libraries.
 
 The repeatable commands are:
 
@@ -160,3 +160,7 @@ Each released source revision binds the full tested toolchain, locks, configurat
 The read-only stack commands use the existing Node runtime and GitHub HTTPS API. They add no npm dependency or required GitHub CLI. An optional API credential changes access, not release qualification. Missing, inconsistent or unavailable remote evidence fails selection instead of falling back to the development branch. The report hashes selected exact-revision stack files; the commit identifies the complete source tree. These hashes do not authorize copying the Standard's subject corpus.
 
 An existing Wiki keeps its stack during update checks. Only an authorised, reviewable migration may change it, after adapting the full relevant dependency closure and passing target checks. Historical release verification does not claim that today's advisory database is clear. The 26 October audit failures remain historical evidence. Immutable rc.9 repairs those tooling findings and the later msgpack finding. Complete release verification and separately authorised Documentation adoption/deployment are recorded for `8800e139d73fd58ee1bd756d3e5497f62ed678e4` and `25d72256aa29abd6039095e1fbca3c2363d234e8`. The dated audit results do not establish future vulnerability clearance. [SRC-088](docs/sources.md#src-088), [SRC-089](docs/sources.md#src-089) [SRC-079](docs/sources.md#src-079), [SRC-081](docs/sources.md#src-081), [SRC-085](docs/sources.md#src-085), [SRC-086](docs/sources.md#src-086)
+
+## Shared header browser qualification
+
+The candidate `DKBWS-DESIGN-002` gate uses the existing exact Playwright dependency and both matching Chromium and WebKit binaries. No browser package version changes in this promotion. `npm run check:header-browser` checks real renderer fixtures and emits `output/verification/header/contract.json`; complete verification requires that gate and its negative fixtures. Browser engine availability, the tested layout/text zoom modes and the narrow reflow viewport are explicit evidence. No native browser-chrome or operating-system zoom qualification is implied.
