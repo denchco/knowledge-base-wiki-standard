@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-11-01 — Shared header draft implementation
+
+- **Origin:** Inspect all five final files at the exact owner-specified consumer commit. Retain full commit, Jujutsu change, Standard pin, role-labelled digests and private governed intake. Adapt only generic rules and tests. [SRC-090](sources.md#src-090)
+- **Candidate:** Propose reusable `DKBWS-DESIGN-002`; update geometry, semantic state colours, keyboard adapter, appearance generator, design guidance, starter and complete proof mapping together. Add Chromium/WebKit matrix and negative fixtures. The draft PR records execution results; this log is not a passing receipt.
+- **Boundary:** Preserve the distinct earlier sizing contribution. Prepare separate private consumer migration plans. Acceptance, a containing immutable release and each protected adoption remain separate, pending stages. [SRC-091](sources.md#src-091)
+
 ## 2026-10-28 — rc.9 publication and Documentation adoption
 
 - **Standard:** Protected PR #50 publishes `8800e139d73fd58ee1bd756d3e5497f62ed678e4` after qualified head `fbe0816ec00c4a7a720cc6be3096b88ebbc49c63` passes complete maintainer verification and protected checks. Exact-merge Verify `40606700715` passes. Read back release `426128023` as non-draft and immutable, with all five asset comparisons and eight prior release metadata comparisons passing. The public qualification binds both clean audits to the release locks. [SRC-088](sources.md#src-088)

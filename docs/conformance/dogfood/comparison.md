@@ -31,15 +31,17 @@ No `WAIVED` result was recognised. A narrative decision not to adopt OKF, Graph 
 
 ## Requirement result summary
 
-| Project | Closest candidate position | PASS | FAIL | WAIVED | NOT APPLICABLE | NOT IMPLEMENTED |
-|---|---|---:|---:|---:|---:|---:|
-| [NHS Data Sharing](nhs-data-sharing.json) | Standard Production + Question-Led | 13 | 5 | 0 | 1 | 8 |
-| [Regulation 28](regulation-28.json) | Evidence/Human/Graph/Design + Generated Analytical + Ask | 12 | 3 | 0 | 3 | 9 |
-| [InterSystems](intersystems.json) | Evidence/Human/Graph/Design + Material compatibility | 11 | 3 | 0 | 4 | 9 |
-| [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 4 | 12 |
-| [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 4 | 0 | 1 | 10 |
+| Project | Closest candidate position | PASS | FAIL | WAIVED | NOT APPLICABLE | NOT IMPLEMENTED | NOT CHECKED |
+|---|---|---:|---:|---:|---:|---:|---:|
+| [NHS Data Sharing](nhs-data-sharing.json) | Standard Production + Question-Led | 13 | 5 | 0 | 1 | 8 | 1 |
+| [Regulation 28](regulation-28.json) | Evidence/Human/Graph/Design + Generated Analytical + Ask | 12 | 3 | 0 | 3 | 9 | 1 |
+| [InterSystems](intersystems.json) | Evidence/Human/Graph/Design + Material compatibility | 11 | 3 | 0 | 4 | 9 | 1 |
+| [X-Lab](x-lab.json) | Evidence/Human + Material compatibility + Source Extraction | 6 | 5 | 0 | 4 | 12 | 1 |
+| [Palantir](palantir.json) | Standard Production candidate + Question-Led, without OKF/deployment | 12 | 4 | 0 | 1 | 10 | 1 |
 
 The retained `DKBWS-HUMAN-001` findings and counts cover only the historical strict-build and stable-URL wording. None of these audits assessed the status-free default or its navigation accessibility checks added on 19 October 2026. They do not establish conformance to that expanded scope. The retained `DKBWS-DESIGN-001` results likewise cover historical tokens and linting only; they provide no proof of the current Wide default, saved-width precedence or storage-failure behaviour.
+
+The 1 November 2026 catalogue overlay adds `DKBWS-DESIGN-002` as `NOT_CHECKED` in all five reports. The historical audits collected no Chromium/WebKit evidence for the new shared header. Their original dates, findings and earlier results remain unchanged. The overlay establishes no Standard acceptance, release inclusion or consumer adoption.
 
 These counts are diagnostic rather than rankings. X-Lab deliberately omits capabilities that its purpose does not currently justify. Regulation 28's legacy Level 4 label similarly prevents the audit from silently treating advanced Ask/deployment work as a higher formal claim.
 
@@ -169,6 +171,7 @@ Clarify whether `DKBWS-RELEASE-001` governs releases of the DenchCo standard, pu
 - `WAIVED`: applicable requirement explicitly waived in the manifest with authority, reason and expiry/review state.
 - `NOT_APPLICABLE`: the selected profile or project facts make the requirement irrelevant.
 - `NOT_IMPLEMENTED`: relevant capability is absent and no conformance claim is made for it.
+- `NOT_CHECKED`: the audit did not assess the requirement; a stated limitation explains the missing evidence. This result proves neither implementation nor absence.
 
 Narrative exclusions must not silently become waivers. A missing mandatory core requirement is `FAIL`, not `NOT_IMPLEMENTED`, once a formal profile is selected.
 

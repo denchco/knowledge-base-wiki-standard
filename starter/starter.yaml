@@ -32,6 +32,7 @@ bootstrap:
     deployment: "none"
     authoring_policy: "denchco-asd-ste100-inspired-80-percent"
     desktop_width: "wide"
+    header_controls: "shared-semantic-opaque-1.6rem-0.4rem"
     source_citation_style: "numeric-superscript"
   inspect_before_asking: ["research seed", "existing target", "design contract", "repository boundary"]
   conditional_questions: ["research extent", "missing purpose detail", "sensitive or restricted source handling", "target collision"]
@@ -266,7 +267,7 @@ entries:
     role: "design-contract"
     classification: "render-template"
     template: "starter/templates/DESIGN.md.tmpl"
-    requirements: ["DKBWS-DESIGN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
+    requirements: ["DKBWS-DESIGN-001", "DKBWS-DESIGN-002", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002"]
   - target: "zensical.toml"
     role: "renderer-config"
     classification: "render-template"
@@ -607,3 +608,53 @@ entries:
     planning_only: true
     dependency_closure: "released tools/design-md source, exact npm and Python locks, package verification commands and qualified toolchain"
     requirements: ["DKBWS-SEC-001", "DKBWS-VERIFY-001"]
+
+  - target: "docs/assets/theme.css"
+    role: "shared-header-theme"
+    classification: "adapt-from-release"
+    source: "docs/assets/theme.css"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "docs/assets/layout-width.css"
+    role: "shared-header-width"
+    classification: "adapt-from-release"
+    source: "docs/assets/layout-width.css"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "docs/assets/wiki.js"
+    role: "native-header-keyboard-adapter"
+    classification: "adapt-from-release"
+    source: "docs/assets/wiki.js"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/header-browser-contract.mjs"
+    role: "shared-header-browser-contract"
+    classification: "adapt-from-release"
+    source: "scripts/header-browser-contract.mjs"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/header-browser-contract.test.mjs"
+    role: "shared-header-negative-fixtures"
+    classification: "adapt-from-release"
+    source: "scripts/header-browser-contract.test.mjs"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/header-browser-fixture.mjs"
+    role: "shared-header-renderer-fixture"
+    classification: "adapt-from-release"
+    source: "scripts/header-browser-fixture.mjs"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/check-header-browser.mjs"
+    role: "shared-header-browser-gate"
+    classification: "adapt-from-release"
+    source: "scripts/check-header-browser.mjs"
+    planning_only: true
+    dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
+    requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
