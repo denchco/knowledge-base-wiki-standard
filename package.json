@@ -80,7 +80,7 @@
     "healthPath": "/assets/service-identity.json"
   },
   "devDependencies": {
-    "3d-force-graph": "1.80.0",
+    "3d-force-graph": "1.80.1",
     "@denchco/design-md-validator": "file:tools/design-md",
     "@playwright/test": "1.63.0",
     "ajv": "8.20.0",
