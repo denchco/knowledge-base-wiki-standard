@@ -23,6 +23,10 @@ Existing passages do not require a bulk rewrite. When a requested change replace
 
 Explicit user instructions and stronger applicable local rules take precedence. Record a material local variation in the target's authoring policy. Examples include required legal wording, a controlled clinical vocabulary, or a stricter STE contract. Retain the project's chosen spelling convention; adopting this house style does not silently change it.
 
+## Reader-journey guidance
+
+The advisory [reader-journey guide](../guides/reader-journey.md) illustrates the existing habits of stating the main point early, explaining terms and preserving source meaning. It suggests moving from the reader's task and a short answer to explanation, worked application and exact reference. It adds no normative requirement, automated semantic gate or readability score. Subject-empty Wikis still receive no invented subject content. The [review record](../project/reader-journey-review.md) describes its bounded origin and proposed reusable classification. [SRC-090](../sources.md#src-090)
+
 ## Writing habits
 
 These are selected habits for the DenchCo adaptation. They do not reproduce the complete ASD standard or its dictionary.

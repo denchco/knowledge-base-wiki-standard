@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — reader journey candidate
+
+- Add advisory reader-journey guidance illustrating the existing `DKBWS-PROMPT-001` writing/discovery policy: a short answer, progressive explanation, worked application and exact reference. Link it from authoring guidance and the prompt without adding normative requirements, parity rules or a conformance gate.
+- Add a subject-neutral guide, manual review record and opt-in migration. Preserve canonical questions, source meaning, uncertainty, target-owned policy files and subject-empty behaviour. Existing structural checks do not prove comprehension or a readability score.
+- Record the verified private consumer origin without copying its corpus or implying public source access. Proposed reusable classification, acceptance, release and adoption remain separate. No consumer pin, dependency or released snapshot changes.
+
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
 ## v0.1.0-rc.9 — 2026-10-28
