@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-11-03 — Reader journey candidate
+
+- Synthesise an audience-led progression from a short substantive answer to explanation, worked application and exact reference. Retain the Standard's existing question-led architecture, source authority and prospective writing-policy boundaries.
+- The maintainer-observed private consumer implementation is `4e17d4e6e01d51e24137e1ea9b5514e98627ac02`, JJ change `llkzyppuollwwtmrpsmmvwuqtquuqvzm`, pinned to immutable rc.9. Its supplied full verification completed at `2026-11-03T16:57:44.639Z`. This is origin evidence, not proof that private source blobs are publicly accessible or that the Standard candidate is accepted. [SRC-090](sources.md#src-090)
+- Add an advisory subject-neutral guide and manual review criteria, with optional authoring guidance and prompt links. Existing automated checks cover structural contracts and planning boundaries; no new requirement, parity rule or semantic gate is introduced. Comprehension remains a manual review. No healthcare corpus, raw private evidence or branding is copied. Acceptance, release and adoption remain pending.
+
 ## 2026-10-28 — rc.9 publication and Documentation adoption
 
 - **Standard:** Protected PR #50 publishes `8800e139d73fd58ee1bd756d3e5497f62ed678e4` after qualified head `fbe0816ec00c4a7a720cc6be3096b88ebbc49c63` passes complete maintainer verification and protected checks. Exact-merge Verify `40606700715` passes. Read back release `426128023` as non-draft and immutable, with all five asset comparisons and eight prior release metadata comparisons passing. The public qualification binds both clean audits to the release locks. [SRC-088](sources.md#src-088)

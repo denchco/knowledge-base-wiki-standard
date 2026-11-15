@@ -11,6 +11,8 @@ The 80% target is a pragmatic style preference, not a computed score or a claim 
 - Keep explanations connected. Use lists, tables and short sentences when they help the reader.
 - Define unfamiliar abbreviations and technical terms. Retain precise domain language and the project's established spelling convention.
 
+For a subject-bearing Wiki, an audience-led reader journey can help apply these habits: establish the reader's task, give a short answer to an agreed question, then add explanation, worked application and exact reference. The [reader-journey guide](docs/guides/reader-journey.md) offers a manual review method. It preserves source meaning and exact questions, adds no conformance requirement or readability score, and invents no content for a subject-empty Wiki.
+
 Review new and replaced passages before completing the change. Preserve evidence state, uncertainty, attribution, obligations and exceptions. Record any material style variation and its reason in this policy or the change record.
 
 Preserve required exact quotations, source titles and identities, canonical governing questions, official names, code, commands, URLs, paths and identifiers. Apply the style to the surrounding explanation. This policy does not authorise source corrections or changes to mandated wording.

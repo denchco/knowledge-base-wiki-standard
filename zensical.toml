@@ -11,6 +11,7 @@ nav = [
   {"Start here" = [
     {"Home" = "index.md"},
     {"Build and update a Wiki" = "guides/first-wiki.md"},
+    {"Shape the reader journey" = "guides/reader-journey.md"},
     {"Architecture" = "architecture.md"},
     {"Roadmap" = "roadmap.md"}
   ]},
@@ -55,6 +56,8 @@ nav = [
     {"Appearance contribution review" = "project/configurable-appearance-review.md"},
     {"Navigation status migration" = "reference/navigation-status-migration.md"},
     {"Reader defaults migration" = "reference/reader-defaults-migration.md"},
+    {"Reader journey migration" = "reference/reader-journey-migration.md"},
+    {"Reader journey review" = "project/reader-journey-review.md"},
     {"Release preparation" = "project/release-readiness.md"}
   ]}
 ]

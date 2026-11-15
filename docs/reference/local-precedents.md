@@ -32,3 +32,9 @@ The 2026-08-03 audit covered all immediate child repositories. No child had sema
 4. EPMA supplies the concise boundary against adjacent rabbit holes without explicit scope.
 
 The Standard tightens these precedents by making three a maximum rather than an unconditional quota. Active project status may still hold three priorities, but an answer never invents a third recommendation or treats breadth as merely interesting adjacent exploration.
+
+## Reader-journey synthesis
+
+The existing question-led architecture, source-row navigation and canonical/generated boundaries provide parts of a reader journey. The later private consumer review supplied a specific failure case: broad reference coverage did not make the homepage's answer or the route to detail clear enough. Its verified origin supports this proposal, without importing the consumer's subject, audience hierarchy or branding. [SRC-011](../sources.md#src-011), [SRC-012](../sources.md#src-012), [SRC-090](../sources.md#src-090)
+
+The reusable synthesis is to establish the reader's task, give a short answer, explain it, apply it in worked steps and expose exact references. This is an editorial judgement from maintained projects, not a comparative user study or proof that every existing Wiki already follows the pattern. The [review record](../project/reader-journey-review.md) keeps that limit and the pending classification explicit.
