@@ -7,7 +7,7 @@ status: draft
 
 # Shared header promotion review
 
-This candidate adapts COPPER TIGER's verified header treatment into the shared reference adapter. It is proposed as **reusable**, with new stable requirement `DKBWS-DESIGN-002` for Standard Production. The owner requested a draft implementation PR. This record does not establish an acceptance decision, a containing immutable release or any consumer adoption. [SRC-090](../sources.md#src-090)
+This candidate adapts COPPER TIGER's verified header treatment into the shared reference adapter. It is proposed as **reusable**, with new stable requirement `DKBWS-DESIGN-002` for Standard Production. The owner requested a draft implementation PR. This record does not establish an acceptance decision, a containing immutable release or any consumer adoption. [SRC-091](../sources.md#src-091)
 
 ## Origin and rights
 
@@ -27,7 +27,7 @@ The tracked private proposal is `DKBWS-PROP-consistent-header-controls-50172e87a
 
 The origin's complete 31 October receipt is historical evidence for that consumer. Its SHA-256 is `1303231814171234264f3306af2800bd060daabcbcc5bba991399c11d07dd146`; the matching full conformance report is `e002af6ce3761d5b58a90fcd3f34f2e72797e57cdc7a8010d8925a3a11fc7eab`. All 37 recorded tracked inputs match the requested commit. The five-input hash closure above also covers source files that were not individually listed in that receipt. The origin's four focused engine/appearance checks do not prove the broader shared matrix.
 
-[Earlier sizing PR #44](https://github.com/denchco/knowledge-base-wiki-standard/pull/44) has a different consumer origin and proposal. It covers a narrower geometry change. This broader draft preserves that contribution's identity and does not close, overwrite or claim its acceptance. [SRC-091](../sources.md#src-091)
+[Earlier sizing PR #44](https://github.com/denchco/knowledge-base-wiki-standard/pull/44) has a different consumer origin and proposal. It covers a narrower geometry change. This broader draft preserves that contribution's identity and does not close, overwrite or claim its acceptance. [SRC-092](../sources.md#src-092)
 
 ## Shared implementation and proof
 

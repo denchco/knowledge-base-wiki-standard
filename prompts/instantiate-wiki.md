@@ -36,6 +36,10 @@ Do not ask about routine defaults. Use `standard-production`, a subject-appropri
 
 After the last material answer, report the inferred and user-selected setup—starting mode or seed, title and purpose, audience and governing question state, research/source scope, target path, profile, accent hex, local Wiki URL, and deployment state—then implement the local wiki. The answers authorise the described local initialization; do not add a redundant confirmation question unless a destructive collision or external action remains.
 
+## Optional reader-journey review
+
+For a subject-bearing Wiki, consider the [reader-journey guide](../docs/guides/reader-journey.md) when applying the existing audience/task discovery and writing policy. It suggests a short answer to an agreed question followed by explanation, worked application and exact reference. Review meaning manually; this adds no conformance gate or computed readability score. Preserve exact questions and material qualifications. Subject-empty work invents no audience fact, question, answer, example or source.
+
 ## Existing Wiki release checks
 
 Run `npm run standard:stack -- check <wiki>` to compare an existing Wiki with the current verified release. The command only reads local declarations and remote release evidence. It does not install tools, rewrite locks, change the pin or migrate content. A newer release is an available option, not adoption authority.

@@ -7,7 +7,7 @@ status: draft
 
 # Shared header controls migration
 
-`DKBWS-DESIGN-002` adds a common reference header to Standard Production. It is a reusable candidate for new-Wiki defaults and separately reviewed existing-Wiki migrations. The [promotion review](../project/header-controls-review.md) records the exact consumer origin and the distinct acceptance, release and adoption stages. [SRC-090](../sources.md#src-090)
+`DKBWS-DESIGN-002` adds a common reference header to Standard Production. It is a reusable candidate for new-Wiki defaults and separately reviewed existing-Wiki migrations. The [promotion review](../project/header-controls-review.md) records the exact consumer origin and the distinct acceptance, release and adoption stages. [SRC-091](../sources.md#src-091)
 
 ## Required behaviour
 

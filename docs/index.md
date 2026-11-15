@@ -45,6 +45,7 @@ Read from top to bottom: source material becomes inspectable evidence, then main
 ## Start here
 
 - To create an independent wiki, give an AI agent only <https://github.com/denchco/knowledge-base-wiki-standard>. The repository's canonical prompt begins an adaptive seed-or-subject-empty interview and infers routine local defaults.
+- [Shape the reader journey](guides/reader-journey.md) moves from an agreed question and short answer to explanation, examples and exact reference.
 - [Architecture](architecture.md) explains the complete system.
 - [Normative specification](spec/index.md) defines conformance.
 - [Requirements](spec/requirements.md) provides stable rule identifiers.

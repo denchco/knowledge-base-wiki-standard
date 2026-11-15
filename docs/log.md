@@ -7,11 +7,17 @@ status: draft
 
 # Research and change log
 
+## 2026-11-03 — Reader journey candidate
+
+- Synthesise an audience-led progression from a short substantive answer to explanation, worked application and exact reference. Retain the Standard's existing question-led architecture, source authority and prospective writing-policy boundaries.
+- The maintainer-observed private consumer implementation is `4e17d4e6e01d51e24137e1ea9b5514e98627ac02`, JJ change `llkzyppuollwwtmrpsmmvwuqtquuqvzm`, pinned to immutable rc.9. Its supplied full verification completed at `2026-11-03T16:57:44.639Z`. This is origin evidence, not proof that private source blobs are publicly accessible or that the Standard candidate is accepted. [SRC-090](sources.md#src-090)
+- Add an advisory subject-neutral guide and manual review criteria, with optional authoring guidance and prompt links. Existing automated checks cover structural contracts and planning boundaries; no new requirement, parity rule or semantic gate is introduced. Comprehension remains a manual review. No healthcare corpus, raw private evidence or branding is copied. Acceptance, release and adoption remain pending.
+
 ## 2026-11-01 — Shared header draft implementation
 
-- **Origin:** Inspect all five final files at the exact owner-specified consumer commit. Retain full commit, Jujutsu change, Standard pin, role-labelled digests and private governed intake. Adapt only generic rules and tests. [SRC-090](sources.md#src-090)
+- **Origin:** Inspect all five final files at the exact owner-specified consumer commit. Retain full commit, Jujutsu change, Standard pin, role-labelled digests and private governed intake. Adapt only generic rules and tests. [SRC-091](sources.md#src-091)
 - **Candidate:** Propose reusable `DKBWS-DESIGN-002`; update geometry, semantic state colours, keyboard adapter, appearance generator, design guidance, starter and complete proof mapping together. Add Chromium/WebKit matrix and negative fixtures. The draft PR records execution results; this log is not a passing receipt.
-- **Boundary:** Preserve the distinct earlier sizing contribution. Prepare separate private consumer migration plans. Acceptance, a containing immutable release and each protected adoption remain separate, pending stages. [SRC-091](sources.md#src-091)
+- **Boundary:** Preserve the distinct earlier sizing contribution. Prepare separate private consumer migration plans. Acceptance, a containing immutable release and each protected adoption remain separate, pending stages. [SRC-092](sources.md#src-092)
 
 ## 2026-10-28 — rc.9 publication and Documentation adoption
 
