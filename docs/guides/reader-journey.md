@@ -53,6 +53,8 @@ The second opening can lead to a worked sequence, then the exact reference. The 
 
 ## Review the journey
 
+Start from the page where a reader is likely to enter. Check that the headings point to the first action and that each link opens the intended reference. Ask a reviewer to follow the same route and judge it against the reader's task.
+
 For an entry-page or structure review, consider following one complete route from the short answer to exact evidence. A bounded review note can identify the pages, reviewer or method, date, findings and remaining uncertainty. An ordinary prose edit does not need a separate review record merely because this guide exists. Useful review questions include:
 
 1. Does the opening answer the agreed question, including conditions that materially change the result?
