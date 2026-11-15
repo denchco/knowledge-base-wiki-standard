@@ -18,7 +18,20 @@ colors:
   muted: "#52606d"
   border: "#aab7c0"
   surface: "#ffffff"
-  logoSurface: "#ffffff"
+  headerSurface: "#ffffff"
+  headerText: "#1f2933"
+  headerControlSurface: "#edf2f5"
+  headerHover: "#aaa08d"
+  headerHoverText: "#29251f"
+  headerSelected: "#d9e7f0"
+  headerSelectedText: "#1f2933"
+  darkHeaderSurface: "#18242a"
+  darkHeaderText: "#e5eef1"
+  darkHeaderControlSurface: "#293740"
+  darkHeaderHover: "#948774"
+  darkHeaderHoverText: "#201c17"
+  darkHeaderSelected: "#344854"
+  darkHeaderSelectedText: "#e5eef1"
   tableHeader: "#d9e7f0"
   link: "#004d80"
   conditional: "#a15c00"
@@ -67,6 +80,8 @@ shape:
   componentBorderWidth: "1px"
   technicalFrameBorderWidth: "1.75px"
   headerTitleContentRailOffset: "8.162rem"
+  headerControlHeight: "1.6rem"
+  headerControlRadius: ".4rem"
   sourceRowRailWidth: ".25rem"
   accentRailWidth: ".3rem"
   layoutWidthControlContentRailOffset: "2rem"
@@ -127,8 +142,24 @@ components:
     backgroundColor: "{colors.border}"
   diagram-boundary:
     backgroundColor: "{colors.accentLight}"
-  header-logo:
-    backgroundColor: "{colors.logoSurface}"
+  header-control:
+    backgroundColor: "{colors.headerControlSurface}"
+    textColor: "{colors.headerText}"
+  header-control-hover:
+    backgroundColor: "{colors.headerHover}"
+    textColor: "{colors.headerHoverText}"
+  header-control-selected:
+    backgroundColor: "{colors.headerSelected}"
+    textColor: "{colors.headerSelectedText}"
+  dark-header-control:
+    backgroundColor: "{colors.darkHeaderControlSurface}"
+    textColor: "{colors.darkHeaderText}"
+  dark-header-control-hover:
+    backgroundColor: "{colors.darkHeaderHover}"
+    textColor: "{colors.darkHeaderHoverText}"
+  dark-header-control-selected:
+    backgroundColor: "{colors.darkHeaderSelected}"
+    textColor: "{colors.darkHeaderSelectedText}"
   header:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
@@ -216,7 +247,7 @@ The shell may look identical across topics. The topic's reader model, navigation
 
 The unconfigured DenchCo Standard Wiki uses the public Documentation Wiki's DenchCo blue family, anchored to `#004d80`, on a white page. Its existing `docs/assets/brand/denchco-wordmark.png` supplies the header logo and favicon. The header title offset accounts for the wordmark's `1032:350` aspect ratio.
 
-The header wordmark uses a fixed white backing for contrast in either appearance; its source pixels remain unchanged. The backing protects the blue artwork when a configured header uses any brand colour. This branding belongs to the Standard and Documentation Wikis. The subject-empty starter retains its own configurable identity and excludes the wordmark.
+The header wordmark remains unframed: no added control background, border or rounded container surrounds it. Its source pixels remain unchanged. This branding belongs to the Standard and Documentation Wikis. The subject-empty starter retains its own identity and excludes the wordmark. Review each consumer's logo against its own header surface without turning the logo into an action control.
 
 A consumer using the manual adapter may replace the complete accent family in this file and `docs/assets/theme.css`, then regenerate Graphify. A consumer selecting the configurable adapter uses the generated roles described below. Do not alter Zensical chrome structure to create a topic identity.
 
@@ -234,6 +265,18 @@ Mermaid keeps its ordinary source-level node treatment and semantic roles; share
 
 Verify both appearances at desktop and mobile widths, control order, keyboard operation, persistence after navigation and reload, search readability, diagrams, both graph views and no page overflow. Adopting this adapter is an explicit consumer change: add the two native palettes, complete named colour families, graph bridge assets and browser assertions together. It changes no source identity, knowledge content, deployment or consumer pin automatically.
 
+## Header controls
+
+The candidate `DKBWS-DESIGN-002` contract is the default reference header for new Wikis after release. Existing Wikis adopt it through the [header migration](docs/reference/header-controls-migration.md).
+
+Search, Wide, the native appearance actions, and visible mobile menu/search actions share `headerControlHeight: 1.6rem` and `headerControlRadius: .4rem`. Icon-only controls remain square. Keep logos outside that control treatment. Preserve the renderer's hidden-label and responsive visibility rules; a centring rule must not force hidden labels to display.
+
+Use `headerSurface`, `headerText`, `headerControlSurface`, `headerHover`, `headerHoverText`, `headerSelected` and `headerSelectedText` as semantic roles, with corresponding dark roles. Rest, hover and selected backgrounds are opaque. The configured generator derives readable rest and selected colours from each Wiki's own brand. Both adapters use light hover `#aaa08d` with `#29251f`, and dark hover `#948774` with `#201c17`. Hover takes precedence over selected Wide. Switch each foreground/background pair together without a colour crossfade. Search's magnifier and shortcut badge remain readable in every state.
+
+Centre each icon-only control's actual SVG on both axes within `.5` CSS pixels of its control, independently of the SVG's size. Keep Wide's icon/text group centred with its SVG aligned vertically. Retain native appearance radios and preference storage. Mobile menu/search labels retain native toggle behaviour and gain keyboard access without duplicate navigation listeners. Preserve visible focus, Enter/Space operation, search, width selection, appearance switching, reload and navigation persistence.
+
+Verify Chromium and WebKit independently. Cover light/dark, desktop/mobile, Standard/Wide, rendered layout zoom, text resizing, narrow reflow, reload and navigation. Require matching geometry, opaque states, exact hover pairs, SVG centring and readable Search pseudo-elements. Normal text and shortcut labels require 4.5:1 contrast; icons and visible focus require 3:1 against actual adjacent surfaces. Report the tested zoom mechanism; do not claim untested browser-chrome or operating-system controls.
+
 ## Content And Navigation
 
 - Use one governing question and answer-first routes when the topic is a decision, comparison, compliance, purchase, build, migration, or operational interpretation.
@@ -250,7 +293,7 @@ Verify both appearances at desktop and mobile widths, control order, keyboard op
 - When Human, Agent, and Graph surfaces are all shown, use three separately labelled sibling boxes, each reached directly from canonical knowledge. Where verification follows, each path rejoins it. Their visual separation does not make them separate canonical corpora or evidence authorities.
 - No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
 - Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
-- The unconfigured production header remains on the restrained surface/text treatment and the search button remains neutral; interaction states alone take the accent. The optional configured adapter uses the exact brand colour for the header and selected navigation, with contrasting text and transparent header controls.
+- The unconfigured production header retains its restrained surface/text treatment. The configured adapter keeps the exact brand colour on the header and selected navigation. Header controls use opaque semantic rest and selected surfaces with contrasting text. Both adapters share the brown hover pairs below; those interaction colours do not replace the Wiki's branding.
 - Mermaid `11.17.2` with qualified KaTeX `0.18.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects

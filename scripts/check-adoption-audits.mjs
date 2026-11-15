@@ -15,6 +15,7 @@ export const ADOPTION_STATUSES = [
   "WAIVED",
   "NOT_APPLICABLE",
   "NOT_IMPLEMENTED",
+  "NOT_CHECKED",
 ];
 export const ADOPTION_CONFIDENCE = ["HIGH", "MEDIUM", "LOW"];
 
@@ -183,6 +184,9 @@ function validateResult(value, add, pointer, kind) {
   validateStringList(value.evidence_paths, add, `${pointer}.evidence_paths`, { portable: true, allowEmpty: true });
   if (!isNonEmptyString(value.finding)) add(`${pointer}.finding`, "must be a non-empty string");
   if (value.limitations !== undefined) validateStringList(value.limitations, add, `${pointer}.limitations`);
+  if (value.status === "NOT_CHECKED" && (!Array.isArray(value.limitations) || value.limitations.length === 0)) {
+    add(`${pointer}.limitations`, "must explain why a NOT_CHECKED result was not assessed");
+  }
 }
 
 function validateReport(record, catalogueIds, schema, globalState, errors) {
@@ -355,6 +359,8 @@ export function validateAdoptionAuditRecords({ reports, catalogueIds, schema }) 
     if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") errors.push(`${SCHEMA_PATH}: must declare JSON Schema Draft 2020-12`);
     if (schema.$id !== ADOPTION_AUDIT_SCHEMA_ID) errors.push(`${SCHEMA_PATH}: $id must equal ${ADOPTION_AUDIT_SCHEMA_ID}`);
     if (JSON.stringify(schema.$defs?.status?.enum) !== JSON.stringify(ADOPTION_STATUSES)) errors.push(`${SCHEMA_PATH}: status definition must match the canonical adoption vocabulary`);
+    if (JSON.stringify(schema.properties?.audit?.properties?.status_vocabulary?.const) !== JSON.stringify(ADOPTION_STATUSES)) errors.push(`${SCHEMA_PATH}: declared audit vocabulary must match the canonical adoption vocabulary`);
+    if (!sameMembers(schema.$defs?.statusSummary?.required ?? [], ADOPTION_STATUSES)) errors.push(`${SCHEMA_PATH}: summary must require every adoption status`);
     if (JSON.stringify(schema.$defs?.confidence?.enum) !== JSON.stringify(ADOPTION_CONFIDENCE)) errors.push(`${SCHEMA_PATH}: confidence definition must match the canonical bounded vocabulary`);
     if (!sameMembers(schema.required ?? [], TOP_LEVEL_KEYS)) errors.push(`${SCHEMA_PATH}: top-level required properties must match the report contract`);
   }

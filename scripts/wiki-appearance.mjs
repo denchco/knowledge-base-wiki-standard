@@ -148,11 +148,28 @@ export function deriveAppearance(value) {
   for (const [name, palette] of Object.entries({ light, dark })) {
     palette.accentTransparent = alpha(palette.accent, 10);
     palette.accentTransparentStrong = alpha(palette.accent, 16);
+    // Header branding stays exact. Control surfaces are opaque and remain
+    // readable with the same ink, including dark or saturated brand seeds.
+    const surfaceDirection = contrastRatio(palette.headerText, "#ffffff")
+      >= contrastRatio(palette.headerText, "#000000") ? 1 : -1;
+    palette.headerSurface = palette.headerBackground;
+    palette.headerControlSurface = readableTone(seed,
+      Math.max(0, Math.min(1, seed.l + surfaceDirection * 0.06)),
+      [palette.headerText], 4.5, surfaceDirection);
+    palette.headerSelected = readableTone(seed,
+      Math.max(0, Math.min(1, seed.l - surfaceDirection * 0.06)),
+      [palette.headerText], 4.5, surfaceDirection);
+    palette.headerSelectedText = palette.headerText;
+    palette.headerHover = name === "light" ? "#aaa08d" : "#948774";
+    palette.headerHoverText = name === "light" ? "#29251f" : "#201c17";
     const surfaces = [palette.background, palette.surface, palette.questionBackground];
     for (const role of ["accent", "accentDark", "accentDarker", "accentVisited", "text", "muted"]) checkPair(palette[role], surfaces, 4.5, `${name}.${role}`);
     for (const role of ["accentLight", "border", "focus"]) checkPair(palette[role], surfaces, 3, `${name}.${role}`);
     for (const role of ["accent", "accentDark", "accentDarker"]) checkPair(palette.accentContrast, [palette[role]], 4.5, `${name}.${role} button text`);
     checkPair(palette.headerText, [palette.headerBackground], 4.5, `${name} header text`);
+    checkPair(palette.headerText, [palette.headerControlSurface], 4.5, `${name} header control text`);
+    checkPair(palette.headerSelectedText, [palette.headerSelected], 4.5, `${name} selected header text`);
+    checkPair(palette.headerHoverText, [palette.headerHover], 4.5, `${name} header hover text`);
     checkPair(palette.selectedText, [palette.selectedBackground], 4.5, `${name} selected text`);
     Object.freeze(palette);
   }
@@ -171,10 +188,10 @@ body[data-md-color-accent],
 body[data-md-color-scheme] {
 ${declarations(light)}
   --layout-width-control-rest-color: var(--header-text);
-  --layout-width-control-hover-color: var(--header-text);
-  --layout-width-control-selected-color: var(--header-text);
-  --layout-width-control-hover-background: transparent;
-  --layout-width-control-selected-background: transparent;
+  --layout-width-control-hover-color: var(--header-hover-text);
+  --layout-width-control-selected-color: var(--header-selected-text);
+  --layout-width-control-hover-background: var(--header-hover);
+  --layout-width-control-selected-background: var(--header-selected);
   --md-primary-fg-color: var(--primary);
   --md-primary-fg-color--light: var(--accent-light);
   --md-primary-fg-color--dark: var(--accent-dark);
@@ -190,23 +207,16 @@ body[data-md-color-scheme="slate"] {
 ${declarations(dark)}
 }
 .md-header {
-  background-color: var(--header-background);
+  background-color: var(--header-surface);
   color: var(--header-text);
   --focus: var(--header-text);
-  --focus-contrast: var(--header-background);
+  --focus-contrast: var(--header-surface);
 }
 .md-header .md-header__title,
-.md-header .md-header__topic,
-.md-header__button,
-.md-header__button:hover,
-.md-header__button:active,
-.md-search__button {
+.md-header .md-header__topic {
   color: var(--header-text);
 }
-.md-search__button { background-color: transparent; }
 .layout-width-toggle[aria-pressed="true"] { box-shadow: inset 0 -2px 0 currentColor; }
-.md-header__button:hover,
-.md-header__button:active { background-color: transparent; }
 .md-nav--primary .md-nav__item--active > .md-nav__link,
 .md-nav--primary .md-nav__item .md-nav__link--active,
 .md-nav--secondary .md-nav__link--active {

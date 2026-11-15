@@ -58,6 +58,8 @@ nav = [
     {"Reader defaults migration" = "reference/reader-defaults-migration.md"},
     {"Reader journey migration" = "reference/reader-journey-migration.md"},
     {"Reader journey review" = "project/reader-journey-review.md"},
+    {"Header controls migration" = "reference/header-controls-migration.md"},
+    {"Header promotion review" = "project/header-controls-review.md"},
     {"Release preparation" = "project/release-readiness.md"}
   ]}
 ]

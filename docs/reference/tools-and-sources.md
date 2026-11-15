@@ -25,7 +25,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Python audit cache | pip-audit `2.10.1`, CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3`; five focused actual-call-path fixtures |
 | Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.70` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0` |
 | Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.4.17`, served locally |
-| Browser proof | [Playwright](https://playwright.dev/docs/intro) with pinned Chromium |
+| Browser proof | [Playwright](https://playwright.dev/docs/intro) with matching pinned Chromium and WebKit for the shared header contract |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): exact `0.45.1` reference-qualified for the Standard Production maintainer workspace |
 | Standard proposal lifecycle | Tracked records, direct-state/terminal-transition validation, the [durable Standard proposal workflow](../llm-wiki/standard-proposals.md), deterministic form-bound approval, exact registry/release evidence, one fixed historical bridge, and GET-only GitHub reconciliation; the user performs final submission |

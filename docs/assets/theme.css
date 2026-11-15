@@ -21,6 +21,15 @@ body[data-md-color-accent] {
   --border: #aab7c0;
   --focus: #003f69;
   --focus-contrast: #ffffff;
+  --header-surface: var(--surface);
+  --header-text: var(--text);
+  --header-control-surface: #edf2f5;
+  --header-hover: #aaa08d;
+  --header-hover-text: #29251f;
+  --header-selected: #d9e7f0;
+  --header-selected-text: var(--header-text);
+  --header-control-height: 1.6rem;
+  --header-control-radius: .4rem;
   --conditional: #a15c00;
   --conditional-transparent: rgb(161 92 0 / 10%);
   --success: #007f3b;
@@ -88,29 +97,67 @@ body[data-md-color-accent] {
 }
 
 .md-header__button {
-  color: var(--accent-dark);
+  color: var(--header-text);
 }
 
 .md-header {
-  background-color: var(--surface);
-  color: var(--text);
+  --focus: var(--header-text);
+  --focus-contrast: var(--header-surface);
+  background-color: var(--header-surface);
+  color: var(--header-text);
 }
 
-.md-search__button {
-  background-color: var(--md-default-fg-color--lightest);
-  color: var(--text);
-}
-
-.md-header__button:hover {
-  background-color: var(--accent-transparent);
-  color: var(--accent-dark);
+.md-search__button,
+.md-header__button:not(.md-logo) {
+  background-color: var(--header-control-surface);
+  border-radius: var(--header-control-radius);
+  box-sizing: border-box;
+  color: var(--header-text);
+  height: var(--header-control-height);
   opacity: 1;
+  transition: none;
 }
 
-.md-header__button:active {
-  background-color: var(--accent-transparent-strong);
-  color: var(--accent-darker);
+.md-header__button:not(.md-logo) {
+  padding: 0;
+  position: relative;
+  width: var(--header-control-height);
+}
+
+/* Keep native label visibility; centre the artwork, not its line box. */
+.md-header__button:not(.md-logo) > svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+[dir="rtl"] .md-header__button:not(.md-logo)[for="__search"] > svg {
+  transform: translate(-50%, -50%) scaleX(-1);
+}
+
+.md-search__button::before {
+  background-color: currentColor;
+  transition: none;
+}
+
+.md-search__button::after {
+  background-color: var(--header-control-surface);
+  color: var(--header-text);
   opacity: 1;
+  transition: none;
+}
+
+.md-header__button:not(.md-logo):is(:hover, :focus-visible),
+.md-search__button:is(:hover, :focus) {
+  background-color: var(--header-hover);
+  color: var(--header-hover-text);
+}
+
+.md-header__button:not(.md-logo):active,
+.md-search__button:active {
+  background-color: var(--header-selected);
+  color: var(--header-selected-text);
 }
 
 .md-tabs__item--active {
@@ -473,16 +520,22 @@ body[data-md-color-scheme="slate"] {
   --border: #798f9a;
   --focus: #abd6ff;
   --focus-contrast: #111a1e;
+  --header-control-surface: #293740;
+  --header-hover: #948774;
+  --header-hover-text: #201c17;
+  --header-selected: #344854;
   --conditional: #edbc74;
   --success: #90d7aa;
   --warning: #ffa69e;
   --md-default-fg-color--lightest: rgba(255, 255, 255, 0.06);
 }
 
-/* Preserve the blue artwork on a readable backing for any header colour. */
+/* Logos retain their artwork without a control frame in either appearance. */
+.md-header__button.md-logo,
 .md-logo img {
-  background-color: var(--logo-surface);
-  border-radius: var(--component-radius-small);
+  background-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 body { background: var(--background); color: var(--text); }

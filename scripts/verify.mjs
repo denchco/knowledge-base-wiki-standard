@@ -43,6 +43,7 @@ const gates = [
   "check:citations-built",
   "check:browser",
   "check:appearance-browser",
+  "check:header-browser",
   ...(provenanceMode === "maintainer" ? ["service:status"] : []),
 ];
 const receiptDirectory = path.join(root, "output", "verification");
@@ -191,6 +192,7 @@ function buildReceipt(provenance) {
     evidence("design-validator-fixtures", "test-suite", "Upstream differential fixtures, invalid design data, source integrity and patched Zod implementation guards.", "scripts/design-validator.test.mjs"),
     evidence("node-tooling-fixtures", "test-suite", "URI security regressions and Ajv reference-resolution compatibility.", "scripts/check-tooling-dependencies.test.mjs"),
     evidence("python-tooling-fixtures", "test-suite", "Frozen audit-cache dependencies, lock behaviour, cache roundtrips and bounded malformed MessagePack regression.", "scripts/check-python-tooling.test.py"),
+    evidence("header-fixtures", "test-suite", "Independent expected header geometry, contrast, visibility and negative-control regressions.", "scripts/header-browser-contract.test.mjs"),
     evidence("appearance-core-fixtures", "test-suite", "Deterministic role derivation, rounded sRGB contrast, strict input validation, runtime width precedence and native configuration preservation.", "scripts/wiki-appearance.test.mjs"),
     evidence("appearance-generation-fixtures", "test-suite", "Absent-config passthrough, deterministic generation, invalid-input safety and shared graph roles.", "scripts/prepare-wiki-appearance.test.mjs"),
     evidence("dependency-lock", "dependency-lock", "Exact npm dependency graph used by build and browser checks.", "package-lock.json"),
@@ -259,6 +261,7 @@ function buildReceipt(provenance) {
         result("DKBWS-HUMAN-004", ["source-consistency"], ["governing-question-repetitions", "governing-question-fixtures"], "The source gate proved one mapped canonical question and rejected ungoverned exact repetitions within the bounded reader set while leaving excluded records and subject-empty fixtures neutral."),
         result("DKBWS-LINK-002", ["source-links", "renderer-fixtures"], ["reader-source-links", "reader-source-link-fixtures", "source-register", "source-citation-renderer", "source-citation-renderer-fixtures"], "The source and renderer fixtures prove exact-row links, numeric superscripts with accessible stable identities, registered authority URLs, neutral excluded regions, and rejection of missing or malformed rendered citations."),
         result("DKBWS-DESIGN-001", ["design-source", "design-fixtures"], ["design-contract", "design-validator-source", "design-validator-fixtures", "appearance-core-fixtures", "appearance-generation-fixtures"], "Source validation and executable fixtures prove the design contract, runtime width precedence, appearance derivation, absent-config handling and deterministic generation."),
+        result("DKBWS-DESIGN-002", ["header-source", "header-fixtures"], ["design-contract", "header-fixtures", "appearance-core-fixtures"], "The source contract and negative fixtures preserve semantic header geometry, opaque colour roles and failure detection."),
         result("DKBWS-RENDER-001", ["dependencies"], ["standard-check", "dependency-lock", "python-dependency-lock", "runtime-dependency-contract", "renderer-dependency-contract"], "Dependency and adapter checks prove the exact renderer and browser runtime pins, qualified runtime assets and their dependency provenance."),
         result("DKBWS-RUNTIME-002", ["service-fixtures"], ["local-service-contract", "local-service-fixtures"], "Service fixtures prove exact registration, installed-job and loaded-job contracts, static identity handling and fail-closed canonical browser handoff."),
         result("DKBWS-PROMPT-001", ["policy-source", "policy-fixtures"], ["standard-check", "prompt-contract", "agent-instruction-parity", "authoring-policy", "authoring-template", "next-step-fixtures", "standard-stack-resolver", "standard-stack-fixtures"], "Checks prove development-cycle handoff cadence and format, bootstrap, authoring-policy propagation, pinned-template boundaries and shared instruction integrity; they do not measure prose quality or ASD-STE100 compliance."),
@@ -344,6 +347,17 @@ function buildReceipt(provenance) {
       results: [
         result("DKBWS-DESIGN-001", ["browser-defaults", "browser-saved-preferences", "browser-appearance"], ["appearance-browser-fixtures", "appearance-browser-result"], "Browser fixtures prove the Wide fresh-reader fallback, explicit configured defaults, saved Standard/Wide precedence through navigation and reload, missing or invalid storage recovery, mobile containment, contrasting themes, and readable derived roles when the appearance adapter is configured."),
       ],
+    },
+    {
+      id: "header-browser",
+      status: "pass",
+      command: "npm run check:header-browser",
+      exitCode: 0,
+      evidence: [
+        evidence("header-browser-contract", "browser-test", "Real-renderer header geometry, opaque state colours, actual SVG alignment, accessible controls and preference checks in Chromium and WebKit.", "scripts/header-browser-contract.mjs"),
+        evidence("header-browser-result", "browser-test", "Current engine and viewport matrix with independent header assertions and generic captures.", "output/verification/header/contract.json"),
+      ],
+      results: [result("DKBWS-DESIGN-002", ["browser-chromium", "browser-webkit", "browser-header-interaction", "browser-header-reflow"], ["header-browser-contract", "header-browser-result"], "Both browser engines passed the declared light/dark, desktop/mobile, Standard/Wide, zoom/reflow, navigation and reload header matrix.")],
     },
     {
       id: "canonical-input-mutation",

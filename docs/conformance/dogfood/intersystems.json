@@ -8,7 +8,7 @@
     "standard_name": "DenchCo Knowledge Base Wiki Standard",
     "standard_version": "0.1.0-candidate",
     "standard_snapshot": "c3469da5bd2be4587d6d9e256c99c9557a61faec+working-tree",
-    "status_vocabulary": ["PASS", "FAIL", "WAIVED", "NOT_APPLICABLE", "NOT_IMPLEMENTED"],
+    "status_vocabulary": ["PASS", "FAIL", "WAIVED", "NOT_APPLICABLE", "NOT_IMPLEMENTED", "NOT_CHECKED"],
     "confidence_vocabulary": ["HIGH", "MEDIUM", "LOW"],
     "confidence": "MEDIUM",
     "waivers_recognized": 0,
@@ -82,7 +82,7 @@
     {"id": "standard-upgrade", "status": "NOT_IMPLEMENTED", "confidence": "MEDIUM", "evidence_paths": [], "finding": "No DenchCo version-aware upgrade and deviation merge exists."},
     {"id": "bounded-ask-wiki", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/llm-wiki/ask.md", "functions/api/ask.js", "DEPLOYMENT.md"], "finding": "Cloudflare Ask is bounded by retrieval, source links, secrets and documented authority limits."}
   ],
-  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 9},
+  "requirement_summary": {"PASS": 11, "FAIL": 3, "WAIVED": 0, "NOT_APPLICABLE": 4, "NOT_IMPLEMENTED": 9, "NOT_CHECKED": 1},
   "requirements": [
     {"id": "DKBWS-CORE-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/", "scripts/check-mkdocs.mjs"], "finding": "Canonical knowledge is Markdown and strict-built with portable local links."},
     {"id": "DKBWS-CORE-002", "status": "FAIL", "confidence": "HIGH", "evidence_paths": [], "finding": "No candidate manifest declares standard version, roles, capabilities or deviations."},
@@ -99,6 +99,7 @@
     {"id": "DKBWS-LINK-002", "status": "NOT_IMPLEMENTED", "confidence": "LOW", "evidence_paths": [], "finding": "The historical audit predates this requirement and records no exact source-row navigation or registered-authority-link evidence; no pass is inferred."},
     {"id": "DKBWS-GRAPH-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["docs/assets/graphify/graph.json", "docs/assets/graphify/graph.html", "docs/assets/graphify/graph-3d.html", "scripts/check-graphify-freshness.mjs"], "finding": "Shared enriched graph data, real 2D/3D views and freshness checks exist."},
     {"id": "DKBWS-DESIGN-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["DESIGN.md", "package.json"], "finding": "Lintable structured DESIGN.md and named tokens are implemented. This historical finding does not assess the Wide default, saved-width precedence or storage-failure behaviour added on 19 October 2026."},
+    {"id": "DKBWS-DESIGN-002", "status": "NOT_CHECKED", "confidence": "LOW", "evidence_paths": [], "finding": "This 3 August 2026 audit predates the shared header contract. It establishes no header acceptance, release inclusion or consumer adoption.", "limitations": ["The 1 November 2026 catalogue overlay adds this unassessed result without rerunning the historical audit. No Chromium/WebKit header geometry, state colour, SVG alignment, contrast or interaction evidence was collected."]},
     {"id": "DKBWS-RENDER-001", "status": "NOT_APPLICABLE", "confidence": "MEDIUM", "evidence_paths": ["mkdocs.yml"], "finding": "The project is a Material compatibility implementation, not a standard-production Zensical claim."},
     {"id": "DKBWS-PROV-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": [".git", ".jj", "AGENTS.md", "docs/llm-wiki/maintenance.md"], "finding": "The inspected maintenance workspace has Git-interoperable history and a colocated Jujutsu workspace; project instructions make JJ phase visibility explicit. This is inferred adoption evidence, not a formal DenchCo claim."},
     {"id": "DKBWS-VERIFY-001", "status": "PASS", "confidence": "HIGH", "evidence_paths": ["package.json", "scripts/check-graphify-freshness.mjs"], "finding": "One check command covers declared capabilities and regenerates Graphify only in a temporary copy."},

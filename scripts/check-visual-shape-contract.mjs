@@ -43,7 +43,12 @@ for (const field of ["logo", "favicon"]) {
   requireIn(zensical, `${field} = "assets/brand/denchco-wordmark.png"`, `The Standard ${field} must use its governed DenchCo wordmark`);
 }
 requireIn(theme, "--background: #ffffff", "The Standard light page must match the white Documentation page");
-requireIn(selectorBlock(theme, ".md-logo img"), "background-color: var(--logo-surface)", "The wordmark must retain its readable backing in either appearance");
+for (const selector of [".md-header__button.md-logo,\n.md-logo img"]) {
+  const logo = selectorBlock(theme, selector);
+  requireIn(logo, "background-color: transparent", "The wordmark must retain a transparent, unframed surround");
+  requireIn(logo, "border-radius: 0", "The wordmark must not acquire control rounding");
+  requireIn(logo, "box-shadow: none", "The wordmark must not acquire a control shadow");
+}
 requireIn(design, 'compactDataFontSize: ".64rem"', "DESIGN.md must pin reduced table text");
 requireIn(design, 'diagramTextSize: ".64rem"', "DESIGN.md must match Mermaid and reduced table text");
 requireIn(design, 'diagramEmphasisLineWidth: "3px"', "DESIGN.md must pin the Mermaid emphasis line");
@@ -265,8 +270,24 @@ requireIn(layout, "margin-inline-start: var(--header-title-content-rail-offset)"
 requireIn(layout, "margin-inline: var(--layout-width-control-inline-start) var(--layout-width-control-content-rail-offset)", "Wide control must align to the content rail");
 requireIn(layout, ".md-header__title .md-header__topic", "the visible header topic must be governed");
 requireIn(layout, "transform: none !important", "the visible header topic must stay on the body rail");
-requireIn(selectorBlock(theme, ".md-header"), "background-color: var(--surface)", "header must use the surface token");
-requireIn(selectorBlock(theme, ".md-search__button"), "background-color: var(--md-default-fg-color--lightest)", "Search must use the neutral renderer token");
+requireIn(selectorBlock(theme, ".md-header"), "background-color: var(--header-surface)", "header must use the semantic header surface token");
+requireIn(theme, "background-color: var(--header-control-surface)", "header controls must use the opaque semantic rest surface");
+for (const [token, value] of [["--header-control-height", "1.6rem"], ["--header-control-radius", ".4rem"], ["--header-hover", "#aaa08d"], ["--header-hover-text", "#29251f"]]) {
+  requireIn(theme, `${token}: ${value}`, `header token must retain ${token} ${value}`);
+}
+requireIn(theme, "--header-hover: #948774", "dark header hover must retain the shared brown surface");
+requireIn(theme, "--header-hover-text: #201c17", "dark header hover must retain its matching foreground");
+requireIn(requirements, "DKBWS-DESIGN-002", "the normative catalogue must identify the shared header contract");
+requireIn(read("profiles/standard-production.yaml"), "- DKBWS-DESIGN-002", "Standard Production must select the shared header requirement");
+requireIn(starterDesign, "DKBWS-DESIGN-002", "the new-Wiki design template must carry the shared header contract");
+for (const artifact of ["docs/assets/theme.css", "docs/assets/layout-width.css", "docs/assets/wiki.js", "scripts/header-browser-contract.mjs", "scripts/header-browser-contract.test.mjs", "scripts/header-browser-fixture.mjs", "scripts/check-header-browser.mjs"]) {
+  requireIn(read("starter/starter.yaml"), `target: "${artifact}"`, `the starter must include the shared header closure: ${artifact}`);
+}
+const packageScripts = JSON.parse(read("package.json")).scripts;
+for (const command of ["browser:install", "browser:install:ci"]) {
+  if (!/\bchromium webkit\b/.test(packageScripts[command])) errors.push(`${command} must install both qualified header engines`);
+}
+
 requireIn(
   selectorBlock(theme, ".md-typeset blockquote.governing-question"),
   "border-inline-start-color: var(--accent)",
@@ -324,7 +345,12 @@ function checkAppearanceContract() {
   const darkBlock = selectorBlock(theme, 'body[data-md-color-scheme="slate"]');
   for (const [key, value] of Object.entries(dark)) {
     const css = key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
-    requireIn(darkBlock, `--${css}: ${value}`, `Dark palette token ${key} must agree with DESIGN.md`);
+    const sharedAlias = { headerSurface: "surface", headerText: "text", headerSelectedText: "header-text" }[key];
+    if (sharedAlias) {
+      requireIn(theme, `--${css}: var(--${sharedAlias})`, `Shared header alias ${key} must preserve the active palette`);
+      const expected = key === "headerSurface" ? colors.darkSurface : colors.darkText;
+      if (value !== expected) errors.push(`Dark palette alias ${key} must agree with DESIGN.md`);
+    } else requireIn(darkBlock, `--${css}: ${value}`, `Dark palette token ${key} must agree with DESIGN.md`);
   }
   for (const config of [zensical, starterZensical]) {
     const palettes = [...config.matchAll(/\[\[project\.theme\.palette\]\]([^[]+)/g)].map(match => match[1]);
