@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — DOMPurify patch
+
+- Select exact DOMPurify `3.4.18` for the Mermaid runtime under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. Keep Mermaid `11.17.2` and KaTeX `0.18.2`. [SRC-094](docs/sources.md#src-094)
+- To migrate an authorised target, carry the direct pin, frozen lock, runtime guards and version rejection fixtures together. Rebuild the runtime and run complete verification.
+
 ## Unreleased — reference toolchain update
 
 - Select exact Node.js `24.22.3` with bundled npm `11.19.1`, CPython `3.12.16` and uv `0.13.8` for the Standard reference under `DKBWS-SEC-001`, `DKBWS-VERIFY-001` and `DKBWS-RELEASE-001`. Set the resolver floor to `>=0.13.8`. Retain the exact renderer and browser selections. [SRC-093](docs/sources.md#src-093)

@@ -24,7 +24,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Schema URI resolution | Ajv `8.20.0` with locked fast-uri `3.1.9`; six focused compatibility and security fixtures in immutable rc.9 |
 | Python audit cache | pip-audit `2.10.1`, CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3`; five focused actual-call-path fixtures |
 | Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.70` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0` |
-| Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.4.17`, served locally |
+| Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.4.18`, served locally. [SRC-094](../sources.md#src-094) |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with matching pinned Chromium and WebKit for the shared header contract |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): exact `0.45.1` reference-qualified for the Standard Production maintainer workspace |
