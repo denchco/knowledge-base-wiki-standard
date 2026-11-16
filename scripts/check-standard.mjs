@@ -574,7 +574,7 @@ const exactNodePins = {
   "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
-  "dompurify": "3.4.17",
+  "dompurify": "3.4.18",
   "esbuild": "0.28.2",
   "katex": "0.18.2",
   "mermaid": "11.17.2",
@@ -644,7 +644,7 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
 }
 if (packageLock.packages?.["node_modules/@google/design.md"]) failures.push("the lock retains the unqualified bundled design.md executable");
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
-if (domPurifyVersion !== "3.4.17") failures.push(`package-lock must resolve exactly DOMPurify 3.4.17; found ${domPurifyVersion ?? "unlisted"}`);
+if (domPurifyVersion !== "3.4.18") failures.push(`package-lock must resolve exactly DOMPurify 3.4.18; found ${domPurifyVersion ?? "unlisted"}`);
 if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.9") failures.push("package-lock must resolve fast-uri exactly 3.1.9");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");

@@ -7,6 +7,10 @@ status: draft
 
 # Research and change log
 
+## 2026-11-16 — DOMPurify patch
+
+- Select DOMPurify `3.4.18` for the embedded Mermaid runtime. The published source tag and npm metadata identify the same commit. Update the direct dependency, lock and runtime guards together. Keep Mermaid `11.17.2` and KaTeX `0.18.2`. [SRC-094](sources.md#src-094)
+
 ## 2026-11-03 — Reader journey candidate
 
 - Synthesise an audience-led progression from a short substantive answer to explanation, worked application and exact reference. Retain the Standard's existing question-led architecture, source authority and prospective writing-policy boundaries.
