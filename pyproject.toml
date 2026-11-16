@@ -10,8 +10,8 @@ dependencies = [
 ]
 
 [tool.uv]
-# Dependency-update resolvers may advance; check:toolchain qualifies exactly 0.13.4.
-required-version = ">=0.13.4"
+# Dependency-update resolvers may advance; check:toolchain qualifies exactly 0.13.8.
+required-version = ">=0.13.8"
 package = false
 
 [dependency-groups]

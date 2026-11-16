@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — reference toolchain update
+
+- Select exact Node.js `24.22.3` with bundled npm `11.19.1`, CPython `3.12.16` and uv `0.13.8` for the Standard reference under `DKBWS-SEC-001`, `DKBWS-VERIFY-001` and `DKBWS-RELEASE-001`. Set the resolver floor to `>=0.13.8`. Retain the exact renderer and browser selections. [SRC-093](docs/sources.md#src-093)
+- To migrate an authorised target, carry the exact version files, package engine and installer declarations, and version checks together. Reinstall from both frozen locks and run complete verification, including the security audits and browser checks, before publication.
+
 ## Unreleased — reader journey candidate
 
 - Add advisory reader-journey guidance illustrating the existing `DKBWS-PROMPT-001` writing/discovery policy: a short answer, progressive explanation, worked application and exact reference. Link it from authoring guidance and the prompt without adding normative requirements, parity rules or a conformance gate.
