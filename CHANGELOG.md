@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Graphify reference update
+
+- Select exact Graphify `0.9.106` under `DKBWS-GRAPH-001` and `DKBWS-SEC-001`. Preserve the input guard and support graph reconciliation after source deletion. [SRC-096](docs/sources.md#src-096)
+- To migrate an authorised target, carry the Python pin, frozen lock, guarded indexing adapter and checks together. Rebuild the graph and run complete verification.
+
 ## Unreleased — DOMPurify patch
 
 - Select exact DOMPurify `3.4.18` for the Mermaid runtime under `DKBWS-SEC-001` and `DKBWS-RUNTIME-001`. Keep Mermaid `11.17.2` and KaTeX `0.18.2`. [SRC-094](docs/sources.md#src-094)

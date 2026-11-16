@@ -16,7 +16,7 @@ import stat
 import sys
 
 
-QUALIFIED_VERSION = "0.9.70"
+QUALIFIED_VERSION = "0.9.106"
 PREPROCESSED_SUFFIXES = frozenset({".F", ".F90", ".F95", ".F03", ".F08"})
 # These exact directory names are unconditional exclusions in the qualified
 # upstream detector. Ignore files cannot expand this adapter's input boundary.
@@ -36,8 +36,8 @@ def refuse(message):
     raise UnsupportedGraphifyInput(f"Graphify input guard failed: {message}")
 
 
-def check_path(root, candidate):
-    """Reject traversal, symlink aliases and preprocessed Fortran paths."""
+def check_path(root, candidate, *, allow_missing=False):
+    """Reject traversal, aliases and preprocessed Fortran paths."""
     root = Path(root).resolve(strict=True)
     candidate = Path(os.path.abspath(candidate))
     try:
@@ -50,6 +50,8 @@ def check_path(root, candidate):
         try:
             mode = current.lstat().st_mode
         except OSError as error:
+            if allow_missing and isinstance(error, FileNotFoundError):
+                break
             refuse(f"cannot inspect input {str(candidate.relative_to(root))!r}: {error}")
         if stat.S_ISLNK(mode):
             refuse(f"corpus symlinks are unsupported: {str(current.relative_to(root))!r}")
@@ -120,9 +122,11 @@ def install_runtime_guard(root, modules):
 
     original_get_extractor = extractor._get_extractor
 
-    def guarded_get_extractor(candidate):
-        check_path(root, candidate)
-        return original_get_extractor(candidate)
+    def guarded_get_extractor(candidate, *, sniff_headers=True):
+        # Graph reconciliation classifies old source paths even after deletion.
+        # Actual extraction still requires every path component to exist.
+        check_path(root, candidate, allow_missing=not sniff_headers)
+        return original_get_extractor(candidate, sniff_headers=sniff_headers)
 
     # SystemExit is intentional: upstream converts ordinary extraction errors
     # to partial graph results, which must not make an unsupported input pass.
