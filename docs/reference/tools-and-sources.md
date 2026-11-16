@@ -20,7 +20,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Claude Code discovery | `CLAUDE.md` importing `AGENTS.md`, plus `.claude/skills/` |
 | Follow-up state | `docs/project/status.md` for zero to three active priorities; validation queue fields for parked work and reopen triggers |
 | Development-response navigation | Configured canonical Human Wiki origin plus `npm run response:links:check -- --base-url <canonical-url> --managed-live` for Markdown, HTML, plain-GFM, exact managed-identity, and per-route HTTP checks; uncaptured pre-send interception still requires a host hook |
-| Validation runtime | Node `24.20.0`, enforced identically in the maintainer workspace, package contract, and CI |
+| Reference toolchain | Node.js `24.22.3` with npm `11.19.1`, CPython `3.12.16` and uv `0.13.8`. The maintainer workspace and CI check the same versions. [SRC-093](../sources.md#src-093) |
 | Schema URI resolution | Ajv `8.20.0` with locked fast-uri `3.1.9`; six focused compatibility and security fixtures in immutable rc.9 |
 | Python audit cache | pip-audit `2.10.1`, CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3`; five focused actual-call-path fixtures |
 | Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.70` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0` |

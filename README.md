@@ -139,13 +139,16 @@ An issue is only intake. Acceptance is a separate Standard-maintainer decision; 
 <details>
 <summary><strong>For Standard maintainers</strong></summary>
 
-Standard Production maintenance requires exactly Node `24.20.0`, npm `11.19.0`, Python `3.12.14`, uv `0.13.4`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.45.1`. The uv bootstrap floor permits newer dependency-update resolvers, while build, serve and verification commands still enforce this exact reference through `check:toolchain`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+Standard Production maintenance requires Node.js `24.22.3` with bundled npm `11.19.1`, CPython `3.12.16`, uv `0.13.8`, Git `2.41` or newer, and Jujutsu `0.45.1`. The uv resolver floor is `>=0.13.8`. Build, serve and verification commands use `check:toolchain` to enforce the exact reference versions. Initialise the colocated Jujutsu workspace only when `.jj` is absent:
 
 ```sh
 node --version
+npm --version
+uv --version
 git --version
 jj --version
 test -d .jj || jj git init --colocate .
+uv python install 3.12.16
 npm ci
 uv sync --frozen
 npm run browser:install
@@ -155,7 +158,7 @@ npm run service:register
 npm run service:start
 ```
 
-`node --version` must report `v24.20.0`, and `jj --version` must report `jj 0.45.1` for this candidate. npm installation fails closed on a different Node version. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
+`node --version` must report `v24.22.3`, and `jj --version` must report `jj 0.45.1`. npm installation enforces the package engines. A Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`. This mode does not establish maintainer provenance.
 
 End every file-changing development turn with the helper below before giving the final response. It runs complete verification, inspects Git and Jujutsu state, records the turn's changes in a JJ commit, discloses a verification failure in that commit while returning the failing status, and creates no empty commit for a clean turn:
 

@@ -622,9 +622,12 @@ if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.cod
   failures.push("static managed service marker must match the configured service identity");
 }
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
-const exactNodeVersion = "24.20.0";
-if (pkg.engines?.npm !== "11.19.0" || pkg.packageManager !== "npm@11.19.0") failures.push("npm must be explicitly pinned to 11.19.0");
-if (readFileSync(".python-version", "utf8") !== "3.12.14\n") failures.push("reference Python must be exactly 3.12.14");
+const exactNodeVersion = "24.22.3";
+const exactNpmVersion = "11.19.1";
+const exactPythonVersion = "3.12.16";
+const exactUvVersion = "0.13.8";
+if (pkg.engines?.npm !== exactNpmVersion || pkg.packageManager !== `npm@${exactNpmVersion}`) failures.push(`npm must be explicitly pinned to ${exactNpmVersion}`);
+if (readFileSync(".python-version", "utf8") !== `${exactPythonVersion}\n`) failures.push(`reference Python must be exactly ${exactPythonVersion}`);
 if (pkg.engines?.node !== exactNodeVersion) failures.push(`Node engine must be exactly ${exactNodeVersion}; found ${pkg.engines?.node ?? "unlisted"}`);
 if (readFileSync(".node-version", "utf8") !== `${exactNodeVersion}\n`) failures.push(`.node-version must contain exactly ${exactNodeVersion}`);
 if (readFileSync(".npmrc", "utf8") !== "engine-strict=true\n") failures.push(".npmrc must enforce the exact package engine");
@@ -634,6 +637,7 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const lockRoot = packageLock.packages?.[""] ?? {};
 if (packageLock.version !== pkg.version || lockRoot.version !== pkg.version) failures.push("package-lock candidate version does not match package.json");
 if (lockRoot.engines?.node !== pkg.engines.node) failures.push("package-lock Node engine does not match package.json");
+if (lockRoot.engines?.npm !== pkg.engines.npm) failures.push("package-lock npm engine does not match package.json");
 if (lockRoot.license !== pkg.license) failures.push("package-lock licence does not match package.json");
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
@@ -742,7 +746,8 @@ for (const gate of ["check:toolchain", "build", "check", "check:graphify", "chec
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
 const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
-if (!/^required-version\s*=\s*">=0\.13\.4"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.13.4; reference qualification remains exactly 0.13.4");
+const uvRequirement = /^required-version\s*=\s*"([^"]+)"\s*$/mu.exec(uvSettings)?.[1];
+if (uvRequirement !== `>=${exactUvVersion}`) failures.push(`uv dependency-update resolvers require >=${exactUvVersion}; reference qualification remains exactly ${exactUvVersion}`);
 for (const pin of ["zensical==0.0.59", "graphifyy==0.9.70", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
@@ -753,10 +758,11 @@ for (const pin of [
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
   "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
   "astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1",
-  "node-version: 24.20.0",
+  `node-version: ${exactNodeVersion}`,
   "runs-on: ubuntu-24.04",
-  'version: "0.13.4"',
-  'python-version: "3.12.14"',
+  `version: "${exactUvVersion}"`,
+  `python-version: "${exactPythonVersion}"`,
+  `test "$(npm --version)" = "${exactNpmVersion}"`,
   "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",
 ]) {
