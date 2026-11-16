@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-stack-report-v1.json",
+  "title": "Read-only immutable Standard stack resolution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "operation", "selection", "observedAt", "source", "readOnly", "writesPerformed", "currentVulnerabilityClearance", "stack"],
+  "properties": {
+    "$schema": { "const": "https://denchco.github.io/knowledge-base-wiki-documentation/schema/standard-stack-report-v1.json" },
+    "schemaVersion": { "const": "1.0" },
+    "operation": { "enum": ["resolve", "check"] },
+    "selection": { "const": "latest-verified-immutable" },
+    "observedAt": { "$ref": "#/$defs/date" },
+    "source": { "$ref": "#/$defs/source" },
+    "readOnly": { "const": true },
+    "writesPerformed": { "const": false },
+    "currentVulnerabilityClearance": { "const": "not-checked" },
+    "stack": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tag", "revision", "release", "qualification", "qualificationScope", "fileEvidenceScope", "files"],
+      "properties": {
+        "tag": { "type": "string", "minLength": 5 },
+        "revision": { "$ref": "#/$defs/revision" },
+        "release": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "tag", "publishedAt", "url", "draft", "immutable"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" }, "tag": { "type": "string", "minLength": 5 },
+            "publishedAt": { "$ref": "#/$defs/date" }, "url": { "type": "string", "pattern": "^https://github\\.com/" },
+            "draft": { "const": false }, "immutable": { "const": true }
+          }
+        },
+        "qualification": {
+          "type": "object", "additionalProperties": false,
+          "required": ["workflowPath", "workflowId", "runId", "attempt", "event", "headBranch", "headSha", "status", "conclusion", "updatedAt", "url"],
+          "properties": {
+            "workflowPath": { "const": ".github/workflows/verify.yml" },
+            "workflowId": { "$ref": "#/$defs/id" }, "runId": { "$ref": "#/$defs/id" }, "attempt": { "$ref": "#/$defs/id" },
+            "event": { "const": "push" }, "headBranch": { "const": "main" }, "headSha": { "$ref": "#/$defs/revision" },
+            "status": { "const": "completed" }, "conclusion": { "const": "success" },
+            "updatedAt": { "$ref": "#/$defs/date" }, "url": { "type": "string", "pattern": "^https://github\\.com/" }
+          }
+        },
+        "qualificationScope": { "const": "dated-release-verification" },
+        "fileEvidenceScope": { "const": "selected-stack-files; full revision binds all release source" },
+        "files": {
+          "type": "array", "minItems": 9, "maxItems": 9, "uniqueItems": true,
+          "allOf": [
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": "package.json" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": "package-lock.json" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": "pyproject.toml" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": "uv.lock" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": ".node-version" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": ".python-version" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": "zensical.toml" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": ".wiki-standard.yaml" } } }, "minContains": 1, "maxContains": 1 },
+            { "contains": { "type": "object", "required": ["path"], "properties": { "path": { "const": ".github/workflows/verify.yml" } } }, "minContains": 1, "maxContains": 1 }
+          ],
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["path", "gitBlob", "sha256", "bytes"],
+            "properties": {
+              "path": { "enum": ["package.json", "package-lock.json", "pyproject.toml", "uv.lock", ".node-version", ".python-version", "zensical.toml", ".wiki-standard.yaml", ".github/workflows/verify.yml"] },
+              "gitBlob": { "$ref": "#/$defs/revision" }, "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "bytes": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "installed": {
+      "type": "object", "additionalProperties": false, "required": ["source", "revision", "tag", "releaseIdentity"],
+      "properties": {
+        "source": { "$ref": "#/$defs/source" }, "revision": { "$ref": "#/$defs/revision" },
+        "tag": { "type": ["string", "null"], "minLength": 5 },
+        "releaseIdentity": { "enum": ["not-recorded", "verified-immutable-release"] }
+      },
+      "allOf": [{
+        "if": { "properties": { "tag": { "type": "null" } } },
+        "then": { "properties": { "releaseIdentity": { "const": "not-recorded" } } },
+        "else": { "properties": { "releaseIdentity": { "const": "verified-immutable-release" } } }
+      }]
+    },
+    "installedFileIntegrity": { "const": "not-checked" },
+    "relation": { "enum": ["same", "update-available", "ahead", "diverged"] },
+    "migration": { "const": "explicit-user-selection-and-target-verification-required" }
+  },
+  "allOf": [{
+    "if": { "properties": { "operation": { "const": "check" } } },
+    "then": {
+      "properties": { "installed": {}, "relation": {}, "migration": {}, "installedFileIntegrity": {} },
+      "required": ["installed", "relation", "migration", "installedFileIntegrity"]
+    },
+    "else": { "properties": { "installed": false, "relation": false, "migration": false, "installedFileIntegrity": false } }
+  }],
+  "$defs": {
+    "id": { "type": "integer", "minimum": 1 },
+    "revision": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "source": { "type": "string", "pattern": "^https://github\\.com/[a-z0-9][a-z0-9_.-]*/[a-z0-9][a-z0-9_.-]*$" },
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$" }
+  }
+}

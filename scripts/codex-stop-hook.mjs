@@ -75,7 +75,7 @@ export async function evaluateStop(event, options = {}) {
     if (event.stop_hook_active) return warning(`DKBWS-STOP-RETRY-EXHAUSTED-001 (${failures})`);
     return {
       decision: "block",
-      reason: `The optional Wiki Standard response check found ${failures}. Correct the current response once using the repository's configured live Wiki origin and DKBWS-PROMPT-001 handoff rules. Complete only the user's requested scope. Do not add work, alter configuration, or restart parked investigations to satisfy this check. If a live route cannot be verified, state that it is unavailable. Omit unnecessary Next Steps; any retained section has at most three unfinished, goal-linked actions.`,
+      reason: `The optional Wiki Standard response check found ${failures}. Correct the current response once using the repository's configured live Wiki origin and DKBWS-PROMPT-001 handoff rules. Complete only the user's requested scope. Do not add work, alter configuration, or restart parked investigations to satisfy this check. If a live route cannot be verified, state that it is unavailable. For a development-cycle response, assess the continuing Wiki subject and include up to three prioritised content-first recommendations using Proposed update:, Why it matters: and Done when:, or state No further grounded content update is available. Required failed or unrun checks take priority. Do not add a handoff to unrelated simple questions; this hook cannot classify the cycle or assess grounding.`,
     };
   } catch { return warning("DKBWS-STOP-VALIDATOR-FAILED-001"); }
 }

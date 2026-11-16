@@ -5,6 +5,7 @@ import YAML from "yaml";
 
 import { inspectGoverningQuestionRepetitions } from "./check-governing-question-repetitions.mjs";
 import { loadProfile } from "./profile-catalogue.mjs";
+import { deriveAppearance } from "./wiki-appearance.mjs";
 
 const LOCAL_ORIGIN = "https://runtime-contract.invalid";
 
@@ -200,8 +201,14 @@ export function resolveRuntimeBrowserConfiguration(options = {}) {
     ),
   };
 
+  const appearancePath = path.join(root, "config/wiki-appearance.json");
+  const appearance = fs.existsSync(appearancePath)
+    ? deriveAppearance(JSON.parse(fs.readFileSync(appearancePath, "utf8")))
+    : null;
+
   return {
     root,
+    appearance,
     profileId: profile.id,
     routes,
     sources,

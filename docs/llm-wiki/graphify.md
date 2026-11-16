@@ -33,6 +33,8 @@ If a query is empty, shallow, stale, or does not expose enough context, continue
 
 These outputs are derived and ignored by Git. Regenerate them; do not edit them as canonical content.
 
+Use the guarded publication command for indexing. Its exact Graphify `0.9.70` wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, and disables external preprocessing at runtime. Direct indexing commands bypass this qualified boundary. Read-only queries above do not regenerate or extract source files. The [dependency contract](../reference/tools-and-sources.md) and `DEPENDENCIES.md` describe the complete migration closure.
+
 The publisher stamps both graph data and summary with the repository `HEAD` used as the build baseline. `npm run check:graphify` rejects a stale or mismatched commit marker, including the common case where an unchanged topology otherwise retains pre-checkpoint provenance.
 
 The published `graph.json` and `summary.json` both declare `publicationSchemaVersion: "1.0"`. Their normative machine contracts are `schema/graph-publication-v1.json` and `schema/graph-publication-summary-v1.json`. A schema-version change requires an explicit migration rather than a silent consumer break.

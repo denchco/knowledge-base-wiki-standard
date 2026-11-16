@@ -5,7 +5,6 @@ extends:
 requires:
   - DKBWS-HUMAN-001
   - DKBWS-HUMAN-002
-  - DKBWS-HUMAN-003
   - DKBWS-HUMAN-004
   - DKBWS-LLM-001
   - DKBWS-LINK-001
@@ -14,5 +13,6 @@ requires:
   - DKBWS-PROMPT-002
 capabilities:
   human_wiki: required
+  source_citation_style: numeric-superscript
   llm_wiki: required
   development_response_links: live-wiki

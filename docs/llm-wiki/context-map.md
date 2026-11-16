@@ -7,15 +7,17 @@ status: draft
 
 # Context map
 
-For appearance work, read `DESIGN.md` and the native Zensical palette configuration together with the width control, semantic theme tokens and graph theme bridge. Keep the appearance action immediately before Wide; verify both native palettes and saved state rather than adding a separate controller. Consumer adoption remains explicit.
+For appearance work, read `DESIGN.md` and the native Zensical palette configuration together with the width control, semantic theme tokens and graph theme bridge. Keep the appearance action immediately before Wide; verify both native palettes and saved state rather than adding a separate controller. Consumer adoption remains explicit. For the accepted reusable configurable adapter, read the [appearance contribution review](../project/configurable-appearance-review.md). Preserve native palette indexes when selecting fresh defaults.
 
 | Task | Required context | Add when needed |
 |---|---|---|
 | Explain the standard | Specification, requirements, profiles | Sources and evidence matrix |
-| Instantiate a wiki | Repository URL, canonical prompt, starter bootstrap contract, automatically resolved immutable revision | Supplied research seed, existing target, conditional source risks, accent decision |
+| Instantiate a wiki | Repository URL, canonical prompt, starter bootstrap contract, latest verified immutable release and exact revision | Supplied research seed, existing target, conditional source risks, accent decision |
 | Audit conformance | Manifest, requirements, conformance page | Fixtures and project deviations |
-| Change visual behaviour | `DESIGN.md`, Zensical adapter | Browser fixtures and local precedent |
-| Upgrade the standard | Current manifest, canonical source, immutable consumer/candidate revisions, migration notes | Pinned profile/catalogue diff, changelog, and changed fixtures |
+| Change visual behaviour | `DESIGN.md`, Zensical adapter, [shared header migration](../reference/header-controls-migration.md) | Both-engine browser fixtures, [header intake review](../project/header-controls-review.md) and local precedent |
+| Upgrade the standard | Current manifest, read-only stack update report, canonical source, immutable consumer/candidate revisions, migration notes | Pinned profile/catalogue diff, changelog, and changed fixtures |
+| Write new prose | Mapped `AUTHORING.md`, [writing policy](../spec/writing-style.md), reader task and source evidence | Existing glossary, exact quotations or identifiers, material style variations and stricter local rules; 80% is a pragmatic preference, not a score |
+| Review the reader journey | Agreed reader/task, [reader-journey guide](../guides/reader-journey.md), affected pages and registered evidence | Page-role map, first-use terms, worked steps, exact-reference routes and unresolved qualifications; manual semantic review is separate from automated checks |
 | Research a concept | Source register, evidence matrix, relevant canonical page | Validation queue and Graphify |
 | Prepare a development response | Manifest capability, canonical Human Wiki URL, and captured response draft | Markdown/HTML/plain-GFM link forms; `--managed-live` exact service identity and route HTTP; host pre-send hook for an uncaptured response |
 | Select follow-up work | User's requested outcome and project status | Failed or unrun checks and currently unparked validation items |

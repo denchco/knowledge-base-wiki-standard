@@ -58,8 +58,8 @@ if (!graph2d.includes("RAW_NODES") && !graph2d.includes("Graphify unavailable"))
 if (!graph2d.includes("width: 100vw; height: 100vh") || !graph2d.includes("#legend-wrap, #stats { display: none; }")) {
   failures.push("graph.html does not preserve a full-width mobile canvas with bounded overlay controls");
 }
-if (!graph2d.includes("#0b7285")) failures.push("graph.html does not expose the governed #0b7285 interaction accent");
-if (!graph2d.includes("outline: 3px solid #0b7285")) failures.push("graph.html search/selection focus does not use the governed accent");
+if (!graph2d.includes("#004d80")) failures.push("graph.html does not expose the governed #004d80 interaction accent");
+if (!graph2d.includes("outline: 3px solid #004d80")) failures.push("graph.html search/selection focus does not use the governed accent");
 if (!graph2d.includes("../vendor/vis-network.min.js")) failures.push("graph.html does not use the pinned local vis-network runtime");
 if (/src="\.\.\/vendor\/vis-network\.min\.js"[^>]*\bintegrity=/i.test(graph2d)) failures.push("graph.html retains stale CDN integrity metadata on the local vis-network runtime");
 
@@ -69,7 +69,7 @@ if (!graph3d.includes("graph.json")) failures.push("graph-3d.html does not refer
 if (!graph3d.includes(".width(window.innerWidth)") || !graph3d.includes('window.addEventListener("resize"')) {
   failures.push("graph-3d.html does not resize its WebGL canvas with the iframe viewport");
 }
-if (!graph3d.includes("--primary: #0b7285")) failures.push("graph-3d.html does not expose the governed #0b7285 interaction accent");
+if (!graph3d.includes("--primary: #004d80")) failures.push("graph-3d.html does not expose the governed #004d80 interaction accent");
 if (!graph3d.includes("outline: 3px solid var(--accent)")) failures.push("graph-3d.html search focus does not use the governed accent");
 if (!graph3d.includes("../vendor/3d-force-graph.min.js")) failures.push("graph-3d.html does not use the pinned local 3d-force-graph runtime");
 

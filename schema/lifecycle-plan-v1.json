@@ -14,7 +14,18 @@
     "applySupported": { "const": false },
     "target": { "type": "string" },
     "evaluationDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
-    "candidate": { "type": "object" },
+    "candidate": {
+      "type": "object",
+      "required": ["standard", "selection"],
+      "properties": {
+        "standard": {
+          "type": "object",
+          "required": ["revision"],
+          "properties": { "revision": { "type": "string", "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$" } }
+        },
+        "selection": { "$ref": "#/$defs/selection" }
+      }
+    },
     "consumer": { "type": "object" },
     "requirements": { "type": "array" },
     "changes": { "type": "array", "items": { "$ref": "#/$defs/change" } },
@@ -50,6 +61,36 @@
   ],
   "additionalProperties": false,
   "$defs": {
+    "selection": {
+      "type": "object",
+      "required": ["mode", "revision", "releaseTag", "bootstrapEligible", "currentVulnerabilityClearance", "evidence"],
+      "properties": {
+        "mode": { "enum": ["latest-verified-immutable", "explicit-unverified"] },
+        "revision": { "type": "string", "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$" },
+        "releaseTag": { "type": ["string", "null"] },
+        "bootstrapEligible": { "type": "boolean" },
+        "currentVulnerabilityClearance": { "const": "not-checked" },
+        "evidence": { "type": ["object", "null"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "latest-verified-immutable" } } },
+          "then": {
+            "properties": {
+              "releaseTag": { "type": "string", "pattern": "^v?[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$" },
+              "bootstrapEligible": { "const": true },
+              "evidence": {
+                "type": "object",
+                "$ref": "standard-stack-report-v1.json",
+                "properties": { "operation": { "const": "resolve" } }
+              }
+            }
+          },
+          "else": { "properties": { "bootstrapEligible": { "const": false }, "evidence": { "type": "null" } } }
+        }
+      ],
+      "additionalProperties": false
+    },
     "change": {
       "type": "object",
       "required": ["id", "kind", "path", "current", "proposed", "reason", "automatic", "blocking"],

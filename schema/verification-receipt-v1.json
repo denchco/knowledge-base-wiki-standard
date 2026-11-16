@@ -99,6 +99,11 @@
           "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 }
         },
+        "proofs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+        },
         "subcontrols": {
           "type": "array",
           "items": { "$ref": "#/$defs/subcontrolResult" }
@@ -153,6 +158,11 @@
           "type": "array",
           "items": { "$ref": "#/$defs/evidence" }
         },
+        "proofs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+        },
         "subcontrols": {
           "type": "array",
           "items": { "$ref": "#/$defs/subcontrolResult" }
@@ -184,6 +194,10 @@
         "method": { "type": "string" },
         "reason": { "type": "string" }
       },
+      "allOf": [{
+        "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+        "then": { "properties": { "changedPaths": { "type": "array", "maxItems": 0 } } }
+      }],
       "additionalProperties": false
     },
     "provenance": {

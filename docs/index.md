@@ -45,6 +45,7 @@ Read from top to bottom: source material becomes inspectable evidence, then main
 ## Start here
 
 - To create an independent wiki, give an AI agent only <https://github.com/denchco/knowledge-base-wiki-standard>. The repository's canonical prompt begins an adaptive seed-or-subject-empty interview and infers routine local defaults.
+- [Shape the reader journey](guides/reader-journey.md) moves from an agreed question and short answer to explanation, examples and exact reference.
 - [Architecture](architecture.md) explains the complete system.
 - [Normative specification](spec/index.md) defines conformance.
 - [Requirements](spec/requirements.md) provides stable rule identifiers.
@@ -53,6 +54,8 @@ Read from top to bottom: source material becomes inspectable evidence, then main
 - [Tools and sources](reference/tools-and-sources.md) records upstream authority.
 - The subject-empty `starter/starter.yaml` recipe creates independent knowledge bases without copying this standard's topic content.
 - [Propose a reusable standard change](llm-wiki/standard-proposals.md) preserves a consumer improvement in a tracked record and keeps intake, Standard acceptance, release, and optional adoption as separate authorised states.
+
+The [writing policy](spec/writing-style.md) applies an ASD-STE100-inspired 80% default to future original English prose. It preserves precise technical meaning and exact source forms.
 
 ## Governed implementation
 

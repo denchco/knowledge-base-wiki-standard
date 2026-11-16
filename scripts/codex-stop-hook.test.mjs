@@ -29,7 +29,9 @@ test("invalid response continues once with static feedback and stops retrying", 
   const first = await evaluateStop(event(message), { findOptIn: optIn });
   assert.equal(first.decision, "block");
   assert.match(first.reason, /DKBWS-RESPONSE-LINK-WIKI-001/);
-  assert.doesNotMatch(first.reason, /secret-key|ignore all previous/);
+  assert.doesNotMatch(first.reason, /secret-key|ignore all previous|Omit unnecessary Next Steps/);
+  assert.match(first.reason, /Proposed update:/);
+  assert.match(first.reason, /unrelated simple questions/);
   const second = await evaluateStop(event(message, true), { findOptIn: optIn });
   assert.equal(second.decision, undefined);
   assert.match(second.systemMessage, /RETRY-EXHAUSTED/);
@@ -54,9 +56,11 @@ test("oversize input and route budget never silently claim validation", async ()
   assert.match(result.systemMessage, /ROUTE-BUDGET/);
 });
 
-test("handoff checker allows no section, enforces max three, and ignores fenced samples", () => {
+test("handoff checker leaves unrelated answers alone and checks explicit development handoffs", () => {
   assert.equal(lintDevelopmentResponseHandoff("Done.").status, "valid");
-  assert.equal(lintDevelopmentResponseHandoff("## Next Steps\n\n1. Repair failing check.\n2. Complete remaining deliverable.\n3. Obtain required decision.").status, "valid");
+  assert.equal(lintDevelopmentResponseHandoff("## Next Steps\n\n1. Proposed update: Refresh the source register. Why it matters: Readers need current evidence. Done when: The source date and supported claim are checked.").status, "valid");
+  assert.equal(lintDevelopmentResponseHandoff("No further grounded content update is available.").status, "valid");
+  assert.equal(lintDevelopmentResponseHandoff("## Next Steps\n\n1. Repair failing check.").status, "invalid");
   assert.equal(lintDevelopmentResponseHandoff("## Next Steps\n\n1. A\n2. B\n3. C\n4. D").status, "invalid");
   assert.equal(lintDevelopmentResponseHandoff("```md\n## Next Steps\n1. A\n2. B\n3. C\n4. D\n```").status, "valid");
 });

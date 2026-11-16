@@ -217,3 +217,18 @@ test("browser routes reject remote, query-bearing, and traversal inputs", () => 
     assert.throws(() => normalizeBrowserRoute(route));
   }
 });
+
+
+test("browser configuration carries derived appearance defaults or preserves no opt-in", t => {
+  const root = fixture(t);
+  const options = { root, env: independentRoutes };
+  assert.equal(resolveRuntimeBrowserConfiguration(options).appearance, null);
+  write(root, "config/wiki-appearance.json", JSON.stringify({ schemaVersion: "1.0", accent: "#e1efdd", appearance: "dark", width: "wide" }));
+  const appearance = resolveRuntimeBrowserConfiguration(options).appearance;
+  assert.equal(appearance.config.appearance, "dark");
+  assert.equal(appearance.config.width, "wide");
+  assert.equal(appearance.light.headerBackground, "#e1efdd");
+  assert.equal(appearance.light.accent, "#505c4d");
+  write(root, "config/wiki-appearance.json", JSON.stringify({ schemaVersion: "1.0", accent: "#e1efdd", appearance: "dark", width: "unexpected" }));
+  assert.throws(() => resolveRuntimeBrowserConfiguration(options), /Width/);
+});

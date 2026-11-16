@@ -55,6 +55,10 @@
             "uniqueItems": true,
             "items": { "type": "string", "minLength": 1 }
           },
+          "proofResults": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/proofResult" }
+          },
           "subcontrols": {
             "type": "array",
             "items": {
@@ -126,6 +130,7 @@
           "id": { "type": "string", "minLength": 1 },
           "requirement": { "type": "string", "pattern": "^DKBWS-" },
           "subcontrol": { "type": "string", "minLength": 1 },
+          "proof": { "type": "string", "minLength": 1 },
           "reason": { "type": "string", "minLength": 1 }
         },
         "additionalProperties": false
@@ -179,6 +184,21 @@
     "resultStatus": {
       "enum": ["pass", "fail", "not-checked", "waived", "not-applicable"]
     },
+    "proofResult": {
+      "type": "object",
+      "required": ["id", "status", "reason", "evidence"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/resultStatus" },
+        "reason": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
     "canonicalMutation": {
       "type": "object",
       "required": ["status", "changedPaths"],
@@ -192,6 +212,10 @@
         "reason": { "type": "string" },
         "method": { "type": "string" }
       },
+      "allOf": [{
+        "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+        "then": { "properties": { "changedPaths": { "type": "array", "maxItems": 0 } } }
+      }],
       "additionalProperties": false
     },
     "evidence": {

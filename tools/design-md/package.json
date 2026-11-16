@@ -1,0 +1,16 @@
+{
+  "name": "@denchco/design-md-validator",
+  "version": "0.4.0-denchco.1",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Reviewed lint-only source adaptation of google-labs-code/design.md 0.4.0 with Zod 4.6.6.",
+  "dependencies": {
+    "remark-frontmatter": "5.0.0",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
+    "unist-util-visit": "5.1.0",
+    "yaml": "2.9.0",
+    "zod": "4.6.6"
+  }
+}

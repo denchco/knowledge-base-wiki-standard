@@ -16,3 +16,6 @@ docs/assets/vendor/
 !.env.example
 site-local/
 zensical.local.toml
+zensical.appearance.toml
+docs/assets/appearance/
+__pycache__/

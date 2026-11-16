@@ -1,18 +1,21 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
+import { checkHandoffInstructions } from "./development-next-steps.mjs";
 
 const required = [
-  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
+  "scripts/design-validator.mjs", "scripts/design-validator.test.mjs", "scripts/check-tooling-dependencies.test.mjs", "scripts/check-python-tooling.test.py",
+  "tools/design-md/package.json", "tools/design-md/upstream-provenance.json", "tools/design-md/zod-4.6.6-inputs.json", "tools/design-md/upstream/LICENSE",
+  "README.md", "LICENSE", "AGENTS.md", "CLAUDE.md", "AUTHORING.md", "DESIGN.md", "DEPENDENCIES.md", ".wiki-standard.yaml", ".node-version", ".npmrc",
   ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/standard-change.yml",
   ".agents/skills/denchco-kb-wiki-standard/SKILL.md",
   ".claude/skills/denchco-kb-wiki-standard/SKILL.md",
   "GOVERNANCE.md", "SECURITY.md", "SOURCE_POLICY.md", "LICENSING.md", "CHANGELOG.md",
-  "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md",
+  "docs/index.md", "docs/spec/index.md", "docs/spec/requirements.md", "docs/spec/writing-style.md",
   "docs/sources.md", "docs/evidence-matrix.md", "docs/validation-queue.md",
   "docs/log.md", "docs/llms.txt", "docs/llm-wiki/index.md", "docs/llm-wiki/standard-proposals.md", "prompts/instantiate-wiki.md",
   "starter/README.md", "starter/starter.yaml", "starter/templates/wiki-standard.yaml.tmpl",
-  "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl",
+  "starter/templates/AGENTS.md.tmpl", "starter/templates/CLAUDE.md.tmpl", "starter/templates/AUTHORING.md.tmpl",
   "starter/templates/LICENSING.md.tmpl",
   "starter/templates/docs/graph/index.md.tmpl",
   "starter/templates/docs/graph/two-dimensional.md.tmpl",
@@ -25,10 +28,10 @@ const required = [
   "docs/llm-wiki/graphify.md", "docs/graph/index.md",
   "docs/graph/two-dimensional.md", "docs/graph/three-dimensional.md",
   "docs/assets/brand/denchco-wordmark.png",
-  "docs/assets/pen-circle.svg", "docs/assets/service-identity.json",
+  "overrides/partials/nav-item.html", "docs/assets/service-identity.json",
   "knowledge/index.md", "knowledge/log.md", "schema/manifest-v1.json", "schema/service-identity-v1.json",
   "schema/conformance-report-v1.json", "schema/okf-v0.2-frontmatter.json",
-  "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json",
+  "schema/okf-export-v1.json", "schema/lifecycle-plan-v1.json", "schema/standard-stack-report-v1.json",
   "schema/adoption-audit-report-v1.json", "schema/verification-receipt-v1.json",
   "schema/documentation-sync-snapshot-v1.json",
   "schema/standard-proposal-record-v1.json", "schema/standard-proposal-registry-v1.json",
@@ -57,17 +60,20 @@ const required = [
   "profiles/standard-production.yaml", "scripts/sync-runtime-assets.mjs",
   "schema/graph-publication-v1.json", "schema/graph-publication-summary-v1.json",
   "scripts/publish-graphify-assets.mjs", "scripts/check-graphify-assets.mjs",
+  "scripts/graphify-update.py", "scripts/check-graphify-inputs.test.py",
   "scripts/check-visual-shape-contract.mjs", "scripts/check-runtime-browser-contract.mjs",
   "scripts/runtime-browser-contract-config.mjs", "scripts/runtime-browser-contract-config.test.mjs",
   "scripts/runtime-browser-contract.playwright.js", "scripts/serve-built-site.mjs",
   "scripts/check-provenance.mjs", "scripts/check-provenance-mode.mjs", "scripts/check-canonical-content.mjs",
   "scripts/check-governing-question-repetitions.mjs", "scripts/check-governing-question-repetitions.test.mjs",
   "scripts/link-source-citations.mjs", "scripts/link-source-citations.test.mjs",
+  "scripts/source_citations.py", "scripts/test_source_citations.py", "scripts/check_rendered_source_citations.py",
   "scripts/development-response-links.mjs", "scripts/development-response-links.test.mjs",
   "scripts/check-schema-artifacts.mjs", "scripts/full-profile-report.mjs", "scripts/dev-service.mjs", "scripts/dev-service.test.mjs",
   "scripts/html-script-json.mjs", "scripts/html-script-json.test.mjs", "scripts/jj-phase.mjs", "scripts/jj-phase.test.mjs", "scripts/verify.mjs",
   "scripts/sync-documentation-snapshot.mjs", "scripts/sync-documentation-snapshot.test.mjs",
   "scripts/standard-proposal-core.mjs", "scripts/standard-proposal-cli.mjs", "scripts/standard-proposal-cli.test.mjs",
+  "scripts/standard-stack.mjs", "scripts/standard-stack-cli.mjs", "scripts/standard-stack.test.mjs",
   "standard-proposals/README.md", "standard-proposals/registry.json", "standard-proposals/standard-change-form-v1.yml",
   "sync/documentation-sync-contract-v1.json"
 ];
@@ -76,7 +82,7 @@ const failures = [];
 for (const file of required) if (!existsSync(file)) failures.push(`missing ${file}`);
 
 const requirements = readFileSync("docs/spec/requirements.md", "utf8");
-for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-003", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
+for (const id of ["DKBWS-CORE-001", "DKBWS-OKF-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-PROMPT-001", "DKBWS-PROMPT-002", "DKBWS-PROV-001", "DKBWS-RUNTIME-002", "DKBWS-UPDATE-001", "DKBWS-UPDATE-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"])
   if (!requirements.includes(id)) failures.push(`missing requirement ${id}`);
 
 const agents = readFileSync("AGENTS.md", "utf8");
@@ -96,6 +102,33 @@ const starterManifest = YAML.parse(readFileSync("starter/starter.yaml", "utf8"))
 const starterEntries = starterManifest?.entries ?? [];
 const starterTargets = starterEntries.map((entry) => entry?.target);
 if (new Set(starterTargets).size !== starterTargets.length) failures.push("starter target paths must be unique");
+const authoringEntry = starterEntries.find((entry) => entry?.target === "AUTHORING.md");
+if (authoringEntry?.classification !== "render-template"
+  || authoringEntry?.template !== "starter/templates/AUTHORING.md.tmpl"
+  || authoringEntry?.role !== "authoring_policy"
+  || authoringEntry?.always !== true
+  || !(authoringEntry?.requirements ?? []).includes("DKBWS-PROMPT-001")) {
+  failures.push("starter must always render the DKBWS-PROMPT-001 authoring policy for new Wikis");
+}
+if (starterManifest?.bootstrap?.defaults?.authoring_policy !== "denchco-asd-ste100-inspired-80-percent") {
+  failures.push("starter must select the pragmatic authoring policy as an automatic bootstrap default");
+}
+if (starterManifest?.bootstrap?.defaults?.desktop_width !== "wide"
+  || !starterManifest?.bootstrap?.no_question_defaults?.includes("Wide desktop width")) {
+  failures.push("starter must select Wide desktop width without a routine bootstrap question");
+}
+const starterAppearance = JSON.parse(readFileSync("starter/templates/config/wiki-appearance.json.tmpl", "utf8"));
+if (starterAppearance.width !== "wide") failures.push("starter appearance configuration must use the Wide desktop default");
+for (const phrase of ["Wide desktop width", "Wide applies without an appearance configuration", "valid saved reader choices", "hidden width control"]) {
+  if (!prompt.includes(phrase)) failures.push(`prompt lacks the governed width-default boundary: ${phrase}`);
+}
+const starterWidthDesign = readFileSync("starter/templates/DESIGN.md.tmpl", "utf8");
+for (const phrase of ["Start fresh desktop readers in Wide", "valid saved Standard or Wide choices", "Missing, invalid or unavailable storage", "hidden and content contained on mobile"]) {
+  if (!starterWidthDesign.includes(phrase)) failures.push(`starter design lacks the governed width-default boundary: ${phrase}`);
+}
+if (!readFileSync("scripts/runtime-browser-contract.playwright.js", "utf8").includes('appearance?.config.width ?? "wide"')) {
+  failures.push("the complete browser contract must expect unconfigured fresh-reader Wide");
+}
 for (const target of [".node-version", ".npmrc"]) {
   const entry = starterEntries.find((candidate) => candidate?.target === target);
   if (entry?.classification !== "adapt-from-release"
@@ -132,6 +165,24 @@ if (starterSourceLinks?.classification !== "adapt-from-release"
   || !(starterSourceLinks?.requirements ?? []).includes("DKBWS-LINK-002")) {
   failures.push("starter must adapt the pinned reader source-link checker for DKBWS-LINK-002");
 }
+for (const target of ["scripts/source_citations.py", "scripts/test_source_citations.py", "scripts/check_rendered_source_citations.py"]) {
+  const entry = starterEntries.find(candidate => candidate?.target === target);
+  if (entry?.classification !== "adapt-from-release" || entry?.source !== target || entry?.planning_only !== true || !entry?.requirements?.includes("DKBWS-LINK-002")) {
+    failures.push(`starter must carry the numeric source-citation dependency closure: ${target}`);
+  }
+}
+if (standardManifest.capabilities?.source_citation_style !== "numeric-superscript"
+  || humanAndAgentProfile.capabilities?.source_citation_style !== "numeric-superscript"
+  || starterManifest.bootstrap?.defaults?.source_citation_style !== "numeric-superscript"
+  || !starterManifest.bootstrap?.no_question_defaults?.includes("numeric superscript source citations")
+  || !readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8").includes('source_citation_style: "numeric-superscript"')) {
+  failures.push("current Human profile and new-wiki defaults must explicitly select numeric-superscript source citations");
+}
+for (const file of ["zensical.toml", "starter/templates/zensical.toml.tmpl"]) {
+  const renderer = readFileSync(file, "utf8");
+  if (!renderer.includes('source_citations = { register_file = "docs/sources.md" }') || !renderer.includes("footnotes = {}")) failures.push(`${file} must enable numeric source citations and explanatory footnotes`);
+}
+if (!prompt.includes("numeric superscript source citations")) failures.push("URL-only bootstrap must declare numeric superscript source citations");
 const starterGoverningQuestion = starterEntries.find((candidate) => candidate?.target === "scripts/check-governing-question-repetitions.mjs");
 if (starterGoverningQuestion?.classification !== "adapt-from-release"
   || starterGoverningQuestion?.source !== "scripts/check-governing-question-repetitions.mjs"
@@ -193,6 +244,10 @@ for (const target of [".wiki-standard.yaml", "AGENTS.md", "CLAUDE.md", "docs/llm
   }
 }
 const starterWikiManifest = readFileSync("starter/templates/wiki-standard.yaml.tmpl", "utf8");
+if (standardManifest?.roles?.authoring_policy !== "AUTHORING.md"
+  || !/^  authoring_policy: "AUTHORING\.md"$/m.test(starterWikiManifest)) {
+  failures.push("Standard and starter manifests must map the authoring policy to AUTHORING.md");
+}
 if (!starterWikiManifest.includes("standard_change_intake: true")) failures.push("starter manifest must select the DKBWS-UPDATE-002 proposal capability");
 if (!starterWikiManifest.includes('development_response_links: "live-wiki"') || !starterWikiManifest.includes('human_wiki_url: "{{WIKI_URL}}"')) {
   failures.push("starter manifest must select DKBWS-PROMPT-002 with a rendered canonical Wiki URL");
@@ -378,6 +433,40 @@ if (agentsHandoff && starterHandoff && agentsHandoff !== starterHandoff) {
   failures.push("root and starter completion/handoff policies have drifted");
 }
 
+// These guards prove policy propagation and its scope, never prose quality or an STE score.
+const agentsWriting = managedSection(agents, "DKBWS-PROMPT-001-WRITING");
+const starterWriting = managedSection(starterAgents, "DKBWS-PROMPT-001-WRITING");
+if (!agentsWriting) failures.push("AGENTS.md lacks the managed writing policy");
+if (!starterWriting) failures.push("starter AGENTS.md template lacks the managed writing policy");
+if (agentsWriting && starterWriting && agentsWriting !== starterWriting) {
+  failures.push("root and starter writing policies have drifted");
+}
+for (const phrase of [
+  "AUTHORING.md",
+  "new original English Wiki prose",
+  "80% is a pragmatic house-style aim, not a computed score or a claim of ASD-STE100 compliance",
+  "Preserve quotations, code, identifiers",
+  "source claims, uncertainty, normative obligations",
+  "exact canonical governing question",
+  "Follow explicit user instructions and stricter applicable local policy",
+  "Review meaning and source fidelity before style",
+  "Apply this policy prospectively",
+  "Do not bulk-rewrite existing content, change consumer pins, or claim adoption",
+]) {
+  if (!agentsWriting?.includes(phrase)) failures.push(`writing policy lacks: ${phrase}`);
+}
+for (const [name, source] of [
+  ["Standard authoring policy", existsSync("AUTHORING.md") ? readFileSync("AUTHORING.md", "utf8") : ""],
+  ["starter authoring policy", readFileSync("starter/templates/AUTHORING.md.tmpl", "utf8")],
+]) {
+  for (const phrase of ["new original English Wiki prose", "not a computed score", "claim of ASD-STE100 compliance"]) {
+    if (!source.includes(phrase)) failures.push(`${name} lacks writing scope or proof boundary: ${phrase}`);
+  }
+}
+for (const [name, source] of [["Standard skill", codexSkill], ["canonical prompt", prompt], ["Standard maintenance", maintenance], ["starter maintenance", starterMaintenance]]) {
+  if (!source.includes("AUTHORING.md")) failures.push(`${name} lacks the authoring policy handoff`);
+}
+
 const agentsLiveWikiLinks = managedSection(agents, "DKBWS-PROMPT-002-LIVE-URL");
 const starterLiveWikiLinks = managedSection(starterAgents, "DKBWS-PROMPT-002-LIVE-URL");
 if (!agentsLiveWikiLinks) failures.push("AGENTS.md lacks the managed live-Wiki response-link policy");
@@ -434,25 +523,14 @@ for (const [name, source] of [
     if (!source.includes(phrase)) failures.push(`${name} lacks development-turn completion phrase: ${phrase}`);
   }
 }
-for (const phrase of [
-  "Complete the requested scope before proposing further work",
-  "recommendations, not continuation authority",
-  "Include no more than three",
-  "failed or unrun required check",
-  "blocked_by",
-  "reopen_when",
-  "last_checked",
-  "If no item qualifies, omit the section and stop",
-]) {
-  if (!agentsHandoff?.includes(phrase)) failures.push(`completion/handoff policy lacks: ${phrase}`);
+for (const [name, source] of [["root handoff", agentsHandoff], ["starter handoff", starterHandoff], ["Standard skill", codexSkill], ["canonical prompt", prompt], ["Standard maintenance", maintenance], ["starter maintenance", starterMaintenance]]) {
+  for (const diagnostic of checkHandoffInstructions(source ?? "")) failures.push(`${name}: ${diagnostic}`);
 }
 if (/exactly three/i.test(prompt)) failures.push("prompt retains an unconditional exactly-three handoff quota");
-for (const phrase of ["completion-first", "no more than three", "If no item qualifies, omit the section"]) {
-  if (!prompt.includes(phrase)) failures.push(`prompt lacks anti-rabbit-hole handoff contract: ${phrase}`);
-}
+if (!prompt.includes("completion-first")) failures.push("prompt lacks completion-first handoff contract");
 for (const boundary of [
   "starter/starter.yaml",
-  "current default-branch HEAD",
+  "latest verified immutable release",
   "Do not ask the user to choose or supply a release tag or commit",
   "Never recursively copy the standard root",
   "URL-only invocation",
@@ -474,6 +552,8 @@ for (const boundary of [
   if (!prompt.includes(boundary)) failures.push(`prompt lacks independent-consumer boundary: ${boundary}`);
 }
 if (/\[immutable release tag or commit\]/i.test(prompt)) failures.push("prompt still requires a user-supplied standard revision");
+if (/Resolve the standard repository's current default-branch HEAD/.test(prompt)) failures.push("bootstrap must select a verified immutable release, not the development branch");
+if (starterManifest.revision_policy !== "automatically-resolve-latest-verified-immutable-release-to-commit") failures.push("starter revision policy must select the latest verified immutable release");
 if (/Topic and intended scope:|Selected profile:|Target Wiki URL:|Target deployment:/i.test(prompt)) {
   failures.push("prompt still exposes the removed field-based bootstrap");
 }
@@ -482,16 +562,21 @@ for (const phrase of ["Give this URL to an AI agent", "research topic seed", "su
 }
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+if (pkg.scripts?.["standard:stack"] !== "node scripts/standard-stack-cli.mjs") failures.push("read-only immutable stack resolver is missing");
+if (!pkg.scripts?.["conformance:test"]?.includes("scripts/standard-stack.test.mjs")) failures.push("immutable stack fixtures are outside complete verification");
+if (pkg.scripts?.["response:next-steps:check"] !== "node scripts/development-next-steps.mjs") failures.push("captured next-step format checker is missing");
+if (!pkg.scripts?.["conformance:test"]?.includes("scripts/development-next-steps.test.mjs")) failures.push("next-step fixtures are outside complete verification");
 const licence = readFileSync("LICENSE", "utf8");
 if (!licence.startsWith("MIT License\n\nCopyright (c) 2026 Andrew Dench")) failures.push("LICENSE must identify MIT and copyright Andrew Dench");
 if (pkg.license !== "MIT") failures.push(`package licence must be MIT; found ${pkg.license ?? "unlisted"}`);
 const exactNodePins = {
-  "@google/design.md": "0.4.0",
+  "@denchco/design-md-validator": "file:tools/design-md",
   "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
-  "dompurify": "3.4.16",
+  "dompurify": "3.4.18",
   "esbuild": "0.28.2",
+  "katex": "0.18.2",
   "mermaid": "11.17.2",
   "vis-network": "10.1.2",
   "yaml": "2.9.0",
@@ -500,9 +585,22 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
   const actual = pkg.devDependencies?.[dependency];
   if (actual !== expected) failures.push(`dependency ${dependency} must be exactly ${expected}; found ${actual ?? "unlisted"}`);
 }
+if (pkg.overrides?.["mermaid@11.17.2"]?.katex !== "$katex") failures.push("Mermaid must use the qualified exact KaTeX override");
 if (pkg.devDependencies?.wrangler) failures.push("wrangler must remain absent until a deployment adapter is selected");
+if (pkg.devDependencies?.["@google/design.md"]) failures.push("the unqualified bundled design.md executable must not be installed");
+if (pkg.scripts?.["design:lint"] !== "node scripts/design-validator.mjs lint DESIGN.md") failures.push("design:lint must use the qualified source adapter");
+for (const test of ["scripts/design-validator.test.mjs", "scripts/check-tooling-dependencies.test.mjs"]) {
+  if (!pkg.scripts?.["conformance:test"]?.includes(test)) failures.push(`complete verification omits ${test}`);
+}
+if (!pkg.scripts?.check?.includes("check:python-tooling") || !pkg.scripts?.["check:python-tooling"]?.includes("scripts/check-python-tooling.test.py")) failures.push("complete verification omits Python tooling qualification");
+
 for (const command of ["check:source-links", "sources:link"]) {
   if (!pkg.scripts?.[command]?.includes("link-source-citations.mjs")) failures.push(`missing ${command} reader source-link command`);
+}
+if (!pkg.scripts?.["check:source-links"]?.includes("scripts/test_source_citations.py")) failures.push("source-link gate must include numeric renderer and independent built-accounting fixtures");
+if (!pkg.scripts?.["check:citations-built"]?.includes("scripts/check_rendered_source_citations.py")) failures.push("whole-built citation accounting gate is missing");
+for (const command of ["dev", "build:site"]) {
+  if (!pkg.scripts?.[command]?.includes("PYTHONPATH=scripts")) failures.push(`${command} must load the numeric citation renderer`);
 }
 if (!pkg.scripts?.["check:governing-question"]?.includes("check-governing-question-repetitions.mjs")) failures.push("missing check:governing-question command");
 if (!pkg.scripts?.check?.includes("check:governing-question")) failures.push("npm run check must include the governing-question repetition gate");
@@ -524,9 +622,12 @@ if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.cod
   failures.push("static managed service marker must match the configured service identity");
 }
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
-const exactNodeVersion = "24.20.0";
-if (pkg.engines?.npm !== "11.19.0" || pkg.packageManager !== "npm@11.19.0") failures.push("npm must be explicitly pinned to 11.19.0");
-if (readFileSync(".python-version", "utf8") !== "3.12.14\n") failures.push("reference Python must be exactly 3.12.14");
+const exactNodeVersion = "24.22.3";
+const exactNpmVersion = "11.19.1";
+const exactPythonVersion = "3.12.16";
+const exactUvVersion = "0.13.8";
+if (pkg.engines?.npm !== exactNpmVersion || pkg.packageManager !== `npm@${exactNpmVersion}`) failures.push(`npm must be explicitly pinned to ${exactNpmVersion}`);
+if (readFileSync(".python-version", "utf8") !== `${exactPythonVersion}\n`) failures.push(`reference Python must be exactly ${exactPythonVersion}`);
 if (pkg.engines?.node !== exactNodeVersion) failures.push(`Node engine must be exactly ${exactNodeVersion}; found ${pkg.engines?.node ?? "unlisted"}`);
 if (readFileSync(".node-version", "utf8") !== `${exactNodeVersion}\n`) failures.push(`.node-version must contain exactly ${exactNodeVersion}`);
 if (readFileSync(".npmrc", "utf8") !== "engine-strict=true\n") failures.push(".npmrc must enforce the exact package engine");
@@ -536,13 +637,15 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const lockRoot = packageLock.packages?.[""] ?? {};
 if (packageLock.version !== pkg.version || lockRoot.version !== pkg.version) failures.push("package-lock candidate version does not match package.json");
 if (lockRoot.engines?.node !== pkg.engines.node) failures.push("package-lock Node engine does not match package.json");
+if (lockRoot.engines?.npm !== pkg.engines.npm) failures.push("package-lock npm engine does not match package.json");
 if (lockRoot.license !== pkg.license) failures.push("package-lock licence does not match package.json");
 for (const [dependency, expected] of Object.entries(exactNodePins)) {
   if (lockRoot.devDependencies?.[dependency] !== expected) failures.push(`package-lock root must pin ${dependency} exactly ${expected}`);
 }
+if (packageLock.packages?.["node_modules/@google/design.md"]) failures.push("the lock retains the unqualified bundled design.md executable");
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
-if (domPurifyVersion !== "3.4.16") failures.push(`package-lock must resolve exactly DOMPurify 3.4.16; found ${domPurifyVersion ?? "unlisted"}`);
-if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.8") failures.push("package-lock must resolve fast-uri exactly 3.1.8");
+if (domPurifyVersion !== "3.4.18") failures.push(`package-lock must resolve exactly DOMPurify 3.4.18; found ${domPurifyVersion ?? "unlisted"}`);
+if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.9") failures.push("package-lock must resolve fast-uri exactly 3.1.9");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
 if (!pkg.scripts?.["conformance:test"]?.includes("runtime-bundle.test.mjs")) failures.push("conformance:test must include runtime sanitizer and bundle inspection fixtures");
@@ -568,6 +671,9 @@ if (!pkg.scripts?.["conformance:test"]?.includes("jj-phase.test.mjs")) {
   failures.push("conformance:test does not exercise end-of-development-turn JJ commit semantics");
 }
 if (!pkg.scripts?.check?.includes("check:visual-shape")) failures.push("check does not exercise check:visual-shape");
+if (pkg.scripts?.["graph:update"] !== "npm run check:toolchain && npm run prepare:runtime && PYTHONDONTWRITEBYTECODE=1 uv run --no-sync python -I -B scripts/graphify-update.py && npm run graph:publish") failures.push("graph:update must use the qualified guarded indexing boundary");
+if (!pkg.scripts?.check?.includes("check:graphify-inputs")
+  || pkg.scripts?.["check:graphify-inputs"] !== "npm run check:toolchain && uv run --no-sync python -I -B scripts/graphify-update.py --check && uv run --no-sync python -I -B scripts/check-graphify-inputs.test.py") failures.push("check must verify graph input rejection and runtime preprocessing guards");
 if (!pkg.scripts?.check?.includes("check:schema-artifacts")) failures.push("check does not exercise Draft 2020-12 artifact validation");
 if (!pkg.scripts?.check?.includes("check:provenance")) failures.push("check does not exercise the explicit provenance mode");
 if (!pkg.scripts?.check?.includes("audit:node") || !pkg.scripts?.check?.includes("audit:python")) failures.push("check does not exercise both locked dependency audits");
@@ -583,12 +689,19 @@ for (const file of sourceFiles(["schema", "profiles", "docs/spec", "docs/conform
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits canonical path ${file}`);
 }
 for (const file of [
+  ...sourceFiles(["tools/design-md"], /./).filter((file) => !file.includes("/node_modules/")),
+  "scripts/design-validator.mjs", "scripts/design-validator.test.mjs", "scripts/check-python-tooling.test.py", "scripts/check-tooling-dependencies.test.mjs",
   ".github/ISSUE_TEMPLATE/config.yml",
   ".github/ISSUE_TEMPLATE/standard-change.yml",
   "docs/llm-wiki/standard-proposals.md",
-  "docs/assets/pen-circle.svg",
+  "overrides/partials/nav-item.html",
   "docs/assets/service-identity.json",
   "scripts/dev-service.test.mjs",
+  "scripts/development-next-steps.mjs",
+  "scripts/development-next-steps.test.mjs",
+  "scripts/jj-phase.test.mjs",
+  "scripts/graphify-update.py",
+  "scripts/check-graphify-inputs.test.py",
   "scripts/check-governing-question-repetitions.mjs",
   "scripts/check-governing-question-repetitions.test.mjs",
   "fixtures/conforming/governing-question-repetitions/.wiki-standard.yaml",
@@ -627,14 +740,15 @@ for (const file of [
   if (!documentationAllowlist.has(file)) failures.push(`documentation snapshot contract omits reusable path ${file}`);
 }
 const verifyOrchestrator = readFileSync("scripts/verify.mjs", "utf8");
-for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:browser", "service:status"]) {
+for (const gate of ["check:toolchain", "build", "check", "check:graphify", "check:citations-built", "check:browser", "service:status"]) {
   if (!verifyOrchestrator.includes(`"${gate}"`)) failures.push(`verify orchestrator does not exercise ${gate}`);
 }
 
 const pyproject = readFileSync("pyproject.toml", "utf8");
 const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
-if (!/^required-version\s*=\s*">=0\.12\.10"\s*$/mu.test(uvSettings)) failures.push("uv dependency-update resolvers require >=0.12.10; reference qualification remains exactly 0.12.10");
-for (const pin of ["zensical==0.0.59", "graphifyy==0.9.55", "pip-audit==2.10.1"])
+const uvRequirement = /^required-version\s*=\s*"([^"]+)"\s*$/mu.exec(uvSettings)?.[1];
+if (uvRequirement !== `>=${exactUvVersion}`) failures.push(`uv dependency-update resolvers require >=${exactUvVersion}; reference qualification remains exactly ${exactUvVersion}`);
+for (const pin of ["zensical==0.0.59", "graphifyy==0.9.70", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
@@ -644,10 +758,11 @@ for (const pin of [
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
   "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
   "astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1",
-  "node-version: 24.20.0",
+  `node-version: ${exactNodeVersion}`,
   "runs-on: ubuntu-24.04",
-  'version: "0.12.10"',
-  'python-version: "3.12.14"',
+  `version: "${exactUvVersion}"`,
+  `python-version: "${exactPythonVersion}"`,
+  `test "$(npm --version)" = "${exactNpmVersion}"`,
   "fetch-depth: 0",
   "DKBWS_PROVENANCE_MODE: distribution",
 ]) {
@@ -655,6 +770,7 @@ for (const pin of [
 }
 
 const schema = JSON.parse(readFileSync("schema/manifest-v1.json", "utf8"));
+if (schema.properties?.capabilities?.properties?.source_citation_style?.const !== "numeric-superscript") failures.push("manifest schema must validate the numeric-superscript capability");
 if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") failures.push("manifest schema dialect is not Draft 2020-12");
 
 for (const file of sourceFiles(["docs", "knowledge", "prompts", "starter"])) {

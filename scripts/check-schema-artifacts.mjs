@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -64,6 +64,10 @@ for (const [name, schema] of schemas) {
 const manifest = parse(readFileSync(path.join(root, ".wiki-standard.yaml"), "utf8"));
 validate("manifest-v1.json", manifest, ".wiki-standard.yaml");
 
+if (existsSync(path.join(root, "config/wiki-appearance.json"))) {
+  validate("wiki-appearance-v1.json", parseJsonStrict(readFileSync(path.join(root, "config/wiki-appearance.json"), "utf8"), "config/wiki-appearance.json"), "config/wiki-appearance.json");
+}
+
 validate("okf-source-lock-v1.json", parseJsonStrict(
   readFileSync(path.join(root, "config/okf-source-lock.json"), "utf8"), "config/okf-source-lock.json",
 ), "config/okf-source-lock.json");
@@ -116,7 +120,14 @@ const lifecycleCases = [
     ],
   },
 ];
+// Schema fixtures exercise immutable local history offline. They do not claim
+// that the development checkout is an approved release for a new Wiki.
+const fixtureRevision = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
+if (fixtureRevision.status !== 0 || !/^[a-f0-9]{40}$/.test(fixtureRevision.stdout.trim())) {
+  throw new Error("Cannot resolve the immutable local revision for offline lifecycle schema fixtures");
+}
 for (const lifecycleCase of lifecycleCases) {
+  lifecycleCase.args.push("--standard-revision", fixtureRevision.stdout.trim());
   const artifact = runJson(
     lifecycleCase.args,
     lifecycleCase.label,

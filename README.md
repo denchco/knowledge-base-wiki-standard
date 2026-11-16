@@ -17,6 +17,8 @@
 
 The Standard keeps editable Markdown, source records, evidence, uncertainty, a human-facing wiki, and an agent-facing wiki working as one maintainable knowledge base.
 
+New Wiki setups use an [ASD-STE100-inspired 80% writing default](docs/spec/writing-style.md) for future original English prose. The percentage is a pragmatic preference. The policy preserves technical meaning, source text and local requirements; it does not claim official STE compliance.
+
 ## Give this URL to an AI agent
 
 Open Codex, Claude Code, or another coding agent that can read GitHub repositories, write local files, and run commands. Start it in the folder where you want to work, then paste this repository address:
@@ -52,7 +54,8 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 
 ## What happens automatically
 
-- The current default branch is resolved to an exact commit and that immutable revision is recorded in your wiki.
+- The latest published, non-draft, native-immutable release is verified, and its exact tag and commit are recorded in your wiki. Numeric `rc` prereleases remain eligible under the default channel.
+- That release supplies one frozen stack: tool versions, dependency locks, configuration contracts and checks. Newer dependencies are not installed silently.
 - `standard-production` is selected unless the evidence calls for another profile.
 - A separate local project folder and a conflict-free local Wiki address are chosen.
 - A title, audience, reader task, intended outcome, and source boundary are inferred where the material supports them.
@@ -73,9 +76,23 @@ The agent does **not** routinely ask you for a version tag, profile, local URL, 
 
 A subject-empty start creates the structure without inventing research claims, evidence, concepts, or a governing question.
 
+## Keep an existing Wiki on its released stack
+
+The frozen-stack commands are released in [v0.1.0-rc.9](https://github.com/denchco/knowledge-base-wiki-standard/releases/tag/v0.1.0-rc.9) at `8800e139d73fd58ee1bd756d3e5497f62ed678e4`. Existing Wikis receive them through a verified release migration.
+
+Your Wiki keeps its selected release until you authorise a migration. Ask the agent to run:
+
+```sh
+npm run standard:stack -- check /path/to/wiki
+```
+
+The check reports release availability without installing anything, changing your pin or editing content. A migration compares compatibility, preserves local choices and unknown fields, and runs complete verification. Improvements are published as a new immutable release. The original release stays intact.
+
+A release’s passing checks describe the date it was qualified. Current security audits still apply; a new finding is reported rather than silently changing your dependencies.
+
 ## Documentation
 
-Use the [first-wiki guide](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) for a plain-language walkthrough, or browse the full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) for examples and explanations.
+The released [first-wiki guide](docs/guides/first-wiki.md) explains the frozen stack and migration boundary. The public [first-wiki guide](https://denchco.github.io/knowledge-base-wiki-documentation/guides/first-wiki/), [getting-started walkthrough](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) and full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) carry the separately adopted rc.9 release. Protected deployment and public verification bind Documentation `25d72256aa29abd6039095e1fbca3c2363d234e8`. [SRC-089](docs/sources.md#src-089)
 
 This repository defines and verifies the Standard. The Documentation explains how to use it.
 
@@ -94,7 +111,7 @@ Only this repository's released specification, schemas, and profile definitions 
 <details>
 <summary><strong>Candidate status</strong></summary>
 
-The implementation version is `0.1.0-candidate`. Immutable prereleases `v0.1.0-rc.1`, `v0.1.0-rc.2`, `v0.1.0-rc.3`, `v0.1.0-rc.4`, and `v0.1.0-rc.5` are identified by their exact CI-green release commits; the repository's current default branch may contain verified unreleased improvements.
+The implementation version is `0.1.0-candidate`. Immutable prereleases through `v0.1.0-rc.8` have exact verified release commits. The default branch may contain unreleased improvements; it is not the default stack for a new Wiki. `npm run standard:stack -- resolve --json` selects and verifies the current eligible release.
 
 The npm package uses `0.1.0-candidate`. Python project metadata represents the candidate as PEP 440 `0.1.0rc0`; neither denotes a public `0.1.0` release.
 
@@ -122,13 +139,16 @@ An issue is only intake. Acceptance is a separate Standard-maintainer decision; 
 <details>
 <summary><strong>For Standard maintainers</strong></summary>
 
-Standard Production maintenance requires exactly Node `24.20.0`, npm `11.19.0`, Python `3.12.14`, uv `0.12.10`, Git `2.41` or newer, and the reference-qualified Jujutsu `0.45.1`. The uv bootstrap floor permits newer dependency-update resolvers, while build, serve and verification commands still enforce this exact reference through `check:toolchain`. Initialize the colocated Jujutsu workspace only when `.jj` is absent:
+Standard Production maintenance requires Node.js `24.22.3` with bundled npm `11.19.1`, CPython `3.12.16`, uv `0.13.8`, Git `2.41` or newer, and Jujutsu `0.45.1`. The uv resolver floor is `>=0.13.8`. Build, serve and verification commands use `check:toolchain` to enforce the exact reference versions. Initialise the colocated Jujutsu workspace only when `.jj` is absent:
 
 ```sh
 node --version
+npm --version
+uv --version
 git --version
 jj --version
 test -d .jj || jj git init --colocate .
+uv python install 3.12.16
 npm ci
 uv sync --frozen
 npm run browser:install
@@ -138,7 +158,7 @@ npm run service:register
 npm run service:start
 ```
 
-`node --version` must report `v24.20.0`, and `jj --version` must report `jj 0.45.1` for this candidate. npm installation fails closed on a different Node version. An explicitly Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`; that narrower check never proves the maintainer-workspace obligation.
+`node --version` must report `v24.22.3`, and `jj --version` must report `jj 0.45.1`. npm installation enforces the package engines. A Git-only distribution or CI checkout uses `node scripts/check-provenance.mjs --mode distribution`. This mode does not establish maintainer provenance.
 
 End every file-changing development turn with the helper below before giving the final response. It runs complete verification, inspects Git and Jujutsu state, records the turn's changes in a JJ commit, discloses a verification failure in that commit while returning the failing status, and creates no empty commit for a clean turn:
 
@@ -177,6 +197,8 @@ Canonical entry points:
 The lifecycle CLI is read-only or planning-only in this candidate:
 
 ```sh
+npm run standard:stack -- resolve --json
+npm run standard:stack -- check /path/to/consumer --json
 npm run conformance:inspect -- . --json
 npm run conformance:validate -- . --strict --json
 npm run conformance:export-okf -- .
@@ -186,7 +208,7 @@ npm run conformance:init-plan -- /path/to/new-wiki --profile standard-production
 npm run standard:proposal -- check --all
 ```
 
-`upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files.
+`upgrade` and `init` emit review plans only. They have no apply mode and never create or rewrite target files. Default initialization uses the verified release stack. An explicit offline or development `--standard-revision` plan can inspect other source, but does not prove release eligibility or production readiness.
 
 </details>
 

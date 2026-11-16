@@ -19,6 +19,12 @@ status: draft
 10. Inspect Git and Jujutsu state.
 11. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
+## New prose
+
+Read the mapped `AUTHORING.md` and [writing policy](../spec/writing-style.md) before new original English Wiki prose. Use the ASD-STE100-inspired 80% default as a pragmatic preference. Review changed passages for clear actions, consistent terms and preserved meaning. Keep exact source text, identifiers, required wording and governing-question repetitions intact. Record material exceptions and unreviewed limits honestly.
+
+Static checks prove that the policy reaches new setups and shared instructions. They do not measure a writing percentage or certify ASD-STE100 compliance. Apply the policy prospectively; do not rewrite untouched history or change another consumer's pin.
+
 ## Development response navigation
 
 - Resolve the Wiki's configured canonical URL from its manifest or registered managed-preview endpoint. Before displaying a user-facing Human or LLM Wiki destination in a development response, verify that absolute HTTP(S) route against the live service.
@@ -29,9 +35,10 @@ status: draft
 
 ## Reader source links
 
+- Use numeric superscript citations whose numbers come from stable source identities, with leading zeroes and full accessible identities retained. Preserve explanatory notes and canonical Markdown.
 - Add a stable anchor to every mapped source-register row. Link each visible source identity independently to its exact internal row; link every list member and only the displayed endpoints of a compact range.
 - Use a registered primary URL when prose directly links a specifically named official authority, guidance, or publication. Do not turn generic institution names into decorative authority links.
-- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, lost visible brackets, and broken destination journeys.
+- Run `npm run sources:link` only as an optional, reviewable rewrite, then run `npm run check:source-links`. The canonical and browser gates reject bare or combined identities, wrong rows or fragments, unknown identities, unregistered named-authority URLs, inaccessible links, missing numeric superscripts, and broken destination journeys.
 
 ## Canonical governing question
 
@@ -47,4 +54,10 @@ Validate direct record states offline as well as command transitions: outcome me
 
 Clarification follows the sequential `Question 1 of N` protocol in `AGENTS.md`.
 
-Follow-up selection follows the same file's completion and cycle guard. A candidate is eligible only when it advances unfinished requested scope, addresses a failed or unrun required check, or asks for authority needed to continue. It must fit one follow-up pass and state a completion condition. Park blocked work in project status or the validation queue with `blocked_by`, `reopen_when`, and `last_checked`; it remains ineligible until that trigger occurs. Do not recommend optional adjacent research or generic maintenance merely to fill a list.
+Complete the requested scope before recommending more work. At the end of every development cycle, assess the Wiki's continuing subject, governing question when declared, evidence and content maturity. Prioritise subject content and evidence work; address a failed or unrun required check before optional content work. Include no more than three prioritised Next Steps. Each must fit one follow-up pass and state `Proposed update:`, `Why it matters:` and `Done when:`. Suggestions are recommendations, not continuation authority. Use project status, the validation queue and relevant handoff evidence to exclude completed work. Do not reopen bounded, parked or evidence-blocked work without new evidence, a due scheduled recheck or explicit user instruction. Parked work retains `blocked_by`, `reopen_when` and `last_checked`. If no grounded content update or required follow-up qualifies, state `No further grounded content update is available.` Never invent filler. Check captured drafts with `response:next-steps:check` when available; format checks do not prove grounding or intercept uncaptured responses.
+
+## Check the installed stack
+
+For an explicit Standard update check, run `npm run standard:stack -- check . --json`. Keep the installed release tag and full revision unchanged while comparing the available release. The command makes read-only network requests and never installs, repins or migrates. If verification evidence is unavailable, report that state rather than calling the Wiki current.
+
+An authorised update carries the reviewed tools, dependency locks, configuration and checks together. Preserve local content, deviations and unknown fields. Run complete target verification before recording adoption. First builds select the latest verified immutable release with `npm run standard:stack -- resolve --json`; a development commit is not an automatic fallback.

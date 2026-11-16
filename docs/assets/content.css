@@ -5,13 +5,14 @@
   color: var(--md-default-fg-color);
 }
 
-/* Source-row links preserve the visible [SRC-NNN] grammar while each identity
-   remains its own native, keyboard-focusable link. */
-
-.md-typeset a[href*="#src-"]::before {
-  content: "[";
+/* Stable source identities render as independent numeric superscript links. */
+.md-typeset .source-citations {
+  font-size: .75em;
+  font-weight: 600;
+  line-height: 0;
+  vertical-align: super;
+  white-space: nowrap;
 }
-
-.md-typeset a[href*="#src-"]::after {
-  content: "]";
-}
+.md-typeset .source-citations a:not(:hover) { text-decoration: none; }
+.md-typeset .source-citations a::before,
+.md-typeset .source-citations a::after { content: none; }

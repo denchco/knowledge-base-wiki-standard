@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "source": "https://github.com/google-labs-code/design.md",
+  "tag": "0.4.0",
+  "tagObject": "070af03b64c57201b27988e4275fcc4b30c24206",
+  "revision": "9bf8eae67128b6cc55ad9bf86665767deb4c11cd",
+  "license": "Apache-2.0",
+  "scope": "Lint API and its parser, model, eleven default rules, spec configuration, Tailwind result, formatting and nine upstream input fixtures; excludes unused CLI commands and other exporters.",
+  "dependencies": {
+    "remark-frontmatter": "5.0.0",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
+    "unist-util-visit": "5.1.0",
+    "yaml": "2.9.0",
+    "zod": "4.6.6"
+  },
+  "files": [
+    {
+      "path": "upstream/LICENSE",
+      "upstreamPath": "LICENSE",
+      "upstreamSha256": "1bdd03995456d191707e379eb06ceac20cf30d520bec90c97c2b6d220906c66e",
+      "sha256": "1bdd03995456d191707e379eb06ceac20cf30d520bec90c97c2b6d220906c66e",
+      "gitBlob": "15e431c225cf463f87a61f4e2a76dfb09e2bf849",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/package.json.upstream",
+      "upstreamPath": "packages/cli/package.json",
+      "upstreamSha256": "9cd26dae8342295b88dad6df3432f732f38c215f401f49af61068211cf2015b9",
+      "sha256": "9cd26dae8342295b88dad6df3432f732f38c215f401f49af61068211cf2015b9",
+      "gitBlob": "1d964075cc16b1b21038edf4759f2f46fce86ad3",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/ALPINE_OBSERVATORY.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/ALPINE_OBSERVATORY.md",
+      "upstreamSha256": "3b4cffc0257eca9c73ebd7e53ccfad35eff0d44b89fcf122ad083ee567077d36",
+      "sha256": "3b4cffc0257eca9c73ebd7e53ccfad35eff0d44b89fcf122ad083ee567077d36",
+      "gitBlob": "d736018483e37ad21706ad2b4dc3b514f424f0a7",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/CARTOGRAPHERS_ATLAS.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/CARTOGRAPHERS_ATLAS.md",
+      "upstreamSha256": "8bc506315a81b4b8a97823c64d633e3152b7b5546b4ee6f8f20961184fdc67af",
+      "sha256": "8bc506315a81b4b8a97823c64d633e3152b7b5546b4ee6f8f20961184fdc67af",
+      "gitBlob": "81508a81396ba1bd579ac5a80c418840cab5dbba",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/DESIGN-test.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/DESIGN-test.md",
+      "upstreamSha256": "5dd65afd2fb1e8536128b1dcf6d148ae24aee8ea25ccc785a9a7a2b7f090925d",
+      "sha256": "5dd65afd2fb1e8536128b1dcf6d148ae24aee8ea25ccc785a9a7a2b7f090925d",
+      "gitBlob": "26887ee4d6a15e26f81f3f06f3807667b059ccc0",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/HERITAGE.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/HERITAGE.md",
+      "upstreamSha256": "81d8b2225211185188c1fb680b430e77bdee758696c34163e2e90655a6dc3677",
+      "sha256": "81d8b2225211185188c1fb680b430e77bdee758696c34163e2e90655a6dc3677",
+      "gitBlob": "b1a4a1dd28a9ff82e9fa4595a722af06c5cd9f7b",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/MERIDIAN.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/MERIDIAN.md",
+      "upstreamSha256": "900ff9e1b2808c73da18a8888837aa5c2ab5da607c9614d147374b79d72d08ea",
+      "sha256": "900ff9e1b2808c73da18a8888837aa5c2ab5da607c9614d147374b79d72d08ea",
+      "gitBlob": "ae83abbf596c3a6e35c9157cdbe25a3b2864a124",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/NEO_ESOTERIC_MONUMENT.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/NEO_ESOTERIC_MONUMENT.md",
+      "upstreamSha256": "c82c81e7234298229dbdf036ce20aad80d99cd1d9e2606798c67016b7a840cbb",
+      "sha256": "c82c81e7234298229dbdf036ce20aad80d99cd1d9e2606798c67016b7a840cbb",
+      "gitBlob": "20853e20184217ec63877f6fbf0cc1409056abbb",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/NO_FRONTMATTER.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/NO_FRONTMATTER.md",
+      "upstreamSha256": "d49f78d3679615e33052d89f199767489b78cf1eff84a29f52119f79d8a74b6d",
+      "sha256": "d49f78d3679615e33052d89f199767489b78cf1eff84a29f52119f79d8a74b6d",
+      "gitBlob": "f8a40dc8183ad1cf67dadd473b9a0827dc198eea",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/OUT_OF_ORDER.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/OUT_OF_ORDER.md",
+      "upstreamSha256": "711b8caa4d05fe1bec5b13a0e80ce62df973a8edd653fade37af6518fd215c5e",
+      "sha256": "711b8caa4d05fe1bec5b13a0e80ce62df973a8edd653fade37af6518fd215c5e",
+      "gitBlob": "a0169923587e0643a270f3089a65aa8a389f926a",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/fixtures/TRACKS_OF_DC.md",
+      "upstreamPath": "packages/cli/src/linter/fixtures/TRACKS_OF_DC.md",
+      "upstreamSha256": "e58b108b552c947e331e77b0574587ec4a2c27de05fa02432f50965b8e394640",
+      "sha256": "e58b108b552c947e331e77b0574587ec4a2c27de05fa02432f50965b8e394640",
+      "gitBlob": "22f18adf158facbd31e0dc50f8b4cf07d34249f6",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/lint.ts",
+      "upstreamPath": "packages/cli/src/linter/lint.ts",
+      "upstreamSha256": "7d69afb0efaeeb61e4b02fcaf23c1ecbfc02cd897dc8238a7ad5adf4a4f84060",
+      "sha256": "7d69afb0efaeeb61e4b02fcaf23c1ecbfc02cd897dc8238a7ad5adf4a4f84060",
+      "gitBlob": "b25dbfd87b635a920ea3bf72aeabcf446ae51f8e",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/handler.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/handler.ts",
+      "upstreamSha256": "84e5b3d2b991ce6473f52f69b83fccd3e97b6f1d2b7d47e322ae6197a62fb262",
+      "sha256": "84e5b3d2b991ce6473f52f69b83fccd3e97b6f1d2b7d47e322ae6197a62fb262",
+      "gitBlob": "ee7eef6fdd3b446ced2eb17bde410e81cbf45958",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/broken-ref.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/broken-ref.ts",
+      "upstreamSha256": "264e8ce1d42ef2f825dabf80e8b5f202d0913fe1318e9c546196b4228975b04c",
+      "sha256": "264e8ce1d42ef2f825dabf80e8b5f202d0913fe1318e9c546196b4228975b04c",
+      "gitBlob": "7aadb73884a8587a430c23b39b6351a4031848ed",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/contrast-ratio.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/contrast-ratio.ts",
+      "upstreamSha256": "d4bea8658f6bfe2b1336957f8f218c2a784c89cb78d3366394bd26a0d5fd72f7",
+      "sha256": "d4bea8658f6bfe2b1336957f8f218c2a784c89cb78d3366394bd26a0d5fd72f7",
+      "gitBlob": "228564906df07c26baeaf7a7395e9f8f4b691b7d",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/index.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/index.ts",
+      "upstreamSha256": "f753c5519a53a3ef4e57c77b4ea8b2f5912b83883f01ae0ab6386b1248f4bf10",
+      "sha256": "f753c5519a53a3ef4e57c77b4ea8b2f5912b83883f01ae0ab6386b1248f4bf10",
+      "gitBlob": "596a78e4449400a619a17a22f96e6a186f0fae0f",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/levenshtein.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/levenshtein.ts",
+      "upstreamSha256": "c06f3415adecb040220bdac5429baf0af7dee6eeed768dce9adb40c1b9c48503",
+      "sha256": "c06f3415adecb040220bdac5429baf0af7dee6eeed768dce9adb40c1b9c48503",
+      "gitBlob": "0203b508802ed041ed021c07b8626d07d9d67bdc",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/missing-primary.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/missing-primary.ts",
+      "upstreamSha256": "59b654032ce59371b1168360c1607778f0502238344446c00d7ed98cd666e027",
+      "sha256": "59b654032ce59371b1168360c1607778f0502238344446c00d7ed98cd666e027",
+      "gitBlob": "ef8b13d4f9efc73fa1b789dcf577d8e9a3b4cef6",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/missing-sections.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/missing-sections.ts",
+      "upstreamSha256": "0ca89c5884e12c4ef8634d7ca90016dbc7b8dd6f360cff6f6a09b36a1db44d7f",
+      "sha256": "0ca89c5884e12c4ef8634d7ca90016dbc7b8dd6f360cff6f6a09b36a1db44d7f",
+      "gitBlob": "35f044b9f357a117e95932f3fa73ce26c0b9147f",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/missing-typography.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/missing-typography.ts",
+      "upstreamSha256": "0020b9b40be6710c4905dbae9961ddaae890c840ab73a5c89ae93628585813dd",
+      "sha256": "0020b9b40be6710c4905dbae9961ddaae890c840ab73a5c89ae93628585813dd",
+      "gitBlob": "03134df9cf52350569e69b626fd3c713fd3c7f33",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/omitted.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/omitted.ts",
+      "upstreamSha256": "0b39b3c5c90f3f5a378f0a9b74e8eb002327d9f8ec2bd102b6004e67b3a7d0a9",
+      "sha256": "0b39b3c5c90f3f5a378f0a9b74e8eb002327d9f8ec2bd102b6004e67b3a7d0a9",
+      "gitBlob": "d802c3522871eee803c451b1e3d12bbf981718c9",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/orphaned-tokens.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/orphaned-tokens.ts",
+      "upstreamSha256": "6dd2db495c05d070282cec9f2b74283ef4eb6228afca7031b08a7730c4d3f99d",
+      "sha256": "6dd2db495c05d070282cec9f2b74283ef4eb6228afca7031b08a7730c4d3f99d",
+      "gitBlob": "55697f6a313b037d71b7e09ff29ea787f6a80f7e",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/section-order.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/section-order.ts",
+      "upstreamSha256": "e4eb2f0ea31ee4debfa4d16a9060b9bb76fe2ddf9e534c7b294c6deede9e4efd",
+      "sha256": "e4eb2f0ea31ee4debfa4d16a9060b9bb76fe2ddf9e534c7b294c6deede9e4efd",
+      "gitBlob": "b425d6d853268dde5dddb0ea9cff8164938e9da1",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/token-like-ignored.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/token-like-ignored.ts",
+      "upstreamSha256": "0cbd9bb5ffcdc0abd1b43ad7c90852b17378168fcce06f78f4169735e61ea766",
+      "sha256": "0cbd9bb5ffcdc0abd1b43ad7c90852b17378168fcce06f78f4169735e61ea766",
+      "gitBlob": "3fbc4c3efa6563a3a5c513c98ed6031ec553304e",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/token-summary.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/token-summary.ts",
+      "upstreamSha256": "4ace4cf581402dec871c532cc94d51fda5a03d22debac019f7a4daee369138af",
+      "sha256": "4ace4cf581402dec871c532cc94d51fda5a03d22debac019f7a4daee369138af",
+      "gitBlob": "8c096e0c70e31c983c1400b36691b0c53fdd6db5",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/types.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/types.ts",
+      "upstreamSha256": "cc51025bdcc10b5a5c84cdcb7f548e2de7eb7cdb51e856aefbe1de4de6389786",
+      "sha256": "cc51025bdcc10b5a5c84cdcb7f548e2de7eb7cdb51e856aefbe1de4de6389786",
+      "gitBlob": "d26075bf939c54cd87c644cb64bdc6d496e7f19c",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/rules/unknown-key.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/rules/unknown-key.ts",
+      "upstreamSha256": "e1946af4049056a492695df604e334046b913ab05d0bd2f59c9be295075ea5d8",
+      "sha256": "e1946af4049056a492695df604e334046b913ab05d0bd2f59c9be295075ea5d8",
+      "gitBlob": "d70f492f453526992fae6f4f4ea3f39a5531472e",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/runner.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/runner.ts",
+      "upstreamSha256": "39dd526bcd032cfee05963b075afe61381a54e1d56410907bb9f845c8d9efe22",
+      "sha256": "39dd526bcd032cfee05963b075afe61381a54e1d56410907bb9f845c8d9efe22",
+      "gitBlob": "6c2c9bc609b26337d863ab3f8e8e069a8ea8b9fd",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/linter/spec.ts",
+      "upstreamPath": "packages/cli/src/linter/linter/spec.ts",
+      "upstreamSha256": "7469d41b78e812958e958090949ac1580614ce2be6e06df7e171bb8df5182c16",
+      "sha256": "7469d41b78e812958e958090949ac1580614ce2be6e06df7e171bb8df5182c16",
+      "gitBlob": "3d3f0b3bc3b69ed1978c96aba4eeb593160aec6e",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/model/color-parser.ts",
+      "upstreamPath": "packages/cli/src/linter/model/color-parser.ts",
+      "upstreamSha256": "d6d3df5857ea001dfeaf79d7fb7268cf724a37b4c89f506a267244d59de21e82",
+      "sha256": "d6d3df5857ea001dfeaf79d7fb7268cf724a37b4c89f506a267244d59de21e82",
+      "gitBlob": "447677e0d1592a6b1baff40b2b1c179cc240a9a2",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/model/handler.ts",
+      "upstreamPath": "packages/cli/src/linter/model/handler.ts",
+      "upstreamSha256": "bdaadcf22e708a60e0f363eb88c7ffcc09d15069407a34f113b60c316ffe1ead",
+      "sha256": "bdaadcf22e708a60e0f363eb88c7ffcc09d15069407a34f113b60c316ffe1ead",
+      "gitBlob": "9ea1193b19a1c9261a4736020c2bdd194a148d75",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/model/spec.ts",
+      "upstreamPath": "packages/cli/src/linter/model/spec.ts",
+      "upstreamSha256": "261d26da2006b3a669a4acebc10f5e2ae092efe6d515952de45192aa0676141d",
+      "sha256": "261d26da2006b3a669a4acebc10f5e2ae092efe6d515952de45192aa0676141d",
+      "gitBlob": "c84b09b3a5e45e2965ab978d1c5126fb2cfb184c",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/parser/handler.ts",
+      "upstreamPath": "packages/cli/src/linter/parser/handler.ts",
+      "upstreamSha256": "09ef806f0bed632d8ffff063a6976625b6147db2e23cf453111a54e07e8ccf3d",
+      "sha256": "09ef806f0bed632d8ffff063a6976625b6147db2e23cf453111a54e07e8ccf3d",
+      "gitBlob": "624fdee11e72363ecbe8089a0b1c6d18f702ec0f",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/parser/spec.ts",
+      "upstreamPath": "packages/cli/src/linter/parser/spec.ts",
+      "upstreamSha256": "c7da37d641173e9d27b63722ff2140471fd8ea280e4218c2c41b8cc705301340",
+      "sha256": "c7da37d641173e9d27b63722ff2140471fd8ea280e4218c2c41b8cc705301340",
+      "gitBlob": "d274c7c2f6b38fb395ffd288461126d8cf0a2b1d",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/spec-config.ts",
+      "upstreamPath": "packages/cli/src/linter/spec-config.ts",
+      "upstreamSha256": "f743d14c7d48e828c2d50c8ee0c16180a128c1a35dbad6bab57158a0c9f28841",
+      "sha256": "d5d98dfaabf584248d97060cc649bf56f18ee5df154b8b5c0449cc4029b1724f",
+      "gitBlob": "4b73af52184ef5ac591508e736989fba6ef31991",
+      "changes": [
+        "Use Zod 4 prefault to parse nested defaults as Zod 3 default did."
+      ]
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/spec-config.yaml",
+      "upstreamPath": "packages/cli/src/linter/spec-config.yaml",
+      "upstreamSha256": "6244e829849e63b55316258f32e1110833d193b79943ec79f245b33ebeec2ef8",
+      "sha256": "6244e829849e63b55316258f32e1110833d193b79943ec79f245b33ebeec2ef8",
+      "gitBlob": "6b1e90fde180acf50690e02386605ed71fa475db",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/tailwind/handler.ts",
+      "upstreamPath": "packages/cli/src/linter/tailwind/handler.ts",
+      "upstreamSha256": "74f23d4302d8a12a9bb9ab08208ad1af1ce569df40ceba17f69afeac2fcd2d47",
+      "sha256": "74f23d4302d8a12a9bb9ab08208ad1af1ce569df40ceba17f69afeac2fcd2d47",
+      "gitBlob": "c6b2f209624355119b6c9ce4d0f93ca04c7ffa2d",
+      "changes": []
+    },
+    {
+      "path": "upstream/packages/cli/src/linter/tailwind/spec.ts",
+      "upstreamPath": "packages/cli/src/linter/tailwind/spec.ts",
+      "upstreamSha256": "444f0ab52514fd36a8fd84f676cfd57f6f2ea20a62140584c5dc27f7ec4617cc",
+      "sha256": "fb6b4179bb3533081f230ddb70197a7ba8f32d114b8332affebc52780997ca6f",
+      "gitBlob": "dfffb35fcbb7c975040da5bcba68f666dab25509",
+      "changes": [
+        "Declare explicit string-key schemas for Zod 4 records; retain original value schemas."
+      ]
+    },
+    {
+      "path": "upstream/packages/cli/src/utils.ts",
+      "upstreamPath": "packages/cli/src/utils.ts",
+      "upstreamSha256": "80aa64645b2a05a3e11dd1621009278091c80afbe933631168fe452f4691d1fe",
+      "sha256": "80aa64645b2a05a3e11dd1621009278091c80afbe933631168fe452f4691d1fe",
+      "gitBlob": "a6a15b095d867a196144d33d12d419fe603b9805",
+      "changes": []
+    }
+  ]
+}

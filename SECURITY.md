@@ -20,6 +20,7 @@ Do not publish suspected vulnerabilities or exposed personal data in an issue. [
 - HTML derived from model or source text is sanitized or rendered as non-executable text/Markdown.
 - JSON embedded in HTML script elements is serialized with HTML-significant characters and JavaScript line separators escaped; raw source labels are never interpolated into executable script text.
 - Dependencies are locked, audited, and upgraded through reviewed changes.
+- Reference Graphify indexing uses the qualified wrapper and exact lock. Its input checks reject unsupported preprocessed Fortran and corpus symlinks, and its runtime guard disables external preprocessing. Direct indexing commands and arbitrary external corpora are outside that qualification.
 - CI uses read-only permissions unless a job's narrowly defined purpose requires more.
 - Validators are read-only; generators write only declared derived paths; upgrades produce reviewable patches.
 - Proposal `check`, `show`, and `sync --check` are read-only. `prepare` writes only a sanitised disposable payload below ignored `output/standard-proposals/`; `record` updates only the selected tracked proposal record; `open` performs GET-only form, label, and duplicate checks and never submits an issue.
