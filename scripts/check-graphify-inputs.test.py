@@ -130,6 +130,7 @@ with patch.object(subprocess, "run", side_effect=AssertionError("preprocessor st
         lambda: modules[1]._cpp_preprocess(late),
         lambda: modules[1]._DISPATCH[".F90"](late),
         lambda: modules[1]._get_extractor(late),
+        lambda: modules[1]._get_extractor(late, sniff_headers=False),
     ):
         try:
             attempt()
@@ -160,16 +161,24 @@ assert modules[1]._extract_parallel(None, None, None, None, None) is False
                 (directory / "excluded.F90").write_text("program excluded\nend program\n")
                 (directory / ".graphifyignore").write_text("!*\n")
             (root / ".graphifyignore").write_text("!*\n")
-            result = subprocess.run(
-                [sys.executable, "-I", "-B", str(SCRIPT)],
-                cwd=root, capture_output=True, text=True, check=False, timeout=60,
-                env={**os.environ, "GRAPHIFY_OUT": "../forbidden-output", "GRAPHIFY_MAX_WORKERS": "8"},
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            def update():
+                result = subprocess.run(
+                    [sys.executable, "-I", "-B", str(SCRIPT)],
+                    cwd=root, capture_output=True, text=True, check=False, timeout=60,
+                    env={**os.environ, "GRAPHIFY_OUT": "../forbidden-output", "GRAPHIFY_MAX_WORKERS": "8"},
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
             graph = root / "graphify-out/graph.json"
-            self.assertTrue(graph.is_file(), result.stdout)
+            update()
+            self.assertTrue(graph.is_file())
             self.assertIn("qualified_example", graph.read_text())
+            self.assertIn("sample_20", graph.read_text())
             self.assertNotIn("excluded.F90", graph.read_text())
+            (root / "example_20.py").unlink()
+            update()
+            self.assertIn("qualified_example", graph.read_text())
+            self.assertNotIn("sample_20", graph.read_text())
 
     def test_unisolated_cli_fails_before_graphify_import_or_update(self):
         with corpus() as root:

@@ -748,7 +748,7 @@ const pyproject = readFileSync("pyproject.toml", "utf8");
 const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
 const uvRequirement = /^required-version\s*=\s*"([^"]+)"\s*$/mu.exec(uvSettings)?.[1];
 if (uvRequirement !== `>=${exactUvVersion}`) failures.push(`uv dependency-update resolvers require >=${exactUvVersion}; reference qualification remains exactly ${exactUvVersion}`);
-for (const pin of ["zensical==0.0.59", "graphifyy==0.9.70", "pip-audit==2.10.1"])
+for (const pin of ["zensical==0.0.59", "graphifyy==0.9.106", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
