@@ -7,7 +7,7 @@ import path from "node:path";
 import { spawn, execFileSync } from "node:child_process";
 import { chromium } from "@playwright/test";
 import { deriveAppearance } from "./wiki-appearance.mjs";
-import { patchZensicalRuntime } from "./patch-zensical-runtime.mjs";
+import { checkZensicalRuntime, rendererBundle, rendererVersion } from "./check-zensical-runtime.mjs";
 
 const root = process.cwd();
 const output = path.join(root, "output/verification/appearance");
@@ -18,7 +18,7 @@ const fixtures = [
   { name: "blue-dark-standard", config: { schemaVersion: "1.0", accent: "#005ea8", appearance: "dark", width: "standard" } },
   { name: "unconfigured", config: null },
 ];
-const report = { ok: false, renderer: "zensical-0.0.59", cases: [] };
+const report = { ok: false, renderer: `zensical-${rendererVersion}`, cases: [] };
 let browser;
 let activePage;
 let failure;
@@ -112,7 +112,7 @@ function buildFixture(fixture) {
   } catch (error) {
     throw new Error(`Cannot build ${fixture.name}: ${error.stderr?.toString() || error.message}`);
   }
-  patchZensicalRuntime(site);
+  checkZensicalRuntime(site);
   return site;
 }
 
@@ -173,7 +173,7 @@ async function runCase(fixture, origin, viewport) {
       mediaQueries: [...document.querySelectorAll('form[data-md-component="palette"] input')].map(input => input.dataset.mdColorMedia || null),
       appearanceScripts: [...document.scripts].filter(script => script.src.endsWith("/assets/appearance/appearance.js")).length,
     }));
-    assert.equal(native.generator, "zensical-0.0.59");
+    assert.equal(native.generator, `zensical-${rendererVersion}`);
     assert.equal(native.paletteCount, 2);
     assert.equal(native.appearanceScripts, 1);
     assert.deepEqual([...native.mediaQueries].sort(), ["all", "not all"], "Native defaults must use unconditional media, independent of the OS");
@@ -208,7 +208,7 @@ async function runCase(fixture, origin, viewport) {
     await page.screenshot({ path: path.join(output, `${fixture.name}-${viewport.width}-default.png`), fullPage: true });
     assert.deepEqual(state.external, [], "Fixture must use local assets only");
     assert.deepEqual(state.errors, [], "No browser or asset errors");
-    assert.ok(state.requests.some(url => url.endsWith("bundle.344b8276.min.js")), "Pinned native renderer bundle must execute");
+    assert.ok(state.requests.some(url => url.endsWith(rendererBundle)), "Pinned native renderer bundle must execute");
     report.cases.push({ fixture: fixture.name, viewport, initial, alternate: changed, native, navigation, savedPreferenceSurvivedNavigationAndReload: true });
   } finally {
     await context.close();

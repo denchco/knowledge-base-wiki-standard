@@ -1017,7 +1017,7 @@ test("lifecycle diff compares the consumer version and selected profile without 
 });
 
 test("status-free navigation preserves the pinned renderer template outside status output", () => {
-  const upstream = readFileSync(path.join(ROOT, ".venv/lib/python3.12/site-packages/zensical/templates/partials/nav-item.html"), "utf8");
+  const upstream = readFileSync(path.join(ROOT, ".venv/lib/python3.12/site-packages/zensical_ui/templates/partials/nav-item.html"), "utf8");
   const withoutNotice = (source) => source.replace(/^\{#-[\s\S]*?-#\}\r?\n/, "");
   let expected = withoutNotice(upstream);
   const statusMacro = /\{% macro render_status\(nav_item, type\) %\}[\s\S]*?\{% endmacro %\}\n/;

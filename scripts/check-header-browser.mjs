@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn, execFileSync } from "node:child_process";
 import { chromium, webkit } from "@playwright/test";
+import { rendererVersion } from "./check-zensical-runtime.mjs";
 import { buildHeaderFixture } from "./header-browser-fixture.mjs";
 import { inspectHeaderControls, contrastRatio } from "./header-browser-contract.mjs";
 
@@ -17,7 +18,7 @@ const fixtures = [
   { name: "blue-brand", config: { schemaVersion: "1.0", accent: "#005ea8", appearance: "dark", width: "standard" } },
 ];
 const report = {
-  schemaVersion: "1.0", ok: false, requirement: "DKBWS-DESIGN-002", renderer: "zensical-0.0.59",
+  schemaVersion: "1.0", ok: false, requirement: "DKBWS-DESIGN-002", renderer: `zensical-${rendererVersion}`,
   engines: {}, cases: [], negativeCases: [], screenshots: [], expectedMatrixCases: 96,
   zoomScope: "Browser-rendered CSS layout zoom at 200%, root text sizing at 200%, and 320 CSS-pixel reflow (400%-equivalent width from 1280). Native browser-chrome zoom UI and OS magnifiers are not automated by this contract.",
 };
@@ -203,15 +204,16 @@ async function keyboardJourney(page, scheme, width, viewport) {
   const search = mobile ? '.md-header label[for="__search"]' : ".md-search__button";
   for (const key of ["Enter", "Space"]) {
     await tabTo(page, search); focus.push(await assertFocus(page, search)); await page.keyboard.press(key);
-    const input = page.locator('input[role="combobox"]'); await input.waitFor({ state: "visible" });
+    const input = page.locator('dialog[open] input[role="combobox"]'); await input.waitFor({ state: "visible" });
+    if (mobile) await page.waitForFunction(() => document.querySelector('.md-header label[for="__search"]')?.getAttribute("aria-expanded") === "true");
     await input.fill("architecture");
-    const result = page.locator('.l ol li a').filter({ hasText: /Architecture/ }).first(); await result.waitFor({ state: "visible" });
+    const result = page.locator('a[role="option"]').filter({ hasText: /Architecture/ }).first(); await result.waitFor({ state: "visible" });
     await input.press("Escape");
     await page.waitForFunction(() => [...document.querySelectorAll("body > div")].every(host => {
       const input = host.shadowRoot?.querySelector('input[role="combobox"]');
       if (!input) return true;
-      const panel = input.closest(".l");
-      return panel && input.getRootNode().activeElement !== input && getComputedStyle(panel).opacity === "0" && getComputedStyle(panel).pointerEvents === "none";
+      const dialog = input.closest("dialog");
+      return dialog && !dialog.open && input.getRootNode().activeElement !== input;
     }));
     if (mobile) {
       await page.waitForFunction(() => document.activeElement === document.querySelector('.md-header label[for="__search"]'));
@@ -220,7 +222,7 @@ async function keyboardJourney(page, scheme, width, viewport) {
   }
   await tabTo(page, search); await page.keyboard.press("Enter");
   const query = page.locator('input[role="combobox"]'); await query.fill("architecture");
-  const destination = page.locator('.l ol li a').filter({ hasText: /Architecture/ }).first();
+  const destination = page.locator('a[role="option"]').filter({ hasText: /Architecture/ }).first();
   await destination.waitFor({ state: "visible" }); await destination.focus(); await page.keyboard.press("Enter");
   await page.waitForURL("**/second/"); await ready(page, scheme, width);
   await page.getByRole("link", { name: "Return to the reference", exact: true }).click();

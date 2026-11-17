@@ -7,27 +7,25 @@
   const endpoint = value => String(value?.id ?? value ?? "");
   const SEARCH_ACCENT_STYLE_ID = "denchco-wiki-search-accent";
   const SEARCH_ACCENT_CSS = `
-    /* Zensical 0.0.59 search-state adapter; structure and behaviour remain upstream-owned. */
-    .B, .n, .E {
+    /* The search dialog, result selection and keyboard behaviour stay upstream-owned. */
+    dialog [role="status"],
+    dialog a[role="option"] .C li,
+    dialog a[role="option"] .p {
       color: var(--muted);
     }
-    .k:focus-within {
+    dialog input[role="combobox"]:focus-visible,
+    dialog button:focus-visible,
+    dialog a[role="option"]:focus-visible {
       outline: 3px solid var(--focus);
       outline-offset: 2px;
       box-shadow: 0 0 0 1px var(--focus-contrast);
     }
-    .r:focus-visible,
-    .i:focus-visible {
-      outline: 3px solid var(--focus);
-      outline-offset: 2px;
-      box-shadow: 0 0 0 1px var(--focus-contrast);
-    }
-    .i.h,
-    .i:hover {
+    dialog a[role="option"][aria-selected="true"],
+    dialog a[role="option"]:hover {
       color: var(--accent-dark);
     }
-    .i.h::before,
-    .i:hover::before {
+    dialog a[role="option"][aria-selected="true"]::before,
+    dialog a[role="option"]:hover::before {
       background-color: var(--accent-transparent);
     }
   `;
@@ -160,7 +158,7 @@
     if (!searchAccentFrame) ensureSearchAccent();
   }
 
-  // Zensical 0.0.59 restores the scheme but leaves its native radios unchecked.
+  // Reflect the resolved scheme if the renderer leaves its native radios unchecked.
   // Reflect its resolved state so Tab enters the active option and its visible
   // action receives the focus ring. Storage, events and switching stay upstream.
   function reflectNativePalette() {
@@ -192,15 +190,15 @@
   let keyboardHeaderAction = null;
   function nativeSearchState() {
     for (const host of document.querySelectorAll("body > div")) {
-      const panel = host.shadowRoot?.querySelector('input[role="combobox"]')?.closest(".l");
-      if (panel) return { host, expanded: getComputedStyle(panel).pointerEvents !== "none" };
+      const dialog = host.shadowRoot?.querySelector('input[role="combobox"]')?.closest("dialog");
+      if (dialog) return { host, expanded: dialog.open };
     }
     return { host: null, expanded: false };
   }
   function observeSearchState(shadow) {
     if (observedSearchRoots.has(shadow)) return;
     observedSearchRoots.add(shadow);
-    new MutationObserver(reflectHeaderActions).observe(shadow, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
+    new MutationObserver(reflectHeaderActions).observe(shadow, { childList: true, subtree: true, attributes: true, attributeFilter: ["open"] });
   }
   const headerActionVisible = element => {
     const style = getComputedStyle(element), box = element.getBoundingClientRect();
@@ -211,6 +209,9 @@
       const input = document.getElementById(label.htmlFor);
       if (!input) continue;
       const search = label.htmlFor === "__search" ? nativeSearchState() : null;
+      // Mobile search uses the checkbox's change event to toggle its dialog.
+      // Clear it silently so instant navigation cannot trigger another toggle.
+      if (search?.host && input.checked) input.checked = false;
       const panel = search ? search.host : document.querySelector(".md-sidebar--primary");
       if (panel) {
         if (!panel.id) panel.id = `${label.htmlFor}_panel`;

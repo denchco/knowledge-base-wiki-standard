@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { patchZensicalRuntime } from "./patch-zensical-runtime.mjs";
+import { checkZensicalRuntime } from "./check-zensical-runtime.mjs";
 
 // Fresh generic content keeps browser evidence independent of any consumer's
 // subject, private source files, hostname or deployment configuration.
@@ -30,6 +30,6 @@ export function buildHeaderFixture({ root, output, name, config = null }) {
     throw new Error(`Header fixture ${name} failed to build: ${error.stderr?.toString() || error.message}`);
   }
   const site = path.join(directory, "site");
-  patchZensicalRuntime(site);
+  checkZensicalRuntime(site);
   return site;
 }

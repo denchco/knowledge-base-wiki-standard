@@ -23,8 +23,8 @@ For a site page, read its `describedby` location, search or skim the discovery f
 
 ## Qualified renderer integration
 
-Zensical `0.0.59` treats every alternate link as a language variant and otherwise requests a sitemap beside the Markdown alternate. The pinned `patch:renderer` build adapter restricts that one selector to alternates with `hreflang`. It verifies the exact upstream and patched SHA-256 digests, preserves upstream licence comments, changes no source-map reference (this upstream bundle has none), and gives the changed script a matching content-hash filename. Missing, duplicate, or changed patch targets require requalification and fail the build. Markdown discovery links remain intact.
+Zensical UI `0.0.42` limits locale discovery to alternate links with `hreflang`. The build uses the upstream bundle and leaves Markdown discovery links intact. `check:renderer` checks the exact bundle digest, locale selector and generated HTML references. [SRC-095](../sources.md#src-095)
 
-The strict static build applies this adapter before publishing discovery. `check:renderer` verifies the generated result, and the browser contract opens search, finds and follows an actual architecture result, tests Escape and reopening, and rejects off-origin code, data, and sitemap requests. The existing configured Google Fonts stylesheet and font files are outside that runtime boundary; all genuine browser errors still fail verification.
+The browser contract opens search, follows an architecture result, checks Escape and reopening, and rejects off-origin code, data, and sitemap requests. The configured Google Fonts stylesheet and font files stay outside that runtime boundary.
 
-The live `dev` command serves from isolated `site-local/` using generated `zensical.local.toml`; it does not run the static discovery publisher or renderer postprocessing. The live watch preview therefore makes no Markdown-alternate claim. Discovery qualification applies to `site/` after the complete static build. A separately requested local static build must finish its publisher and adapter before its discovery output is qualified.
+The live `dev` command serves from isolated `site-local/` using generated `zensical.local.toml`. Markdown discovery applies to `site/` after the static build and publisher complete.
