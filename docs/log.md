@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-11-17 — Immutable rc.16 publication
+
+The owner approved PR #64 at `e1dbf03e6a16ddb5dd35c692d096f8b217490f17` and authorised its merge, immutable release and public Documentation adoption. The protected merge is `c1ee078cefaf035bab0ed33ca1683bfdd06b42c3`. Its tree equals the approved implementation. Trusted push/main Verify `44151427275` passed on that exact merge. [SRC-104](sources.md#src-104)
+
+Immutable `v0.1.0-rc.16` was published at `2026-11-17T19:00:43Z`. All five downloaded release assets match the package and GitHub digests. Fresh package audits report zero findings. The release completes `STD-VAL-016` through governed file-level schema discovery and carries the safe-update prompt, guide and rc.14 to rc.15 regression. Documentation adoption is authorised for this exact release. Guide-only publication automation is a to-do item. [SRC-104](sources.md#src-104)
+
 ## 2026-11-17 — Safe-update and schema-discovery candidate
 
 The owner authorised completion of `STD-VAL-016` and a manually reviewed Standard PR for safe updates of existing Wikis. The candidate adds one file-level schema entry to the governed publication for each maintained root schema. Exact lookup uses the filename, repository path or `$id` and checks its SHA-256. The graph inspector exposes the canonical source in both views. Raw Graphify query behaviour remains documented in the [Graphify guide](llm-wiki/graphify.md).

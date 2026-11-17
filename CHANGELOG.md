@@ -1,10 +1,10 @@
 # Changelog
 
-## Unreleased — schema discovery and safe updates
+## v0.1.0-rc.16 — 2026-11-17
 
 - Complete the schema-discovery correction under `DKBWS-GRAPH-001`. Publish one file-level entry for each maintained root schema and verify exact identity lookup. Migrate the publisher, lookup command and checks together, then rebuild the graph.
 - Add the existing-Wiki update prompt, component review recipe and rc.14 to rc.15 regression test under `DKBWS-UPDATE-001` and `DKBWS-RELEASE-001`. The review preserves local content and checks file preconditions before an authorised implementation. Carry the helper and recipe together when adopting these review tools.
-- The candidate has a separate Documentation guide draft and awaits manual PR approval.
+- Owner-approved PR #64 is published at `c1ee078cefaf035bab0ed33ca1683bfdd06b42c3` after exact-merge Verify and immutable asset readback. Documentation adoption is authorised. [SRC-104](docs/sources.md#src-104)
 
 ## Unreleased — Zensical reference renderer
 
