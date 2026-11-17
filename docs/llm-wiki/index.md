@@ -29,6 +29,8 @@ For a first build, follow the [first-wiki guide](../guides/first-wiki.md) and ca
 
 For an existing Wiki, run `npm run standard:stack -- check <wiki>`. This only reads release availability and identity. It never installs, changes the pin or migrates content. A user-authorised migration checks compatibility, preserves unknown fields and deviations, and runs full selected-profile verification. Improvements require a new immutable release. Historical qualification is date-bound and does not waive current audits. Explicit historical/development revision plans remain unverified release selections.
 
+Use the [existing-Wiki update guide](../guides/update-existing-wiki.md) for an authorised component migration. The canonical agent instructions are in `prompts/update-wiki.md`. Review the frozen dependency locks, adapters and checks together, then verify the target before recording adoption.
+
 ## Operating model
 
 - **Ingest**: register the source, preserve raw identity, add its stable exact-row anchor, update relevant concepts and evidence, add links, and record the change.

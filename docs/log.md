@@ -7,6 +7,14 @@ status: draft
 
 # Research and change log
 
+## 2026-11-17 — Safe-update and schema-discovery candidate
+
+The owner authorised completion of `STD-VAL-016` and a manually reviewed Standard PR for safe updates of existing Wikis. The candidate adds one file-level schema entry to the governed publication for each maintained root schema. Exact lookup uses the filename, repository path or `$id` and checks its SHA-256. The graph inspector exposes the canonical source in both views. Raw Graphify query behaviour remains documented in the [Graphify guide](llm-wiki/graphify.md).
+
+The [update guide](guides/update-existing-wiki.md) and `prompts/update-wiki.md` apply the existing update and immutable-stack requirements. The read-only component review checks a clean consumer boundary, complete changed-file classification, local hashes and modes, reviewed adaptations, preservation and final patch identities. The rc.14 to rc.15 fixture uses the real released file delta. Its synthetic consumer preserves subject content, evidence, local settings and unknown metadata. The fixture does not install a consumer runtime or establish remote release qualification. A real migration still requires current audits and complete target verification.
+
+The separate Documentation guide is prepared as a local review draft. Its public adoption depends on manual Standard acceptance, a verified containing immutable release and authorised Documentation adoption. Earlier backlog research is preserved separately. Guide-only publication automation remains a to-do item.
+
 ## 2026-11-16 — DOMPurify patch
 
 - Select DOMPurify `3.4.18` for the embedded Mermaid runtime. The published source tag and npm metadata identify the same commit. Update the direct dependency, lock and runtime guards together. Keep Mermaid `11.17.2` and KaTeX `0.18.2`. [SRC-094](sources.md#src-094)

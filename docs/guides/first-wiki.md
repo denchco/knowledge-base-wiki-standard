@@ -49,4 +49,6 @@ A newer release is an option for review. If you authorise migration, the agent c
 
 Explicit historical or development revision plans can inspect other source. They remain unverified plans and cannot establish readiness for a production build.
 
+The [safe-update guide](update-existing-wiki.md) gives the implementation sequence for an authorised existing Wiki.
+
 The [release and conformance contract](../spec/conformance.md#immutable-release-stack-checks) defines the evidence. The [prompt contract](../spec/prompts.md) defines the implementation workflow.

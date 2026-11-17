@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — schema discovery and safe updates
+
+- Complete the schema-discovery correction under `DKBWS-GRAPH-001`. Publish one file-level entry for each maintained root schema and verify exact identity lookup. Migrate the publisher, lookup command and checks together, then rebuild the graph.
+- Add the existing-Wiki update prompt, component review recipe and rc.14 to rc.15 regression test under `DKBWS-UPDATE-001` and `DKBWS-RELEASE-001`. The review preserves local content and checks file preconditions before an authorised implementation. Carry the helper and recipe together when adopting these review tools.
+- The candidate has a separate Documentation guide draft and awaits manual PR approval.
+
 ## Unreleased — Zensical reference renderer
 
 - Select Zensical `0.1.1` and Zensical UI `0.0.42` under `DKBWS-RENDER-001`. Check the native UI bundle and refresh the status-free navigation override. The upstream locale selector handles language alternates without a local bundle rewrite. [SRC-095](docs/sources.md#src-095)

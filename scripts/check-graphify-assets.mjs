@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { schemaDiscoveryFailures } from "./graph-schema-discovery.mjs";
 
 const root = process.cwd();
 const target = process.env.GRAPHIFY_TARGET_DIR ?? "docs/assets/graphify";
@@ -31,6 +32,7 @@ const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
 const links = Array.isArray(graph.links) ? graph.links : Array.isArray(graph.edges) ? graph.edges : [];
 
 const failures = [];
+failures.push(...schemaDiscoveryFailures(root, graph));
 if (graph.publicationSchemaVersion !== "1.0") failures.push("graph.json publicationSchemaVersion must equal 1.0");
 if (summary.publicationSchemaVersion !== "1.0") failures.push("summary.json publicationSchemaVersion must equal 1.0");
 for (const [name, schema] of [["graph", graphSchema], ["summary", summarySchema]]) {
@@ -64,6 +66,16 @@ if (!graph2d.includes("../vendor/vis-network.min.js")) failures.push("graph.html
 if (/src="\.\.\/vendor\/vis-network\.min\.js"[^>]*\bintegrity=/i.test(graph2d)) failures.push("graph.html retains stale CDN integrity metadata on the local vis-network runtime");
 
 const graph3d = fs.readFileSync(path.join(root, target, "graph-3d.html"), "utf8");
+if (nodes.some(node => node.file_type === "json-schema")) {
+  for (const [name, html] of [["graph.html", graph2d], ["graph-3d.html", graph3d]]) {
+    if (!html.includes("schema_id") || !html.includes("data-schema-source")) {
+      failures.push(`${name} is missing schema identity and canonical-source inspection controls`);
+    }
+  }
+  if (!graph2d.includes("schema_id: n.schema_id") || !graph2d.includes("source_url: n.source_url")) {
+    failures.push("graph.html does not retain schema identity and canonical source fields in its rendered dataset");
+  }
+}
 if (!graph3d.includes("3d-force-graph")) failures.push("graph-3d.html does not load the 3D graph renderer");
 if (!graph3d.includes("graph.json")) failures.push("graph-3d.html does not reference graph.json");
 if (!graph3d.includes(".width(window.innerWidth)") || !graph3d.includes('window.addEventListener("resize"')) {
@@ -211,7 +223,7 @@ function explicitFileReferences() {
   const refs = [];
   const sourceFiles = new Set(documentSourceFiles());
   const scannable = documentSourceFiles().filter((file) => [".json", ".md", ".markdown", ".yml", ".yaml"].includes(path.extname(file).toLowerCase()));
-  const pathPattern = /(?:^|[\s"'(:`])((?:docs|hooks|scripts|src|assets)\/[A-Za-z0-9_./-]+\.(?:css|html|js|json|md|mjs|py|ts|tsx|ya?ml)|(?:AGENTS|DESIGN|README|DEPLOYMENT)\.md|mkdocs\.yml|package\.json)(?=$|[\s"',)`<])/g;
+  const pathPattern = /(?:^|[\s"'(:`])((?:docs|hooks|scripts|src|schema|assets)\/[A-Za-z0-9_./-]+\.(?:css|html|js|json|md|mjs|py|ts|tsx|ya?ml)|(?:AGENTS|DESIGN|README|DEPLOYMENT)\.md|mkdocs\.yml|package\.json)(?=$|[\s"',)`<])/g;
 
   for (const sourceFile of scannable) {
     const fullPath = path.join(root, sourceFile);
