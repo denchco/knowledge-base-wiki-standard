@@ -6,7 +6,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 |---|---|---|
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
 | Standard validation | Conformance | Exactly Node.js `24.22.3` and its bundled npm `11.19.1`. The `.node-version` file, package engines, npm `engine-strict`, the runtime check and CI enforce the reference. Draft 2020-12 validation uses `ajv==8.20.0` with locked `fast-uri==3.1.9` and `yaml==2.9.0`. |
-| Reference renderer | Human Wiki | Exact CPython `3.12.16` and uv `0.13.8` for the reference build (consumer minimum Python 3.12+), with `zensical==0.0.59`. The installed-lock audit uses `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain. |
+| Reference renderer | Human Wiki | Exact CPython `3.12.16` and uv `0.13.8` for the reference build (consumer minimum Python 3.12+), with `zensical==0.1.1` and its locked `zensical-ui==0.0.42`. The installed-lock audit uses `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain. |
 | Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.106`, with guarded reference indexing |
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.18`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium and WebKit binaries |
@@ -42,7 +42,7 @@ The repeatable commands are:
 | `npm run prepare:runtime` | Builds Mermaid’s core with exact DOMPurify `3.4.18` using `esbuild==0.28.2`; copies graph bundles and emits inspected runtime metadata and a CycloneDX SBOM into ignored assets. |
 | `npm run graph:update` | Prepares local runtimes, checks the bounded corpus and exact Graphify identity, disables external preprocessing, updates the graph in process, enriches six relationship layers, and publishes the shared 2D/3D dataset. |
 | `npm run check:graphify-inputs` | Checks the guarded indexing boundary and runs benign-input, unsupported-input and symlink rejection fixtures. |
-| `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. |
+| `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. Checks the native UI bundle before publishing discovery. |
 | `npm run build` | Regenerates the graph publication and then performs the strict site build. |
 | `npm run standard:stack -- resolve --json` | Reads the latest immutable release, exact tag/commit, trusted Verify evidence and selected stack file hashes. Emits a dated report; changes no repository. |
 | `npm run standard:stack -- check <wiki> --json` | Reads the installed manifest and compares its frozen revision with the verified release. Reports availability without changing pins, installing dependencies or migrating content. |
@@ -88,7 +88,7 @@ Proposal records under `standard-proposals/` are canonical, tracked consumer or 
 
 The CI reference selects Ubuntu `24.04`, Node.js `24.22.3` LTS with npm `11.19.1`, and uv `0.13.8` with managed CPython `3.12.16`. The workflow pins `actions/checkout` to `3d3c42e5aac5ba805825da76410c181273ba90b1` (v7.0.1), `actions/setup-node` to `820762786026740c76f36085b0efc47a31fe5020` (v7.0.0), and `astral-sh/setup-uv` to `20cfd1bf945f4377ade1205e4dbc17946fc9a30d` (v10.0.1). Full Git history (`fetch-depth: 0`) lets lifecycle fixtures resolve immutable historical pins. CI selects distribution provenance mode and records Jujutsu as `not-checked`. Other Node releases require separate qualification.
 
-`docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `output/standard-proposals/`, `GRAPH_REPORT.md`, `site/`, `site-local/`, and `zensical.local.toml` are generated and ignored. The live Zensical service uses the generated local configuration and writes only `site-local/`, keeping its watcher separate from the postprocessed static `site/` build. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
+`docs/assets/vendor/`, `docs/assets/graphify/`, `graphify-out/`, `.cache/`, `output/verification/`, `output/standard-proposals/`, `GRAPH_REPORT.md`, `site/`, `site-local/`, and `zensical.local.toml` are generated and ignored. The live Zensical service uses the generated local configuration and writes only `site-local/`, keeping its watcher separate from the static `site/` build. A clean clone reconstructs them from canonical source and locked dependencies. Dependency environments (`node_modules/` and `.venv/`) and repository control data (`.git/` and `.jj/`) are outside the verification snapshot; installation and workspace setup happen before verification.
 
 No rendered page may load Mermaid, vis-network, or 3d-force-graph from a public CDN. The browser contract resolves question, Mermaid, architecture, table, list, reader-source-link, source-register, and graph representatives independently; records requests; checks numeric citations on every citation-bearing reader route; fails closed when a selected-profile graph route is absent; and rejects public-CDN use, failed local assets, console errors, blank diagrams/canvases, broken exact-row citation journeys, unusable controls, uncontained mobile tables, or desktop/mobile overflow.
 
@@ -106,7 +106,9 @@ The Graphify reference adapter uses exact `graphifyy==0.9.106`. The first patche
 
 Migration requires the wrapper, its fixtures, the exact frozen lock, package command checks and complete graph/browser verification together. The updated adapter preserves cached graph reconciliation when a source file is deleted. This qualification covers the declared reference corpus. Arbitrary untrusted corpora and later Graphify versions require separate qualification. [SRC-062](docs/sources.md#src-062), [SRC-096](docs/sources.md#src-096)
 
-The Zensical reference adapter is tested and supported at exactly `zensical==0.0.59`. Its CSS selectors, closed-shadow Mermaid adapter, navigation/search lifecycle, Standard/Wide geometry, and strict build are verified against that version. A different Zensical version is unsupported until its lock is updated deliberately and the complete source, graph, strict-build, desktop, and mobile browser contracts pass. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
+The reference adapter selects exact Zensical `0.1.1` and Zensical UI `0.0.42`. The UI handles locale alternates directly. The static build checks its native bundle checksum and aligns the status-free navigation override with the locked template. Full verification covers CSS selectors, closed-shadow Mermaid diagrams, navigation, search, and Standard/Wide geometry. [SRC-095](docs/sources.md#src-095)
+
+For an authorised renderer migration, carry the frozen lock, renderer check, and status-free navigation override together. Reinstall with `uv sync --frozen`. Build the static site and run complete desktop, mobile, and managed-preview verification for the selected profile. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
 
 ## rc.9 tooling qualification
 

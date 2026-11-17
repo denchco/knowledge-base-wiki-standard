@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Zensical reference renderer
+
+- Select Zensical `0.1.1` and Zensical UI `0.0.42` under `DKBWS-RENDER-001`. Check the native UI bundle and refresh the status-free navigation override. The upstream locale selector handles language alternates without a local bundle rewrite. [SRC-095](docs/sources.md#src-095)
+- For an authorised migration, carry the frozen lock, runtime check and navigation override together. Rebuild and run complete profile verification.
+
 ## Unreleased — Graphify reference update
 
 - Select exact Graphify `0.9.106` under `DKBWS-GRAPH-001` and `DKBWS-SEC-001`. Preserve the input guard and support graph reconciliation after source deletion. [SRC-096](docs/sources.md#src-096)

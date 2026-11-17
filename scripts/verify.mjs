@@ -200,7 +200,7 @@ function buildReceipt(provenance) {
     evidence("graph-input-boundary", "verification-script", "Exact Graphify identity, bounded corpus and disabled external preprocessing.", "scripts/graphify-update.py"),
     evidence("graph-input-fixtures", "test-suite", "Benign corpus support and fail-closed preprocessing and symlink rejection.", "scripts/check-graphify-inputs.test.py"),
     evidence("runtime-dependency-contract", "verification-script", "Pinned local runtime asset identity and dependency provenance checks.", "scripts/sync-runtime-assets.mjs"),
-    evidence("renderer-dependency-contract", "verification-script", "Exact renderer version, qualified adapter bytes and content-hash checks.", "scripts/patch-zensical-runtime.mjs"),
+    evidence("renderer-dependency-contract", "verification-script", "Exact renderer version, native UI bundle checksum, locale selector and generated HTML references.", "scripts/check-zensical-runtime.mjs"),
     evidence("security-policy", "policy", "Secrets, authorization, untrusted-input, and generated-authority boundaries.", "SECURITY.md"),
     evidence("source-policy", "policy", "Personal, confidential, copyright, retention, correction, and deletion boundaries.", "SOURCE_POLICY.md"),
     evidence("licensing-decision", "policy", "Repository-wide MIT licence for original work, with third-party boundaries.", "LICENSING.md"),

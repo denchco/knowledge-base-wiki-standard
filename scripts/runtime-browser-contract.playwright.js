@@ -892,7 +892,7 @@ export default async (page, options = {}) => {
   // must use this served build, while Markdown discovery retains canonical URLs.
   const searchInput = page.locator('input[role="combobox"]');
   const searchDestination = routeUrl(architectureRoute);
-  const searchResult = page.locator(`.l ol li a[href="${searchDestination}"]`).first();
+  const searchResult = page.locator(`a[role="option"][href="${searchDestination}"]`).first();
   check(await page.locator('link[rel="alternate"][type="text/markdown"]').count() === 1,
     "Rendered pages must retain their Markdown discovery alternate");
   const openSearch = async () => {
@@ -902,8 +902,13 @@ export default async (page, options = {}) => {
     await searchInput.waitFor({ state: "attached" });
     await page.waitForFunction(() => [...document.querySelectorAll("body > div")].some(host => {
       const input = host.shadowRoot?.querySelector('input[role="combobox"]');
-      const panel = input?.closest(".l");
-      return input && input.getRootNode().activeElement === input && panel && getComputedStyle(panel).opacity === "1";
+      const dialog = input?.closest("dialog");
+      if (!dialog?.open || input.getRootNode().activeElement !== input) return false;
+      // The native dialog opens before its inner panel finishes fading in.
+      for (let element = input; element; element = element.parentElement || element.getRootNode()?.host || null) {
+        if (getComputedStyle(element).opacity !== "1") return false;
+      }
+      return true;
     }));
   };
   await openSearch();
@@ -915,9 +920,8 @@ export default async (page, options = {}) => {
   await page.waitForFunction(() => [...document.querySelectorAll("body > div")].every(host => {
     const input = host.shadowRoot?.querySelector('input[role="combobox"]');
     if (!input) return true;
-    const panel = input.closest(".l");
-    return panel && input.getRootNode().activeElement !== input
-      && getComputedStyle(panel).opacity === "0" && getComputedStyle(panel).pointerEvents === "none";
+    const dialog = input.closest("dialog");
+    return dialog && !dialog.open && input.getRootNode().activeElement !== input;
   }));
   await openSearch();
   await searchInput.fill("architecture");
@@ -1300,9 +1304,9 @@ export default async (page, options = {}) => {
       await openSearch();
       await searchInput.fill("architecture");
       await searchResult.waitFor({ state: "visible" });
-      const search = await inspectThemeContrast(page, ['input[role="combobox"]', '.l ol li a', '.l .n li', '.l .B', '.l .x', '.l .u', '.l mark', '.l code']);
+      const search = await inspectThemeContrast(page, ['input[role="combobox"]', 'a[role="option"]', 'a[role="option"] li', 'dialog[open] [role="status"]', 'a[role="option"] .p', 'dialog[open] mark', 'dialog[open] code']);
       checkThemeContrast(search, `${label} open search`);
-      check(search.entries.some(entry => entry.selector === '.l ol li a'), `${label} search must expose readable results`);
+      check(search.entries.some(entry => entry.selector === 'a[role="option"]'), `${label} search must expose readable results`);
       await searchInput.press("Escape");
 
       const themedGraphs = {};
