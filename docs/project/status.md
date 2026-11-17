@@ -23,7 +23,8 @@ status: draft
 | Development-response navigation | Exact `development_response_links: live-wiki` capability, canonical Human Wiki origin, managed root/starter instructions, Markdown/entity-decoded-HTML/plain-GFM detection, and `--managed-live` exact identity plus per-route HTTP checks implemented; the optional trusted Codex Stop adapter supports one corrective continuation; absolute interception remains unclaimed under `STD-VAL-007` |
 | Managed local preview | `DKBWS-RUNTIME-002` implemented with serialized atomic reservation, exact twelve-field registration, byte-identical generated/installed LaunchAgent, loaded-job and marker identity checks, fail-closed `service:preview`, and maintainer-only live status; distribution/CI reports it not checked |
 | Git/Jujutsu boundary | `DKBWS-PROV-001` implemented: every file-changing development turn ends in a disclosed JJ commit after verification and state inspection; root/starter instruction parity and the helper are fixture-tested, exact `jj 0.45.1` is reference-qualified, and explicit Git-only distribution mode does not claim maintainer provenance |
-| Graphify publication | Exact Graphify `0.9.106` indexes the reference corpus through the guarded adapter. The publication includes versioned graph data, enriched 2D/3D views, governed consumer mounts and required route checks. [SRC-096](../sources.md#src-096) |
+| Safe existing-Wiki updates | Candidate prompt, read-only component review and complete rc.14 to rc.15 file-delta fixture. Full target qualification remains required before adoption. [Update guide](../guides/update-existing-wiki.md) |
+| Graphify publication | Exact Graphify `0.9.106` indexes the reference corpus through the guarded adapter. The candidate publication adds one file-level entry per maintained root schema, with exact identity lookup and canonical source inspection in both views. Versioned graph data, governed consumer mounts and required route checks remain enforced. [SRC-096](../sources.md#src-096) |
 | Built-output browser contract | Independent representative routes; desktop/mobile geometry, every canonical-question repetition route, all citation-bearing reader routes with exact source-row navigation, table overflow, local network, Mermaid, graph, controls, console, assets, and status-free navigation checks implemented |
 | Cross-project dogfooding | Five read-only inferred audits plus one independently maintained consumer reconciliation implemented |
 | Lifecycle tooling | Read-only inspect/validate/export/diff plus guarded upgrade/init plans; source/revision ancestry and pinned profile requirement comparison implemented |
@@ -61,7 +62,7 @@ The owner-authorised rc.9 pass is complete. Protected PR #50 published the quali
 
 Protected PR #56 released the reusable reader-journey guidance in immutable `v0.1.0-rc.10` at `c8f342f544b593e3d293218e30e0ed060a6bca4f`. Exact-revision Verify and public release readback passed. Consumer adoption remains separate.
 
-1. **Proposed update:** Record the decision on the verified shared header candidate. **Why it matters:** The change would add an accessible header contract for Standard Production Wikis. **Done when:** A governed review records the classification and decision against the exact verified implementation commit.
+1. **Proposed update:** Review the safe-update prompt, Documentation guide, rc.14 to rc.15 regression and schema-discovery correction in the candidate PR. **Why it matters:** Existing Wikis need a reviewed component migration that preserves their subject, evidence and local settings. **Done when:** The owner records a manual decision against the exact verified PR head.
 
 The completed scope carries the released first-wiki guidance into Documentation. Other Wikis and originating proposal records retain their independently governed states.
 
@@ -84,3 +85,5 @@ The rc.9 release locks DOMPurify `3.4.17`, fast-uri `3.1.9`, actual design-check
 The previous immutable `v0.1.0-rc.5` release remains at `fa805c78dfc9fae77b394e4ce3af980767e932c8`. Native appearance, October maintenance, numeric citations and repaired explanatory notes are included in rc.6 without changing that historical release. Documentation synchronization and public reader verification are complete for the recorded deployment; other originating consumer pins and records remain unchanged. [SRC-043](../sources.md#src-043), [SRC-067](../sources.md#src-067)
 
 Absolute interception of uncaptured responses remains outside the optional Stop continuation adapter. A dedicated Standard MCP remains deferred because the demonstrated workflows are served by repository files, CLI, skill/plugin and optional read-only integrations.
+
+Guide-only acceptance, release and Documentation publication automation remains on the separate to-do list. This candidate uses manual PR approval.

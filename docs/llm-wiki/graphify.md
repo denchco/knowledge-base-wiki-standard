@@ -35,7 +35,18 @@ These outputs are derived and ignored by Git. Regenerate them; do not edit them 
 
 Use the guarded publication command for indexing. Its exact Graphify `0.9.106` wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, and disables external preprocessing at runtime. Direct indexing commands bypass this qualified boundary. Read-only queries above do not regenerate or extract source files. The [dependency contract](../reference/tools-and-sources.md) and `DEPENDENCIES.md` describe the complete migration closure.
 
-The updated Graphify extractor omits JSON Schema keyword nodes from schemas with a declared identifier or definitions. Open the maintained schemas directly when you need their exact content. [SRC-096](../sources.md#src-096)
+Graphify `0.9.106` omits JSON Schema keyword nodes from schemas with a declared identifier or definitions. Its raw query can miss these files. [SRC-096](../sources.md#src-096)
+
+The governed publisher adds one file-level node for each maintained `schema/*.json` file. Each node records the exact schema `$id`, canonical path and source SHA-256. It does not recreate keyword nodes. Both graph views search the schema filename, path and identity. Their details link to the exact canonical GitHub source only when the declared public repository and build commit contain the same bytes.
+
+After a raw Graphify query misses a schema, use the published graph lookup before browsing broader sources.
+
+```sh
+npm run graph:schema -- manifest-v1.json --json
+npm run graph:schema -- schema/manifest-v1.json
+```
+
+The read-only lookup accepts an exact filename, canonical path or `$id`. It checks every maintained schema node against current canonical bytes and fails on missing, duplicate or stale identities. Open the returned canonical source for the schema's full content. The published graph remains a discovery aid and does not replace schema validation.
 
 The publisher stamps both graph data and summary with the repository `HEAD` used as the build baseline. `npm run check:graphify` rejects a stale or mismatched commit marker, including the common case where an unchanged topology otherwise retains pre-checkpoint provenance.
 

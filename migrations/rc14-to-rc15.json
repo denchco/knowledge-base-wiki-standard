@@ -1,0 +1,105 @@
+{
+  "recipeVersion": "1.0",
+  "purpose": "Bounded implementation review for the exact rc.14 to rc.15 release delta. This recipe does not prove release immutability, current audits or target conformance.",
+  "from": {
+    "tag": "v0.1.0-rc.14",
+    "revision": "d2fc92204c11eb8c30501cf644540a0daff3cf53"
+  },
+  "to": {
+    "tag": "v0.1.0-rc.15",
+    "revision": "7be18abaefe7f2f1fc1205a7524e2a5627b99357"
+  },
+  "components": [
+    {
+      "id": "frozen-stack",
+      "order": 0,
+      "review": "Review Python declarations and the complete frozen lock together. Zensical 0.1.1, Zensical UI 0.0.42 and Graphify 0.9.106 are selected.",
+      "paths": [
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    },
+    {
+      "id": "guarded-graph",
+      "order": 1,
+      "review": "Qualify the guarded Graphify adapter before removing renderer files. Keep symlink and preprocessing rejection plus deleted-file cache reconciliation.",
+      "paths": [
+        "scripts/graphify-update.py",
+        "scripts/check-graphify-inputs.test.py",
+        "scripts/check-python-tooling.test.py"
+      ]
+    },
+    {
+      "id": "renderer",
+      "order": 2,
+      "review": "Adapt native UI checksum checks, build commands, search and navigation adapters, and browser proof together. Remove the obsolete patcher only after the graph adapter works.",
+      "paths": [
+        "package.json",
+        "docs/assets/wiki.js",
+        "overrides/partials/nav-item.html",
+        "scripts/check-header-browser.mjs",
+        "scripts/check-standard.mjs",
+        "scripts/check-wiki-appearance-browser.mjs",
+        "scripts/check-zensical-runtime.mjs",
+        "scripts/check-zensical-runtime.test.mjs",
+        "scripts/header-browser-fixture.mjs",
+        "scripts/patch-zensical-runtime.mjs",
+        "scripts/patch-zensical-runtime.test.mjs",
+        "scripts/runtime-browser-contract.playwright.js",
+        "scripts/verify.mjs"
+      ]
+    },
+    {
+      "id": "consumer-ci",
+      "order": 3,
+      "review": "Update dependency-review only where the consumer already selects this action. Do not copy Standard deployment or repository-specific authority.",
+      "paths": [
+        ".github/workflows/dependency-review.yml"
+      ]
+    },
+    {
+      "id": "local-contracts",
+      "order": 4,
+      "review": "Merge applicable dependency, design, licence and maintenance explanations into consumer-owned contracts. Preserve local settings and subject claims.",
+      "paths": [
+        "DEPENDENCIES.md",
+        "DESIGN.md",
+        "LICENSING.md",
+        "docs/llm-wiki/graphify.md",
+        "docs/llm-wiki/web-discovery.md",
+        "docs/reference/navigation-status-migration.md",
+        "docs/reference/tools-and-sources.md"
+      ]
+    },
+    {
+      "id": "standard-only",
+      "order": 5,
+      "review": "Use the Standard records, starter sources and maintainer sync integration as migration context while preserving consumer subject content.",
+      "paths": [
+        "CHANGELOG.md",
+        "docs/project/status.md",
+        "docs/sources.md",
+        "scripts/conformance-cli.test.mjs",
+        "starter/templates/DESIGN.md.tmpl",
+        "starter/templates/overrides/partials/nav-item.html.tmpl",
+        "sync/documentation-sync-contract-v1.json"
+      ]
+    }
+  ],
+  "unchangedClosure": [
+    ".node-version",
+    ".python-version",
+    ".npmrc",
+    "package-lock.json",
+    "config/wiki-appearance.json",
+    "zensical.toml",
+    "scripts/check-reference-toolchain.mjs",
+    "scripts/check-graphify-assets.mjs",
+    "scripts/check-runtime-browser-contract.mjs",
+    "scripts/header-browser-contract.mjs",
+    "scripts/sync-runtime-assets.mjs",
+    "docs/assets/content.css",
+    "docs/assets/layout-width.js",
+    "docs/assets/theme.css"
+  ]
+}

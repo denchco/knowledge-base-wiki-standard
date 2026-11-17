@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 
 import { scriptSafeJson } from "./html-script-json.mjs";
 import { deriveAppearance } from "./wiki-appearance.mjs";
+import { maintainedSchemas, schemaSourceUrl } from "./graph-schema-discovery.mjs";
 
 const root = process.cwd();
 const appearancePath = path.join(root, "config/wiki-appearance.json");
@@ -143,8 +144,9 @@ function enhanceGraph(graph) {
   const htmlEdges = readGraphHtmlConst(graphHtml, "RAW_EDGES");
   const baseNodes = (htmlNodes.length ? htmlNodes : graph.nodes ?? []).map(normalizeHtmlNode);
   const baseEdges = (htmlEdges.length ? htmlEdges : graphLinks(graph).map(htmlEdgeFromGraphLink)).map(normalizeHtmlEdge);
+  const schemas = maintainedSchemas(root);
 
-  if (!baseNodes.length) {
+  if (!baseNodes.length && !schemas.length) {
     return {
       graph: {
         ...graph,
@@ -160,8 +162,16 @@ function enhanceGraph(graph) {
   const communityLabels = buildCommunityLabels(baseNodes, baseEdges);
   const communityRemap = stableCommunityRemap(baseNodes, communityLabels);
   const stableNodes = baseNodes.map((node) => withStableCommunity(node, communityRemap, communityLabels));
-  const documentLayer = markdownDocumentLayer(stableNodes, maxCommunityId(stableNodes) + 1);
-  const documentNodes = [...stableNodes, ...documentLayer.nodes];
+  const schemaCommunity = maxCommunityId(stableNodes) + 1;
+  const schemaNodes = schemas.map(record => ({
+    ...syntheticNode(record.id, record.label, record.title, schemaCommunity, "Canonical JSON Schemas: Files", record.source_file, primaryDark, 13),
+    ...record,
+    source_url: schemaSourceUrl(root, record, repositoryCommit),
+  }));
+  const schemaNodeIds = new Set(schemaNodes.map(node => node.id));
+  if (stableNodes.some(node => schemaNodeIds.has(node.id))) throw new Error("Graphify schema discovery node ID collision");
+  const documentLayer = markdownDocumentLayer([...stableNodes, ...schemaNodes], schemaCommunity + 1);
+  const documentNodes = [...stableNodes, ...schemaNodes, ...documentLayer.nodes];
   const linkEdges = markdownLinkEdges(documentNodes, baseEdges);
   const sourceLayer = sourceReferenceLayer(documentNodes, [...baseEdges, ...linkEdges], maxCommunityId(documentNodes) + 1);
   const navLayer = navHierarchyLayer(
@@ -206,6 +216,7 @@ function enhanceGraph(graph) {
     htmlEdges: enhancedEdges,
     interconnections: {
       graphifyEdgeCount: baseEdges.length,
+      schemaDocumentNodeCount: schemaNodes.length,
       markdownDocumentNodeCount: documentLayer.nodes.length,
       markdownLinkEdgeCount: linkEdges.length,
       sourceReferenceNodeCount: sourceLayer.nodes.length,
@@ -232,6 +243,7 @@ function currentRepositoryCommit() {
 function emptyInterconnectionSummary() {
   return {
     graphifyEdgeCount: 0,
+    schemaDocumentNodeCount: 0,
     markdownDocumentNodeCount: 0,
     markdownLinkEdgeCount: 0,
     sourceReferenceNodeCount: 0,
@@ -577,7 +589,7 @@ function normalizeFileReference(sourceFile, rawRef, nodeBySource) {
     if (!normalized.startsWith("..")) candidates.push(normalized);
   };
 
-  if (/^(AGENTS|DESIGN|README|DEPLOYMENT)\.md$/.test(cleanRef) || /^(docs|hooks|scripts|src)\//.test(cleanRef) || cleanRef === "mkdocs.yml" || cleanRef === "package.json") {
+  if (/^(AGENTS|DESIGN|README|DEPLOYMENT)\.md$/.test(cleanRef) || /^(docs|hooks|scripts|src|schema)\//.test(cleanRef) || cleanRef === "mkdocs.yml" || cleanRef === "package.json") {
     addCandidate(cleanRef);
   }
   if (cleanRef.startsWith("assets/")) addCandidate(`docs/${cleanRef}`);
@@ -599,7 +611,7 @@ function normalizeFileReference(sourceFile, rawRef, nodeBySource) {
 
 function explicitFileReferences(content) {
   const refs = new Set();
-  const pathPattern = /(?:^|[\s"'(:`])((?:docs|hooks|scripts|src|assets)\/[A-Za-z0-9_./-]+\.(?:css|html|js|json|md|mjs|py|ts|tsx|ya?ml)|(?:AGENTS|DESIGN|README|DEPLOYMENT)\.md|mkdocs\.yml|package\.json)(?=$|[\s"',)`<])/g;
+  const pathPattern = /(?:^|[\s"'(:`])((?:docs|hooks|scripts|src|schema|assets)\/[A-Za-z0-9_./-]+\.(?:css|html|js|json|md|mjs|py|ts|tsx|ya?ml)|(?:AGENTS|DESIGN|README|DEPLOYMENT)\.md|mkdocs\.yml|package\.json)(?=$|[\s"',)`<])/g;
   for (const match of content.matchAll(pathPattern)) refs.add(match[1]);
   for (const match of content.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) refs.add(match[1]);
   for (const match of content.matchAll(/\b(?:href|src)=["']([^"']+)["']/g)) refs.add(match[1]);
@@ -983,6 +995,12 @@ function syncGraphHtml(filePath, nodes, edges) {
       '<script src="../vendor/vis-network.min.js"></script>',
     )
     .replace(/const RAW_NODES = .*?;\nconst RAW_EDGES = /s, `const RAW_NODES = ${scriptSafeJson(nodes)};\nconst RAW_EDGES = `)
+    .replace("member_count: n.member_count,", "member_count: n.member_count, schema_id: n.schema_id, source_url: n.source_url, source_sha256: n.source_sha256,")
+    .replace("n.label.toLowerCase().includes(q)", "[n.label, n.source_file, n.schema_id].filter(Boolean).some(value => value.toLowerCase().includes(q))")
+    .replace("let html = `<div class=\"field\"><b>${esc(n.label)}</b></div>`;", `let html = \`<div class="field"><b>\${esc(n.label)}</b></div>\`;
+  if (n.schema_id) html += \`<div class="field">Schema identity: \${esc(n.schema_id)}</div>\`;
+  if (n.source_sha256) html += \`<div class="field">Source SHA-256: \${esc(n.source_sha256)}</div>\`;
+  if (n.source_url && /^https:\\/\\/github\\.com\\//.test(n.source_url)) html += \`<div class="field"><a data-schema-source href="\${esc(n.source_url)}" target="_blank" rel="noopener">Open canonical schema source</a></div>\`;`)
     .replace(/const RAW_EDGES = .*?;\nconst LEGEND = /s, `const RAW_EDGES = ${scriptSafeJson(edges)};\nconst LEGEND = `)
     .replace(/const LEGEND = .*?;\n\n\/\//s, `const LEGEND = ${scriptSafeJson(legend)};\n\n//`)
     .replace(
@@ -1003,6 +1021,7 @@ function syncGraphHtml(filePath, nodes, edges) {
     .replace(
       "</style>",
       `  .legend-cb:focus-visible, #select-all-cb:focus-visible { outline: 3px solid ${primary}; outline-offset: 2px; }
+  #info-content .field { overflow-wrap: anywhere; }
   #graph { min-width: 0; }
   @media (max-width: 720px) {
     body { display: block; position: relative; }
@@ -1145,6 +1164,7 @@ function graph3dHtml(summary) {
     outline-offset: 2px;
   }
   #info {
+    overflow-wrap: anywhere;
     margin-top: 12px;
     padding-top: 12px;
     border-top: var(--component-border-width) solid ${panelDivider};
@@ -1228,6 +1248,8 @@ function nodeLabel(node) {
 function inspect(node) {
   const fields = [
     ["Source", node.source_file],
+    ["Schema identity", node.schema_id],
+    ["Source SHA-256", node.source_sha256],
     ["Location", node.source_location],
     ["Community", node.community_name ?? node.community],
     ["Type", node.file_type ?? node.type],
@@ -1236,7 +1258,9 @@ function inspect(node) {
 
   infoEl.innerHTML = [
     \`<b>\${escapeHtml(nodeLabel(node))}</b>\`,
-    ...fields.map(([label, value]) => \`<div><span class="pill">\${label}</span>\${escapeHtml(String(value))}</div>\`)
+    ...fields.map(([label, value]) => \`<div><span class="pill">\${label}</span>\${escapeHtml(String(value))}</div>\`),
+    node.source_url && /^https:\\/\\/github\\.com\\//.test(node.source_url)
+      ? \`<div><a data-schema-source href="\${escapeHtml(node.source_url)}" target="_blank" rel="noopener">Open canonical schema source</a></div>\` : ""
   ].join("");
 }
 
@@ -1264,7 +1288,7 @@ function focusNode(node) {
 function findMatch(query) {
   const q = query.trim().toLowerCase();
   if (!q) return null;
-  return rawData.nodes.find((node) => [node.label, node.id, node.source_file, node.community_name]
+  return rawData.nodes.find((node) => [node.label, node.id, node.source_file, node.schema_id, node.community_name]
     .filter(Boolean)
     .some((value) => String(value).toLowerCase().includes(q)));
 }

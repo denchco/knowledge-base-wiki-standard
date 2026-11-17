@@ -90,6 +90,10 @@ The check reports release availability without installing anything, changing you
 
 A release’s passing checks describe the date it was qualified. Current security audits still apply; a new finding is reported rather than silently changing your dependencies.
 
+## Update an existing Wiki safely
+
+For an authorised migration, use [the update prompt](prompts/update-wiki.md) and [the update guide](docs/guides/update-existing-wiki.md). The workflow records the exact released target, reviews the complete component change set, checks local file preconditions, and verifies the target Wiki before adoption. The rc.14 to rc.15 example covers the renderer, graph adapter and verification files together.
+
 ## Documentation
 
 The released [first-wiki guide](docs/guides/first-wiki.md) explains the frozen stack and migration boundary. The public [first-wiki guide](https://denchco.github.io/knowledge-base-wiki-documentation/guides/first-wiki/), [getting-started walkthrough](https://denchco.github.io/knowledge-base-wiki-documentation/getting-started/) and full [Documentation](https://denchco.github.io/knowledge-base-wiki-documentation/) carry the separately adopted rc.9 release. Protected deployment and public verification bind Documentation `25d72256aa29abd6039095e1fbca3c2363d234e8`. [SRC-089](docs/sources.md#src-089)
