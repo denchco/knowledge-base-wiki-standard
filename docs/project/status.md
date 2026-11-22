@@ -35,7 +35,7 @@ status: draft
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
-| Public GitHub release | Immutable `v0.1.0-rc.16` resolves to `c1ee078cefaf035bab0ed33ca1683bfdd06b42c3`. Approved PR #64, exact-merge Verify, fresh package audits and all five downloaded asset checks pass. The release carries the safe-update procedure and schema discovery. [SRC-104](../sources.md#src-104) |
+| Public GitHub release | Immutable `v0.1.0-rc.17` resolves to `b781907eea212c4ddcbd64183997d0982d4caf40`. It requires checksum verification for fresh uv downloads in CI. Verify passed on the merge commit and all five downloaded assets matched their published digests. [SRC-105](../sources.md#src-105) |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
 The local Zensical service is registered as `denchco-kb-wiki-standard` at `http://127.0.0.1:8017/`; managed health requires every governed registration field, exact LaunchAgent bytes, the loaded job, canonical URL, and `service-identity-v1` marker in addition to HTTP 200. The maintainer-only live gate supplies current evidence and the preview command refuses browser handoff on any mismatch.
