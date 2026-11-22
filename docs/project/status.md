@@ -48,11 +48,10 @@ The released Standard implementation extends `DKBWS-PROMPT-001` with development
 
 | Proposed update | Why it matters | Done when |
 |---|---|---|
-| Restore hosted Python dependency updates and reconcile `STD-VAL-008`. | The 22 November updater used uv 0.13.7. Both repositories require at least 0.13.8. | A hosted job in each repository resolves the Python updates with a supported uv version, and the validation record links the results. |
 | Qualify setup-node 7.1.0 and npm 11.21.3. | Both ship libraries with security advisories outside the Wiki package lock. | Frozen installs and CI pass, and the review records which bundled advisories the update fixes and which remain. |
 | Qualify Zensical 0.1.3 for the Wiki build. | It includes a rustix security fix and changes the native UI used by readers. | The review records whether the build uses the affected functions and tests the new UI on desktop and mobile. |
 
-The [22 November Standard updater run](https://github.com/denchco/knowledge-base-wiki-standard/actions/runs/44986202206) records the current resolver failure. The October resolution below applies to the earlier toolchain.
+[STD-VAL-008](../validation-queue.md#std-val-008) is blocked on GitHub’s hosted updater. Both 22 November retries failed. The October result below applies to the earlier toolchain. [SRC-106](../sources.md#src-106)
 
 The owner approved PR #64 and authorised rc.16 publication and Documentation adoption. The Standard release is published and `STD-VAL-016` is resolved. The completed approval item is closed. [SRC-104](../sources.md#src-104)
 
@@ -81,13 +80,14 @@ The [reader-defaults migration](../reference/reader-defaults-migration.md) cover
 
 | Parked work | `blocked_by` | `reopen_when` | `last_checked` |
 |---|---|---|---|
+| Hosted Python dependency updates ([STD-VAL-008](../validation-queue.md#std-val-008)) | GitHub’s updater supplies uv 0.13.7. Both repositories require at least 0.13.8. | A compatible hosted image or version-selection feature is available. Retry both root uv jobs and check their lock-resolution logs. | 2026-11-22 |
 | Shared-header consumer adoption | No accepted immutable release contains the candidate; repository and branch-protection readiness varies by target | A verified accepted containing release exists and the target has the required protected PR workflow | 2026-11-01 |
 
 The [three-contribution intake review](proposal-intake-review.md) confirms the immutable origins, exact payloads and acceptance scope. The owner authorised completing intake and acceptance, approved all three exact payloads, and delegated their final governed-form submission. The originating records now contain those approvals. Issues #32, #33 and #34 exactly match those payloads. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc` with decision `b0b5e8021a5a93feb767e486699ec7c524955da6`: numeric citations are preferred; appearance configuration and content-first handoffs are reusable. All three consumer records reconciled with the published acceptance registry before rc.6 publication. Their issue-linkage and acceptance phases remain separate commits. The later Standard ledger records rc.6 inclusion, while the untouched originating records still show release pending and adoption not considered. Their earlier reconciliation does not prove they are current against the new release ledger. This scoped delegation does not change the general manual-submission rule. Completed technical reviews are not repeated as separate priorities.
 
 No active maintenance priorities remain from the earlier October review. The scoped security and dependency-updater maintenance merged through protected PR #13 at `fef1392548381276a03ca89a2ede435a3d04ec08` on 3 October 2026. Post-merge Verify run `37101094460` passed on that exact revision. [SRC-044](../sources.md#src-044), [SRC-045](../sources.md#src-045)
 
-Fresh hosted uv Dependabot run `37103486583` also passed on that revision using uv `0.12.18`; both targeted dependency resolutions exited successfully. This closes [STD-VAL-008](../validation-queue.md). The generated Graphify and Zensical upgrade proposals require their own qualification and are not adopted by this evidence record. [SRC-046](../sources.md#src-046)
+Fresh hosted uv Dependabot run `37103486583` also passed on that revision using uv `0.12.18`; both targeted dependency resolutions exited successfully. That run closed the October incident. The November regression is recorded in [STD-VAL-008](../validation-queue.md#std-val-008). The generated Graphify and Zensical upgrade proposals require their own qualification and are not adopted by this evidence record. [SRC-046](../sources.md#src-046)
 
 The rc.9 release locks DOMPurify `3.4.17`, fast-uri `3.1.9`, actual design-checker Zod `4.6.6`, filelock `4.2.1`, msgpack `1.2.3`, urllib3 `2.8.0` and Certifi `2026.10.19`. [SRC-088](../sources.md#src-088) The rc.6 release requires exact uv `0.13.4` for reference execution and `>=0.13.4` for resolver bootstrap after the certificate-security announcement. Earlier resolver evidence below remains historical. [SRC-065](../sources.md#src-065), [SRC-066](../sources.md#src-066) Actual uv `0.12.15` reproduced the former resolver failure and verified the repaired bootstrap boundary; exact `0.12.10` consumed its generated lock. The scoped maintenance tree has its own verification receipt; evidence from the separate numeric-citation candidate is not substituted for this tree's checks. [SRC-041](../sources.md#src-041), [SRC-042](../sources.md#src-042)
 
