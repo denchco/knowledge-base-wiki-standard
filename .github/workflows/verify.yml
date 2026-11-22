@@ -18,13 +18,21 @@ jobs:
         with:
           node-version: 24.22.3
           cache: npm
-      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         with:
           version: "0.13.8"
           python-version: "3.12.16"
+          require-checksums: true
       - name: Check npm reference version
         run: test "$(npm --version)" = "11.19.1"
       - run: npm ci
+      - name: Qualify changes to the uv installer
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if ! git diff --quiet "$BASE_SHA" HEAD -- .github/workflows/verify.yml .github/workflows/security-audit.yml scripts/test-setup-uv-download.mjs; then
+            node scripts/test-setup-uv-download.mjs
+          fi
       - run: uv sync --frozen
       - run: npm run browser:install:ci
       - name: Verify Git-distributed contract

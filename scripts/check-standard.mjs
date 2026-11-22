@@ -760,7 +760,7 @@ const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
 for (const pin of [
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
   "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
-  "astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1",
+  "astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0",
   `node-version: ${exactNodeVersion}`,
   "runs-on: ubuntu-24.04",
   `version: "${exactUvVersion}"`,
