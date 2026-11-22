@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased — uv installer integrity
+## v0.1.0-rc.17 — 2026-11-22
 
-- Under `DKBWS-SEC-001`, Verify and the scheduled audit use setup-uv v10.4.0 and require checksums for the selected uv 0.13.8 archive. Carry the action pin, strict setting and download test together when adopting this change. The Python and uv runtime pins stay the same.
+- Under `DKBWS-SEC-001`, Verify and the scheduled audit use setup-uv v10.4.0 and require checksums for the selected uv 0.13.8 archive. Carry the action pin, strict setting and download test together when adopting this change. The Python and uv runtime pins stay the same. [SRC-105](docs/sources.md#src-105)
 
 ## v0.1.0-rc.16 — 2026-11-17
 
