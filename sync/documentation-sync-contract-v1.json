@@ -278,6 +278,7 @@
     "scripts/sync-documentation-snapshot.mjs",
     "scripts/sync-documentation-snapshot.test.mjs",
     "scripts/sync-runtime-assets.mjs",
+    "scripts/test-setup-uv-download.mjs",
     "scripts/test_source_citations.py",
     "scripts/verify.mjs",
     "scripts/wiki-appearance.mjs",

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — uv installer integrity
+
+- Under `DKBWS-SEC-001`, Verify and the scheduled audit use setup-uv v10.4.0 and require checksums for the selected uv 0.13.8 archive. Carry the action pin, strict setting and download test together when adopting this change. The Python and uv runtime pins stay the same.
+
 ## v0.1.0-rc.16 — 2026-11-17
 
 - Complete the schema-discovery correction under `DKBWS-GRAPH-001`. Publish one file-level entry for each maintained root schema and verify exact identity lookup. Migrate the publisher, lookup command and checks together, then rebuild the graph.

@@ -162,6 +162,10 @@ test("verification and scheduled audits keep each exact runtime pin", () => {
     const setup = steps.filter((step) => step.uses?.startsWith("astral-sh/setup-uv@"));
     const setupNode = steps.filter((step) => step.uses?.startsWith("actions/setup-node@"));
     assert(setup.length > 0, name);
+    for (const step of setup) {
+      assert.equal(step.uses, "astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d", name);
+      assert.equal(step.with?.["require-checksums"], true, name);
+    }
     assert(setup.every((step) => step.with?.version === "0.13.8" && step.with?.["python-version"] === "3.12.16"), name);
     assert(setupNode.length > 0 && setupNode.every((step) => step.with?.["node-version"] === "24.22.3"), name);
     assert(steps.some((step) => step.run === 'test "$(npm --version)" = "11.19.1"'), name);

@@ -46,6 +46,14 @@ The released Standard implementation extends `DKBWS-PROMPT-001` with development
 
 ## Current bounded priorities
 
+| Proposed update | Why it matters | Done when |
+|---|---|---|
+| Restore hosted Python dependency updates and reconcile `STD-VAL-008`. | The 22 November updater used uv 0.13.7. Both repositories require at least 0.13.8. | A hosted job in each repository resolves the Python updates with a supported uv version, and the validation record links the results. |
+| Qualify setup-node 7.1.0 and npm 11.21.3. | Both ship libraries with security advisories outside the Wiki package lock. | Frozen installs and CI pass, and the review records which bundled advisories the update fixes and which remain. |
+| Qualify Zensical 0.1.3 for the Wiki build. | It includes a rustix security fix and changes the native UI used by readers. | The review records whether the build uses the affected functions and tests the new UI on desktop and mobile. |
+
+The [22 November Standard updater run](https://github.com/denchco/knowledge-base-wiki-standard/actions/runs/44986202206) records the current resolver failure. The October resolution below applies to the earlier toolchain.
+
 The owner approved PR #64 and authorised rc.16 publication and Documentation adoption. The Standard release is published and `STD-VAL-016` is resolved. The completed approval item is closed. [SRC-104](../sources.md#src-104)
 
 The reader defaults and conformance accounting corrections are published in immutable `v0.1.0-rc.6` at `8c134952dacfcd7a60c8da82d59aecb67117c512`. The [release record](release-readiness.md) accounts for each integration, its exact origin and the remaining consumer boundaries. Complete maintainer verification qualified the implementation; protected post-merge Verify passed on the exact release revision. The later Standard registry records four accepted contributions as included. Documentation adopted that release and passed its own local, protected CI, deployment and public reader checks at the recorded rc.6 revision. [SRC-067](../sources.md#src-067), [SRC-069](../sources.md#src-069)
