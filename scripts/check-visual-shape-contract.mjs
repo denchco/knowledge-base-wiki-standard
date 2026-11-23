@@ -345,7 +345,7 @@ function checkAppearanceContract() {
   const darkBlock = selectorBlock(theme, 'body[data-md-color-scheme="slate"]');
   for (const [key, value] of Object.entries(dark)) {
     const css = key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
-    const sharedAlias = { headerSurface: "surface", headerText: "text", headerSelectedText: "header-text" }[key];
+    const sharedAlias = { headerSurface: "surface", headerText: "text" }[key];
     if (sharedAlias) {
       requireIn(theme, `--${css}: var(--${sharedAlias})`, `Shared header alias ${key} must preserve the active palette`);
       const expected = key === "headerSurface" ? colors.darkSurface : colors.darkText;

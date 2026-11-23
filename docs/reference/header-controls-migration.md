@@ -17,6 +17,8 @@ Use semantic opaque surfaces for rest, hover and selected states. Preserve the W
 
 Search's magnifier and shortcut badge remain readable in every state. Normal text and the shortcut badge meet `4.5:1` contrast; meaningful icons and visible focus meet `3:1` against their adjacent background. Keep keyboard operation, search, width selection, appearance switching, reload/navigation and saved preferences intact. The bounded mobile adapter supplies keyboard semantics to the native menu/search labels without replacing their controllers.
 
+For revisions containing the control-contrast update, carry `headerControlText`, `headerControlBoundary` and the light and dark navigation selection roles. Test resting and selected fills against the header at 3:1. During hover, a solid border of at least 1 CSS pixel can provide the 3:1 separation on every side. Check each control at its actual surrounding colour. Keep the logo unframed. Check that current links in each sidebar share the same tint (at least 1.2:1 against the sidebar), have bold text at 4.5:1, and line up with ordinary links without an inline-start rail. The 1.2:1 tint threshold is a design choice.
+
 ## Complete migration
 
 1. Select an accepted, published native-immutable Standard release that contains this change. Resolve its exact tag and full commit; require successful protected verification on that revision. The current rc.9 release does not contain this candidate. A branch, draft PR or older passing release is not the adoption target.

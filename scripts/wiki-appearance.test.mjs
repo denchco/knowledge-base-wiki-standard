@@ -58,9 +58,9 @@ test("pale brand survives verbatim and its darker shades preserve the requested 
   for (const palette of [result.light, result.dark]) {
     assert.equal(palette.brandAccent, config.accent);
     assert.equal(palette.headerBackground, config.accent);
-    assert.equal(palette.selectedBackground, config.accent);
+    assert.ok(contrast(palette.selectedBackground, palette.background) >= 1.2);
     assert.ok(contrast(palette.headerText, config.accent) >= 4.5);
-    assert.ok(contrast(palette.selectedText, config.accent) >= 4.5);
+    assert.ok(contrast(palette.selectedText, palette.selectedBackground) >= 4.5);
     assert.equal(palette.questionText, palette.accent);
     assert.equal(palette.questionBorder, palette.accent);
   }
@@ -70,7 +70,7 @@ test("pale brand survives verbatim and its darker shades preserve the requested 
 });
 
 test("quantized saturated, dark, neutral and generated seeds retain contrast", () => {
-  const seeds = new Set(["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#00ffff", "#ff00ff", "#005ea8", "#777777", "#010101"]);
+  const seeds = new Set(["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#00ffff", "#ff00ff", "#005ea8", "#32541c", "#777777", "#010101"]);
   for (let index = 0; index < 384; index += 1) seeds.add(`#${((index * 2654435761) >>> 0).toString(16).slice(-6).padStart(6, "0")}`);
   for (const accent of seeds) {
     const result = deriveAppearance({ ...config, accent });
@@ -88,9 +88,12 @@ test("quantized saturated, dark, neutral and generated seeds retain contrast", (
       }
       assert.equal(palette.headerBackground, accent);
       assert.equal(palette.headerSurface, accent);
-      assert.equal(palette.selectedBackground, accent);
+      for (const surface of [palette.background, palette.surface]) assert.ok(contrast(palette.selectedBackground, surface) >= 1.2);
+      assert.ok(contrast(palette.selectedText, palette.selectedBackground) >= 4.5);
+      assert.ok(contrast(palette.headerControlBoundary, palette.headerSurface) >= 3);
+      for (const fill of [palette.headerControlSurface, palette.headerSelected]) assert.ok(contrast(fill, accent) >= 3);
       assert.ok(contrast(palette.headerText, accent) >= 4.5);
-      assert.ok(contrast(palette.headerText, palette.headerControlSurface) >= 4.5,
+      assert.ok(contrast(palette.headerControlText, palette.headerControlSurface) >= 4.5,
         `${accent} ${name} header rest text`);
       assert.ok(contrast(palette.headerSelectedText, palette.headerSelected) >= 4.5,
         `${accent} ${name} header selected text`);

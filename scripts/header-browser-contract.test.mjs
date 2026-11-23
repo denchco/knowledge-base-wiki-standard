@@ -5,8 +5,8 @@ import { assertHeaderSnapshot, assertNoColourTransition, contrastRatio, headerHo
 const stationary = { transitionProperty: "none", transitionDuration: "0s", transitionDelay: "0s" };
 const rendered = { content: '"Search"', display: "block", visibility: "visible", opacity: 1, width: 20, height: 20 };
 function fixture() {
-  const tokens = { "header-surface": "rgb(225, 239, 221)", "header-text": "rgb(31, 39, 43)", "header-control-surface": "rgb(237, 242, 245)", "header-selected": "rgb(214, 226, 234)", "header-selected-text": "rgb(31, 39, 43)" };
-  const base = { width: 32, height: 32, centreY: 24, radii: [8, 8, 8, 8], opacity: 1, transition: stationary, foreground: tokens["header-text"], background: tokens["header-control-surface"] };
+  const tokens = { "header-surface": "rgb(225, 239, 221)", "header-control-text": "rgb(255, 255, 255)", "header-control-surface": "rgb(49, 66, 75)", "header-selected": "rgb(41, 53, 60)", "header-selected-text": "rgb(255, 255, 255)" };
+  const base = { surround: tokens["header-surface"], borders: Array.from({ length: 4 }, () => ({ color: "rgb(38, 49, 52)", width: 1, style: "solid" })), width: 32, height: 32, centreY: 24, radii: [8, 8, 8, 8], opacity: 1, transition: stationary, foreground: tokens["header-control-text"], background: tokens["header-control-surface"] };
   return {
     scheme: "default", width: "wide", rem: 20, zoom: 1, tokens, header: { background: tokens["header-surface"] },
     visiblePaletteLabels: 1, revealedHiddenLabels: 0, hiddenTabStops: 0, pageOverflow: 0,
@@ -14,7 +14,7 @@ function fixture() {
     controls: [
       { ...base, name: "appearance", kind: "icon", square: true, svg: { width: 18, height: 18, offsetX: 0, offsetY: 0 } },
       { ...base, name: "Wide", kind: "width", square: false, width: 70, background: tokens["header-selected"], group: { offsetX: 0, offsetY: 0 } },
-      { ...base, name: "Search", kind: "search", square: false, width: 180, searchParts: { icon: tokens["header-text"], shortcutForeground: tokens["header-text"], shortcutBackground: tokens["header-control-surface"], beforeTransition: stationary, afterTransition: stationary, rendered: { magnifier: rendered, shortcut: rendered } } },
+      { ...base, name: "Search", kind: "search", square: false, width: 180, searchParts: { icon: tokens["header-control-text"], shortcutForeground: tokens["header-control-text"], shortcutBackground: tokens["header-control-surface"], beforeTransition: stationary, afterTransition: stationary, rendered: { magnifier: rendered, shortcut: rendered } } },
     ],
   };
 }
@@ -24,6 +24,9 @@ test("independent fixture accepts opaque semantic controls and centred different
   value.controls[0].svg.width = 13; value.controls[0].svg.height = 21; inspect(value);
 });
 for (const [name, mutate, message] of [
+  ["invisible appearance perimeter", value => { value.controls[0].surround = value.controls[0].background; value.controls[0].borders.forEach(border => { border.width = 0; }); }, /perimeter contrast/],
+  ["incomplete width perimeter", value => { value.controls[1].surround = value.controls[1].background; value.controls[1].borders[2].style = "none"; }, /perimeter contrast/],
+  ["transparent search perimeter", value => { value.controls[2].surround = value.controls[2].background; value.controls[2].borders[0].color = "transparent"; }, /perimeter contrast/],
   ["unequal height", value => value.controls[1].height = 30, /height/],
   ["wrong corner radius", value => value.controls[1].radii = [8, 8, 8, 2], /rounding/],
   ["translucent selected surface", value => value.controls[1].background = "rgba(0,0,0,.1)", /opaque/],
@@ -39,7 +42,7 @@ for (const [name, mutate, message] of [
   ["hidden Search magnifier", value => value.controls[2].searchParts.rendered.magnifier = { ...rendered, opacity: 0 }, /rendered and readable/],
   ["wrong selected semantic token", value => value.controls[1].background = value.tokens["header-control-surface"], /semantic background/],
   ["horizontal reflow failure", value => value.pageOverflow = 2, /overflow/],
-  ["low contrast rest token", value => { value.tokens["header-text"] = "rgb(230,230,230)"; value.controls[0].foreground = value.tokens["header-text"]; }, /contrast/],
+  ["low contrast rest token", value => { value.tokens["header-control-text"] = "rgb(46,46,46)"; value.controls[0].foreground = value.tokens["header-control-text"]; }, /contrast/],
 ]) test(`rejects ${name}`, () => { const value = fixture(); mutate(value); assert.throws(() => inspect(value), message); });
 
 test("foreground alpha is composited for accessible contrast", () => {

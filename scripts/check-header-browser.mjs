@@ -249,6 +249,9 @@ async function zoomJourney(page, scheme, width, label) {
 }
 async function negativeJourneys(page, engine) {
   const probes = [
+    ["invisible-palette-perimeter", ".md-header__option label { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
+    ["partial-width-perimeter", ".layout-width-toggle { background:var(--header-surface)!important; color:var(--header-text)!important; border-inline-start-width:0!important; }", /perimeter contrast/],
+    ["invisible-search-perimeter", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
     ["unequal-height", ".layout-width-toggle { height:1.5rem!important; }", /height/],
     ["wrong-radius", ".layout-width-toggle { border-radius:0!important; }", /rounding/],
     ["translucent-rest", ".layout-width-toggle { background-color:rgba(0,0,0,.5)!important; }", /opaque/],

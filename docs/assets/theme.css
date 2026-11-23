@@ -23,11 +23,15 @@ body[data-md-color-accent] {
   --focus-contrast: #ffffff;
   --header-surface: var(--surface);
   --header-text: var(--text);
-  --header-control-surface: #edf2f5;
+  --selected-background: #d9e7f0;
+  --selected-text: var(--accent-dark);
+  --header-control-boundary: #637684;
+  --header-control-surface: #8093a1;
+  --header-control-text: #172028;
   --header-hover: #aaa08d;
   --header-hover-text: #29251f;
-  --header-selected: #d9e7f0;
-  --header-selected-text: var(--header-text);
+  --header-selected: #4a6679;
+  --header-selected-text: #ffffff;
   --header-control-height: 1.6rem;
   --header-control-radius: .4rem;
   --conditional: #a15c00;
@@ -92,8 +96,11 @@ body[data-md-color-accent] {
 .md-nav--primary .md-nav__item--active > .md-nav__link,
 .md-nav--primary .md-nav__item .md-nav__link--active,
 .md-nav--secondary .md-nav__link--active {
-  background-color: var(--accent-transparent);
-  color: var(--accent-dark);
+  background-color: var(--selected-background);
+  border-inline-start: 0;
+  box-shadow: none;
+  color: var(--selected-text);
+  font-weight: 700;
 }
 
 .md-header__button {
@@ -108,11 +115,17 @@ body[data-md-color-accent] {
 }
 
 .md-search__button,
+.md-header__button:not(.md-logo),
+.layout-width-toggle {
+  border: var(--component-border-width) solid var(--header-control-boundary);
+}
+
+.md-search__button,
 .md-header__button:not(.md-logo) {
   background-color: var(--header-control-surface);
   border-radius: var(--header-control-radius);
   box-sizing: border-box;
-  color: var(--header-text);
+  color: var(--header-control-text);
   height: var(--header-control-height);
   opacity: 1;
   transition: none;
@@ -143,7 +156,7 @@ body[data-md-color-accent] {
 
 .md-search__button::after {
   background-color: var(--header-control-surface);
-  color: var(--header-text);
+  color: var(--header-control-text);
   opacity: 1;
   transition: none;
 }
@@ -520,10 +533,15 @@ body[data-md-color-scheme="slate"] {
   --border: #798f9a;
   --focus: #abd6ff;
   --focus-contrast: #111a1e;
-  --header-control-surface: #293740;
+  --selected-background: #344854;
+  --selected-text: var(--accent-dark);
+  --header-control-boundary: #98aebb;
+  --header-control-surface: #a3b7c2;
+  --header-control-text: #172028;
   --header-hover: #948774;
   --header-hover-text: #201c17;
-  --header-selected: #344854;
+  --header-selected: #c5d7e1;
+  --header-selected-text: #172028;
   --conditional: #edbc74;
   --success: #90d7aa;
   --warning: #ffa69e;

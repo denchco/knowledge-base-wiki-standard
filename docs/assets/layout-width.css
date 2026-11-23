@@ -6,7 +6,7 @@ body[data-md-color-scheme] {
   --layout-width-control-content-rail-offset: 2rem;
   --layout-width-control-inline-start: 0.25rem;
   --layout-width-control-radius: var(--header-control-radius);
-  --layout-width-control-rest-color: var(--header-text);
+  --layout-width-control-rest-color: var(--header-control-text);
   --layout-width-control-hover-background: var(--header-hover);
   --layout-width-control-hover-color: var(--header-hover-text);
   --layout-width-control-selected-background: var(--header-selected);

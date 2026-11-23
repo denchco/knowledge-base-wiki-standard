@@ -878,7 +878,7 @@ export default async (page, options = {}) => {
   check(standardHeader.headerBackground === rgb(lightColors.headerBackground), "The production header must render its configured light surface");
   check(standardHeader.headerColour === rgb(lightColors.headerText), "The production header must render its configured readable text");
   check(standardHeader.searchBackground === standardHeaderControls.snapshot.tokens["header-control-surface"], "The closed Search control must use its opaque semantic surface");
-  check(standardHeader.searchColour === rgb(lightColors.headerText), "The closed Search control must render its configured readable text");
+  check(standardHeader.searchColour === standardHeaderControls.snapshot.tokens["header-control-text"], "The closed Search control must render its configured readable text");
   check(
     standardHeader.topic && standardHeader.heading && closeTo(standardHeader.topic.left, standardHeader.heading.left),
     "The visible desktop title must align to the body-text left rail in Standard mode",
