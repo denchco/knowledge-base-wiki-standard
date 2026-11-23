@@ -192,6 +192,9 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
   const hovered = [];
   if (hover) for (const [index, control] of (await page.locator(headerControlSelector).all()).entries()) {
     await control.hover();
+    // WebKit can still report the preceding native press when the pointer arrives.
+    // Wait for the input state alone. A wrong hover colour must still fail immediately.
+    await control.and(page.locator(":hover:not(:active)")).waitFor({ state: "visible", timeout: 2500 });
     const samples = [];
     for (let frame = 0; frame < 3; frame++) {
       const sample = await control.evaluate(element => {
@@ -213,6 +216,7 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
     samples.at(-1).minimumBoundaryContrast = hoveredMetrics.minimumBoundaryContrast;
     await page.mouse.down();
     try {
+      await control.and(page.locator(":active")).waitFor({ state: "visible", timeout: 2500 });
       const active = await measureHeader(page);
       const pressed = active.controls[index];
       assert.equal(pressed.background, snapshot.tokens["header-pressed"], `${label}: pointer-down surface`);
@@ -221,6 +225,7 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
     } finally {
       await page.mouse.move(0, 200);
       await page.mouse.up();
+      await control.and(page.locator(":active")).waitFor({ state: "hidden", timeout: 2500 });
     }
     hovered.push(samples);
   }
