@@ -2,7 +2,7 @@
 
 ## Unreleased — Header contrast and current navigation
 
-- Revise `DKBWS-DESIGN-002` for Standard Production. Measure header fills and persistent edges against the adjacent header, preserve keyboard focus, and give the current page and current outline entry the same unrailed, bold, scheme-specific treatment.
+- Revise `DKBWS-DESIGN-002` for Standard Production. Use the Wiki’s own accent for hover and pointer-down. Give every action the same painted height, resting colour and edges, including Wide when selected. Measure header fills and persistent edges against the adjacent header, preserve keyboard focus, and give the current page and current outline entry the same unrailed, bold, scheme-specific treatment.
 - Carry the reference CSS, navigation adapters, generator and browser checks together when adopting a verified immutable release. Existing release pins stay valid.
 
 ## v0.1.0-rc.17 — 2026-11-22

@@ -9,7 +9,7 @@ status: draft
 
 ## 2026-11-23 — Header controls and current navigation
 
-The proposed reference treatment separates the header actions from their surrounding surface and gives both sidebars a common current-item style. Browser checks measure the control boundary independently of the text and keyboard focus. See the [migration guide](reference/header-controls-migration.md).
+The proposed reference treatment separates the header actions from their surrounding surface and gives both sidebars a common current-item style. The header actions share three accent-family states. A bold label marks selected Wide without changing its resting fill or edges. Browser checks measure the control boundary independently of the text and keyboard focus. See the [migration guide](reference/header-controls-migration.md).
 
 ## 2026-11-22 — Hosted Python dependency updates
 

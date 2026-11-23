@@ -20,24 +20,22 @@ colors:
   surface: "#ffffff"
   headerSurface: "#ffffff"
   headerText: "#1f2933"
-  headerControlSurface: "#8093a1"
-  headerControlText: "#172028"
-  headerControlBoundary: "#637684"
+  headerControlSurface: "#004d80"
+  headerControlText: "#ffffff"
   selectedBackground: "#d9e7f0"
-  headerHover: "#aaa08d"
-  headerHoverText: "#29251f"
-  headerSelected: "#4a6679"
-  headerSelectedText: "#ffffff"
+  headerHover: "#003f69"
+  headerHoverText: "#ffffff"
+  headerPressed: "#003452"
+  headerPressedText: "#ffffff"
   darkHeaderSurface: "#18242a"
   darkHeaderText: "#e5eef1"
-  darkHeaderControlSurface: "#a3b7c2"
-  darkHeaderControlText: "#172028"
-  darkHeaderControlBoundary: "#98aebb"
+  darkHeaderControlSurface: "#83c4ff"
+  darkHeaderControlText: "#111a1e"
   darkSelectedBackground: "#344854"
-  darkHeaderHover: "#948774"
-  darkHeaderHoverText: "#201c17"
-  darkHeaderSelected: "#c5d7e1"
-  darkHeaderSelectedText: "#172028"
+  darkHeaderHover: "#abd6ff"
+  darkHeaderHoverText: "#111a1e"
+  darkHeaderPressed: "#d0e8ff"
+  darkHeaderPressedText: "#111a1e"
   tableHeader: "#d9e7f0"
   link: "#004d80"
   conditional: "#a15c00"
@@ -154,18 +152,18 @@ components:
   header-control-hover:
     backgroundColor: "{colors.headerHover}"
     textColor: "{colors.headerHoverText}"
-  header-control-selected:
-    backgroundColor: "{colors.headerSelected}"
-    textColor: "{colors.headerSelectedText}"
+  header-control-pressed:
+    backgroundColor: "{colors.headerPressed}"
+    textColor: "{colors.headerPressedText}"
   dark-header-control:
     backgroundColor: "{colors.darkHeaderControlSurface}"
     textColor: "{colors.darkHeaderControlText}"
   dark-header-control-hover:
     backgroundColor: "{colors.darkHeaderHover}"
     textColor: "{colors.darkHeaderHoverText}"
-  dark-header-control-selected:
-    backgroundColor: "{colors.darkHeaderSelected}"
-    textColor: "{colors.darkHeaderSelectedText}"
+  dark-header-control-pressed:
+    backgroundColor: "{colors.darkHeaderPressed}"
+    textColor: "{colors.darkHeaderPressedText}"
   header:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
@@ -277,7 +275,7 @@ The candidate `DKBWS-DESIGN-002` contract is the default reference header for ne
 
 Search, Wide, the native appearance actions, and visible mobile menu/search actions share `headerControlHeight: 1.6rem` and `headerControlRadius: .4rem`. Icon-only controls remain square. Keep logos outside that control treatment. Preserve the renderer's hidden-label and responsive visibility rules; a centring rule must not force hidden labels to display.
 
-Use `headerSurface`, `headerText`, `headerControlSurface`, `headerHover`, `headerHoverText`, `headerSelected` and `headerSelectedText` as semantic roles, with corresponding dark roles. Rest, hover and selected backgrounds are opaque. The configured generator derives readable rest and selected colours from each Wiki's own brand. Both adapters use light hover `#aaa08d` with `#29251f`, and dark hover `#948774` with `#201c17`. Hover takes precedence over selected Wide. Switch each foreground/background pair together without a colour crossfade. Search's magnifier and shortcut badge remain readable in every state. Choose a separate `headerControlText` for the resting surface. At rest and when selected, the control fill has at least 3:1 contrast with its surrounding header. At hover, the fill or a continuous solid border of at least 1 CSS pixel meets this threshold. Keep the visible keyboard focus indicator independent of this permanent boundary. The `headerControlBoundary` role supplies the persistent edge.
+All header actions share `headerControlSurface` and `headerControlText`. Use one height, baseline, radius and border on all four sides. Wide uses a bold label and `aria-pressed="true"` when selected. A toggle never adds an inset stripe, persistent shadow or alternative resting colour. For pointer hover and pointer-down, use the Wiki's accent family (`headerHover`, `headerHoverText`, `headerPressed`, `headerPressedText`). The unconfigured shell uses the reference blue family. Change the fill and ink together. The Search shortcut inherits its parent's current fill and ink. Keep keyboard focus visible with a separate outline. Resting fills need 3:1 contrast against the surrounding header. A continuous 1 CSS pixel border follows the control fill in every state.
 
 Centre each icon-only control's actual SVG on both axes within `.5` CSS pixels of its control, independently of the SVG's size. Keep Wide's icon/text group centred with its SVG aligned vertically. Retain native appearance radios and preference storage. Mobile menu/search labels retain native toggle behaviour and gain keyboard access without duplicate navigation listeners. Preserve visible focus, Enter/Space operation, search, width selection, appearance switching, reload and navigation persistence.
 
@@ -299,7 +297,7 @@ Verify Chromium and WebKit independently. Cover light/dark, desktop/mobile, Stan
 - When Human, Agent, and Graph surfaces are all shown, use three separately labelled sibling boxes, each reached directly from canonical knowledge. Where verification follows, each path rejoins it. Their visual separation does not make them separate canonical corpora or evidence authorities.
 - No connector may intersect a node label or cluster title, and nodes may not overlap. Prefer cluster-free flows on narrow content rails; use a subgraph only when nesting is itself material and rendered checks prove its title and contents remain clear.
 - Canonical diagrams preserve accessible titles/descriptions and material path order while fitting the content rail at desktop, tablet, and mobile widths. The diagram surface is centred within the content rail whenever its intrinsic width fits. Contained scrolling is a downstream fallback, not a simplification target. After labels have been shortened and the exact bounded 40px three-product node spacing applied, the branch may exceed the 390px reference content rail by no more than 60px; safe centring falls back to start alignment for the oversized surface, the pane opens at its horizontal centre, and no page overflow is created.
-- The unconfigured production header retains its restrained surface/text treatment. The configured adapter keeps the exact brand colour on the header. Both sidebars use the same scheme-specific tint and bold current text. Header controls use opaque semantic rest and selected surfaces with contrasting text. Both adapters share the brown hover pairs below; those interaction colours do not replace the Wiki's branding.
+- The unconfigured header uses the reference blue control family. The configured header keeps the exact brand colour and derives its control states from that brand. Both sidebars use the same scheme-specific selection tint and bold current text.
 - Mermaid `11.17.2` with qualified KaTeX `0.18.2`, vis-network `10.1.2`, and 3d-force-graph `1.80.0` are local
   production dependencies. `prepare:runtime` publishes their browser bundles
   before Zensical starts, and `mermaid-adapter.js` injects

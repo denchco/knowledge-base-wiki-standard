@@ -25,13 +25,14 @@ body[data-md-color-accent] {
   --header-text: var(--text);
   --selected-background: #d9e7f0;
   --selected-text: var(--accent-dark);
-  --header-control-boundary: #637684;
-  --header-control-surface: #8093a1;
-  --header-control-text: #172028;
-  --header-hover: #aaa08d;
-  --header-hover-text: #29251f;
-  --header-selected: #4a6679;
-  --header-selected-text: #ffffff;
+  --header-control-surface: var(--accent);
+  --header-control-text: var(--accent-contrast);
+  --header-hover: var(--accent-dark);
+  --header-hover-text: var(--accent-contrast);
+  --header-pressed: var(--accent-darker);
+  --header-pressed-text: var(--accent-contrast);
+  --header-selected: var(--header-control-surface);
+  --header-selected-text: var(--header-control-text);
   --header-control-height: 1.6rem;
   --header-control-radius: .4rem;
   --conditional: #a15c00;
@@ -114,21 +115,28 @@ body[data-md-color-accent] {
   color: var(--header-text);
 }
 
-.md-search__button,
-.md-header__button:not(.md-logo),
-.layout-width-toggle {
-  border: var(--component-border-width) solid var(--header-control-boundary);
-}
-
-.md-search__button,
-.md-header__button:not(.md-logo) {
-  background-color: var(--header-control-surface);
+.md-header :is(.md-search__button, .md-header__button:not(.md-logo), .layout-width-toggle) {
+  --action-fill: var(--header-control-surface);
+  --action-ink: var(--header-control-text);
+  background-color: var(--action-fill);
+  border: var(--component-border-width) solid var(--action-fill);
   border-radius: var(--header-control-radius);
+  box-shadow: none;
   box-sizing: border-box;
-  color: var(--header-control-text);
+  color: var(--action-ink);
   height: var(--header-control-height);
   opacity: 1;
   transition: none;
+}
+
+.md-header :is(.md-search__button, .md-header__button:not(.md-logo), .layout-width-toggle):hover {
+  --action-fill: var(--header-hover);
+  --action-ink: var(--header-hover-text);
+}
+
+.md-header :is(.md-search__button, .md-header__button:not(.md-logo), .layout-width-toggle):active {
+  --action-fill: var(--header-pressed);
+  --action-ink: var(--header-pressed-text);
 }
 
 .md-header__button:not(.md-logo) {
@@ -154,23 +162,11 @@ body[data-md-color-accent] {
   transition: none;
 }
 
-.md-search__button::after {
-  background-color: var(--header-control-surface);
-  color: var(--header-control-text);
+.md-header .md-search__button::after {
+  background-color: var(--action-fill);
+  color: var(--action-ink);
   opacity: 1;
   transition: none;
-}
-
-.md-header__button:not(.md-logo):is(:hover, :focus-visible),
-.md-search__button:is(:hover, :focus) {
-  background-color: var(--header-hover);
-  color: var(--header-hover-text);
-}
-
-.md-header__button:not(.md-logo):active,
-.md-search__button:active {
-  background-color: var(--header-selected);
-  color: var(--header-selected-text);
 }
 
 .md-tabs__item--active {
@@ -257,6 +253,11 @@ input.md-option:is(:focus-visible, .focus-visible) + label,
   outline: 3px solid var(--focus);
   outline-offset: 3px;
   box-shadow: 0 0 0 1px var(--focus-contrast);
+}
+
+.md-header :is(.md-search__button, .md-header__button:not(.md-logo), .layout-width-toggle):is(:focus-visible, .focus-visible),
+.md-header input.md-option:is(:focus-visible, .focus-visible) + label {
+  box-shadow: none;
 }
 
 .md-typeset .requirement-tier {
@@ -535,13 +536,6 @@ body[data-md-color-scheme="slate"] {
   --focus-contrast: #111a1e;
   --selected-background: #344854;
   --selected-text: var(--accent-dark);
-  --header-control-boundary: #98aebb;
-  --header-control-surface: #a3b7c2;
-  --header-control-text: #172028;
-  --header-hover: #948774;
-  --header-hover-text: #201c17;
-  --header-selected: #c5d7e1;
-  --header-selected-text: #172028;
   --conditional: #edbc74;
   --success: #90d7aa;
   --warning: #ffa69e;

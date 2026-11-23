@@ -856,6 +856,7 @@ export default async (page, options = {}) => {
       controlText: control?.textContent.trim() || "",
       controlPressed: control?.getAttribute("aria-pressed"),
       controlBackground: control ? getComputedStyle(control).backgroundColor : "",
+      controlWeight: control ? Number(getComputedStyle(control).fontWeight) : 0,
       controlBoxShadow: control ? getComputedStyle(control).boxShadow : "",
       headerBackground: header ? getComputedStyle(header).backgroundColor : "",
       headerColour: header ? getComputedStyle(header).color : "",
@@ -939,7 +940,7 @@ export default async (page, options = {}) => {
   await page.waitForFunction(() => document.documentElement.dataset.layoutWidth === "wide");
   const wideHeaderControls = await inspectHeaderControls(page, { scheme: "default", label: "Wide header", hover: false });
   const wideHeader = await measureHeader();
-  check(wideHeader.controlBackground === wideHeaderControls.snapshot.tokens["header-selected"], "Wide at rest must use its opaque selected semantic surface");
+  check(wideHeader.controlBackground === wideHeaderControls.snapshot.tokens["header-control-surface"], "Wide at rest must match the other controls");
   check(wideHeader.mode === "wide", "The width control must activate Wide mode");
   check(wideHeader.controlPressed === "true", "Wide mode must expose aria-pressed=true");
   check(
@@ -955,7 +956,7 @@ export default async (page, options = {}) => {
     "Wide mode must increase the central content width",
   );
   check(
-    wideHeader.controlBackground !== standardHeader.controlBackground || wideHeader.controlBoxShadow !== standardHeader.controlBoxShadow,
+    wideHeader.controlBackground === standardHeader.controlBackground && wideHeader.controlBoxShadow === "none" && wideHeader.controlWeight >= 700 && wideHeader.controlWeight > standardHeader.controlWeight,
     "Wide selection must have a visible selected-state treatment",
   );
 

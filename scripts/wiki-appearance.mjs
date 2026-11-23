@@ -102,13 +102,10 @@ export function deriveAppearance(value) {
   const pale = tone(seed, 0.96, Math.min(seed.c, 0.025));
   const darkInk = tone(seed, 0.20, neutral);
   const lightInk = tone(seed, 0.98, Math.min(seed.c, 0.006));
-  function inkFor(surface) {
-    const light = contrastRatio(lightInk, surface) >= contrastRatio(darkInk, surface);
-    const ink = light ? lightInk : darkInk;
-    return contrastRatio(ink, surface) >= 4.5 ? ink
-      : (contrastRatio("#ffffff", surface) >= contrastRatio("#000000", surface) ? "#ffffff" : "#000000");
-  }
-  const brandInk = inkFor(config.accent);
+  const brandText = contrastRatio(darkInk, config.accent) >= contrastRatio(lightInk, config.accent) ? darkInk : lightInk;
+  // At least one of black and white always exceeds 4.5:1; tonal ink can be refined.
+  const brandInk = contrastRatio(brandText, config.accent) >= 4.5 ? brandText
+    : (contrastRatio("#000000", config.accent) >= contrastRatio("#ffffff", config.accent) ? "#000000" : "#ffffff");
   const lightBackground = tone(seed, 0.985, Math.min(seed.c, 0.006));
   const lightSurface = "#ffffff";
   const lightAccents = [0.46, 0.42, 0.38, 0.49].map(l => readableTone(seed, l, [lightBackground, lightSurface, pale], 4.5, -1));
@@ -125,7 +122,7 @@ export function deriveAppearance(value) {
     focus: lightAccents[1], focusContrast: "#ffffff",
     headerBackground: config.accent, headerText: brandInk,
     selectedBackground: readableTone(seed, 0.92, [lightBackground, lightSurface], 1.2, -1, Math.min(seed.c, 0.035)),
-    selectedText: lightAccents[2],
+    selectedText: lightAccents[1],
     questionBackground, questionText: lightAccents[0], questionBorder: lightAccents[0],
     tableHeader: questionBackground,
   };
@@ -153,24 +150,31 @@ export function deriveAppearance(value) {
   for (const [name, palette] of Object.entries({ light, dark })) {
     palette.accentTransparent = alpha(palette.accent, 10);
     palette.accentTransparentStrong = alpha(palette.accent, 16);
-    const towardsLight = contrastRatio("#ffffff", config.accent) >= contrastRatio("#000000", config.accent);
-    const direction = towardsLight ? 1 : -1;
-    const headerTone = lightness => readableTone(seed, lightness, [config.accent], 3, direction, Math.min(seed.c, 0.045));
-    palette.headerSurface = config.accent;
-    palette.headerControlBoundary = headerTone(seed.l);
-    palette.headerControlSurface = headerTone(towardsLight ? 0.88 : 0.60);
-    palette.headerControlText = inkFor(palette.headerControlSurface);
-    palette.headerSelected = headerTone(towardsLight ? 0.96 : 0.46);
-    palette.headerSelectedText = inkFor(palette.headerSelected);
-    palette.headerHover = name === "light" ? "#aaa08d" : "#948774";
-    palette.headerHoverText = name === "light" ? "#29251f" : "#201c17";
+    // Put opaque controls on the lighter side of a dark brand or the darker
+    // side of a light brand. Their labels need a separate ink from the title.
+    const lightControls = contrastRatio("#ffffff", config.accent) >= contrastRatio("#000000", config.accent);
+    const direction = lightControls ? 1 : -1;
+    palette.headerSurface = palette.headerBackground;
+    palette.headerControlSurface = readableTone(seed, lightControls ? 0.9 : 0.38,
+      [palette.headerSurface], 4.1, direction, Math.min(seed.c, 0.035));
+    palette.headerHover = readableTone(seed, lightControls ? 0.82 : 0.46,
+      [palette.headerSurface], 3.55, direction, Math.min(seed.c, 0.055));
+    palette.headerPressed = readableTone(seed, lightControls ? 0.75 : 0.53,
+      [palette.headerSurface], 3, direction, Math.min(seed.c, 0.075));
+    palette.headerControlText = readableTone(seed, lightControls ? 0.27 : 0.97,
+      [palette.headerControlSurface, palette.headerHover, palette.headerPressed], 4.5, -direction, Math.min(seed.c, 0.025));
+    palette.headerHoverText = palette.headerControlText;
+    palette.headerPressedText = palette.headerControlText;
+    // Existing token readers can still resolve the persistent selection roles.
+    palette.headerSelected = palette.headerControlSurface;
+    palette.headerSelectedText = palette.headerControlText;
     const surfaces = [palette.background, palette.surface, palette.questionBackground];
     for (const role of ["accent", "accentDark", "accentDarker", "accentVisited", "text", "muted"]) checkPair(palette[role], surfaces, 4.5, `${name}.${role}`);
     for (const role of ["accentLight", "border", "focus"]) checkPair(palette[role], surfaces, 3, `${name}.${role}`);
     for (const role of ["accent", "accentDark", "accentDarker"]) checkPair(palette.accentContrast, [palette[role]], 4.5, `${name}.${role} button text`);
     checkPair(palette.headerText, [palette.headerBackground], 4.5, `${name} header text`);
     checkPair(palette.headerControlText, [palette.headerControlSurface], 4.5, `${name} header control text`);
-    checkPair(palette.headerSelectedText, [palette.headerSelected], 4.5, `${name} selected header text`);
+    checkPair(palette.headerPressedText, [palette.headerPressed], 4.5, `${name} pressed header text`);
     checkPair(palette.headerHoverText, [palette.headerHover], 4.5, `${name} header hover text`);
     checkPair(palette.selectedBackground, [palette.background, palette.surface], 1.2, `${name} navigation tint`);
     checkPair(palette.selectedText, [palette.selectedBackground], 4.5, `${name} selected text`);
@@ -190,11 +194,6 @@ body[data-md-color-primary],
 body[data-md-color-accent],
 body[data-md-color-scheme] {
 ${declarations(light)}
-  --layout-width-control-rest-color: var(--header-control-text);
-  --layout-width-control-hover-color: var(--header-hover-text);
-  --layout-width-control-selected-color: var(--header-selected-text);
-  --layout-width-control-hover-background: var(--header-hover);
-  --layout-width-control-selected-background: var(--header-selected);
   --md-primary-fg-color: var(--primary);
   --md-primary-fg-color--light: var(--accent-light);
   --md-primary-fg-color--dark: var(--accent-dark);
@@ -219,7 +218,6 @@ ${declarations(dark)}
 .md-header .md-header__topic {
   color: var(--header-text);
 }
-.layout-width-toggle[aria-pressed="true"] { box-shadow: inset 0 -2px 0 currentColor; }
 .md-nav--primary a.md-nav__link[aria-current="page"],
 .md-nav--secondary .md-nav__link--active {
   background-color: var(--selected-background);

@@ -1,11 +1,6 @@
 import assert from "node:assert/strict";
 
 export const headerControlSelector = ".md-header .md-header__button:not(.md-logo):visible, .md-search__button:visible, .layout-width-toggle:visible";
-export const headerHover = {
-  default: { background: "rgb(170, 160, 141)", foreground: "rgb(41, 37, 31)" },
-  slate: { background: "rgb(148, 135, 116)", foreground: "rgb(32, 28, 23)" },
-};
-
 export function rgba(value) {
   const text = String(value).trim();
   if (text === "transparent") return [0, 0, 0, 0];
@@ -50,7 +45,7 @@ function controlBoundary(control) {
 }
 
 export function assertHeaderSnapshot(snapshot, { scheme, state = "rest", label = scheme } = {}) {
-  assert.ok(headerHover[scheme], `${label}: known appearance required`);
+  assert.ok(["default", "slate"].includes(scheme), `${label}: known appearance required`);
   assert.equal(snapshot.scheme, scheme, `${label}: active appearance differs`);
   assert.ok(snapshot.controls.length >= 3, `${label}: expected Search, appearance and width/menu actions`);
   assert.equal(snapshot.visiblePaletteLabels, 1, `${label}: exactly one native appearance action must be visible`);
@@ -89,25 +84,28 @@ export function assertHeaderSnapshot(snapshot, { scheme, state = "rest", label =
     const boundary = controlBoundary(control);
     assert.ok(boundary >= 3, `${name}: control perimeter contrast ${boundary.toFixed(2)}:1 is below 3:1`);
     boundaryRatios.push(boundary);
+    assert.ok(contrastRatio(control.background, control.surround) >= 3, `${name}: action fill must contrast 3:1 with the header`);
     if (state === "rest") {
-      assert.ok(contrastRatio(control.background, control.surround) >= 3, `${name}: resting or selected fill must contrast 3:1 with the header`);
-      const selected = control.kind === "width" && snapshot.width === "wide";
-      assert.equal(control.background, snapshot.tokens[selected ? "header-selected" : "header-control-surface"], `${name}: rest/selected semantic background`);
-      assert.equal(control.foreground, snapshot.tokens[selected ? "header-selected-text" : "header-control-text"], `${name}: rest/selected semantic foreground`);
+      assert.equal(control.background, snapshot.tokens["header-control-surface"], `${name}: shared resting background`);
+      assert.equal(control.foreground, snapshot.tokens["header-control-text"], `${name}: shared resting foreground`);
+      if (control.kind === "width" && snapshot.width === "wide") assert.ok(control.weight >= 700, `${name}: bold active width label`);
     }
-    if (control.searchParts) assertSearchParts(control.searchParts, control, snapshot.tokens, name);
+    assert.equal(control.shadow, "none", `${name}: shared shape excludes a control-specific shadow or stripe`);
+    assert.ok(control.borders.every(edge => edge.width === 1 && edge.style === "solid" && edge.color === control.background),
+      `${name}: each action needs the same one-pixel, fill-coloured boundary on all sides`);
+    if (control.searchParts) assertSearchParts(control.searchParts, control, name);
   }
   return { minimumBoundaryContrast: Math.min(...boundaryRatios), minimumTextContrast: textRatios.length ? Math.min(...textRatios) : null, minimumIconContrast: iconRatios.length ? Math.min(...iconRatios) : null };
 }
 
-export function assertSearchParts(parts, control, tokens, label) {
+export function assertSearchParts(parts, control, label) {
   for (const [name, part] of Object.entries(parts.rendered)) {
     assert.ok(part.display !== "none" && part.visibility === "visible" && part.opacity === 1 && part.width > 0 && part.height > 0 && !["none", "normal"].includes(part.content), `${label}: Search ${name} must remain rendered and readable`);
   }
   assert.ok(!['""', "''"].includes(parts.rendered.shortcut.content), `${label}: shortcut text must not be empty`);
   assert.equal(parts.icon, control.foreground, `${label}: Search magnifier must follow the readable foreground`);
-  assert.equal(parts.shortcutBackground, tokens["header-control-surface"], `${label}: shortcut badge must keep its opaque rest surface`);
-  assert.equal(parts.shortcutForeground, tokens["header-control-text"], `${label}: shortcut badge must keep its readable text`);
+  assert.equal(parts.shortcutBackground, control.background, `${label}: shortcut badge must match its control surface`);
+  assert.equal(parts.shortcutForeground, control.foreground, `${label}: shortcut badge must match its control ink`);
   assert.equal(rgba(parts.shortcutBackground)[3], 1, `${label}: shortcut badge must be opaque`);
   assert.ok(contrastRatio(parts.shortcutForeground, parts.shortcutBackground) >= 4.5, `${label}: shortcut text contrast`);
   assert.ok(contrastRatio(parts.icon, control.background) >= 3, `${label}: magnifier contrast`);
@@ -149,7 +147,7 @@ export async function measureHeader(page) {
         name: element.getAttribute("aria-label") || element.title || element.textContent.trim() || element.getAttribute("for"),
         kind, square, width: box.width, height: box.height, centreY: box.top + box.height / 2,
         radii: [style.borderTopLeftRadius, style.borderTopRightRadius, style.borderBottomRightRadius, style.borderBottomLeftRadius].map(parseFloat), background: style.backgroundColor, foreground: style.color,
-        surround: surround(element),
+        surround: surround(element), weight: Number(style.fontWeight), shadow: style.boxShadow,
         borders: ["Top", "Right", "Bottom", "Left"].map(side => ({
           color: style[`border${side}Color`], width: parseFloat(style[`border${side}Width`]), style: style[`border${side}Style`],
         })),
@@ -165,7 +163,7 @@ export async function measureHeader(page) {
     };
     const probe = document.createElement("span"); document.body.append(probe);
     const tokens = {};
-    for (const token of ["header-surface", "header-text", "header-control-text", "header-control-surface", "header-hover", "header-hover-text", "header-selected", "header-selected-text"]) {
+    for (const token of ["header-surface", "header-text", "header-control-text", "header-control-surface", "header-hover", "header-hover-text", "header-pressed", "header-pressed-text"]) {
       probe.style.color = `var(--${token})`; tokens[token] = getComputedStyle(probe).color;
     }
     probe.remove();
@@ -192,7 +190,7 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
   const snapshot = await measureHeader(page);
   const contrast = assertHeaderSnapshot(snapshot, { scheme, label });
   const hovered = [];
-  if (hover) for (const control of await page.locator(headerControlSelector).all()) {
+  if (hover) for (const [index, control] of (await page.locator(headerControlSelector).all()).entries()) {
     await control.hover();
     const samples = [];
     for (let frame = 0; frame < 3; frame++) {
@@ -200,19 +198,30 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
         const style = getComputedStyle(element), before = getComputedStyle(element, "::before"), after = getComputedStyle(element, "::after");
         return { background: style.backgroundColor, foreground: style.color, icon: before.backgroundColor, badge: after.backgroundColor, badgeText: after.color };
       });
-      assert.equal(sample.background, headerHover[scheme].background, `${label}: every action including selected Wide must use the fixed brown hover`);
-      assert.equal(sample.foreground, headerHover[scheme].foreground, `${label}: brown hover foreground must switch with background`);
+      assert.equal(sample.background, snapshot.tokens["header-hover"], `${label}: every action must use its accent hover`);
+      assert.equal(sample.foreground, snapshot.tokens["header-hover-text"], `${label}: accent hover foreground must switch with background`);
       assert.ok(contrastRatio(sample.foreground, sample.background) >= 4.5, `${label}: hover contrast`);
       if (await control.evaluate(element => element.classList.contains("md-search__button"))) {
         assert.equal(sample.icon, sample.foreground, `${label}: hovered Search magnifier`);
-        assert.equal(sample.badge, snapshot.tokens["header-control-surface"], `${label}: hovered shortcut surface`);
-        assert.equal(sample.badgeText, snapshot.tokens["header-control-text"], `${label}: hovered shortcut text`);
+        assert.equal(sample.badge, sample.background, `${label}: hovered shortcut surface`);
+        assert.equal(sample.badgeText, sample.foreground, `${label}: hovered shortcut text`);
       }
       samples.push(sample);
       await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
     }
     const hoveredMetrics = assertHeaderSnapshot(await measureHeader(page), { scheme, label: `${label}/hover`, state: "hover" });
     samples.at(-1).minimumBoundaryContrast = hoveredMetrics.minimumBoundaryContrast;
+    await page.mouse.down();
+    try {
+      const active = await measureHeader(page);
+      const pressed = active.controls[index];
+      assert.equal(pressed.background, snapshot.tokens["header-pressed"], `${label}: pointer-down surface`);
+      assert.equal(pressed.foreground, snapshot.tokens["header-pressed-text"], `${label}: pointer-down foreground`);
+      assertHeaderSnapshot(active, { scheme, label: `${label}/pointer-down`, state: "pressed" });
+    } finally {
+      await page.mouse.move(0, 200);
+      await page.mouse.up();
+    }
     hovered.push(samples);
   }
   await page.mouse.move(0, 200);

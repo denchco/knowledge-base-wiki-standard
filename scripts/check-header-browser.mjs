@@ -6,7 +6,7 @@ import { spawn, execFileSync } from "node:child_process";
 import { chromium, webkit } from "@playwright/test";
 import { rendererVersion } from "./check-zensical-runtime.mjs";
 import { buildHeaderFixture } from "./header-browser-fixture.mjs";
-import { inspectHeaderControls, contrastRatio } from "./header-browser-contract.mjs";
+import { assertHeaderSnapshot, measureHeader, inspectHeaderControls, contrastRatio } from "./header-browser-contract.mjs";
 
 const root = process.cwd(), output = path.join(root, "output/verification/header");
 const palette = 'form[data-md-component="palette"]';
@@ -116,7 +116,7 @@ try {
   assert.deepEqual(Object.keys(report.engines).sort(), ["chromium", "webkit"], "Both browser engines must finish");
   assert.equal(report.cases.length, 96, "Every fixture, appearance, width, viewport and zoom case must finish");
   assert.equal(report.navigation.length, 12, "Both menus must pass for every engine, appearance and adapter");
-  assert.equal(report.negativeCases.length, 30, "Both engines must refuse every rendered defect");
+  assert.equal(report.negativeCases.length, 36, "Both engines must refuse every rendered defect");
   assert.equal(report.screenshots.length, 8, "Generic screenshots must cover both engines, appearances and device classes");
   report.completedMatrixCases = report.cases.length;
   report.ok = true;
@@ -178,6 +178,8 @@ async function assertFocus(page, selector) {
   });
   assert.ok(result.focused && result.style !== "none" && result.width >= 2, `Visible keyboard focus required for ${selector}`);
   assert.ok(contrastRatio(result.color, result.header) >= 3, `Keyboard focus boundary must contrast with header for ${selector}`);
+  const snapshot = await measureHeader(page);
+  assertHeaderSnapshot(snapshot, { scheme: snapshot.scheme, label: "keyboard focus keeps common action colours" });
   return result;
 }
 async function keyboardJourney(page, scheme, width, viewport) {
@@ -295,7 +297,7 @@ async function inspectCurrentNavigation(page, engine, fixture, scheme) {
 
 async function negativeJourneys(page, engine) {
   const probes = [
-    ["outlined-low-contrast-fill", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; }", /resting or selected fill/],
+    ["outlined-low-contrast-fill", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; }", /action fill/],
     ["hover-perimeter", ".md-header__inner:has(.layout-width-toggle:hover) { background:var(--header-hover)!important } .layout-width-toggle:hover { border-color:transparent!important }", /perimeter contrast/],
     ["invisible-palette-perimeter", ".md-header__option label { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
     ["partial-width-perimeter", ".layout-width-toggle { background:var(--header-surface)!important; color:var(--header-text)!important; border-inline-start-width:0!important; }", /perimeter contrast/],
@@ -307,7 +309,10 @@ async function negativeJourneys(page, engine) {
     ["revealed-native-label", ".md-header label[hidden] { display:block!important; }", /native.*(?:visible|hidden)/],
     ["unreadable-shortcut", ".md-search__button::after { color:var(--header-control-surface)!important; }", /shortcut/],
     ["colour-crossfade", ".layout-width-toggle { transition:color .2s,background-color .2s!important; }", /crossfade/],
-    ["wrong-hover", ".layout-width-toggle:hover { background-color:#ff0000!important; }", /brown hover/],
+    ["stripe-on-wide", ".layout-width-toggle[aria-pressed=true] { box-shadow:inset 0 -2px white!important }", /stripe/],
+    ["shortcut-stuck-at-rest", ".md-search__button:hover::after { background:var(--header-control-surface)!important }", /shortcut surface/],
+    ["frozen-pointer-colour", ".md-search__button:active { background:var(--header-hover)!important }", /pointer-down surface/],
+    ["wrong-hover", ".layout-width-toggle:hover { background-color:#ff0000!important; }", /accent hover/],
   ];
   const results = [];
   for (const [name, css, expected] of probes) {
