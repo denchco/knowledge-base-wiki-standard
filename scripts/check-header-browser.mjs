@@ -19,7 +19,7 @@ const fixtures = [
 ];
 const report = {
   schemaVersion: "1.0", ok: false, requirement: "DKBWS-DESIGN-002", renderer: `zensical-${rendererVersion}`,
-  engines: {}, cases: [], negativeCases: [], screenshots: [], expectedMatrixCases: 96,
+  engines: {}, cases: [], navigation: [], negativeCases: [], screenshots: [], expectedMatrixCases: 96,
   zoomScope: "Browser-rendered CSS layout zoom at 200%, root text sizing at 200%, and 320 CSS-pixel reflow (400%-equivalent width from 1280). Native browser-chrome zoom UI and OS magnifiers are not automated by this contract.",
 };
 let activePage, failure;
@@ -56,6 +56,7 @@ try {
             for (const scheme of ["default", "slate"]) {
               await page.setViewportSize({ width: 1440, height: 1000 });
               await selectScheme(page, scheme);
+              report.navigation.push(await inspectCurrentNavigation(page, engine, fixture.name, scheme));
               for (const width of ["standard", "wide"]) {
                 await page.setViewportSize({ width: 1440, height: 1000 });
                 await setWidth(page, width);
@@ -114,7 +115,8 @@ try {
   }
   assert.deepEqual(Object.keys(report.engines).sort(), ["chromium", "webkit"], "Both browser engines must finish");
   assert.equal(report.cases.length, 96, "Every fixture, appearance, width, viewport and zoom case must finish");
-  assert.equal(report.negativeCases.length, 16, "Both engines must refuse every rendered defect");
+  assert.equal(report.navigation.length, 12, "Both menus must pass for every engine, appearance and adapter");
+  assert.equal(report.negativeCases.length, 30, "Both engines must refuse every rendered defect");
   assert.equal(report.screenshots.length, 8, "Generic screenshots must cover both engines, appearances and device classes");
   report.completedMatrixCases = report.cases.length;
   report.ok = true;
@@ -247,8 +249,54 @@ async function zoomJourney(page, scheme, width, label) {
   await ready(page, scheme, width);
   return { cssLayoutZoom: layout, textSizing: text, nativeBrowserChromeZoom: "not-automated" };
 }
+async function inspectCurrentNavigation(page, engine, fixture, scheme) {
+  const primary = page.locator('.md-nav--primary a[aria-current="page"]');
+  const outline = page.locator('.md-sidebar--secondary nav');
+  const current = outline.locator('a[aria-current="location"]');
+  const section = id => page.locator(`.md-content h2[id="${id}"]`);
+  // Even the short generic fixture must have enough space for native scroll tracking.
+  const spacing = await page.addStyleTag({ content: ".md-content h2 + p { min-height: 100vh }" });
+  try {
+    for (const id of ["reader-choices", "saved-settings"]) {
+      await section(id).evaluate(element => element.scrollIntoView());
+      await outline.locator(`a[href$="#${id}"][aria-current="location"]`).waitFor();
+      assert.equal(await current.count(), 1, "Expose exactly one current heading per outline");
+    }
+    const controls = [];
+    for (const link of [primary, current]) {
+      const style = await link.evaluate(element => {
+        const computed = getComputedStyle(element);
+        let parent = element.parentElement;
+        while (parent && getComputedStyle(parent).backgroundColor === "rgba(0, 0, 0, 0)") parent = parent.parentElement;
+        return { fill: computed.backgroundColor, ink: computed.color, surround: getComputedStyle(parent).backgroundColor,
+          weight: Number(computed.fontWeight), leadingBorder: parseFloat(computed.borderInlineStartWidth), shadow: computed.boxShadow };
+      });
+      assert.ok(contrastRatio(style.fill, style.surround) >= 1.2, "Current navigation fill must be distinguishable on the sidebar");
+      assert.ok(contrastRatio(style.ink, style.fill) >= 4.5, "Current navigation text contrast");
+      assert.ok(style.weight >= 700 && style.leadingBorder === 0 && style.shadow === "none", "Current navigation must be bold and free of a leading rail");
+      controls.push(style);
+    }
+    assert.equal(controls[0].fill, controls[1].fill, "Both current navigation links share a tint");
+    assert.equal(controls[0].ink, controls[1].ink, "Both current navigation links share text colour");
+    await page.getByRole("link", { name: "Read the architecture page", exact: true }).click();
+    await page.locator('.md-content h1').filter({ hasText: "Architecture" }).waitFor();
+    assert.equal((await primary.innerText()).trim(), "Architecture");
+    await section("layout-settings").evaluate(element => element.scrollIntoView());
+    await outline.locator('a[href$="#layout-settings"][aria-current="location"]').waitFor();
+    await page.getByRole("link", { name: "Return to the reference", exact: true }).click();
+    await section("reader-choices").waitFor();
+    assert.equal((await primary.innerText()).trim(), "Reference");
+    return { engine, fixture, scheme, controls };
+  } finally {
+    await spacing.evaluate(element => element.remove());
+    await page.evaluate(() => window.scrollTo(0, 0));
+  }
+}
+
 async function negativeJourneys(page, engine) {
   const probes = [
+    ["outlined-low-contrast-fill", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; }", /resting or selected fill/],
+    ["hover-perimeter", ".md-header__inner:has(.layout-width-toggle:hover) { background:var(--header-hover)!important } .layout-width-toggle:hover { border-color:transparent!important }", /perimeter contrast/],
     ["invisible-palette-perimeter", ".md-header__option label { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
     ["partial-width-perimeter", ".layout-width-toggle { background:var(--header-surface)!important; color:var(--header-text)!important; border-inline-start-width:0!important; }", /perimeter contrast/],
     ["invisible-search-perimeter", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
@@ -265,6 +313,15 @@ async function negativeJourneys(page, engine) {
   for (const [name, css, expected] of probes) {
     const style = await page.addStyleTag({ content: css });
     try { await assert.rejects(() => inspectHeaderControls(page, { scheme: "default", label: `${engine}/negative/${name}` }), expected); }
+    finally { await style.evaluate(element => element.remove()); }
+    results.push({ engine, name, rejected: true });
+  }
+  for (const [name, css, expected] of [
+    ["current-page-rail", '.md-nav a[aria-current="page"] { border-inline-start: 3px solid!important }', /leading rail/],
+    ["current-outline-tint", '.md-nav a[aria-current="location"] { background:var(--background)!important }', /distinguishable/],
+  ]) {
+    const style = await page.addStyleTag({ content: css });
+    try { await assert.rejects(() => inspectCurrentNavigation(page, engine, "negative", "default"), expected); }
     finally { await style.evaluate(element => element.remove()); }
     results.push({ engine, name, rejected: true });
   }

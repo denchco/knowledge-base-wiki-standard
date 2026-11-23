@@ -220,8 +220,7 @@ ${declarations(dark)}
   color: var(--header-text);
 }
 .layout-width-toggle[aria-pressed="true"] { box-shadow: inset 0 -2px 0 currentColor; }
-.md-nav--primary .md-nav__item--active > .md-nav__link,
-.md-nav--primary .md-nav__item .md-nav__link--active,
+.md-nav--primary a.md-nav__link[aria-current="page"],
 .md-nav--secondary .md-nav__link--active {
   background-color: var(--selected-background);
   color: var(--selected-text);

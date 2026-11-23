@@ -19,6 +19,10 @@ status: draft
 10. Inspect Git and Jujutsu state.
 11. Before the development turn ends, record all persistent changes from that turn in a JJ commit and prepare a reviewable Git change. Disclose failed or unrun required checks in the commit and final response; never leave turn changes only in the working copy because they were judged insufficiently “substantive.” Do not create an empty commit when the turn changed no persistent files.
 
+## Reference appearance changes
+
+Use the [header and navigation migration guide](../reference/header-controls-migration.md) when changing a control or sidebar selection. Check the rendered fill against the surrounding surface as well as the label against the fill. Test rest, hover and keyboard focus separately. Exercise a page change and a scroll change so the visible and announced current links agree.
+
 ## New prose
 
 Read the mapped `AUTHORING.md` and [writing policy](../spec/writing-style.md) before new original English Wiki prose. Use the ASD-STE100-inspired 80% default as a pragmatic preference. Review changed passages for clear actions, consistent terms and preserved meaning. Keep exact source text, identifiers, required wording and governing-question repetitions intact. Record material exceptions and unreviewed limits honestly.
