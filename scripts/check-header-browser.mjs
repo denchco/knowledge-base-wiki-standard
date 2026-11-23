@@ -6,7 +6,7 @@ import { spawn, execFileSync } from "node:child_process";
 import { chromium, webkit } from "@playwright/test";
 import { rendererVersion } from "./check-zensical-runtime.mjs";
 import { buildHeaderFixture } from "./header-browser-fixture.mjs";
-import { assertHeaderSnapshot, measureHeader, inspectHeaderControls, contrastRatio } from "./header-browser-contract.mjs";
+import { assertHeaderSnapshot, measureHeader, inspectHeaderControls, inspectPressedActions, contrastRatio } from "./header-browser-contract.mjs";
 
 const root = process.cwd(), output = path.join(root, "output/verification/header");
 const palette = 'form[data-md-component="palette"]';
@@ -66,6 +66,7 @@ try {
                   const label = `${engine}/${fixture.name}/${scheme}/${width}/${viewport.name}`;
                   console.log(`Header browser: ${label}`);
                   const controls = await inspectHeaderControls(page, { scheme, label, artworkSizes: true });
+                  controls.pressed = await inspectPressedActions(page, { scheme, label });
                   await assertVisibility(page, viewport.width);
                   const expectedBrand = fixture.config?.accent;
                   if (expectedBrand) assert.equal(controls.snapshot.tokens["header-surface"], hexRgb(expectedBrand), `${label}: exact consumer brand must remain on header`);
@@ -239,6 +240,7 @@ async function zoomJourney(page, scheme, width, label) {
   try {
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
     layout = await inspectHeaderControls(page, { scheme, label: `${label}/CSS-layout-zoom-200%`, artworkSizes: true });
+    layout.pressed = await inspectPressedActions(page, { scheme, label: `${label}/layout-zoom-200%` });
     assert.equal(layout.snapshot.zoom, 2, "The layout zoom probe must really scale the page");
   } finally { await page.evaluate(() => document.documentElement.style.removeProperty("zoom")); }
   const original = await page.locator("html").evaluate(element => parseFloat(getComputedStyle(element).fontSize));
@@ -246,6 +248,7 @@ async function zoomJourney(page, scheme, width, label) {
   let text;
   try {
     text = await inspectHeaderControls(page, { scheme, label: `${label}/text-sizing-200%`, artworkSizes: true });
+    text.pressed = await inspectPressedActions(page, { scheme, label: `${label}/text-sizing-200%` });
     assert.equal(text.snapshot.rem, original * 2, "The text sizing probe must really double rem units");
   } finally { await page.locator("html").evaluate(element => element.style.removeProperty("font-size")); }
   await ready(page, scheme, width);
@@ -311,7 +314,6 @@ async function negativeJourneys(page, engine) {
     ["colour-crossfade", ".layout-width-toggle { transition:color .2s,background-color .2s!important; }", /crossfade/],
     ["stripe-on-wide", ".layout-width-toggle[aria-pressed=true] { box-shadow:inset 0 -2px white!important }", /stripe/],
     ["shortcut-stuck-at-rest", ".md-search__button:hover::after { background:var(--header-control-surface)!important }", /shortcut surface/],
-    ["frozen-pointer-colour", ".md-search__button:active { background:var(--header-hover)!important }", /pointer-down surface/],
     ["wrong-hover", ".layout-width-toggle:hover { background-color:#ff0000!important; }", /accent hover/],
   ];
   const results = [];
@@ -330,6 +332,11 @@ async function negativeJourneys(page, engine) {
     finally { await style.evaluate(element => element.remove()); }
     results.push({ engine, name, rejected: true });
   }
+  await assert.rejects(() => inspectPressedActions(page, {
+    scheme: "default", label: `${engine}/negative/frozen-pointer-colour`,
+    searchDefect: ".md-search__button:active { background:var(--header-hover)!important }",
+  }), /pointer-down surface/);
+  results.push({ engine, name: "frozen-pointer-colour", rejected: true });
   await inspectHeaderControls(page, { scheme: "default", label: `${engine}/negative-restored`, hover: false });
   return results;
 }

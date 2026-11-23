@@ -190,10 +190,9 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
   const snapshot = await measureHeader(page);
   const contrast = assertHeaderSnapshot(snapshot, { scheme, label });
   const hovered = [];
-  if (hover) for (const [index, control] of (await page.locator(headerControlSelector).all()).entries()) {
+  if (hover) for (const control of await page.locator(headerControlSelector).all()) {
     await control.hover();
-    // WebKit can still report the preceding native press when the pointer arrives.
-    // Wait for the input state alone. A wrong hover colour must still fail immediately.
+    // Wait for the input state alone. A wrong hover colour must fail immediately.
     await control.and(page.locator(":hover:not(:active)")).waitFor({ state: "visible", timeout: 2500 });
     const samples = [];
     for (let frame = 0; frame < 3; frame++) {
@@ -214,19 +213,6 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
     }
     const hoveredMetrics = assertHeaderSnapshot(await measureHeader(page), { scheme, label: `${label}/hover`, state: "hover" });
     samples.at(-1).minimumBoundaryContrast = hoveredMetrics.minimumBoundaryContrast;
-    await page.mouse.down();
-    try {
-      await control.and(page.locator(":active")).waitFor({ state: "visible", timeout: 2500 });
-      const active = await measureHeader(page);
-      const pressed = active.controls[index];
-      assert.equal(pressed.background, snapshot.tokens["header-pressed"], `${label}: pointer-down surface`);
-      assert.equal(pressed.foreground, snapshot.tokens["header-pressed-text"], `${label}: pointer-down foreground`);
-      assertHeaderSnapshot(active, { scheme, label: `${label}/pointer-down`, state: "pressed" });
-    } finally {
-      await page.mouse.move(0, 200);
-      await page.mouse.up();
-      await control.and(page.locator(":active")).waitFor({ state: "hidden", timeout: 2500 });
-    }
     hovered.push(samples);
   }
   await page.mouse.move(0, 200);
@@ -241,4 +227,68 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
     } finally { await style.evaluate(element => element.remove()); }
   }
   return { snapshot, contrast, hovered, resized };
+}
+
+
+// A press may open Search, change the scheme or save a width preference. Let it
+// finish on its own original action. Discard the context before the next action.
+export async function inspectPressedActions(page, { scheme, label = scheme, searchDefect = null }) {
+  const original = await measureHeader(page);
+  const storageState = await page.context().storageState();
+  const viewport = page.viewportSize();
+  const url = page.url();
+  const settings = await page.evaluate(() => ({
+    zoom: document.documentElement.style.zoom, fontSize: document.documentElement.style.fontSize,
+    colorScheme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+  }));
+  const results = [];
+  for (const [index, expected] of original.controls.entries()) {
+    if (searchDefect && expected.kind !== "search") continue;
+    const context = await page.context().browser().newContext({ viewport, colorScheme: settings.colorScheme, storageState });
+    try {
+      const isolated = await context.newPage();
+      isolated.setDefaultTimeout(10000);
+      const external = [];
+      await context.route("**/*", route => {
+        const request = route.request().url();
+        if (/^https?:/.test(request) && new URL(request).origin !== new URL(url).origin) {
+          external.push(request);
+          return route.abort();
+        }
+        return route.continue();
+      });
+      await isolated.goto(url, { waitUntil: "domcontentloaded" });
+      await isolated.waitForFunction(({ scheme, width }) => document.querySelector(".layout-width-toggle") &&
+        document.body.dataset.mdColorScheme === scheme && document.documentElement.dataset.layoutWidth === width,
+        { scheme, width: original.width });
+      await isolated.evaluate(({ zoom, fontSize }) => {
+        document.documentElement.style.zoom = zoom;
+        document.documentElement.style.fontSize = fontSize;
+      }, settings);
+      if (searchDefect) await isolated.addStyleTag({ content: searchDefect });
+      const action = isolated.locator(headerControlSelector).nth(index);
+      await action.hover();
+      await action.and(isolated.locator(":hover:not(:active)")).waitFor();
+      await isolated.mouse.down();
+      try {
+        await action.and(isolated.locator(":active")).waitFor();
+        const active = await measureHeader(isolated);
+        const measured = active.controls[index];
+        assert.equal(measured.name, expected.name, `${label}: original action identity`);
+        assert.equal(active.zoom, original.zoom, `${label}: original layout zoom`);
+        assert.equal(active.rem, original.rem, `${label}: original text sizing`);
+        assert.equal(measured.background, active.tokens["header-pressed"], `${label}/${expected.name}: pointer-down surface`);
+        assert.equal(measured.foreground, active.tokens["header-pressed-text"], `${label}/${expected.name}: pointer-down foreground`);
+        assertHeaderSnapshot(active, { scheme, label: `${label}/${expected.name}/pointer-down`, state: "pressed" });
+        results.push({ name: expected.name, fill: measured.background, ink: measured.foreground });
+      } finally {
+        await isolated.mouse.up();
+      }
+      assert.deepEqual(external, [], `${label}: isolated press stays within the fixture origin`);
+    } finally {
+      await context.close();
+    }
+  }
+  assert.ok(results.length, `${label}: at least one rendered action was exercised`);
+  return results;
 }
