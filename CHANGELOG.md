@@ -45,6 +45,8 @@ All notable standard changes are recorded here. The candidate follows Semantic V
 
 ## Unreleased — shared header candidate
 
+This entry records the original proposal. The later [header contrast and current navigation revision](#unreleased--header-contrast-and-current-navigation) replaces its fixed hover pair with accent-derived states.
+
 - Propose reusable `DKBWS-DESIGN-002` for Standard Production: `1.6rem` controls, `.4rem` rounding, square icon actions, unframed logos, opaque semantic states, fixed light/dark brown hover and actual SVG centring. Preserve branding, native visibility, keyboard operation, search, saved width and appearance choices.
 - Adapt the exact five-file final consumer tree with sanitised provenance and retained private intake. Update shared appearance/keyboard adapters, the new-Wiki starter and design guidance together. Add both-engine browser and negative fixtures plus explicit complete-proof accounting under `DKBWS-VERIFY-001` and `DKBWS-VERIFY-002`.
 - Migration: carry the complete adapter, fixture, browser, CI and receipt closure from an accepted containing immutable release, then run the target's complete contract. This draft establishes no acceptance, release or consumer adoption. Separate private rollout plans retain repository/protection prerequisites and existing pins. See the [promotion record](docs/project/header-controls-review.md) and [migration guide](docs/reference/header-controls-migration.md). [SRC-091](docs/sources.md#src-091), [SRC-092](docs/sources.md#src-092)
