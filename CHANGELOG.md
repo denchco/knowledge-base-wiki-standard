@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Mermaid sanitizer
+
+- Build Mermaid `11.17.2` with DOMPurify `3.5.0` and KaTeX `0.18.2`. Carry the exact package pin, frozen lock and runtime identity checks together. [SRC-110](docs/sources.md#src-110)
+
 ## v0.1.0-rc.17 — 2026-11-22
 
 - Under `DKBWS-SEC-001`, Verify and the scheduled audit use setup-uv v10.4.0 and require checksums for the selected uv 0.13.8 archive. Carry the action pin, strict setting and download test together when adopting this change. The Python and uv runtime pins stay the same. [SRC-105](docs/sources.md#src-105)
