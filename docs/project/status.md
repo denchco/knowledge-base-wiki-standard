@@ -48,7 +48,7 @@ The released Standard implementation extends `DKBWS-PROMPT-001` with development
 
 | Proposed update | Why it matters | Done when |
 |---|---|---|
-| Qualify setup-node 7.1.0 and npm 11.21.3. | Both ship libraries with security advisories outside the Wiki package lock. | Frozen installs and CI pass, and the review records which bundled advisories the update fixes and which remain. |
+| Review the setup-node 7.1.0 and npm 11.21.3 candidate. | Both ship libraries with security advisories outside the Wiki package lock. [SRC-109](../sources.md#src-109) | The owner reviews the frozen installs, exact-commit CI results and remaining tool advisories and records the adoption decision. |
 | Qualify Zensical 0.1.3 for the Wiki build. | It includes a rustix security fix and changes the native UI used by readers. | The review records whether the build uses the affected functions and tests the new UI on desktop and mobile. |
 
 [STD-VAL-008](../validation-queue.md#std-val-008) is blocked on GitHub’s hosted updater. Both 22 November retries failed. The October result below applies to the earlier toolchain. [SRC-106](../sources.md#src-106)

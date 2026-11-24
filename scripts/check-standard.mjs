@@ -626,7 +626,7 @@ if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.cod
 }
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
 const exactNodeVersion = "24.22.3";
-const exactNpmVersion = "11.19.1";
+const exactNpmVersion = "11.21.3";
 const exactPythonVersion = "3.12.16";
 const exactUvVersion = "0.13.8";
 if (pkg.engines?.npm !== exactNpmVersion || pkg.packageManager !== `npm@${exactNpmVersion}`) failures.push(`npm must be explicitly pinned to ${exactNpmVersion}`);
@@ -759,7 +759,7 @@ if (!pyproject.includes('license = "MIT"')) failures.push("Python project licenc
 const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
 for (const pin of [
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
-  "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+  "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0",
   "astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0",
   `node-version: ${exactNodeVersion}`,
   "runs-on: ubuntu-24.04",
