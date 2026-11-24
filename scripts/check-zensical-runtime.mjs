@@ -4,9 +4,9 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
-export const rendererVersion = "0.1.1";
-export const rendererBundle = "bundle.3cb411a8.min.js";
-const rendererBundleHash = "3cb411a815f9f840c846297066b77797d7a182ed5b1676c0dc7316bcf51379d9";
+export const rendererVersion = "0.1.3";
+export const rendererBundle = "bundle.9e76c64c.min.js";
+const rendererBundleHash = "9e76c64cc08547f19d90b0499c5404ae5d8578766cd8e52c2a290bec3c3d57d4";
 const localeSelector = '"link[rel=alternate][hreflang]"';
 
 export function checkZensicalRuntime(siteRoot) {

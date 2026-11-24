@@ -577,7 +577,7 @@ const exactNodePins = {
   "@playwright/test": "1.63.0",
   "3d-force-graph": "1.80.0",
   "ajv": "8.20.0",
-  "dompurify": "3.4.18",
+  "dompurify": "3.5.0",
   "esbuild": "0.28.2",
   "katex": "0.18.2",
   "mermaid": "11.17.2",
@@ -626,7 +626,7 @@ if (serviceIdentity.schemaVersion !== 1 || serviceIdentity.serviceId !== pkg.cod
 }
 if (pkg.version !== "0.1.0-candidate") failures.push(`package version must be 0.1.0-candidate; found ${pkg.version}`);
 const exactNodeVersion = "24.22.3";
-const exactNpmVersion = "11.19.1";
+const exactNpmVersion = "11.21.3";
 const exactPythonVersion = "3.12.16";
 const exactUvVersion = "0.13.8";
 if (pkg.engines?.npm !== exactNpmVersion || pkg.packageManager !== `npm@${exactNpmVersion}`) failures.push(`npm must be explicitly pinned to ${exactNpmVersion}`);
@@ -647,7 +647,7 @@ for (const [dependency, expected] of Object.entries(exactNodePins)) {
 }
 if (packageLock.packages?.["node_modules/@google/design.md"]) failures.push("the lock retains the unqualified bundled design.md executable");
 const domPurifyVersion = packageLock.packages?.["node_modules/dompurify"]?.version;
-if (domPurifyVersion !== "3.4.18") failures.push(`package-lock must resolve exactly DOMPurify 3.4.18; found ${domPurifyVersion ?? "unlisted"}`);
+if (domPurifyVersion !== "3.5.0") failures.push(`package-lock must resolve exactly DOMPurify 3.5.0; found ${domPurifyVersion ?? "unlisted"}`);
 if (packageLock.packages?.["node_modules/fast-uri"]?.version !== "3.1.9") failures.push("package-lock must resolve fast-uri exactly 3.1.9");
 if (pkg.scripts?.["check:runtime"] !== "node scripts/sync-runtime-assets.mjs --check") failures.push("check:runtime must inspect reconstructed bundle bytes and SBOM");
 if (!pkg.scripts?.check?.includes("check:runtime")) failures.push("npm run check must inspect the shipped runtime bundle and SBOM");
@@ -751,7 +751,7 @@ const pyproject = readFileSync("pyproject.toml", "utf8");
 const uvSettings = pyproject.split(/^\[tool\.uv\]\s*$/mu)[1]?.split(/^\[/mu)[0] ?? "";
 const uvRequirement = /^required-version\s*=\s*"([^"]+)"\s*$/mu.exec(uvSettings)?.[1];
 if (uvRequirement !== `>=${exactUvVersion}`) failures.push(`uv dependency-update resolvers require >=${exactUvVersion}; reference qualification remains exactly ${exactUvVersion}`);
-for (const pin of ["zensical==0.1.1", "graphifyy==0.9.106", "pip-audit==2.10.1"])
+for (const pin of ["zensical==0.1.3", "graphifyy==0.9.118", "pip-audit==2.10.1"])
   if (!pyproject.includes(pin)) failures.push(`missing Python pin ${pin}`);
 if (!pyproject.includes('version = "0.1.0rc0"')) failures.push("Python project version must encode 0.1.0-candidate as PEP 440 0.1.0rc0");
 if (!pyproject.includes('license = "MIT"')) failures.push("Python project licence must be MIT");
@@ -759,7 +759,7 @@ if (!pyproject.includes('license = "MIT"')) failures.push("Python project licenc
 const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
 for (const pin of [
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
-  "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+  "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0",
   "astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0",
   `node-version: ${exactNodeVersion}`,
   "runs-on: ubuntu-24.04",

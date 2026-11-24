@@ -7,6 +7,10 @@ status: draft
 
 # Research and change log
 
+## 2026-11-24 — Mermaid sanitizer update
+
+The candidate selects DOMPurify `3.5.0` for the Mermaid browser bundle. The Wiki adapter uses Mermaid’s strict mode and does not enable `SAFE_FOR_TEMPLATES`. The package, frozen lock, build inputs and embedded implementation must agree. [SRC-110](sources.md#src-110)
+
 ## 2026-11-22 — Hosted Python dependency updates
 
 The maintainer requested fresh root uv updates through GitHub’s Dependabot controls for both repositories. Standard run `45067488464` and Documentation run `45067517175` failed. The updater supplied uv 0.13.7 and each project required at least 0.13.8. [SRC-106](sources.md#src-106)

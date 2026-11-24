@@ -20,11 +20,11 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Claude Code discovery | `CLAUDE.md` importing `AGENTS.md`, plus `.claude/skills/` |
 | Follow-up state | `docs/project/status.md` for zero to three active priorities; validation queue fields for parked work and reopen triggers |
 | Development-response navigation | Configured canonical Human Wiki origin plus `npm run response:links:check -- --base-url <canonical-url> --managed-live` for Markdown, HTML, plain-GFM, exact managed-identity, and per-route HTTP checks; uncaptured pre-send interception still requires a host hook |
-| Reference toolchain | Node.js `24.22.3` with npm `11.19.1`, CPython `3.12.16` and uv `0.13.8`. The maintainer workspace and CI check the same versions. [SRC-093](../sources.md#src-093) |
+| Reference toolchain | Node.js `24.22.3` with npm `11.21.3`, CPython `3.12.16` and uv `0.13.8`. The maintainer workspace and CI check the same versions. [SRC-093](../sources.md#src-093), [SRC-109](../sources.md#src-109) |
 | Schema URI resolution | Ajv `8.20.0` with locked fast-uri `3.1.9`; six focused compatibility and security fixtures in immutable rc.9 |
 | Python audit cache | pip-audit `2.10.1`, CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3`; five focused actual-call-path fixtures |
-| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.106` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0`. [SRC-096](../sources.md#src-096) |
-| Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.4.18`, served locally. [SRC-094](../sources.md#src-094) |
+| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.118` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0`. [SRC-108](../sources.md#src-108) |
+| Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.5.0`, served locally. [SRC-110](../sources.md#src-110) |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with matching pinned Chromium and WebKit for the shared header contract |
 | Versioning | Git and GitHub Releases |
 | Development-turn commits | [Jujutsu](https://github.com/jj-vcs/jj): exact `0.45.1` reference-qualified for the Standard Production maintainer workspace |
@@ -59,7 +59,7 @@ The [Human and LLM Wiki products](../architecture.md#human-and-llm-products) are
 
 ## Human reference implementation
 
-The [Standard Production profile](../spec/profiles.md#profiles) selects exactly [Zensical](https://zensical.org/docs/) `0.1.1` with Zensical UI `0.0.42` to render the Human Wiki with the DenchCo visual profile, repository-local diagram and graph assets, and built-output browser checks. [Google DESIGN.md](https://github.com/google-labs-code/design.md) supplies an agent-readable design-contract format; the actual colours, shapes, layout, accessibility rules, and adapter decisions are governed by the canonical [DenchCo `DESIGN.md`](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md). Exact pins and the offline/runtime boundary are recorded in [Dependencies](../spec/dependencies.md). [SRC-095](../sources.md#src-095)
+The [Standard Production profile](../spec/profiles.md#profiles) selects exactly [Zensical](https://zensical.org/docs/) `0.1.3` with Zensical UI `0.0.43` to render the Human Wiki with the DenchCo visual profile, repository-local diagram and graph assets, and built-output browser checks. [Google DESIGN.md](https://github.com/google-labs-code/design.md) supplies an agent-readable design-contract format; the actual colours, shapes, layout, accessibility rules, and adapter decisions are governed by the canonical [DenchCo `DESIGN.md`](https://github.com/denchco/knowledge-base-wiki-standard/blob/main/DESIGN.md). Exact pins and the offline/runtime boundary are recorded in [Dependencies](../spec/dependencies.md). [SRC-111](../sources.md#src-111)
 
 Immutable rc.9 at `8800e139d73fd58ee1bd756d3e5497f62ed678e4` passes 23 focused tests, complete Standard verification and dated Node/Python audits. The design adaptation preserves nine upstream fixture results and verifies actual dependency bytes before compilation. Protected publication and exact release readback pass. Documentation adopts the released tooling and guidance at `25d72256aa29abd6039095e1fbca3c2363d234e8`; full target verification, protected deployment and public proof pass. These observations do not authorise migration of other Wikis or clear future advisories. [SRC-087](../sources.md#src-087), [SRC-088](../sources.md#src-088), [SRC-089](../sources.md#src-089)
 

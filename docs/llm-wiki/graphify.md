@@ -33,7 +33,7 @@ If a query is empty, shallow, stale, or does not expose enough context, continue
 
 These outputs are derived and ignored by Git. Regenerate them; do not edit them as canonical content.
 
-Use the guarded publication command for indexing. Its exact Graphify `0.9.106` wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, and disables external preprocessing at runtime. Direct indexing commands bypass this qualified boundary. Read-only queries above do not regenerate or extract source files. The [dependency contract](../reference/tools-and-sources.md) and `DEPENDENCIES.md` describe the complete migration closure.
+Use the guarded publication command for indexing. Its exact Graphify `0.9.118` wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, and disables external preprocessing at runtime. Direct indexing commands bypass this qualified boundary. Read-only queries above do not regenerate or extract source files. The [dependency contract](../reference/tools-and-sources.md) and `DEPENDENCIES.md` describe the complete migration closure.
 
 Graphify `0.9.106` omits JSON Schema keyword nodes from schemas with a declared identifier or definitions. Its raw query can miss these files. [SRC-096](../sources.md#src-096)
 

@@ -29,7 +29,7 @@ Consumers keep their current pinned contract until they explicitly adopt a revis
 6. Rebuild the Human Wiki and run the complete selected-profile verification. Check draft, stable, deprecated and unmapped lifecycle values at desktop and mobile widths. Confirm absent status markup and tooltips, readable titles, keyboard focus, working section controls and no page overflow.
 7. Record the reviewed migration and verification in the consumer's own history. Change its Standard pin only under separate adoption authority.
 
-The original override used the Zensical `0.0.59` template. The current override uses Zensical UI `0.0.42`. It removes the status macro and its calls and retains native title, section, index and table-of-contents logic. Template comparison fixtures detect upstream drift. Check browser behaviour after changing the renderer. [SRC-032](../sources.md#src-032) · [SRC-095](../sources.md#src-095)
+The original override used the Zensical `0.0.59` template. The current override uses Zensical UI `0.0.43`. It removes the status macro and its calls and retains native title, section, index and table-of-contents logic. Template comparison fixtures detect upstream drift. Check browser behaviour after changing the renderer. [SRC-032](../sources.md#src-032) · [SRC-111](../sources.md#src-111)
 
 ## Verification and history boundary
 
