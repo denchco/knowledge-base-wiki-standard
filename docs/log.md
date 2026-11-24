@@ -7,6 +7,18 @@ status: draft
 
 # Research and change log
 
+## 2026-11-22 — Hosted Python dependency updates
+
+The maintainer requested fresh root uv updates through GitHub’s Dependabot controls for both repositories. Standard run `45067488464` and Documentation run `45067517175` failed. The updater supplied uv 0.13.7 and each project required at least 0.13.8. [SRC-106](sources.md#src-106)
+
+In disposable copies of the manifests and locks, uv 0.13.8 resolved the same Graphify and Zensical targets one at a time. Each generated lock selected the requested version and passed `uv lock --check`. The repository pins and locks stayed unchanged. [STD-VAL-008](validation-queue.md#std-val-008) remains open until both hosted jobs succeed. [SRC-107](sources.md#src-107)
+
+## 2026-11-22 — Immutable rc.17 publication
+
+The owner approved PR #67 at `414bd806613cff1f66977cae0edecdea6a8d67aa`. The merge commit `b781907eea212c4ddcbd64183997d0982d4caf40` has the same file tree. Verify run `45055693614` passed on that commit before publication. [SRC-105](sources.md#src-105)
+
+The released CI installer verified the official uv 0.13.8 archive on macOS ARM64 and Ubuntu x86-64. On each platform it rejected the same archive when given an incorrect checksum. The Python and uv runtime versions stay at 3.12.16 and 0.13.8. [SRC-105](sources.md#src-105)
+
 ## 2026-11-17 — Immutable rc.16 publication
 
 The owner approved PR #64 at `e1dbf03e6a16ddb5dd35c692d096f8b217490f17` and authorised its merge, immutable release and public Documentation adoption. The protected merge is `c1ee078cefaf035bab0ed33ca1683bfdd06b42c3`. Its tree equals the approved implementation. Trusted push/main Verify `44151427275` passed on that exact merge. [SRC-104](sources.md#src-104)
