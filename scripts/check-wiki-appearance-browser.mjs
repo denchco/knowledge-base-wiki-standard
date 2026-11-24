@@ -472,7 +472,7 @@ async function inspectAppearance(page, accent, palette, viewportWidth) {
   report.lastObservation = snapshot;
   const rgb = hex => [1, 3, 5].map(offset => Number.parseInt(hex.slice(offset, offset + 2), 16));
   assert.deepEqual(snapshot.header.background, rgb(accent), "The supplied accent must be visibly present on the header");
-  assert.deepEqual(snapshot.selected.background, rgb(accent), "The supplied accent must be visibly present on selected navigation");
+  assert.deepEqual(snapshot.selected.background, rgb(palette.selectedBackground), "Selected navigation must use its scheme-specific tint");
   assert.deepEqual(snapshot.question.background, rgb(palette.questionBackground));
   assert.deepEqual(snapshot.table.background, rgb(palette.tableHeader));
   for (const [role, result] of Object.entries(snapshot)) {

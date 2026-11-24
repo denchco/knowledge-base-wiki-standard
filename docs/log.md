@@ -7,6 +7,10 @@ status: draft
 
 # Research and change log
 
+## 2026-11-23 — Header controls and current navigation
+
+The proposed reference treatment separates the header actions from their surrounding surface and gives both sidebars a common current-item style. The header actions share three accent-family states. A bold label marks selected Wide without changing its resting fill or edges. Browser checks measure the control boundary independently of the text and keyboard focus. See the [migration guide](reference/header-controls-migration.md).
+
 ## 2026-11-22 — Hosted Python dependency updates
 
 The maintainer requested fresh root uv updates through GitHub’s Dependabot controls for both repositories. Standard run `45067488464` and Documentation run `45067517175` failed. The updater supplied uv 0.13.7 and each project required at least 0.13.8. [SRC-106](sources.md#src-106)

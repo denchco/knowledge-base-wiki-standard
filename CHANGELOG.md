@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Header contrast and current navigation
+
+- Revise `DKBWS-DESIGN-002` for Standard Production. Use the Wiki’s own accent for hover and pointer-down. Give every action the same painted height, resting colour and edges, including Wide when selected. Measure header fills and persistent edges against the adjacent header, preserve keyboard focus, and give the current page and current outline entry the same unrailed, bold, scheme-specific treatment.
+- Carry the reference CSS, navigation adapters, generator and browser checks together when adopting a verified immutable release. Existing release pins stay valid.
+
 ## v0.1.0-rc.17 — 2026-11-22
 
 - Under `DKBWS-SEC-001`, Verify and the scheduled audit use setup-uv v10.4.0 and require checksums for the selected uv 0.13.8 archive. Carry the action pin, strict setting and download test together when adopting this change. The Python and uv runtime pins stay the same. [SRC-105](docs/sources.md#src-105)
@@ -39,6 +44,8 @@
 All notable standard changes are recorded here. The candidate follows Semantic Versioning; [candidate governance](GOVERNANCE.md) defines compatibility and migration before `1.0.0`.
 
 ## Unreleased — shared header candidate
+
+This entry records the original proposal. The later [header contrast and current navigation revision](#unreleased--header-contrast-and-current-navigation) replaces its fixed hover pair with accent-derived states.
 
 - Propose reusable `DKBWS-DESIGN-002` for Standard Production: `1.6rem` controls, `.4rem` rounding, square icon actions, unframed logos, opaque semantic states, fixed light/dark brown hover and actual SVG centring. Preserve branding, native visibility, keyboard operation, search, saved width and appearance choices.
 - Adapt the exact five-file final consumer tree with sanitised provenance and retained private intake. Update shared appearance/keyboard adapters, the new-Wiki starter and design guidance together. Add both-engine browser and negative fixtures plus explicit complete-proof accounting under `DKBWS-VERIFY-001` and `DKBWS-VERIFY-002`.

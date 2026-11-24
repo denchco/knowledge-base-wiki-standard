@@ -58,9 +58,9 @@ test("pale brand survives verbatim and its darker shades preserve the requested 
   for (const palette of [result.light, result.dark]) {
     assert.equal(palette.brandAccent, config.accent);
     assert.equal(palette.headerBackground, config.accent);
-    assert.equal(palette.selectedBackground, config.accent);
+    assert.ok(contrast(palette.selectedBackground, palette.background) >= 1.2);
     assert.ok(contrast(palette.headerText, config.accent) >= 4.5);
-    assert.ok(contrast(palette.selectedText, config.accent) >= 4.5);
+    assert.ok(contrast(palette.selectedText, palette.selectedBackground) >= 4.5);
     assert.equal(palette.questionText, palette.accent);
     assert.equal(palette.questionBorder, palette.accent);
   }
@@ -70,7 +70,7 @@ test("pale brand survives verbatim and its darker shades preserve the requested 
 });
 
 test("quantized saturated, dark, neutral and generated seeds retain contrast", () => {
-  const seeds = new Set(["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#00ffff", "#ff00ff", "#005ea8", "#777777", "#010101"]);
+  const seeds = new Set(["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#00ffff", "#ff00ff", "#005ea8", "#32541c", "#777777", "#010101"]);
   for (let index = 0; index < 384; index += 1) seeds.add(`#${((index * 2654435761) >>> 0).toString(16).slice(-6).padStart(6, "0")}`);
   for (const accent of seeds) {
     const result = deriveAppearance({ ...config, accent });
@@ -88,22 +88,38 @@ test("quantized saturated, dark, neutral and generated seeds retain contrast", (
       }
       assert.equal(palette.headerBackground, accent);
       assert.equal(palette.headerSurface, accent);
-      assert.equal(palette.selectedBackground, accent);
+      for (const surface of [palette.background, palette.surface]) assert.ok(contrast(palette.selectedBackground, surface) >= 1.2);
+      assert.ok(contrast(palette.selectedText, palette.selectedBackground) >= 4.5);
+
+      for (const fill of [palette.headerControlSurface, palette.headerHover, palette.headerPressed]) assert.ok(contrast(fill, accent) >= 3);
       assert.ok(contrast(palette.headerText, accent) >= 4.5);
-      assert.ok(contrast(palette.headerText, palette.headerControlSurface) >= 4.5,
+      assert.ok(contrast(palette.headerControlText, palette.headerControlSurface) >= 4.5,
         `${accent} ${name} header rest text`);
-      assert.ok(contrast(palette.headerSelectedText, palette.headerSelected) >= 4.5,
+      assert.ok(contrast(palette.headerPressedText, palette.headerPressed) >= 4.5,
         `${accent} ${name} header selected text`);
       assert.ok(contrast(palette.headerHoverText, palette.headerHover) >= 4.5,
         `${accent} ${name} header hover text`);
-      assert.deepEqual([palette.headerHover, palette.headerHoverText], name === "light"
-        ? ["#aaa08d", "#29251f"] : ["#948774", "#201c17"],
-      `${accent} ${name} must keep the shared brown hover independent of branding`);
+      assert.equal(new Set([palette.headerControlSurface, palette.headerHover, palette.headerPressed]).size, 3, `${accent}: interaction states must remain distinct`);
       for (const button of [palette.accent, palette.accentDark, palette.accentDarker]) assert.ok(contrast(palette.accentContrast, button) >= 4.5);
     }
   }
   assert.equal(contrastRatio("#000000", "#ffffff"), 21);
   assert.equal(contrastRatio("#ffffff", "#ffffff"), 1);
+});
+
+test("header interaction colours follow the selected brand including neutral seeds", () => {
+  const red = deriveAppearance({ ...config, accent: "#9a1026" }).light;
+  const green = deriveAppearance({ ...config, accent: "#32541c" }).light;
+  const grey = deriveAppearance({ ...config, accent: "#444444" }).light;
+  assert.deepEqual([green.headerControlSurface, green.headerHover, green.headerPressed, green.headerControlText],
+    ["#d4e4cd", "#b5cda9", "#9ab989", "#21291d"], "The published dark-green reference case is reproducible");
+  for (const role of ["headerControlSurface", "headerHover", "headerPressed"]) {
+    const channels = hex => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16));
+    const [r1, g1] = channels(red[role]);
+    const [r2, g2] = channels(green[role]);
+    assert.ok(r1 > g1 && g2 > r2, `${role} must follow the brand hue`);
+    assert.equal(new Set(channels(grey[role])).size, 1, `${role} must stay neutral for a grey brand`);
+  }
 });
 
 test("dark seeds receive a readable question tint without replacing visible brand surfaces", () => {
@@ -130,10 +146,6 @@ test("generated values are deterministic and do not mutate caller configuration"
   assert.equal((css.match(/^  --md-primary-bg-color:/gm) || []).length, 1);
   assert.match(css, /--brand-accent: #e1efdd;/);
   assert.match(css, /--header-surface: #e1efdd;/);
-  assert.match(css, /--layout-width-control-hover-color: var\(--header-hover-text\);/);
-  assert.match(css, /--layout-width-control-hover-background: var\(--header-hover\);/);
-  assert.match(css, /--layout-width-control-selected-background: var\(--header-selected\);/);
-  assert.doesNotMatch(css, /--layout-width-control-(?:hover|selected)-background:\s*transparent/);
   assert.doesNotMatch(css, /\.md-search__button\s*\{\s*background-color:\s*transparent/);
   assert.match(css, /background-color: var\(--selected-background\)/);
   assert.match(css, /blockquote\.governing-question > p\s*\{\s*color: var\(--question-text\)/);

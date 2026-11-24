@@ -263,7 +263,27 @@
     });
   });
 
+  // Zensical tracks the current heading in both copies of its table of contents.
+  // Expose that same selection when scrolling and after an instant navigation.
+  function reflectCurrentHeading(link) {
+    if (link.classList.contains("md-nav__link--active")) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
+  }
+  const contentsObserver = new MutationObserver(records => {
+    for (const { target } of records) {
+      if (target.matches("a.md-nav__link")) reflectCurrentHeading(target);
+    }
+  });
+  function observeContents() {
+    contentsObserver.disconnect();
+    for (const contents of document.querySelectorAll("nav.md-nav--secondary")) {
+      contents.querySelectorAll("a.md-nav__link").forEach(reflectCurrentHeading);
+      contentsObserver.observe(contents, { subtree: true, attributes: true, attributeFilter: ["class"] });
+    }
+  }
+
   const boot = () => {
+    observeContents();
     observeNativePalette();
     observeHeaderActions();
     document.querySelectorAll("[data-graph-view]").forEach(render);

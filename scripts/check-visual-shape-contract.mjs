@@ -271,12 +271,13 @@ requireIn(layout, "margin-inline: var(--layout-width-control-inline-start) var(-
 requireIn(layout, ".md-header__title .md-header__topic", "the visible header topic must be governed");
 requireIn(layout, "transform: none !important", "the visible header topic must stay on the body rail");
 requireIn(selectorBlock(theme, ".md-header"), "background-color: var(--header-surface)", "header must use the semantic header surface token");
-requireIn(theme, "background-color: var(--header-control-surface)", "header controls must use the opaque semantic rest surface");
-for (const [token, value] of [["--header-control-height", "1.6rem"], ["--header-control-radius", ".4rem"], ["--header-hover", "#aaa08d"], ["--header-hover-text", "#29251f"]]) {
+requireIn(theme, "--action-fill: var(--header-control-surface)", "header controls must use the opaque semantic rest surface");
+for (const [token, value] of [["--header-control-height", "1.6rem"], ["--header-control-radius", ".4rem"]]) {
   requireIn(theme, `${token}: ${value}`, `header token must retain ${token} ${value}`);
 }
-requireIn(theme, "--header-hover: #948774", "dark header hover must retain the shared brown surface");
-requireIn(theme, "--header-hover-text: #201c17", "dark header hover must retain its matching foreground");
+for (const token of ["header-hover", "header-hover-text", "header-pressed", "header-pressed-text"]) {
+  requireIn(theme, `var(--${token})`, `All header controls must use the governed ${token} state`);
+}
 requireIn(requirements, "DKBWS-DESIGN-002", "the normative catalogue must identify the shared header contract");
 requireIn(read("profiles/standard-production.yaml"), "- DKBWS-DESIGN-002", "Standard Production must select the shared header requirement");
 requireIn(starterDesign, "DKBWS-DESIGN-002", "the new-Wiki design template must carry the shared header contract");
@@ -345,10 +346,11 @@ function checkAppearanceContract() {
   const darkBlock = selectorBlock(theme, 'body[data-md-color-scheme="slate"]');
   for (const [key, value] of Object.entries(dark)) {
     const css = key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
-    const sharedAlias = { headerSurface: "surface", headerText: "text", headerSelectedText: "header-text" }[key];
+    const sharedAlias = { headerSurface: "surface", headerText: "text", headerControlSurface: "accent", headerControlText: "accent-contrast", headerHover: "accent-dark", headerHoverText: "accent-contrast", headerPressed: "accent-darker", headerPressedText: "accent-contrast" }[key];
     if (sharedAlias) {
       requireIn(theme, `--${css}: var(--${sharedAlias})`, `Shared header alias ${key} must preserve the active palette`);
-      const expected = key === "headerSurface" ? colors.darkSurface : colors.darkText;
+      const designRole = sharedAlias.replace(/-([a-z])/g, (_, ch) => ch.toUpperCase());
+      const expected = dark[designRole];
       if (value !== expected) errors.push(`Dark palette alias ${key} must agree with DESIGN.md`);
     } else requireIn(darkBlock, `--${css}: ${value}`, `Dark palette token ${key} must agree with DESIGN.md`);
   }

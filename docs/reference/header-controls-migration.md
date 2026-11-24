@@ -13,9 +13,15 @@ status: draft
 
 Search, Wide, appearance controls and visible mobile menu/search actions have a `1.6rem` height and `.4rem` rounding. Icon-only controls are square. Do not frame logos as controls. Centre the actual SVG in each icon-only control on both axes within `.5` CSS pixels, even when icon sizes differ. Keep Wide's icon/text group centred with its SVG aligned vertically. Keep native hidden-label and responsive visibility rules.
 
-Use semantic opaque surfaces for rest, hover and selected states. Preserve the Wiki's brand, header and native palette configuration. Hover uses background `#aaa08d` with foreground `#29251f` in light appearance, and background `#948774` with foreground `#201c17` in dark appearance. Selected Wide uses the same hover pair. Change foreground and background together without an intervening low-contrast crossfade.
+Carry the shared resting, hover and pointer-down roles and the rules for all controls together. Replace legacy fixed hover colours with the Wiki’s own accent family. The unconfigured reference uses its blue palette. Wide uses bold text and `aria-pressed` for its persistent state. Remove any selected colour override, width-only shadow or inset stripe so it shares the same painted height and edges as every other action. Make the Search icon and shortcut follow the complete control state. Keep keyboard focus visible on a separate outline.
 
 Search's magnifier and shortcut badge remain readable in every state. Normal text and the shortcut badge meet `4.5:1` contrast; meaningful icons and visible focus meet `3:1` against their adjacent background. Keep keyboard operation, search, width selection, appearance switching, reload/navigation and saved preferences intact. The bounded mobile adapter supplies keyboard semantics to the native menu/search labels without replacing their controllers.
+
+For revisions containing the control-contrast update, carry `headerControlText`, the common fill-coloured border and the light and dark navigation selection roles. Test resting and selected fills against the header at 3:1. Use the same 1 CSS pixel border in the current fill colour for every action. Hover and pointer-down fills must also reach 3:1. Check each control at its actual surrounding colour. Keep the logo unframed. Check that current links in each sidebar share the same tint (at least 1.2:1 against the sidebar), have bold text at 4.5:1, and line up with ordinary links without an inline-start rail. The 1.2:1 tint threshold is a design choice.
+
+### Reproducing a configured accent
+
+Use the versioned `deriveAppearance` generator and test the final six-digit sRGB colours. When white contrasts more strongly with the header, the resting, hover and pointer-down fills start at OKLCH lightness 0.90, 0.82 and 0.75. Otherwise they start at 0.38, 0.46 and 0.53. Preserve the seed hue and cap chroma at 0.035, 0.055 and 0.075 respectively. Move lightness outwards until the rounded fill meets 4.10:1, 3.55:1 and 3.00:1 against the header. The generator selects a common ink that reaches 4.5:1 on all three fills. For seed `#32541c`, the three results are `#d4e4cd`, `#b5cda9` and `#9ab989`, with ink `#21291d`. Without a configured seed, use the scheme’s accent, dark-accent and darker-accent roles with the scheme’s accent-contrast ink.
 
 ## Complete migration
 

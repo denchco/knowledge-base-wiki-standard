@@ -1016,7 +1016,7 @@ test("lifecycle diff compares the consumer version and selected profile without 
   assert.equal(diff.candidate.manifest.sha256, createHash("sha256").update(headManifest.stdout).digest("hex"));
 });
 
-test("status-free navigation preserves the pinned renderer template outside status output", () => {
+test("navigation preserves the pinned renderer template outside status and current-page annotations", () => {
   const upstream = readFileSync(path.join(ROOT, ".venv/lib/python3.12/site-packages/zensical_ui/templates/partials/nav-item.html"), "utf8");
   const withoutNotice = (source) => source.replace(/^\{#-[\s\S]*?-#\}\r?\n/, "");
   let expected = withoutNotice(upstream);
@@ -1030,6 +1030,13 @@ test("status-free navigation preserves the pinned renderer template outside stat
     const output = `  {% if ${condition} %}\n    {{ render_status(nav_item, ${argument}) }}\n  {% endif %}\n`;
     assert.equal(expected.split(output).length, 2, `pinned renderer must contain exactly one ${condition} block`);
     expected = expected.replace(output, "");
+  }
+  for (const [anchor, annotation] of [
+    ['<a href="{{ index.url | url }}" class="md-nav__link {{ class }}"', '{% if index.active %} aria-current="page"{% endif %}'],
+    ['<a href="{{ nav_item.url | url }}" class="md-nav__link md-nav__link--active"', ' aria-current="page"'],
+  ]) {
+    assert.equal(expected.split(anchor).length, 2, "Exactly one upstream anchor maps to each current-page annotation");
+    expected = expected.replace(anchor, anchor + annotation);
   }
   assert.equal(withoutNotice(readFileSync(path.join(ROOT, "overrides/partials/nav-item.html"), "utf8")), expected);
 });

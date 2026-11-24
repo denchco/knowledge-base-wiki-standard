@@ -121,7 +121,8 @@ export function deriveAppearance(value) {
     border: readableTone(seed, 0.61, lightSurfaces, 3, -1, neutral),
     focus: lightAccents[1], focusContrast: "#ffffff",
     headerBackground: config.accent, headerText: brandInk,
-    selectedBackground: config.accent, selectedText: brandInk,
+    selectedBackground: readableTone(seed, 0.92, [lightBackground, lightSurface], 1.2, -1, Math.min(seed.c, 0.035)),
+    selectedText: lightAccents[1],
     questionBackground, questionText: lightAccents[0], questionBorder: lightAccents[0],
     tableHeader: questionBackground,
   };
@@ -140,7 +141,8 @@ export function deriveAppearance(value) {
     border: readableTone(seed, 0.62, darkSurfaces, 3, 1, neutral),
     focus: darkAccents[1], focusContrast: darkBackground,
     headerBackground: config.accent, headerText: brandInk,
-    selectedBackground: config.accent, selectedText: brandInk,
+    selectedBackground: readableTone(seed, 0.35, [darkBackground, darkSurface], 1.2, 1, Math.min(seed.c, 0.035)),
+    selectedText: darkAccents[1],
     questionBackground: darkQuestion, questionText: darkAccents[0], questionBorder: darkAccents[0],
     tableHeader: darkQuestion,
   };
@@ -148,28 +150,33 @@ export function deriveAppearance(value) {
   for (const [name, palette] of Object.entries({ light, dark })) {
     palette.accentTransparent = alpha(palette.accent, 10);
     palette.accentTransparentStrong = alpha(palette.accent, 16);
-    // Header branding stays exact. Control surfaces are opaque and remain
-    // readable with the same ink, including dark or saturated brand seeds.
-    const surfaceDirection = contrastRatio(palette.headerText, "#ffffff")
-      >= contrastRatio(palette.headerText, "#000000") ? 1 : -1;
+    // Put opaque controls on the lighter side of a dark brand or the darker
+    // side of a light brand. Their labels need a separate ink from the title.
+    const lightControls = contrastRatio("#ffffff", config.accent) >= contrastRatio("#000000", config.accent);
+    const direction = lightControls ? 1 : -1;
     palette.headerSurface = palette.headerBackground;
-    palette.headerControlSurface = readableTone(seed,
-      Math.max(0, Math.min(1, seed.l + surfaceDirection * 0.06)),
-      [palette.headerText], 4.5, surfaceDirection);
-    palette.headerSelected = readableTone(seed,
-      Math.max(0, Math.min(1, seed.l - surfaceDirection * 0.06)),
-      [palette.headerText], 4.5, surfaceDirection);
-    palette.headerSelectedText = palette.headerText;
-    palette.headerHover = name === "light" ? "#aaa08d" : "#948774";
-    palette.headerHoverText = name === "light" ? "#29251f" : "#201c17";
+    palette.headerControlSurface = readableTone(seed, lightControls ? 0.9 : 0.38,
+      [palette.headerSurface], 4.1, direction, Math.min(seed.c, 0.035));
+    palette.headerHover = readableTone(seed, lightControls ? 0.82 : 0.46,
+      [palette.headerSurface], 3.55, direction, Math.min(seed.c, 0.055));
+    palette.headerPressed = readableTone(seed, lightControls ? 0.75 : 0.53,
+      [palette.headerSurface], 3, direction, Math.min(seed.c, 0.075));
+    palette.headerControlText = readableTone(seed, lightControls ? 0.27 : 0.97,
+      [palette.headerControlSurface, palette.headerHover, palette.headerPressed], 4.5, -direction, Math.min(seed.c, 0.025));
+    palette.headerHoverText = palette.headerControlText;
+    palette.headerPressedText = palette.headerControlText;
+    // Existing token readers can still resolve the persistent selection roles.
+    palette.headerSelected = palette.headerControlSurface;
+    palette.headerSelectedText = palette.headerControlText;
     const surfaces = [palette.background, palette.surface, palette.questionBackground];
     for (const role of ["accent", "accentDark", "accentDarker", "accentVisited", "text", "muted"]) checkPair(palette[role], surfaces, 4.5, `${name}.${role}`);
     for (const role of ["accentLight", "border", "focus"]) checkPair(palette[role], surfaces, 3, `${name}.${role}`);
     for (const role of ["accent", "accentDark", "accentDarker"]) checkPair(palette.accentContrast, [palette[role]], 4.5, `${name}.${role} button text`);
     checkPair(palette.headerText, [palette.headerBackground], 4.5, `${name} header text`);
-    checkPair(palette.headerText, [palette.headerControlSurface], 4.5, `${name} header control text`);
-    checkPair(palette.headerSelectedText, [palette.headerSelected], 4.5, `${name} selected header text`);
+    checkPair(palette.headerControlText, [palette.headerControlSurface], 4.5, `${name} header control text`);
+    checkPair(palette.headerPressedText, [palette.headerPressed], 4.5, `${name} pressed header text`);
     checkPair(palette.headerHoverText, [palette.headerHover], 4.5, `${name} header hover text`);
+    checkPair(palette.selectedBackground, [palette.background, palette.surface], 1.2, `${name} navigation tint`);
     checkPair(palette.selectedText, [palette.selectedBackground], 4.5, `${name} selected text`);
     Object.freeze(palette);
   }
@@ -187,11 +194,6 @@ body[data-md-color-primary],
 body[data-md-color-accent],
 body[data-md-color-scheme] {
 ${declarations(light)}
-  --layout-width-control-rest-color: var(--header-text);
-  --layout-width-control-hover-color: var(--header-hover-text);
-  --layout-width-control-selected-color: var(--header-selected-text);
-  --layout-width-control-hover-background: var(--header-hover);
-  --layout-width-control-selected-background: var(--header-selected);
   --md-primary-fg-color: var(--primary);
   --md-primary-fg-color--light: var(--accent-light);
   --md-primary-fg-color--dark: var(--accent-dark);
@@ -216,9 +218,7 @@ ${declarations(dark)}
 .md-header .md-header__topic {
   color: var(--header-text);
 }
-.layout-width-toggle[aria-pressed="true"] { box-shadow: inset 0 -2px 0 currentColor; }
-.md-nav--primary .md-nav__item--active > .md-nav__link,
-.md-nav--primary .md-nav__item .md-nav__link--active,
+.md-nav--primary a.md-nav__link[aria-current="page"],
 .md-nav--secondary .md-nav__link--active {
   background-color: var(--selected-background);
   color: var(--selected-text);

@@ -9,6 +9,8 @@ status: draft
 
 This candidate adapts COPPER TIGER's verified header treatment into the shared reference adapter. It is proposed as **reusable**, with new stable requirement `DKBWS-DESIGN-002` for Standard Production. The owner requested a draft implementation PR. This record does not establish an acceptance decision, a containing immutable release or any consumer adoption. [SRC-091](../sources.md#src-091)
 
+The original review below records the fixed hover pair used at that stage. For the proposed accent-derived replacement, use the [current reference contract](../spec/requirements.md#shared-header-controls) and [worked migration](../reference/header-controls-migration.md#reproducing-a-configured-accent).
+
 ## Origin and rights
 
 The implementation origin is the full Git tree at `bf0197cf5056962a308b255c3b1b5382c56d8fa8`, tree `738658d405ab4180cc592cb7d836fcf9b005ceb2`, Jujutsu change `wzutmzytmprmwptummyvqlmvwrlkpxrt`. The originating Standard pin is `d339a0e30de41c4a3260f22c00c96898299a1834`. All five requested files were read from that final tree. The correction diff alone was not used.
