@@ -29,7 +29,7 @@ class PythonToolingQualification(unittest.TestCase):
     def test_selected_dependency_versions(self):
         expected = {
             "filelock": "4.2.1", "msgpack": "1.2.3", "CacheControl": "0.14.4",
-            "pip-audit": "2.10.1", "graphifyy": "0.9.106", "zensical": "0.1.1", "zensical-ui": "0.0.42",
+            "pip-audit": "2.10.1", "graphifyy": "0.9.118", "zensical": "0.1.1", "zensical-ui": "0.0.42",
         }
         for name, version in expected.items():
             with self.subTest(package=name):

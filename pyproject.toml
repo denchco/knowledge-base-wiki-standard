@@ -5,7 +5,7 @@ description = "Canonical OKF-compatible standard for evidence-governed human and
 license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
-  "graphifyy==0.9.106",
+  "graphifyy==0.9.118",
   "zensical==0.1.1",
 ]
 

@@ -7,7 +7,7 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
 | Standard validation | Conformance | Exactly Node.js `24.22.3` and its bundled npm `11.19.1`. The `.node-version` file, package engines, npm `engine-strict`, the runtime check and CI enforce the reference. Draft 2020-12 validation uses `ajv==8.20.0` with locked `fast-uri==3.1.9` and `yaml==2.9.0`. |
 | Reference renderer | Human Wiki | Exact CPython `3.12.16` and uv `0.13.8` for the reference build (consumer minimum Python 3.12+), with `zensical==0.1.1` and its locked `zensical-ui==0.0.42`. The installed-lock audit uses `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain. |
-| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.106`, with guarded reference indexing |
+| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.118`, with guarded reference indexing |
 | Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.18`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium and WebKit binaries |
 | Design validation | Design-Governed capability | local `@denchco/design-md-validator==0.4.0-denchco.1` from reviewed Google `design.md` `0.4.0` source, built with exact Zod `4.6.6` and `esbuild==0.28.2`; source, licence and dependency proofs under `tools/design-md/` |
@@ -104,7 +104,9 @@ The exception applies to Mermaid's public `renderToString` calls. Fixtures cover
 
 Migration requires the exact direct pin, scoped override, frozen lock, runtime builder, entry point and matching fixtures together. Run `npm ci`, rebuild runtime and graph assets, inspect their dependency evidence, and run complete verification. A lock-only replacement does not carry this compatibility contract. Other consumer pins remain separately authorised.
 
-The Graphify reference adapter uses exact `graphifyy==0.9.106`. The first patched release for `GHSA-pcc4-rvhr-2pr8` was `0.9.70`. Indexing must use `scripts/graphify-update.py` through `npm run graph:update`. The wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, checks the installed API boundary, and disables external preprocessing during extraction. Direct indexing commands bypass this qualified boundary. Read-only queries of the generated graph remain available.
+The Graphify reference adapter uses exact `graphifyy==0.9.118`. The first patched release for `GHSA-pcc4-rvhr-2pr8` was `0.9.70`. Indexing must use `scripts/graphify-update.py` through `npm run graph:update`. The wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, checks the installed API boundary, and disables external preprocessing during extraction. Direct indexing commands bypass this qualified boundary. Read-only queries of the generated graph remain available.
+
+Upstream fixed a Windows credential disclosure in `0.9.115` when indexing an untrusted repository. The selected `0.9.118` also updates the extraction cache format. Rebuild the derived graph and check schema identities after upgrading. [SRC-108](docs/sources.md#src-108)
 
 Migration requires the wrapper, its fixtures, the exact frozen lock, package command checks and complete graph/browser verification together. The updated adapter preserves cached graph reconciliation when a source file is deleted. This qualification covers the declared reference corpus. Arbitrary untrusted corpora and later Graphify versions require separate qualification. [SRC-062](docs/sources.md#src-062), [SRC-096](docs/sources.md#src-096)
 
