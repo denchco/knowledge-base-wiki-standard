@@ -23,7 +23,7 @@ For a site page, read its `describedby` location, search or skim the discovery f
 
 ## Qualified renderer integration
 
-Zensical UI `0.0.42` limits locale discovery to alternate links with `hreflang`. The build uses the upstream bundle and leaves Markdown discovery links intact. `check:renderer` checks the exact bundle digest, locale selector and generated HTML references. [SRC-095](../sources.md#src-095)
+Zensical UI `0.0.43` limits locale discovery to alternate links with `hreflang`. The build uses the upstream bundle and leaves Markdown discovery links intact. `check:renderer` checks the exact bundle digest, locale selector and generated HTML references. [SRC-111](../sources.md#src-111)
 
 The browser contract opens search, follows an architecture result, checks Escape and reopening, and rejects off-origin code, data, and sitemap requests. The configured Google Fonts stylesheet and font files stay outside that runtime boundary.
 

@@ -5,10 +5,10 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Class | Required for | Dependencies |
 |---|---|---|
 | Universal | Reading and editing | UTF-8, Markdown, YAML frontmatter, and Git-compatible files; no Jujutsu CLI is required for Portable Core reading |
-| Standard validation | Conformance | Exactly Node.js `24.22.3` and its bundled npm `11.19.1`. The `.node-version` file, package engines, npm `engine-strict`, the runtime check and CI enforce the reference. Draft 2020-12 validation uses `ajv==8.20.0` with locked `fast-uri==3.1.9` and `yaml==2.9.0`. |
-| Reference renderer | Human Wiki | Exact CPython `3.12.16` and uv `0.13.8` for the reference build (consumer minimum Python 3.12+), with `zensical==0.1.1` and its locked `zensical-ui==0.0.42`. The installed-lock audit uses `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain. |
-| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.106`, with guarded reference indexing |
-| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.4.18`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
+| Standard validation | Conformance | Exactly Node.js `24.22.3` and npm `11.21.3`. The `.node-version` file, package engines, npm `engine-strict`, the runtime check and CI enforce the reference. Draft 2020-12 validation uses `ajv==8.20.0` with locked `fast-uri==3.1.9` and `yaml==2.9.0`. |
+| Reference renderer | Human Wiki | Exact CPython `3.12.16` and uv `0.13.8` for the reference build (consumer minimum Python 3.12+), with `zensical==0.1.3` and its locked `zensical-ui==0.0.43`. The installed-lock audit uses `pip-audit==2.10.1`, with CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3` in its frozen cache dependency chain. |
+| Knowledge graph | Graph-Linked capability | exactly pinned `graphifyy==0.9.118`, with guarded reference indexing |
+| Browser runtimes | Production diagrams/graphs | `mermaid==11.17.2` with exact scoped `katex==0.18.2` override and locked `dompurify==3.5.0`, `vis-network==10.1.2`, `3d-force-graph==1.80.0` |
 | Browser verification | Rendered conformance | `@playwright/test==1.63.0` and its matching Chromium and WebKit binaries |
 | Design validation | Design-Governed capability | local `@denchco/design-md-validator==0.4.0-denchco.1` from reviewed Google `design.md` `0.4.0` source, built with exact Zod `4.6.6` and `esbuild==0.28.2`; source, licence and dependency proofs under `tools/design-md/` |
 | Local provenance | Standard Production maintenance workspace | Git 2.41 or newer; exactly `jj==0.45.1` is the reference-qualified Jujutsu CLI; colocated `.git` and `.jj` roots |
@@ -18,13 +18,20 @@ Dependencies are classified so consumers can distinguish required knowledge-form
 | Proposal integration | Optional consumer-to-Standard handoff | Existing Node, Ajv, and YAML dependencies for local record validation and preview generation; a browser and network are used only for an explicitly requested governed-form check/open or registry comparison |
 | MCP integration | Optional | Separately selected read-only GitHub MCP; a dedicated Standard MCP remains deferred until evidence shows an unmet workflow |
 
+## npm and setup-node qualification
+
+Node 24.22.3 ships npm 11.19.1. The reference uses npm 11.21.3. CI installs it before `npm ci` and checks its version. [SRC-109](docs/sources.md#src-109)
+
+The 24 November registry check found no matching `undici` or `brace-expansion` advisory in npm 11.21.3. It still reported moderate findings for bundled `glob` 13.0.6 and `minimatch` 10.2.5. The setup-node 7.1.0 production lock updates `undici` from 6.27.0 to 6.29.0 and removes the previous `brace-expansion` findings. Its lock still has findings for `undici`, `fast-xml-parser`, `minimatch` and `smol-toml`. Package-version matches do not establish whether a workflow invokes the affected code. Review new upstream releases for these residual findings. [SRC-109](docs/sources.md#src-109)
+
 ## Repeatable reference build
 
-Install the exact Node.js and uv versions listed above. The Node.js distribution bundles the selected npm version. Run `uv python install 3.12.16` to install the exact CPython version. The uv `0.13.8` download catalogue includes this version for macOS and Linux. [SRC-093](docs/sources.md#src-093)
+Install the exact Node.js and uv versions listed above. Run `uv python install 3.12.16` to install the exact CPython version. The uv `0.13.8` download catalogue includes this version for macOS and Linux. [SRC-093](docs/sources.md#src-093)
 
-The reference distribution has three install surfaces:
+Install the selected npm CLI in a user-managed Node toolchain. Then install the frozen project dependencies and matching browsers:
 
 ```sh
+npm install --global --ignore-scripts --no-audit --no-fund npm@11.21.3
 npm ci
 uv sync --frozen
 npm run browser:install
@@ -39,7 +46,7 @@ The repeatable commands are:
 
 | Command | Contract |
 |---|---|
-| `npm run prepare:runtime` | Builds Mermaid’s core with exact DOMPurify `3.4.18` using `esbuild==0.28.2`; copies graph bundles and emits inspected runtime metadata and a CycloneDX SBOM into ignored assets. |
+| `npm run prepare:runtime` | Builds Mermaid’s core with exact DOMPurify `3.5.0` using `esbuild==0.28.2`; copies graph bundles and emits inspected runtime metadata and a CycloneDX SBOM into ignored assets. |
 | `npm run graph:update` | Prepares local runtimes, checks the bounded corpus and exact Graphify identity, disables external preprocessing, updates the graph in process, enriches six relationship layers, and publishes the shared 2D/3D dataset. |
 | `npm run check:graphify-inputs` | Checks the guarded indexing boundary and runs benign-input, unsupported-input and symlink rejection fixtures. |
 | `npm run build:site` | Prepares local runtimes and performs a strict Zensical build. Checks the native UI bundle before publishing discovery. |
@@ -86,7 +93,7 @@ Those two output paths are reserved for their declared schemas in Standard and c
 
 Proposal records under `standard-proposals/` are canonical, tracked consumer or Standard-maintainer records. Prepared payloads under `output/standard-proposals/` are generated, ignored, and reconstructible. Local validation never needs network access; the CLI performs no issue submission, attachment upload, release publication, or consumer-pin mutation. Those actions remain with their separately named human authorities.
 
-The CI reference selects Ubuntu `24.04`, Node.js `24.22.3` LTS with npm `11.19.1`, and uv `0.13.8` with managed CPython `3.12.16`. The workflow pins `actions/checkout` to `3d3c42e5aac5ba805825da76410c181273ba90b1` (v7.0.1), `actions/setup-node` to `820762786026740c76f36085b0efc47a31fe5020` (v7.0.0), and `astral-sh/setup-uv` to `1db35dd8eee11c5894872e0b383ae6c406cf738d` (v10.4.0). Full Git history (`fetch-depth: 0`) lets lifecycle fixtures resolve immutable historical pins. CI selects distribution provenance mode and records Jujutsu as `not-checked`. Other Node releases require separate qualification.
+The CI reference selects Ubuntu `24.04`, Node.js `24.22.3` LTS with npm `11.21.3`, and uv `0.13.8` with managed CPython `3.12.16`. The workflow pins `actions/checkout` to `3d3c42e5aac5ba805825da76410c181273ba90b1` (v7.0.1), `actions/setup-node` to `949feb2413d6458794dcd2491c4babbbce0c15c1` (v7.1.0), and `astral-sh/setup-uv` to `1db35dd8eee11c5894872e0b383ae6c406cf738d` (v10.4.0). Full Git history (`fetch-depth: 0`) lets lifecycle fixtures resolve immutable historical pins. CI selects distribution provenance mode and records Jujutsu as `not-checked`. Other Node releases require separate qualification.
 
 Verify and the scheduled audit set `require-checksums: true`. On a fresh install, setup-uv checks the uv archive against the SHA-256 digest bundled with the pinned action before extraction. To qualify an installer change, run `node scripts/test-setup-uv-download.mjs` after `npm ci`. Verify runs the same clean-download and incorrect-checksum cases on Ubuntu when the installer workflows or the test change.
 
@@ -104,11 +111,13 @@ The exception applies to Mermaid's public `renderToString` calls. Fixtures cover
 
 Migration requires the exact direct pin, scoped override, frozen lock, runtime builder, entry point and matching fixtures together. Run `npm ci`, rebuild runtime and graph assets, inspect their dependency evidence, and run complete verification. A lock-only replacement does not carry this compatibility contract. Other consumer pins remain separately authorised.
 
-The Graphify reference adapter uses exact `graphifyy==0.9.106`. The first patched release for `GHSA-pcc4-rvhr-2pr8` was `0.9.70`. Indexing must use `scripts/graphify-update.py` through `npm run graph:update`. The wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, checks the installed API boundary, and disables external preprocessing during extraction. Direct indexing commands bypass this qualified boundary. Read-only queries of the generated graph remain available.
+The Graphify reference adapter uses exact `graphifyy==0.9.118`. The first patched release for `GHSA-pcc4-rvhr-2pr8` was `0.9.70`. Indexing must use `scripts/graphify-update.py` through `npm run graph:update`. The wrapper rejects unsupported preprocessed Fortran inputs and corpus symlinks, checks the installed API boundary, and disables external preprocessing during extraction. Direct indexing commands bypass this qualified boundary. Read-only queries of the generated graph remain available.
+
+Upstream fixed a Windows credential disclosure in `0.9.115` when indexing an untrusted repository. The selected `0.9.118` also updates the extraction cache format. Rebuild the derived graph and check schema identities after upgrading. [SRC-108](docs/sources.md#src-108)
 
 Migration requires the wrapper, its fixtures, the exact frozen lock, package command checks and complete graph/browser verification together. The updated adapter preserves cached graph reconciliation when a source file is deleted. This qualification covers the declared reference corpus. Arbitrary untrusted corpora and later Graphify versions require separate qualification. [SRC-062](docs/sources.md#src-062), [SRC-096](docs/sources.md#src-096)
 
-The reference adapter selects exact Zensical `0.1.1` and Zensical UI `0.0.42`. The UI handles locale alternates directly. The static build checks its native bundle checksum and aligns the status-free navigation override with the locked template. Full verification covers CSS selectors, closed-shadow Mermaid diagrams, navigation, search, and Standard/Wide geometry. [SRC-095](docs/sources.md#src-095)
+The reference adapter selects exact Zensical `0.1.3` and Zensical UI `0.0.43`. The UI handles locale alternates directly. The static build checks its native bundle checksum and aligns the status-free navigation override with the locked template. Full verification covers CSS selectors, closed-shadow Mermaid diagrams, navigation, search, and Standard/Wide geometry. [SRC-111](docs/sources.md#src-111)
 
 For an authorised renderer migration, carry the frozen lock, renderer check, and status-free navigation override together. Reinstall with `uv sync --frozen`. Build the static site and run complete desktop, mobile, and managed-preview verification for the selected profile. Portable OKF knowledge and the core conformance profile remain renderer-neutral.
 
@@ -141,7 +150,7 @@ The candidate is locally reference-qualified with Git `2.50.1` and Jujutsu `0.45
 
 ## Runtime bundle and update evidence
 
-The reference Mermaid runtime uses DOMPurify `3.4.18`, Mermaid `11.17.2` and KaTeX `0.18.2`. The runtime check verifies the exact sanitizer input, package and lock agreement, and the generated bundle and inventory hashes. The older source, bundle and lock fixtures reject `3.4.17`. [SRC-094](docs/sources.md#src-094)
+The reference Mermaid runtime uses DOMPurify `3.5.0`, Mermaid `11.17.2` and KaTeX `0.18.2`. The runtime check verifies the exact sanitizer input, package and lock agreement, and the generated bundle and inventory hashes. The older source, bundle and lock fixtures reject `3.4.18`. [SRC-110](docs/sources.md#src-110)
 
 The 23 October 2026 sanitizer qualification selects exact DOMPurify `3.4.17`, retaining Mermaid `11.17.2` and KaTeX `0.18.2`. A fresh audit reported three advisories against the former `3.4.16` pin; reviewed affected-version metadata identifies `3.4.17` as patched. The release and npm metadata identify commit `a77a3e78b59f72fa4d1c83f22e121ad9cc7d3575`. Frozen installation changes only DOMPurify; the fresh 23 October npm audit reports zero findings. That result is bounded by the audit database at execution time. [SRC-073](docs/sources.md#src-073), [SRC-074](docs/sources.md#src-074), [SRC-075](docs/sources.md#src-075), [SRC-076](docs/sources.md#src-076)
 
