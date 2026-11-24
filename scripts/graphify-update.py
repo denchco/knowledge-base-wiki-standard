@@ -16,7 +16,7 @@ import stat
 import sys
 
 
-QUALIFIED_VERSION = "0.9.106"
+QUALIFIED_VERSION = "0.9.118"
 PREPROCESSED_SUFFIXES = frozenset({".F", ".F90", ".F95", ".F03", ".F08"})
 # These exact directory names are unconditional exclusions in the qualified
 # upstream detector. Ignore files cannot expand this adapter's input boundary.

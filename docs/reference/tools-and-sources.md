@@ -23,7 +23,7 @@ Upstream sources are authoritative only for the formats, ideas, or tools they de
 | Reference toolchain | Node.js `24.22.3` with npm `11.19.1`, CPython `3.12.16` and uv `0.13.8`. The maintainer workspace and CI check the same versions. [SRC-093](../sources.md#src-093) |
 | Schema URI resolution | Ajv `8.20.0` with locked fast-uri `3.1.9`; six focused compatibility and security fixtures in immutable rc.9 |
 | Python audit cache | pip-audit `2.10.1`, CacheControl `0.14.4`, filelock `4.2.1` and msgpack `1.2.3`; five focused actual-call-path fixtures |
-| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.106` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0`. [SRC-096](../sources.md#src-096) |
+| Knowledge graph | [Graphify](https://github.com/Graphify-Labs/graphify) `0.9.118` through the guarded reference command, vis-network `10.1.2`, and 3d-force-graph `1.80.0`. [SRC-108](../sources.md#src-108) |
 | Diagrams | Mermaid `11.17.2` with qualified KaTeX `0.18.2` and DOMPurify `3.4.18`, served locally. [SRC-094](../sources.md#src-094) |
 | Browser proof | [Playwright](https://playwright.dev/docs/intro) with matching pinned Chromium and WebKit for the shared header contract |
 | Versioning | Git and GitHub Releases |

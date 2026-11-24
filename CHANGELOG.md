@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Update the guarded Graphify indexer to `0.9.118` for the Windows credential disclosure fixed upstream in `0.9.115`. Rebuild derived graph data with the new extraction cache format. [SRC-108](docs/sources.md#src-108)
+
 ## v0.1.0-rc.17 — 2026-11-22
 
 - Under `DKBWS-SEC-001`, Verify and the scheduled audit use setup-uv v10.4.0 and require checksums for the selected uv 0.13.8 archive. Carry the action pin, strict setting and download test together when adopting this change. The Python and uv runtime pins stay the same. [SRC-105](docs/sources.md#src-105)
