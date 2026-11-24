@@ -14,7 +14,7 @@ function withToolchain(overrides, callback) {
   const fixture = mkdtempSync(path.join(os.tmpdir(), "dkbws-toolchain-"));
   const bin = path.join(fixture, "bin");
   const log = path.join(fixture, "output/verification/probes.jsonl");
-  const versions = { npm: "11.19.1", uv: "uv 0.13.8 (fixture)", python: "3.12.16", ...overrides };
+  const versions = { npm: "11.21.3", uv: "uv 0.13.8 (fixture)", python: "3.12.16", ...overrides };
   mkdirSync(bin);
   mkdirSync(path.dirname(log), { recursive: true });
   writeFileSync(log, "");
@@ -91,10 +91,10 @@ test("missing or malformed uv version evidence fails closed before running Pytho
 });
 
 test("npm and Python still require the exact qualified versions", () => {
-  withToolchain({ npm: "11.19.0" }, ({ run, probes }) => {
+  withToolchain({ npm: "11.19.1" }, ({ run, probes }) => {
     const result = run();
     assert.equal(result.status, 1);
-    assert.match(result.stderr, /npm: expected 11\.19\.1, found 11\.19\.0/);
+    assert.match(result.stderr, /npm: expected 11\.21\.3, found 11\.19\.1/);
     assert.deepEqual(probes(), [["npm", "--version"]]);
   });
   withToolchain({ python: "3.12.14" }, ({ run }) => {
@@ -167,8 +167,13 @@ test("verification and scheduled audits keep each exact runtime pin", () => {
       assert.equal(step.with?.["require-checksums"], true, name);
     }
     assert(setup.every((step) => step.with?.version === "0.13.8" && step.with?.["python-version"] === "3.12.16"), name);
-    assert(setupNode.length > 0 && setupNode.every((step) => step.with?.["node-version"] === "24.22.3"), name);
-    assert(steps.some((step) => step.run === 'test "$(npm --version)" = "11.19.1"'), name);
+    assert(setupNode.length > 0 && setupNode.every((step) =>
+      step.uses === "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1" && step.with?.["node-version"] === "24.22.3"), name);
+    const setupIndex = steps.indexOf(setupNode[0]);
+    const installNpm = steps.findIndex((step) => step.run === "npm install --global --ignore-scripts --no-audit --no-fund npm@11.21.3");
+    const checkNpm = steps.findIndex((step) => step.run === 'test "$(npm --version)" = "11.21.3"');
+    const frozenInstall = steps.findIndex((step) => step.run === "npm ci");
+    assert(setupIndex < installNpm && installNpm < checkNpm && checkNpm < frozenInstall, name);
     if (name === "security-audit.yml") assert(steps.some((step) => step.run === "npm run check:toolchain"));
   }
 });
