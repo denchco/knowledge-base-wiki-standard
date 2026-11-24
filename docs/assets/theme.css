@@ -46,6 +46,7 @@ body[data-md-color-accent] {
   --diagram-node-radius: 5px;
   --component-border-width: 1px;
   --accent-rail-width: .3rem;
+  --governing-question-inset: .6rem;
   --source-row-rail-width: .25rem;
   --technical-frame-border-width: 1.75px;
   --diagram-emphasis-line-width: 3px;
@@ -217,9 +218,11 @@ body[data-md-color-accent] {
 
 .md-typeset blockquote.governing-question {
   border-inline-start-color: var(--accent);
+  padding: var(--governing-question-inset);
 }
 
 .md-typeset blockquote.governing-question > p {
+  margin: 0;
   color: var(--accent);
   font-weight: 700;
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Governing-question spacing
+
+- Extend `DKBWS-HUMAN-002` to require equal positive space inside every border of a governing-question callout. The reference style applies one inset and removes the question paragraph margin. Soil Acoustics and IBMI Trauma Register provide the rendered observations. [SRC-113](docs/sources.md#src-113), [SRC-114](docs/sources.md#src-114)
+- When adopting this change, carry the callout style and browser measurement together. Test desktop and wrapped mobile text. No content or ordinary quotation changes are needed.
+
 ## Unreleased — Header contrast and current navigation
 
 - Revise `DKBWS-DESIGN-002` for Standard Production. Use the Wiki’s own accent for hover and pointer-down. Give every action the same painted height, resting colour and edges, including Wide when selected. Measure header fills and persistent edges against the adjacent header, preserve keyboard focus, and give the current page and current outline entry the same unrailed, bold, scheme-specific treatment.

@@ -221,6 +221,8 @@ export function resolveRuntimeBrowserConfiguration(options = {}) {
       required: sourceLinksRequired,
     },
     governingQuestion: {
+      presentationNotApplicable: (manifest.deviations ?? []).some(deviation =>
+        deviation?.requirement === "DKBWS-HUMAN-002" && deviation?.status === "not-applicable"),
       selected: governingQuestionInspection.selected,
       applicable: governingQuestionInspection.applicable,
       canonicalSource: governingQuestionInspection.canonicalSource,

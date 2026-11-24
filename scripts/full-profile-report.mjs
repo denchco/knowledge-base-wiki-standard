@@ -32,7 +32,7 @@ export const REQUIREMENT_PROOFS = Object.freeze(Object.fromEntries(Object.entrie
   "DKBWS-EVID-001": ["source-register"],
   "DKBWS-EVID-002": ["evidence-review"],
   "DKBWS-HUMAN-001": ["strict-build", "http", "browser-navigation"],
-  "DKBWS-HUMAN-002": ["browser-presentation"],
+  "DKBWS-HUMAN-002": ["browser-presentation", "browser-question-insets"],
   "DKBWS-HUMAN-004": ["source-consistency", "browser-repetitions"],
   "DKBWS-LLM-001": ["agent-contract"],
   "DKBWS-LINK-001": ["source-links"],

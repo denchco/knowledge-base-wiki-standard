@@ -48,6 +48,7 @@ The released Standard implementation extends `DKBWS-PROMPT-001` with development
 
 | Proposed update | Why it matters | Done when |
 |---|---|---|
+| Review governing-question spacing under `DKBWS-HUMAN-002`. | Soil Acoustics and IBMI Trauma Register show how the same question component behaves with different text lengths. | The owner reviews the measurements and decides on the proposed spacing requirement. |
 | Qualify setup-node 7.1.0 and npm 11.21.3. | Both ship libraries with security advisories outside the Wiki package lock. | Frozen installs and CI pass, and the review records which bundled advisories the update fixes and which remain. |
 | Qualify Zensical 0.1.3 for the Wiki build. | It includes a rustix security fix and changes the native UI used by readers. | The review records whether the build uses the affected functions and tests the new UI on desktop and mobile. |
 
