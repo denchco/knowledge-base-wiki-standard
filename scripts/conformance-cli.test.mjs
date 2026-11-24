@@ -1754,6 +1754,7 @@ test("reference receipt proof ownership follows executed commands and no deleted
     ["DKBWS-DESIGN-002", "browser-webkit", "header-browser"],
     ["DKBWS-DESIGN-002", "browser-header-interaction", "header-browser"],
     ["DKBWS-DESIGN-002", "browser-header-reflow", "header-browser"],
+    ["DKBWS-HUMAN-002", "browser-question-insets", "browser"],
     ["DKBWS-RENDER-001", "dependencies", "check"],
     ["DKBWS-RUNTIME-002", "service-fixtures", "check"],
     ["DKBWS-RUNTIME-002", "live-service", "managed-service"],
@@ -1796,7 +1797,7 @@ test("full-profile reporting requires each proof of every selected compound obli
 
 test("full-profile reporting cannot use generic legacy passes to replace missing browser and citation proofs", () => {
   const receipt = completeProductionReceipt();
-  const browserRequirements = ["DKBWS-HUMAN-001", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-GRAPH-001", "DKBWS-DESIGN-001", "DKBWS-DESIGN-002"];
+  const browserRequirements = ["DKBWS-HUMAN-001", "DKBWS-HUMAN-002", "DKBWS-HUMAN-004", "DKBWS-LINK-002", "DKBWS-GRAPH-001", "DKBWS-DESIGN-001", "DKBWS-DESIGN-002"];
   for (const result of receipt.gates[0].results) {
     if (!browserRequirements.includes(result.requirement)) continue;
     result.proofs = result.proofs.filter(id => !id.startsWith("browser-") && id !== "built-citations");

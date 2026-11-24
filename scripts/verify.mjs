@@ -322,11 +322,14 @@ function buildReceipt(provenance) {
       command: "npm run check:browser",
       exitCode: 0,
       evidence: [
+        evidence("question-inset-browser", "browser-test", "Desktop and mobile inner-edge measurements and wrapped-text and defect fixtures in Chromium and WebKit.", "scripts/governing-question-browser.mjs"),
         evidence("browser-contract", "browser-test", "Built-output HTTP, local-runtime, responsive, diagram, and 2D/3D checks.", "scripts/runtime-browser-contract.playwright.js"),
       ],
       results: [
         result("DKBWS-HUMAN-001", ["http", "browser-navigation"], ["browser-contract"], "The Human Wiki returned HTTP 200 and remained usable at tested viewports, including status-free navigation with accessible page links and section controls, and contained scrolling for a representative wide mobile table."),
-        result("DKBWS-HUMAN-002", ["browser-presentation"], ["browser-contract"], "The governing-question marker rendered its rail and text in the resolved active accent at desktop and mobile widths while an ordinary quotation remained neutral."),
+        ...((manifest.deviations ?? []).some(deviation => deviation?.requirement === "DKBWS-HUMAN-002" && deviation?.status === "not-applicable") ? [] : [
+          result("DKBWS-HUMAN-002", ["browser-presentation", "browser-question-insets"], ["browser-contract", "question-inset-browser"], "The governing-question rail and text used the active accent while ordinary quotes remained neutral. Chromium and WebKit measured all four inner edges at desktop and mobile widths and rejected defective spacing."),
+        ]),
         result("DKBWS-HUMAN-004", ["browser-repetitions"], ["browser-contract"], "Every exact canonical-question repetition route rendered the same governed text and passed the desktop/mobile accent, neutral-quotation, and containment checks."),
         result("DKBWS-LINK-002", ["browser-citations"], ["browser-contract"], "Browser checks inspect every citation-bearing reader route and every citation at desktop and mobile widths for numeric superscripts, accessible identities, native keyboard focusability, exact-row target URLs and containment. A representative Tab/Enter journey proves the visible focus ring and arrival at the matching source-register row."),
         result("DKBWS-DESIGN-001", ["browser-layout"], ["browser-contract"], "Ordinary entry and architecture Mermaid diagrams retained renderer-default node treatment and passed desktop, tablet, mobile, collision, and accessibility checks."),

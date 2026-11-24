@@ -48,7 +48,7 @@ Static checks prove that the policy reaches new setups and shared instructions. 
 
 - When one canonical governing question is declared, map its authoritative source and maintain a finite `reader_sources` set in the manifest capability contract.
 - Run the exact-text repetition lint after editing any bounded reader source. Every verbatim repetition uses the same governed callout; paraphrases, unrelated quotations, and historical/source records outside the bounded set remain ordinary content.
-- Run the built-output browser contract across every discovered repetition route at desktop and mobile widths. A subject-empty or question-free Wiki records `DKBWS-HUMAN-004` as not applicable and does not manufacture a callout.
+- Run the built-output browser contract across every discovered repetition route at desktop and mobile widths. Measure all four gaps inside the border and include a wrapped mobile question. If the Wiki has no marked question, record `DKBWS-HUMAN-002` as not applicable. If it declares no canonical question, record `DKBWS-HUMAN-004` as not applicable.
 
 ## Consumer-derived proposals
 

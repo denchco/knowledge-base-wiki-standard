@@ -18,6 +18,10 @@ function fixture(t, options = {}) {
   const governingQuestionNotApplicable = options.governingQuestionNotApplicable ?? false;
   const manifestGraph = options.manifestGraph ?? false;
   const deviations = [
+    ...(options.questionPresentationNotApplicable ? [{
+      requirement: "DKBWS-HUMAN-002",
+      reason: "Subject-empty fixture presents no governing question.",
+    }] : []),
     ...(options.sourceLinksNotApplicable ? [{
       requirement: "DKBWS-LINK-002",
       reason: "Subject-empty fixture displays no source identities.",
@@ -208,8 +212,15 @@ test("an explicit HUMAN-004 not-applicable deviation preserves the legacy questi
   assert.equal(configuration.routes.question, "/question/");
   assert.equal(configuration.governingQuestion.selected, true);
   assert.equal(configuration.governingQuestion.applicable, false);
+  assert.equal(configuration.governingQuestion.presentationNotApplicable, false);
   assert.equal(configuration.governingQuestion.canonicalQuestion, null);
   assert.deepEqual(configuration.governingQuestion.repetitionRoutes, []);
+});
+
+test("a subject-empty presentation deviation skips the governing-question inset fixtures", t => {
+  const root = fixture(t, { governingQuestionNotApplicable: true, questionPresentationNotApplicable: true });
+  const configuration = resolveRuntimeBrowserConfiguration({ root, env: independentRoutes });
+  assert.equal(configuration.governingQuestion.presentationNotApplicable, true);
 });
 
 test("browser routes reject remote, query-bearing, and traversal inputs", () => {

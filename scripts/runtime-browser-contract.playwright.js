@@ -794,9 +794,10 @@ export default async (page, options = {}) => {
   await selectNativeScheme("default");
   const questionRouteIsGovernedRepetition = governingQuestionRepetitionApplicable
     && governingQuestionRepetitionRoutes.some(entry => entry.route === questionRoute);
+  const defaultQuestionCount = options.governingQuestion?.presentationNotApplicable ? 0 : 1;
   const questionRouteRepetitionCount = questionRouteIsGovernedRepetition
     ? governingQuestionRepetitionRoutes.find(entry => entry.route === questionRoute).repetitions
-    : 1;
+    : defaultQuestionCount;
   const desktopGoverningQuestion = await inspectGoverningQuestion(
     "desktop",
     questionRoute,

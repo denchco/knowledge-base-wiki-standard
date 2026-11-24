@@ -239,6 +239,7 @@
     "scripts/development-response-links.mjs",
     "scripts/development-response-links.test.mjs",
     "scripts/full-profile-report.mjs",
+    "scripts/governing-question-browser.mjs",
     "scripts/graph-schema-discovery.mjs",
     "scripts/graph-schema-discovery.test.mjs",
     "scripts/graphify-update.py",

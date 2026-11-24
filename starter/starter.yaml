@@ -630,6 +630,13 @@ entries:
     planning_only: true
     dependency_closure: "semantic theme and width CSS, native wiki and appearance adapters, header fixtures and runner, both exact Playwright browser engines, package/CI commands, complete verification receipt and DKBWS-DESIGN-002 proof mapping"
     requirements: ["DKBWS-DESIGN-002", "DKBWS-VERIFY-001", "DKBWS-VERIFY-002"]
+  - target: "scripts/governing-question-browser.mjs"
+    role: "governing-question-inset-browser-check"
+    classification: "adapt-from-release"
+    source: "scripts/governing-question-browser.mjs"
+    planning_only: true
+    dependency_closure: "marked callout CSS, built reader routes, runtime browser runner, pinned Chromium and WebKit, and the browser-question-insets receipt proof"
+    requirements: ["DKBWS-HUMAN-002", "DKBWS-VERIFY-002"]
   - target: "scripts/header-browser-contract.mjs"
     role: "shared-header-browser-contract"
     classification: "adapt-from-release"

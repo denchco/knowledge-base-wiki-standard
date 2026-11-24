@@ -3,7 +3,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawn, execFileSync } from "node:child_process";
-import { chromium } from "@playwright/test";
+import { chromium, webkit } from "@playwright/test";
+import { checkGoverningQuestionInsets, findGoverningQuestionRoutes } from "./governing-question-browser.mjs";
 import runContract from "./runtime-browser-contract.playwright.js";
 import { resolveRuntimeBrowserConfiguration } from "./runtime-browser-contract-config.mjs";
 
@@ -72,6 +73,21 @@ try {
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
+  const insetRoutes = await findGoverningQuestionRoutes(page, path.join(root, "site"));
+  if (governingQuestion.presentationNotApplicable && insetRoutes.length) {
+    throw new Error("The built site contains marked governing questions despite a DKBWS-HUMAN-002 not-applicable deviation.");
+  }
+  if (!governingQuestion.presentationNotApplicable) {
+    if (!insetRoutes.length) throw new Error("No built governing question was available for the inset check.");
+    await checkGoverningQuestionInsets(browser, serverUrl, insetRoutes);
+    const webkitBrowser = await webkit.launch({ headless: true });
+    try {
+      await checkGoverningQuestionInsets(webkitBrowser, serverUrl, insetRoutes);
+    } finally {
+      await webkitBrowser.close();
+    }
+    console.log(`Governing-question insets passed on ${insetRoutes.length} marked routes in Chromium and WebKit at 1440px and 390px, including wrapped text and negative fixtures.`);
+  }
   await page.goto(initialUrl.href, { waitUntil: "networkidle" });
   const bootstrap = await page.evaluate(() => ({
     control: Boolean(document.querySelector(".layout-width-toggle")),
@@ -92,6 +108,7 @@ try {
       fs.writeFileSync(path.join(directory, `${name}.png`), bytes);
     },
     governingQuestion: {
+      presentationNotApplicable: governingQuestion.presentationNotApplicable,
       applicable: governingQuestion.applicable,
       canonicalQuestion: governingQuestion.canonicalQuestion,
       repetitionRoutes: governingQuestion.repetitionRoutes,
@@ -120,7 +137,7 @@ try {
 
 if (failure) {
   const suffix = String(failure.message).includes("Executable doesn't exist")
-    ? "\nInstall the pinned Chromium build with: npm run browser:install"
+    ? "\nInstall the pinned Chromium and WebKit builds with: npm run browser:install"
     : "";
   console.error(`${failure.message}${suffix}`);
   process.exit(1);
