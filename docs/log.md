@@ -7,6 +7,12 @@ status: draft
 
 # Research and change log
 
+## 2026-11-25 — Immutable rc.18 publication
+
+The owner approved PR #70 for the shared header controls and current navigation, and PR #74 for governing-question spacing. Immutable release `v0.1.0-rc.18` contains both at `f89a16fa7c17a9dd9ba4e8624c19246caf257555`. Post-merge Verify run `45414836276` passed on that revision. [SRC-115](sources.md#src-115)
+
+Chromium and WebKit checked the header interactions and measured the question on desktop and mobile. The spacing check includes wrapped text and rejects a missing inset, unequal insets and a paragraph margin that changes the measurement. The five assets downloaded from the release matched the reviewed files. [SRC-115](sources.md#src-115)
+
 ## 2026-11-23 — Header controls and current navigation
 
 The proposed reference treatment separates the header actions from their surrounding surface and gives both sidebars a common current-item style. The header actions share three accent-family states. A bold label marks selected Wide without changing its resting fill or edges. Browser checks measure the control boundary independently of the text and keyboard focus. See the [migration guide](reference/header-controls-migration.md).
