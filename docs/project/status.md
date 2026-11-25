@@ -11,7 +11,7 @@ status: draft
 |---|---|
 | Portable Markdown/OKF structure | Executable candidate: hard validation, strict guidance mode, fixtures, and lossless export |
 | Evidence governance | Implemented candidate with stable numeric superscript citations, full accessible identities, exact row anchors, explanatory-note preservation, registered named-authority URLs and all-page output validation |
-| Shared header controls | Reusable draft candidate under `DKBWS-DESIGN-002`, with semantic opaque states, matched geometry, native keyboard preservation and both-engine proof gates. [Promotion review](header-controls-review.md); acceptance, containing release and consumer adoption remain separate and pending. |
+| Shared header controls | Immutable rc.18 releases the accent-derived header states and current navigation treatment under `DKBWS-DESIGN-002`. The [promotion review](header-controls-review.md) records the earlier design. [SRC-115](../sources.md#src-115) |
 | Human Zensical wiki | Governed reference runtime with Wide as the unconfigured fresh-desktop default, saved reader preferences, strict build, local assets, status-free navigation with retained lifecycle metadata, titles and controls, and one manifest-mapped canonical question consistently governed across its bounded reader routes |
 | Reader journey | Immutable rc.10 releases reusable advisory guidance under `DKBWS-PROMPT-001`. Start with a short answer, then give an explanation, worked application and exact reference. Review source fidelity manually. Consumer adoption remains separate. [SRC-090](../sources.md#src-090) |
 | Writing policy | ASD-STE100-inspired 80% default under `DKBWS-PROMPT-001`, carried by the mapped authoring policy, prompt, starter and shared instructions; prospective application, protected content and no computed compliance claim |
@@ -35,7 +35,7 @@ status: draft
 | Documentation synchronization | Explicit allowlist, deterministic hashes, isolated snapshot writes, conflict refusal, and clean-commit release order implemented; each documentation release records the exact clean Standard commit |
 | Repository licence | MIT License selected for original code and accompanying documentation; copyright Andrew Dench; third-party terms preserved |
 | Deployment adapter | Consumer-owned and not inherited from the standard/documentation repositories; no standard candidate deployment adapter selected |
-| Public GitHub release | Immutable `v0.1.0-rc.17` resolves to `b781907eea212c4ddcbd64183997d0982d4caf40`. It requires checksum verification for fresh uv downloads in CI. Verify passed on the merge commit and all five downloaded assets matched their published digests. [SRC-105](../sources.md#src-105) |
+| Public GitHub release | Immutable `v0.1.0-rc.18` resolves to `f89a16fa7c17a9dd9ba4e8624c19246caf257555`. It includes the shared header and navigation changes under `DKBWS-DESIGN-002` and equal governing-question insets under `DKBWS-HUMAN-002`. The release commit passed Verify. All five downloaded assets matched their published digests. [SRC-115](../sources.md#src-115) |
 | Dedicated MCP | Deferred until CLI/schema stabilization |
 
 The local Zensical service is registered as `denchco-kb-wiki-standard` at `http://127.0.0.1:8017/`; managed health requires every governed registration field, exact LaunchAgent bytes, the loaded job, canonical URL, and `service-identity-v1` marker in addition to HTTP 200. The maintainer-only live gate supplies current evidence and the preview command refuses browser handoff on any mismatch.
@@ -48,9 +48,7 @@ The released Standard implementation extends `DKBWS-PROMPT-001` with development
 
 | Proposed update | Why it matters | Done when |
 |---|---|---|
-| Review governing-question spacing under `DKBWS-HUMAN-002`. | Soil Acoustics and IBMI Trauma Register show how the same question component behaves with different text lengths. | The owner reviews the measurements and decides on the proposed spacing requirement. |
-| Qualify setup-node 7.1.0 and npm 11.21.3. | Both ship libraries with security advisories outside the Wiki package lock. | Frozen installs and CI pass, and the review records which bundled advisories the update fixes and which remain. |
-| Qualify Zensical 0.1.3 for the Wiki build. | It includes a rustix security fix and changes the native UI used by readers. | The review records whether the build uses the affected functions and tests the new UI on desktop and mobile. |
+| Refresh the separate [dependency PR #73](https://github.com/denchco/knowledge-base-wiki-standard/pull/73) against current Standard `main`. | It carries the qualified tooling and renderer updates and now has merge conflicts. | The reconciled revision passes the applicable checks and is ready for owner review. |
 
 [STD-VAL-008](../validation-queue.md#std-val-008) is blocked on GitHub’s hosted updater. Both 22 November retries failed. The October result below applies to the earlier toolchain. [SRC-106](../sources.md#src-106)
 
@@ -82,7 +80,7 @@ The [reader-defaults migration](../reference/reader-defaults-migration.md) cover
 | Parked work | `blocked_by` | `reopen_when` | `last_checked` |
 |---|---|---|---|
 | Hosted Python dependency updates ([STD-VAL-008](../validation-queue.md#std-val-008)) | GitHub’s updater supplies uv 0.13.7. Both repositories require at least 0.13.8. | A compatible hosted image or version-selection feature is available. Retry both root uv jobs and check their lock-resolution logs. | 2026-11-22 |
-| Shared-header consumer adoption | No accepted immutable release contains the candidate; repository and branch-protection readiness varies by target | A verified accepted containing release exists and the target has the required protected PR workflow | 2026-11-01 |
+| Consumer adoption of the rc.18 header and spacing changes | Each Wiki needs its own migration decision. | A target owner authorises an rc.18 update and the target can run the required checks. | 2026-11-25 |
 
 The [three-contribution intake review](proposal-intake-review.md) confirms the immutable origins, exact payloads and acceptance scope. The owner authorised completing intake and acceptance, approved all three exact payloads, and delegated their final governed-form submission. The originating records now contain those approvals. Issues #32, #33 and #34 exactly match those payloads. The [acceptance publication](https://github.com/denchco/knowledge-base-wiki-standard/pull/35) merged at `c836eb7184cb836193b229f68fe487e70e3e3bfc` with decision `b0b5e8021a5a93feb767e486699ec7c524955da6`: numeric citations are preferred; appearance configuration and content-first handoffs are reusable. All three consumer records reconciled with the published acceptance registry before rc.6 publication. Their issue-linkage and acceptance phases remain separate commits. The later Standard ledger records rc.6 inclusion, while the untouched originating records still show release pending and adoption not considered. Their earlier reconciliation does not prove they are current against the new release ledger. This scoped delegation does not change the general manual-submission rule. Completed technical reviews are not repeated as separate priorities.
 
