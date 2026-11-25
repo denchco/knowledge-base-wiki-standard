@@ -272,6 +272,7 @@ requireIn(layout, ".md-header__title .md-header__topic", "the visible header top
 requireIn(layout, "transform: none !important", "the visible header topic must stay on the body rail");
 requireIn(selectorBlock(theme, ".md-header"), "background-color: var(--header-surface)", "header must use the semantic header surface token");
 requireIn(theme, "--action-fill: var(--header-control-surface)", "header controls must use the opaque semantic rest surface");
+requireIn(theme, "border: var(--component-border-width) solid var(--header-control-border)", "header controls must use their permanent four-sided border role");
 for (const [token, value] of [["--header-control-height", "1.6rem"], ["--header-control-radius", ".4rem"]]) {
   requireIn(theme, `${token}: ${value}`, `header token must retain ${token} ${value}`);
 }
@@ -346,7 +347,7 @@ function checkAppearanceContract() {
   const darkBlock = selectorBlock(theme, 'body[data-md-color-scheme="slate"]');
   for (const [key, value] of Object.entries(dark)) {
     const css = key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
-    const sharedAlias = { headerSurface: "surface", headerText: "text", headerControlSurface: "accent", headerControlText: "accent-contrast", headerHover: "accent-dark", headerHoverText: "accent-contrast", headerPressed: "accent-darker", headerPressedText: "accent-contrast" }[key];
+    const sharedAlias = { headerSurface: "surface", headerText: "text", headerControlBorder: "accent", headerControlText: "text", headerHoverText: "text", headerPressedText: "text" }[key];
     if (sharedAlias) {
       requireIn(theme, `--${css}: var(--${sharedAlias})`, `Shared header alias ${key} must preserve the active palette`);
       const designRole = sharedAlias.replace(/-([a-z])/g, (_, ch) => ch.toUpperCase());

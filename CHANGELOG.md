@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Tonal header controls
+
+- Revise the Standard Production reference treatment under `DKBWS-DESIGN-002`. Keep the brand on the header and use tonal fills for its actions. A permanent one-pixel border must reach 3:1 against both the header and the current fill in every interaction state.
+- Carry the theme, appearance generator and both-engine browser checks together after a containing release. The new `browser-header-boundary` proof records the two independent contrast checks. A separate focus indicator and the existing text and icon thresholds remain required.
+
 ## Unreleased — Governing-question spacing
 
 - Extend `DKBWS-HUMAN-002` to require equal positive space inside every border of a governing-question callout. The reference style applies one inset and removes the question paragraph margin. Soil Acoustics and IBMI Trauma Register provide the rendered observations. [SRC-113](docs/sources.md#src-113), [SRC-114](docs/sources.md#src-114)

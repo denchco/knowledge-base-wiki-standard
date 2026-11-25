@@ -25,12 +25,13 @@ body[data-md-color-accent] {
   --header-text: var(--text);
   --selected-background: #d9e7f0;
   --selected-text: var(--accent-dark);
-  --header-control-surface: var(--accent);
-  --header-control-text: var(--accent-contrast);
-  --header-hover: var(--accent-dark);
-  --header-hover-text: var(--accent-contrast);
-  --header-pressed: var(--accent-darker);
-  --header-pressed-text: var(--accent-contrast);
+  --header-control-surface: #e8f1f6;
+  --header-control-border: var(--accent);
+  --header-control-text: var(--text);
+  --header-hover: #d9e7f0;
+  --header-hover-text: var(--text);
+  --header-pressed: #c7dce9;
+  --header-pressed-text: var(--text);
   --header-selected: var(--header-control-surface);
   --header-selected-text: var(--header-control-text);
   --header-control-height: 1.6rem;
@@ -120,7 +121,7 @@ body[data-md-color-accent] {
   --action-fill: var(--header-control-surface);
   --action-ink: var(--header-control-text);
   background-color: var(--action-fill);
-  border: var(--component-border-width) solid var(--action-fill);
+  border: var(--component-border-width) solid var(--header-control-border);
   border-radius: var(--header-control-radius);
   box-shadow: none;
   box-sizing: border-box;
@@ -537,6 +538,9 @@ body[data-md-color-scheme="slate"] {
   --border: #798f9a;
   --focus: #abd6ff;
   --focus-contrast: #111a1e;
+  --header-control-surface: #253640;
+  --header-hover: #304451;
+  --header-pressed: #3a5060;
   --selected-background: #344854;
   --selected-text: var(--accent-dark);
   --conditional: #edbc74;

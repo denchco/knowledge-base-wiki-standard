@@ -1754,6 +1754,7 @@ test("reference receipt proof ownership follows executed commands and no deleted
     ["DKBWS-DESIGN-002", "browser-webkit", "header-browser"],
     ["DKBWS-DESIGN-002", "browser-header-interaction", "header-browser"],
     ["DKBWS-DESIGN-002", "browser-header-reflow", "header-browser"],
+    ["DKBWS-DESIGN-002", "browser-header-boundary", "header-browser"],
     ["DKBWS-HUMAN-002", "browser-question-insets", "browser"],
     ["DKBWS-RENDER-001", "dependencies", "check"],
     ["DKBWS-RUNTIME-002", "service-fixtures", "check"],

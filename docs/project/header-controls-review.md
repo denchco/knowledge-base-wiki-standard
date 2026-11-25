@@ -11,6 +11,8 @@ This candidate adapts COPPER TIGER's verified header treatment into the shared r
 
 The original review below records the fixed hover pair used at that stage. For the proposed accent-derived replacement, use the [current reference contract](../spec/requirements.md#shared-header-controls) and [worked migration](../reference/header-controls-migration.md#reproducing-a-configured-accent).
 
+The tonal control proposal follows rc.18. It responds to feedback that the strong control fills dominate a coloured header. It retains the size and alignment from that release and moves the measured boundary contrast to a permanent border. The [migration guide](../reference/header-controls-migration.md) describes the separate measurements.
+
 ## Origin and rights
 
 The implementation origin is the full Git tree at `bf0197cf5056962a308b255c3b1b5382c56d8fa8`, tree `738658d405ab4180cc592cb7d836fcf9b005ceb2`, Jujutsu change `wzutmzytmprmwptummyvqlmvwrlkpxrt`. The originating Standard pin is `d339a0e30de41c4a3260f22c00c96898299a1834`. All five requested files were read from that final tree. The correction diff alone was not used.

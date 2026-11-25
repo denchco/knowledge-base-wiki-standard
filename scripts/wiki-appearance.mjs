@@ -94,6 +94,29 @@ function checkPair(foreground, backgrounds, ratio, name) {
   }
 }
 
+// Keep actions in the header's colour family. The stroke identifies the control
+// against both adjoining surfaces, so the fill can stay close to the header.
+function headerControls(seed, headerSurface) {
+  const lightHeader = contrastRatio("#000000", headerSurface) >= contrastRatio("#ffffff", headerSurface);
+  const inkDirection = lightHeader ? -1 : 1;
+  const restLightness = lightHeader
+    ? Math.min(0.955, Math.max(0.78, seed.l + 0.14))
+    : Math.max(0.18, Math.min(0.45, seed.l - 0.01));
+  const headerControlSurface = tone(seed, restLightness, Math.min(seed.c * 0.65, 0.12));
+  const headerHover = tone(seed, restLightness + inkDirection * 0.045, Math.min(seed.c * 0.72, 0.13));
+  const headerPressed = tone(seed, restLightness + inkDirection * 0.09, Math.min(seed.c * 0.8, 0.14));
+  const fills = [headerControlSurface, headerHover, headerPressed];
+  const headerControlBorder = readableTone(seed, seed.l + inkDirection * 0.21,
+    [headerSurface, ...fills], 3, inkDirection, Math.min(seed.c, 0.09));
+  const headerControlText = readableTone(seed, lightHeader ? 0.25 : 0.94,
+    fills, 4.5, inkDirection, Math.min(seed.c, 0.035));
+  return {
+    headerSurface, headerControlSurface, headerControlBorder, headerControlText,
+    headerHover, headerHoverText: headerControlText, headerPressed, headerPressedText: headerControlText,
+    headerSelected: headerControlSurface, headerSelectedText: headerControlText,
+  };
+}
+
 /** Role colours are final six-digit sRGB hex; seed.h is in radians. */
 export function deriveAppearance(value) {
   const config = validateAppearanceConfig(value);
@@ -147,27 +170,11 @@ export function deriveAppearance(value) {
     tableHeader: darkQuestion,
   };
   dark.tableText = dark.text;
+  const controls = headerControls(seed, config.accent);
   for (const [name, palette] of Object.entries({ light, dark })) {
+    Object.assign(palette, controls);
     palette.accentTransparent = alpha(palette.accent, 10);
     palette.accentTransparentStrong = alpha(palette.accent, 16);
-    // Put opaque controls on the lighter side of a dark brand or the darker
-    // side of a light brand. Their labels need a separate ink from the title.
-    const lightControls = contrastRatio("#ffffff", config.accent) >= contrastRatio("#000000", config.accent);
-    const direction = lightControls ? 1 : -1;
-    palette.headerSurface = palette.headerBackground;
-    palette.headerControlSurface = readableTone(seed, lightControls ? 0.9 : 0.38,
-      [palette.headerSurface], 4.1, direction, Math.min(seed.c, 0.035));
-    palette.headerHover = readableTone(seed, lightControls ? 0.82 : 0.46,
-      [palette.headerSurface], 3.55, direction, Math.min(seed.c, 0.055));
-    palette.headerPressed = readableTone(seed, lightControls ? 0.75 : 0.53,
-      [palette.headerSurface], 3, direction, Math.min(seed.c, 0.075));
-    palette.headerControlText = readableTone(seed, lightControls ? 0.27 : 0.97,
-      [palette.headerControlSurface, palette.headerHover, palette.headerPressed], 4.5, -direction, Math.min(seed.c, 0.025));
-    palette.headerHoverText = palette.headerControlText;
-    palette.headerPressedText = palette.headerControlText;
-    // Existing token readers can still resolve the persistent selection roles.
-    palette.headerSelected = palette.headerControlSurface;
-    palette.headerSelectedText = palette.headerControlText;
     const surfaces = [palette.background, palette.surface, palette.questionBackground];
     for (const role of ["accent", "accentDark", "accentDarker", "accentVisited", "text", "muted"]) checkPair(palette[role], surfaces, 4.5, `${name}.${role}`);
     for (const role of ["accentLight", "border", "focus"]) checkPair(palette[role], surfaces, 3, `${name}.${role}`);

@@ -7,6 +7,10 @@ status: draft
 
 # Research and change log
 
+## 2026-11-25 — Tonal header controls proposal
+
+A review of a branded header found that the dark control fills drew attention away from the header itself. The proposed change uses related tonal fills and a permanent border. The [migration guide](reference/header-controls-migration.md) explains how to measure both sides of that border in each interaction state.
+
 ## 2026-11-23 — Header controls and current navigation
 
 The proposed reference treatment separates the header actions from their surrounding surface and gives both sidebars a common current-item style. The header actions share three accent-family states. A bold label marks selected Wide without changing its resting fill or edges. Browser checks measure the control boundary independently of the text and keyboard focus. See the [migration guide](reference/header-controls-migration.md).

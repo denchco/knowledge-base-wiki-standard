@@ -15,11 +15,12 @@ const tabNavigationKeys = new WeakMap();
 const fixtures = [
   { name: "unconfigured", config: null },
   { name: "pale-brand", config: { schemaVersion: "1.0", accent: "#e1efdd", appearance: "light", width: "wide" } },
+  { name: "amber-brand", config: { schemaVersion: "1.0", accent: "#de9e28", appearance: "light", width: "wide" } },
   { name: "blue-brand", config: { schemaVersion: "1.0", accent: "#005ea8", appearance: "dark", width: "standard" } },
 ];
 const report = {
   schemaVersion: "1.0", ok: false, requirement: "DKBWS-DESIGN-002", renderer: `zensical-${rendererVersion}`,
-  engines: {}, cases: [], navigation: [], negativeCases: [], screenshots: [], expectedMatrixCases: 96,
+  engines: {}, cases: [], amberSurfaceCases: [], navigation: [], negativeCases: [], screenshots: [], expectedMatrixCases: 96,
   zoomScope: "Browser-rendered CSS layout zoom at 200%, root text sizing at 200%, and 320 CSS-pixel reflow (400%-equivalent width from 1280). Native browser-chrome zoom UI and OS magnifiers are not automated by this contract.",
 };
 let activePage, failure;
@@ -56,6 +57,25 @@ try {
             for (const scheme of ["default", "slate"]) {
               await page.setViewportSize({ width: 1440, height: 1000 });
               await selectScheme(page, scheme);
+              if (fixture.name === "amber-brand") {
+                // The full geometry, keyboard, navigation and zoom matrix runs on
+                // the other fixtures. This regression isolates the reported gold surface.
+                for (const viewport of [{ width: 1570, height: 1512 }, { width: 390, height: 844 }]) {
+                  await page.setViewportSize(viewport);
+                  await ready(page, scheme, "wide");
+                  const label = `${engine}/amber/${scheme}/${viewport.width}`;
+                  const { snapshot, contrast, hovered } = await inspectHeaderControls(page, { scheme, label });
+                  assert.equal(snapshot.header.background, hexRgb(fixture.config.accent), `${label}: keep exact amber header`);
+                  for (const role of ["header-control-surface", "header-hover", "header-pressed"]) {
+                    const fill = snapshot.tokens[role], header = snapshot.header.background;
+                    assert.ok(contrastRatio(fill, header) < 2 && contrastRatio(fill, "#ffffff") < contrastRatio(header, "#ffffff"),
+                      `${label}/${role}: use a lighter tonal fill on the amber header`);
+                  }
+                  const pressed = await inspectPressedActions(page, { scheme, label });
+                  report.amberSurfaceCases.push({ engine, scheme, viewport, snapshot, contrast, hovered, pressed });
+                }
+                continue;
+              }
               report.navigation.push(await inspectCurrentNavigation(page, engine, fixture.name, scheme));
               for (const width of ["standard", "wide"]) {
                 await page.setViewportSize({ width: 1440, height: 1000 });
@@ -116,8 +136,9 @@ try {
   }
   assert.deepEqual(Object.keys(report.engines).sort(), ["chromium", "webkit"], "Both browser engines must finish");
   assert.equal(report.cases.length, 96, "Every fixture, appearance, width, viewport and zoom case must finish");
+  assert.equal(report.amberSurfaceCases.length, 8, "Measure amber controls in both engines, schemes and viewport classes");
   assert.equal(report.navigation.length, 12, "Both menus must pass for every engine, appearance and adapter");
-  assert.equal(report.negativeCases.length, 36, "Both engines must refuse every rendered defect");
+  assert.equal(report.negativeCases.length, 38, "Both engines must refuse every rendered defect");
   assert.equal(report.screenshots.length, 8, "Generic screenshots must cover both engines, appearances and device classes");
   report.completedMatrixCases = report.cases.length;
   report.ok = true;
@@ -300,11 +321,12 @@ async function inspectCurrentNavigation(page, engine, fixture, scheme) {
 
 async function negativeJourneys(page, engine) {
   const probes = [
-    ["outlined-low-contrast-fill", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; }", /action fill/],
-    ["hover-perimeter", ".md-header__inner:has(.layout-width-toggle:hover) { background:var(--header-hover)!important } .layout-width-toggle:hover { border-color:transparent!important }", /perimeter contrast/],
-    ["invisible-palette-perimeter", ".md-header__option label { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
-    ["partial-width-perimeter", ".layout-width-toggle { background:var(--header-surface)!important; color:var(--header-text)!important; border-inline-start-width:0!important; }", /perimeter contrast/],
-    ["invisible-search-perimeter", ".md-search__button { background:var(--header-surface)!important; color:var(--header-text)!important; border-color:transparent!important; }", /perimeter contrast/],
+    ["outline-header-contrast", ".md-search { background:var(--header-control-border)!important }", /perimeter against header/],
+    ["outline-fill-contrast", ".md-search { background:#000!important } .md-search__button { border-color:var(--header-control-surface)!important }", /perimeter against fill/],
+    ["hover-perimeter", ".layout-width-toggle:hover { border-color:transparent!important }", /opaque solid CSS pixel/],
+    ["invisible-palette-perimeter", ".md-header__option label { border-color:transparent!important }", /opaque solid CSS pixel/],
+    ["partial-width-perimeter", ".layout-width-toggle { border-inline-start-width:0!important }", /opaque solid CSS pixel/],
+    ["invisible-search-perimeter", ".md-search__button { border-color:transparent!important }", /opaque solid CSS pixel/],
     ["unequal-height", ".layout-width-toggle { height:1.5rem!important; }", /height/],
     ["wrong-radius", ".layout-width-toggle { border-radius:0!important; }", /rounding/],
     ["translucent-rest", ".layout-width-toggle { background-color:rgba(0,0,0,.5)!important; }", /opaque/],

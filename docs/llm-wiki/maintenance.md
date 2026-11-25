@@ -21,7 +21,7 @@ status: draft
 
 ## Reference appearance changes
 
-Use the [header and navigation migration guide](../reference/header-controls-migration.md) when changing a control or sidebar selection. Check the rendered fill against the surrounding surface as well as the label against the fill. Test rest, hover and keyboard focus separately. Exercise a page change and a scroll change so the visible and announced current links agree.
+Use the [header and navigation migration guide](../reference/header-controls-migration.md) when changing a control or sidebar selection. Check the permanent control edge against the header and each control fill. Check text and icons against the fill. Test rest, hover, pointer-down and keyboard focus separately. Exercise a page change and a scroll change so the visible and announced current links agree.
 
 ## New prose
 

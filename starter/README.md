@@ -42,4 +42,4 @@ Carry `scripts/wiki-appearance.mjs`, `scripts/prepare-wiki-appearance.mjs`, the 
 
 ## Shared header default
 
-A new Standard Production Wiki adapts `DKBWS-DESIGN-002` from its selected verified immutable release. Carry semantic theme and width styles, the appearance generator, native mobile keyboard adapter and both-engine header fixtures together. Keep the Wiki's own branding and unframed logo. A draft implementation or Standard merge is not an eligible released stack, and it does not migrate existing Wikis.
+A new Standard Production Wiki adapts `DKBWS-DESIGN-002` from its selected verified immutable release. Carry semantic theme and width styles, the appearance generator, native mobile keyboard adapter and both-engine header fixtures together. Keep the Wiki's own branding and unframed logo. For a release with tonal controls, verify the permanent control border against both the header and the fill in each state. A draft implementation or Standard merge is not an eligible released stack, and it does not migrate existing Wikis.
