@@ -39,7 +39,7 @@ export const REQUIREMENT_PROOFS = Object.freeze(Object.fromEntries(Object.entrie
   "DKBWS-LINK-002": ["source-links", "renderer-fixtures", "built-citations", "browser-citations"],
   "DKBWS-GRAPH-001": ["publication", "browser-2d", "browser-3d"],
   "DKBWS-DESIGN-001": ["design-source", "design-fixtures", "browser-layout", "browser-defaults", "browser-saved-preferences", "browser-appearance"],
-  "DKBWS-DESIGN-002": ["header-source", "header-fixtures", "browser-chromium", "browser-webkit", "browser-header-interaction", "browser-header-reflow"],
+  "DKBWS-DESIGN-002": ["header-source", "header-fixtures", "browser-chromium", "browser-webkit", "browser-header-interaction", "browser-header-reflow", "browser-header-boundary"],
   "DKBWS-RENDER-001": ["dependencies", "browser-network"],
   "DKBWS-PROV-001": ["turn-policy"],
   "DKBWS-VERIFY-001": ["toolchain", "canonical-mutation"],

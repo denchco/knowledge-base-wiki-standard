@@ -360,7 +360,7 @@ function buildReceipt(provenance) {
         evidence("header-browser-contract", "browser-test", "Real-renderer header geometry, opaque state colours, actual SVG alignment, accessible controls and preference checks in Chromium and WebKit.", "scripts/header-browser-contract.mjs"),
         evidence("header-browser-result", "browser-test", "Current engine and viewport matrix with independent header assertions and generic captures.", "output/verification/header/contract.json"),
       ],
-      results: [result("DKBWS-DESIGN-002", ["browser-chromium", "browser-webkit", "browser-header-interaction", "browser-header-reflow"], ["header-browser-contract", "header-browser-result"], "Both browser engines passed the declared light/dark, desktop/mobile, Standard/Wide, zoom/reflow, navigation and reload header matrix.")],
+      results: [result("DKBWS-DESIGN-002", ["browser-chromium", "browser-webkit", "browser-header-interaction", "browser-header-reflow", "browser-header-boundary"], ["header-browser-contract", "header-browser-result"], "Chromium and WebKit checked the permanent border against the header and each control fill across the light/dark, desktop/mobile, Standard/Wide, zoom/reflow, navigation and reload matrix.")],
     },
     {
       id: "canonical-input-mutation",

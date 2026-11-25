@@ -17,15 +17,21 @@ Carry the shared resting, hover and pointer-down roles and the rules for all con
 
 Search's magnifier and shortcut badge remain readable in every state. Normal text and the shortcut badge meet `4.5:1` contrast; meaningful icons and visible focus meet `3:1` against their adjacent background. Keep keyboard operation, search, width selection, appearance switching, reload/navigation and saved preferences intact. The bounded mobile adapter supplies keyboard semantics to the native menu/search labels without replacing their controllers.
 
-For revisions containing the control-contrast update, carry `headerControlText`, the common fill-coloured border and the light and dark navigation selection roles. Test resting and selected fills against the header at 3:1. Use the same 1 CSS pixel border in the current fill colour for every action. Hover and pointer-down fills must also reach 3:1. Check each control at its actual surrounding colour. Keep the logo unframed. Check that current links in each sidebar share the same tint (at least 1.2:1 against the sidebar), have bold text at 4.5:1, and line up with ordinary links without an inline-start rail. The 1.2:1 tint threshold is a design choice.
+The version released in rc.18 used the fill to identify each action against the header. The proposed tonal update gives that work to a permanent solid border one CSS pixel wide. Carry the border role with the state fills and common ink. Measure its contrast against the header outside and the fill inside. Both ratios must reach 3:1 for every action at rest, on hover, on pointer-down and during keyboard focus. Include selected Wide.
+
+Continue to measure current links in both sidebars. They share a tint with at least 1.2:1 contrast against the sidebar, plus bold text at 4.5:1 against the tint. Keep these links aligned with their siblings.
 
 ### Reproducing a configured accent
 
-Use the versioned `deriveAppearance` generator and test the final six-digit sRGB colours. When white contrasts more strongly with the header, the resting, hover and pointer-down fills start at OKLCH lightness 0.90, 0.82 and 0.75. Otherwise they start at 0.38, 0.46 and 0.53. Preserve the seed hue and cap chroma at 0.035, 0.055 and 0.075 respectively. Move lightness outwards until the rounded fill meets 4.10:1, 3.55:1 and 3.00:1 against the header. The generator selects a common ink that reaches 4.5:1 on all three fills. For seed `#32541c`, the three results are `#d4e4cd`, `#b5cda9` and `#9ab989`, with ink `#21291d`. Without a configured seed, use the scheme’s accent, dark-accent and darker-accent roles with the scheme’s accent-contrast ink.
+Give `deriveAppearance` the configured seed and inspect the final rounded sRGB roles. Keep the exact seed on the header. Use small tonal steps for the control fills so the header remains the dominant colour. The common border must pass against the header and each fill. Use a common ink that meets 4.5:1 on all fills, including hover and pointer-down. For an unconfigured Wiki, use the light and dark reference blue roles.
+
+For example, the amber seed `#de9e28` produces resting fill `#fcd191`, hover fill `#f0c17a` and pointer-down fill `#e5b261`. The border is `#765211` and the common ink is `#2b1f0d`. The border-to-header ratio is 3.02:1. Its lowest contrast against the three fills is 3.64:1, over the pointer-down fill.
+
+When testing a branded Wiki, read the computed colours on its actual header. Record the lowest border-to-header and border-to-fill ratios separately. A fill-to-header reading alone cannot establish the border measurement.
 
 ## Complete migration
 
-1. Select an accepted, published native-immutable Standard release that contains this change. Resolve its exact tag and full commit; require successful protected verification on that revision. The current rc.9 release does not contain this candidate. A branch, draft PR or older passing release is not the adoption target.
+1. Select an accepted, published native-immutable Standard release that contains this change. Resolve its exact tag and full commit; require successful protected verification on that revision. The tonal update follows rc.18 and requires a release containing the new border treatment. A branch, draft PR or older passing release is not the adoption target.
 2. Inspect the target's renderer, profile, existing changes, branding, deviations and repository protection. Preserve consumer-owned content and unknown fields. Record a compatibility assessment for another renderer; do not apply Zensical selectors to it by assumption.
 3. Carry the shared theme and width CSS, native Wiki keyboard adapter, appearance generator and preparer, design guidance and exact dependency closure together. Preserve the existing width and palette storage keys and native visibility. Remove superseded local header rules that would override the shared semantics, while retaining unrelated target styles.
 4. Carry the header contract, negative fixtures, generic real-renderer fixture and browser runner. Add the gate to the target's complete verification command. Install both matching Chromium and WebKit binaries from its qualified Playwright version. Carry the package/CI commands and complete named-proof receipt mapping; source files alone cannot establish browser proof.
@@ -39,7 +45,7 @@ Both engines must test both appearances, desktop and mobile, Standard and Wide, 
 
 Exercise 200% rendered layout zoom, 200% text resize and 320 CSS pixel reflow. Record these exact methods rather than claiming native browser-chrome or operating-system zoom coverage. Preserve the existing reader tests so a passing header fixture cannot hide a search, navigation, preference or content regression.
 
-The complete receipt needs `header-source`, `header-fixtures`, `browser-chromium`, `browser-webkit`, `browser-header-interaction` and `browser-header-reflow` for `DKBWS-DESIGN-002`. Missing proof must remain not checked. Older receipts remain historical and do not acquire these proofs automatically.
+The complete receipt needs `header-source`, `header-fixtures`, `browser-chromium`, `browser-webkit`, `browser-header-interaction`, `browser-header-reflow` and `browser-header-boundary` for `DKBWS-DESIGN-002`. Missing proof must remain not checked. Older receipts remain historical and do not acquire these proofs automatically.
 
 ## Compatibility and rollout
 

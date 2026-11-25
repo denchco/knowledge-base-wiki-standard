@@ -7,6 +7,10 @@ status: draft
 
 # Research and change log
 
+## 2026-11-25 — Tonal header controls proposal
+
+A review of a branded header found that the dark control fills drew attention away from the header itself. The proposed change uses related tonal fills and a permanent border. The [migration guide](reference/header-controls-migration.md) explains how to measure both sides of that border in each interaction state.
+
 ## 2026-11-25 — Immutable rc.18 publication
 
 The owner approved PR #70 for the shared header controls and current navigation, and PR #74 for governing-question spacing. Immutable release `v0.1.0-rc.18` contains both at `f89a16fa7c17a9dd9ba4e8624c19246caf257555`. Post-merge Verify run `45414836276` passed on that revision. [SRC-115](sources.md#src-115)

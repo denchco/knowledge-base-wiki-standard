@@ -20,22 +20,24 @@ colors:
   surface: "#ffffff"
   headerSurface: "#ffffff"
   headerText: "#1f2933"
-  headerControlSurface: "#004d80"
-  headerControlText: "#ffffff"
+  headerControlSurface: "#e8f1f6"
+  headerControlBorder: "#004d80"
+  headerControlText: "#1f2933"
   selectedBackground: "#d9e7f0"
-  headerHover: "#003f69"
-  headerHoverText: "#ffffff"
-  headerPressed: "#003452"
-  headerPressedText: "#ffffff"
+  headerHover: "#d9e7f0"
+  headerHoverText: "#1f2933"
+  headerPressed: "#c7dce9"
+  headerPressedText: "#1f2933"
   darkHeaderSurface: "#18242a"
   darkHeaderText: "#e5eef1"
-  darkHeaderControlSurface: "#83c4ff"
-  darkHeaderControlText: "#111a1e"
+  darkHeaderControlSurface: "#253640"
+  darkHeaderControlBorder: "#83c4ff"
+  darkHeaderControlText: "#e5eef1"
   darkSelectedBackground: "#344854"
-  darkHeaderHover: "#abd6ff"
-  darkHeaderHoverText: "#111a1e"
-  darkHeaderPressed: "#d0e8ff"
-  darkHeaderPressedText: "#111a1e"
+  darkHeaderHover: "#304451"
+  darkHeaderHoverText: "#e5eef1"
+  darkHeaderPressed: "#3a5060"
+  darkHeaderPressedText: "#e5eef1"
   tableHeader: "#d9e7f0"
   link: "#004d80"
   conditional: "#a15c00"
@@ -146,6 +148,8 @@ components:
     backgroundColor: "{colors.border}"
   diagram-boundary:
     backgroundColor: "{colors.accentLight}"
+  header-control-border:
+    backgroundColor: "{colors.headerControlBorder}"
   header-control:
     backgroundColor: "{colors.headerControlSurface}"
     textColor: "{colors.headerControlText}"
@@ -155,6 +159,8 @@ components:
   header-control-pressed:
     backgroundColor: "{colors.headerPressed}"
     textColor: "{colors.headerPressedText}"
+  dark-header-control-border:
+    backgroundColor: "{colors.darkHeaderControlBorder}"
   dark-header-control:
     backgroundColor: "{colors.darkHeaderControlSurface}"
     textColor: "{colors.darkHeaderControlText}"
@@ -275,7 +281,9 @@ The candidate `DKBWS-DESIGN-002` contract is the default reference header for ne
 
 Search, Wide, the native appearance actions, and visible mobile menu/search actions share `headerControlHeight: 1.6rem` and `headerControlRadius: .4rem`. Icon-only controls remain square. Keep logos outside that control treatment. Preserve the renderer's hidden-label and responsive visibility rules; a centring rule must not force hidden labels to display.
 
-All header actions share `headerControlSurface` and `headerControlText`. Use one height, baseline, radius and border on all four sides. Wide uses a bold label and `aria-pressed="true"` when selected. A toggle never adds an inset stripe, persistent shadow or alternative resting colour. For pointer hover and pointer-down, use the Wiki's accent family (`headerHover`, `headerHoverText`, `headerPressed`, `headerPressedText`). The unconfigured shell uses the reference blue family. Change the fill and ink together. The Search shortcut inherits its parent's current fill and ink. Keep keyboard focus visible with a separate outline. Resting fills need 3:1 contrast against the surrounding header. A continuous 1 CSS pixel border follows the control fill in every state.
+The header keeps the Wiki’s configured brand colour. Search, Wide, the appearance switch and the mobile actions use related opaque fills for rest, hover and pointer-down. Use the reference blue family for an unconfigured Wiki. The Search shortcut follows its control’s current fill and ink. A bold label and `aria-pressed="true"` identify selected Wide.
+
+Apply `headerControlBorder` to all four sides of every control. Keep the solid edge one CSS pixel wide in each pointer state and during keyboard focus. The edge must contrast at 3:1 against both the surrounding header and the current fill. Use a separate focus indicator. Keep text and shortcut contrast at 4.5:1 and icon and focus contrast at 3:1 against their adjacent surfaces.
 
 Centre each icon-only control's actual SVG on both axes within `.5` CSS pixels of its control, independently of the SVG's size. Keep Wide's icon/text group centred with its SVG aligned vertically. Retain native appearance radios and preference storage. Mobile menu/search labels retain native toggle behaviour and gain keyboard access without duplicate navigation listeners. Preserve visible focus, Enter/Space operation, search, width selection, appearance switching, reload and navigation persistence.
 

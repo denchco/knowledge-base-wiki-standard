@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Tonal header controls
+
+- Revise the Standard Production reference treatment under `DKBWS-DESIGN-002`. Keep the brand on the header and use tonal fills for its actions. A permanent one-pixel border must reach 3:1 against both the header and the current fill in every interaction state.
+- Carry the theme, appearance generator and both-engine browser checks together after a containing release. The new `browser-header-boundary` proof records the two independent contrast checks. A separate focus indicator and the existing text and icon thresholds remain required.
+
 ## v0.1.0-rc.18 — 2026-11-25
 
 Immutable `v0.1.0-rc.18` contains the shared header, navigation and governing-question spacing changes. [SRC-115](docs/sources.md#src-115)

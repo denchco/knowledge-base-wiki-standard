@@ -5,8 +5,14 @@ import { assertHeaderSnapshot, assertNoColourTransition, contrastRatio } from ".
 const stationary = { transitionProperty: "none", transitionDuration: "0s", transitionDelay: "0s" };
 const rendered = { content: '"Search"', display: "block", visibility: "visible", opacity: 1, width: 20, height: 20 };
 function fixture() {
-  const tokens = { "header-surface": "rgb(225, 239, 221)", "header-control-text": "rgb(255, 255, 255)", "header-control-surface": "rgb(49, 66, 75)", "header-selected": "rgb(41, 53, 60)", "header-selected-text": "rgb(255, 255, 255)" };
-  const base = { weight: 400, shadow: "none", surround: tokens["header-surface"], borders: Array.from({ length: 4 }, () => ({ color: tokens["header-control-surface"], width: 1, style: "solid" })), width: 32, height: 32, centreY: 24, radii: [8, 8, 8, 8], opacity: 1, transition: stationary, foreground: tokens["header-control-text"], background: tokens["header-control-surface"] };
+  // A bright amber header with a pale action surface deliberately has less than
+  // 3:1 fill-to-header contrast. Its permanent border supplies both boundaries.
+  const tokens = {
+    "header-surface": "rgb(222, 158, 40)", "header-control-text": "rgb(48, 34, 13)",
+    "header-control-surface": "rgb(248, 217, 155)", "header-control-border": "rgb(94, 67, 28)",
+    "header-selected": "rgb(252, 226, 181)", "header-selected-text": "rgb(48, 34, 13)",
+  };
+  const base = { weight: 400, shadow: "none", surround: tokens["header-surface"], borders: Array.from({ length: 4 }, () => ({ color: tokens["header-control-border"], width: 1, style: "solid" })), width: 32, height: 32, centreY: 24, radii: [8, 8, 8, 8], opacity: 1, transition: stationary, foreground: tokens["header-control-text"], background: tokens["header-control-surface"] };
   return {
     scheme: "default", width: "wide", rem: 20, zoom: 1, tokens, header: { background: tokens["header-surface"] },
     visiblePaletteLabels: 1, revealedHiddenLabels: 0, hiddenTabStops: 0, pageOverflow: 0,
@@ -20,13 +26,22 @@ function fixture() {
 }
 const inspect = value => assertHeaderSnapshot(value, { scheme: "default", label: "defect fixture" });
 test("independent fixture accepts opaque semantic controls and centred differently sized artwork", () => {
-  const value = fixture(); inspect(value);
+  const value = fixture();
+  const { minimumBorderToFillContrast, minimumBorderToHeaderContrast } = inspect(value);
+  assert.ok(contrastRatio(value.controls[0].background, value.header.background) < 2);
+  assert.ok(minimumBorderToFillContrast >= 3 && minimumBorderToHeaderContrast >= 3);
   value.controls[0].svg.width = 13; value.controls[0].svg.height = 21; inspect(value);
 });
 for (const [name, mutate, message] of [
-  ["invisible appearance perimeter", value => { value.controls[0].surround = value.controls[0].background; value.controls[0].borders.forEach(border => { border.width = 0; }); }, /perimeter contrast/],
-  ["incomplete width perimeter", value => { value.controls[1].surround = value.controls[1].background; value.controls[1].borders[2].style = "none"; }, /perimeter contrast/],
-  ["transparent search perimeter", value => { value.controls[2].surround = value.controls[2].background; value.controls[2].borders[0].color = "transparent"; }, /perimeter contrast/],
+  ["absent appearance outline", value => value.controls[0].borders.forEach(edge => { edge.width = 0; }), /opaque solid CSS pixel/],
+  ["missing width outline edge", value => value.controls[1].borders[2].style = "none", /opaque solid CSS pixel/],
+  ["transparent search outline", value => value.controls[2].borders[0].color = "transparent", /opaque solid CSS pixel/],
+  ["outline disappears into header", value => value.controls[2].surround = value.tokens["header-control-border"], /perimeter against header/],
+  ["outline disappears into fill", value => {
+    value.controls[0].foreground = "rgb(255,255,255)";
+    value.controls[0].background = value.tokens["header-control-border"];
+  }, /perimeter against fill/],
+  ["conflicting outline token", value => value.controls[1].borders[0].color = "rgb(0,0,0)", /shared border colour/],
   ["selected width stripe", value => value.controls[1].shadow = "inset 0px -2px white", /stripe/],
   ["unmarked width selection", value => value.controls[1].weight = 400, /bold/],
   ["unequal height", value => value.controls[1].height = 30, /height/],
@@ -44,7 +59,7 @@ for (const [name, mutate, message] of [
   ["hidden Search magnifier", value => value.controls[2].searchParts.rendered.magnifier = { ...rendered, opacity: 0 }, /rendered and readable/],
   ["wrong selected semantic token", value => value.controls[1].background = value.tokens["header-selected"], /shared resting background/],
   ["horizontal reflow failure", value => value.pageOverflow = 2, /overflow/],
-  ["low contrast rest token", value => { value.tokens["header-control-text"] = "rgb(46,46,46)"; value.controls[0].foreground = value.tokens["header-control-text"]; }, /contrast/],
+  ["low contrast rest token", value => { value.tokens["header-control-text"] = value.tokens["header-control-surface"]; value.controls[0].foreground = value.tokens["header-control-text"]; }, /contrast/],
 ]) test(`rejects ${name}`, () => { const value = fixture(); mutate(value); assert.throws(() => inspect(value), message); });
 
 test("foreground alpha is composited for accessible contrast", () => {

@@ -35,13 +35,23 @@ export function assertNoColourTransition(style, label) {
   }
 }
 
-// Evaluate the button silhouette separately from the label, icon and focus ring.
-function controlBoundary(control) {
-  const surface = contrastRatio(control.background, control.surround);
-  const edges = control.borders.map(border => border.width >= 1 && border.style === "solid" && rgba(border.color)[3] === 1
-    ? contrastRatio(border.color, control.surround) : 1);
-  assert.equal(edges.length, 4, "Measure every side of each control");
-  return Math.max(surface, Math.min(...edges));
+// The stationary outline touches the header on one side and the active fill on the other.
+// Read the four physical edges separately to catch missing sides and CSS overrides.
+function inspectControlBoundary(control, expectedColor, label) {
+  assert.equal(control.borders.length, 4, `${label}: measure all four perimeter edges`);
+  let minimumOuter = Infinity, minimumInner = Infinity;
+  for (const edge of control.borders) {
+    assert.ok(edge.width === 1 && edge.style === "solid" && rgba(edge.color)[3] === 1,
+      `${label}: each perimeter edge must be one opaque solid CSS pixel`);
+    const outer = contrastRatio(edge.color, control.surround);
+    const inner = contrastRatio(edge.color, control.background);
+    assert.ok(outer >= 3, `${label}: perimeter against header is below 3:1 (${outer})`);
+    assert.ok(inner >= 3, `${label}: perimeter against fill is below 3:1 (${inner})`);
+    assert.equal(edge.color, expectedColor, `${label}: each perimeter edge must use the shared border colour`);
+    minimumOuter = Math.min(minimumOuter, outer);
+    minimumInner = Math.min(minimumInner, inner);
+  }
+  return { minimumOuter, minimumInner };
 }
 
 export function assertHeaderSnapshot(snapshot, { scheme, state = "rest", label = scheme } = {}) {
@@ -59,7 +69,7 @@ export function assertHeaderSnapshot(snapshot, { scheme, state = "rest", label =
     assert.equal(logo.borderWidth, 0, `${label}: logos must not have a control border`);
     assert.equal(logo.boxShadow, "none", `${label}: logos must not have a control shadow`);
   }
-  const textRatios = [], iconRatios = [], boundaryRatios = [];
+  const textRatios = [], iconRatios = [], outerRatios = [], innerRatios = [];
   for (const control of snapshot.controls) {
     const name = `${label}/${control.name}`;
     const expectedHeight = snapshot.rem * 1.6 * snapshot.zoom;
@@ -81,21 +91,24 @@ export function assertHeaderSnapshot(snapshot, { scheme, state = "rest", label =
     const ratio = contrastRatio(control.foreground, control.background);
     (control.square ? iconRatios : textRatios).push(ratio);
     assert.ok(ratio >= (control.square ? 3 : 4.5), `${name}: accessible contrast is insufficient (${ratio})`);
-    const boundary = controlBoundary(control);
-    assert.ok(boundary >= 3, `${name}: control perimeter contrast ${boundary.toFixed(2)}:1 is below 3:1`);
-    boundaryRatios.push(boundary);
-    assert.ok(contrastRatio(control.background, control.surround) >= 3, `${name}: action fill must contrast 3:1 with the header`);
+    const boundary = inspectControlBoundary(control, snapshot.tokens["header-control-border"], name);
+    outerRatios.push(boundary.minimumOuter);
+    innerRatios.push(boundary.minimumInner);
     if (state === "rest") {
       assert.equal(control.background, snapshot.tokens["header-control-surface"], `${name}: shared resting background`);
       assert.equal(control.foreground, snapshot.tokens["header-control-text"], `${name}: shared resting foreground`);
       if (control.kind === "width" && snapshot.width === "wide") assert.ok(control.weight >= 700, `${name}: bold active width label`);
     }
     assert.equal(control.shadow, "none", `${name}: shared shape excludes a control-specific shadow or stripe`);
-    assert.ok(control.borders.every(edge => edge.width === 1 && edge.style === "solid" && edge.color === control.background),
-      `${name}: each action needs the same one-pixel, fill-coloured boundary on all sides`);
     if (control.searchParts) assertSearchParts(control.searchParts, control, name);
   }
-  return { minimumBoundaryContrast: Math.min(...boundaryRatios), minimumTextContrast: textRatios.length ? Math.min(...textRatios) : null, minimumIconContrast: iconRatios.length ? Math.min(...iconRatios) : null };
+  return {
+    minimumBoundaryContrast: Math.min(...outerRatios, ...innerRatios),
+    minimumBorderToHeaderContrast: Math.min(...outerRatios),
+    minimumBorderToFillContrast: Math.min(...innerRatios),
+    minimumTextContrast: textRatios.length ? Math.min(...textRatios) : null,
+    minimumIconContrast: iconRatios.length ? Math.min(...iconRatios) : null,
+  };
 }
 
 export function assertSearchParts(parts, control, label) {
@@ -163,7 +176,7 @@ export async function measureHeader(page) {
     };
     const probe = document.createElement("span"); document.body.append(probe);
     const tokens = {};
-    for (const token of ["header-surface", "header-text", "header-control-text", "header-control-surface", "header-hover", "header-hover-text", "header-pressed", "header-pressed-text"]) {
+    for (const token of ["header-surface", "header-text", "header-control-text", "header-control-border", "header-control-surface", "header-hover", "header-hover-text", "header-pressed", "header-pressed-text"]) {
       probe.style.color = `var(--${token})`; tokens[token] = getComputedStyle(probe).color;
     }
     probe.remove();
@@ -212,7 +225,7 @@ export async function inspectHeaderControls(page, { scheme, label = scheme, hove
       await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
     }
     const hoveredMetrics = assertHeaderSnapshot(await measureHeader(page), { scheme, label: `${label}/hover`, state: "hover" });
-    samples.at(-1).minimumBoundaryContrast = hoveredMetrics.minimumBoundaryContrast;
+    Object.assign(samples.at(-1), hoveredMetrics);
     hovered.push(samples);
   }
   await page.mouse.move(0, 200);
@@ -279,8 +292,8 @@ export async function inspectPressedActions(page, { scheme, label = scheme, sear
         assert.equal(active.rem, original.rem, `${label}: original text sizing`);
         assert.equal(measured.background, active.tokens["header-pressed"], `${label}/${expected.name}: pointer-down surface`);
         assert.equal(measured.foreground, active.tokens["header-pressed-text"], `${label}/${expected.name}: pointer-down foreground`);
-        assertHeaderSnapshot(active, { scheme, label: `${label}/${expected.name}/pointer-down`, state: "pressed" });
-        results.push({ name: expected.name, fill: measured.background, ink: measured.foreground });
+        const contrast = assertHeaderSnapshot(active, { scheme, label: `${label}/${expected.name}/pointer-down`, state: "pressed" });
+        results.push({ name: expected.name, fill: measured.background, ink: measured.foreground, border: measured.borders[0].color, ...contrast });
       } finally {
         await isolated.mouse.up();
       }
